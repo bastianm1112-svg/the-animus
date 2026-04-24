@@ -1,11 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://api.anthropic.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://api.anthropic.com; frame-ancestors 'none';">
-<meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANIMUS — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -570,19 +566,15 @@ function showToast(msg){
 }
 </script>
 
-// Smart logo nav - goes to dashboard if logged in, landing if not
-(function(){
-  function setupSmartLogo(){
-    var logos = document.querySelectorAll('.nav-logo, .panel-logo, .footer-logo');
-    auth.onAuthStateChanged(function(user){
-      logos.forEach(function(el){
-        el.href = user ? 'dashboard.html' : 'landing.html';
-      });
-    });
-  }
-  if(typeof auth !== 'undefined') setupSmartLogo();
-  else document.addEventListener('DOMContentLoaded', setupSmartLogo);
-})();
 
+// Smart logo: dashboard if logged in, landing if not
+try {
+  firebase.auth().onAuthStateChanged(function(user){
+    document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){
+      el.href = user ? 'dashboard.html' : 'landing.html';
+    });
+  });
+} catch(e){}
+</script>
 </body>
 </html>

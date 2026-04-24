@@ -1,499 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com https://www.gstatic.com; connect-src 'self' https://api.anthropic.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-ancestors 'none'; base-uri 'self';">
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
 <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://api.anthropic.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://api.anthropic.com; frame-ancestors 'none';">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANIMUS — Sign In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #080808;
-  --surface: #0f0f0f;
-  --surface2: #141414;
-  --border: #1e1e1e;
-  --border2: #2a2a2a;
-  --text: #e2e2e2;
-  --muted: #555;
-  --muted2: #888;
-  --gold: #c8a96e;
-  --gold2: #8a6f3e;
-  --gold3: #f0d090;
-  --white: #f0ece4;
-  --error: #c0392b;
-}
-body.light-mode {
-  --bg: #f4f1ec; --surface: #ffffff; --surface2: #f8f5f0;
-  --border: #e0dbd4; --border2: #cdc7bf;
-  --text: #1a1714; --muted: #9a9189; --muted2: #6b6259;
-  --white: #1a1714;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-@media(max-width: 768px) {
-  body { grid-template-columns: 1fr; }
-  .left-panel { display: none; }
-}
 
-/* ── LEFT PANEL ── */
-.left-panel {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 48px;
-  position: relative;
-  overflow: hidden;
-}
-.left-panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 30% 50%, rgba(200,169,110,0.05) 0%, transparent 70%);
-  pointer-events: none;
-}
-.panel-logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
-  letter-spacing: 0.12em;
-  color: var(--white);
-  text-decoration: none;
-}
-.panel-logo span { color: var(--gold); }
-
-.panel-middle { position: relative; z-index: 1; }
-.panel-big {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(72px, 10vw, 120px);
-  letter-spacing: 0.06em;
-  line-height: 0.88;
-  color: var(--white);
-  margin-bottom: 24px;
-}
-.panel-big span { color: var(--gold); }
-.panel-quote {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 17px;
-  color: var(--muted2);
-  line-height: 1.7;
-  max-width: 360px;
-  border-left: 2px solid var(--gold2);
-  padding-left: 20px;
-}
-
-.panel-dims {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  position: relative;
-  z-index: 1;
-}
-.panel-dim {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 12px;
-  color: var(--muted);
-}
-.panel-dim::before {
-  content: '';
-  width: 24px; height: 1px;
-  background: var(--gold2);
-  flex-shrink: 0;
-}
-.panel-dim strong { color: var(--muted2); font-weight: 400; }
-
-/* vertical label */
-.panel-vert {
-  position: absolute;
-  right: 24px; top: 50%;
-  transform: translateY(-50%) rotate(90deg);
-  font-size: 9px;
-  letter-spacing: 0.4em;
-  color: var(--muted);
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-/* ── RIGHT PANEL ── */
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 48px 40px;
-  min-height: 100vh;
-}
-.auth-box {
-  width: 100%;
-  max-width: 400px;
-}
-
-/* Mobile logo */
-.mobile-logo {
-  display: none;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
-  letter-spacing: 0.12em;
-  color: var(--white);
-  text-decoration: none;
-  margin-bottom: 40px;
-  text-align: center;
-}
-.mobile-logo span { color: var(--gold); }
-@media(max-width:768px){ .mobile-logo { display: block; } }
-
-.auth-eyebrow {
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 12px;
-}
-.auth-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--white);
-  margin-bottom: 8px;
-  line-height: 1.2;
-}
-.auth-sub {
-  font-size: 13px;
-  color: var(--muted2);
-  margin-bottom: 40px;
-  line-height: 1.7;
-}
-
-/* Mode toggle */
-.auth-toggle {
-  display: flex;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  margin-bottom: 32px;
-}
-.toggle-btn {
-  flex: 1;
-  padding: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.toggle-btn.active {
-  background: var(--surface2);
-  color: var(--text);
-  border-bottom: 2px solid var(--gold);
-}
-
-/* Google button */
-.btn-google {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 14px;
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-  margin-bottom: 24px;
-}
-.btn-google:hover { border-color: var(--gold2); background: var(--surface2); }
-.btn-google svg { flex-shrink: 0; }
-
-/* Divider */
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.auth-divider::before, .auth-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-.auth-divider span {
-  font-size: 10px;
-  color: var(--muted);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-/* Form */
-.auth-form { display: flex; flex-direction: column; gap: 14px; }
-
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-label {
-  font-size: 11px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--muted2);
-}
-.form-input {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 12px 16px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-  width: 100%;
-}
-.form-input::placeholder { color: var(--muted); }
-.form-input:focus { border-color: var(--gold2); }
-.form-input.error { border-color: var(--error); }
-
-/* Password wrapper */
-.password-wrap { position: relative; }
-.password-wrap .form-input { padding-right: 44px; }
-.toggle-pass {
-  position: absolute;
-  right: 14px; top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  transition: color 0.2s;
-  padding: 0;
-}
-.toggle-pass:hover { color: var(--text); }
-
-/* Username field (signup only) */
-.signup-only { display: none; }
-.signup-only.visible { display: flex; }
-
-/* Error message */
-.auth-error {
-  font-size: 12px;
-  color: var(--error);
-  padding: 10px 14px;
-  border: 1px solid rgba(192,57,43,0.2);
-  background: rgba(192,57,43,0.05);
-  display: none;
-}
-.auth-error.visible { display: block; }
-
-/* Submit */
-.btn-submit {
-  width: 100%;
-  padding: 14px;
-  background: var(--gold);
-  border: none;
-  color: #000;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 4px;
-  position: relative;
-  overflow: hidden;
-}
-.btn-submit:hover { background: var(--gold3); }
-.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-submit .spinner {
-  display: none;
-  width: 16px; height: 16px;
-  border: 2px solid rgba(0,0,0,0.3);
-  border-top-color: #000;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  position: absolute;
-  right: 16px; top: 50%;
-  transform: translateY(-50%);
-}
-.btn-submit.loading .spinner { display: block; }
-@keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
-
-/* Forgot password */
-.auth-forgot {
-  text-align: right;
-  margin-top: -6px;
-}
-.auth-forgot a {
-  font-size: 11px;
-  color: var(--muted);
-  text-decoration: none;
-  letter-spacing: 0.05em;
-  transition: color 0.2s;
-}
-.auth-forgot a:hover { color: var(--gold); }
-
-/* Switch mode */
-.auth-switch {
-  text-align: center;
-  margin-top: 32px;
-  font-size: 13px;
-  color: var(--muted);
-}
-.auth-switch a {
-  color: var(--gold);
-  text-decoration: none;
-  font-weight: 500;
-  cursor: pointer;
-}
-.auth-switch a:hover { color: var(--gold3); }
-
-/* Guest link */
-.auth-guest {
-  text-align: center;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-}
-.auth-guest a {
-  font-size: 12px;
-  color: var(--muted);
-  text-decoration: none;
-  letter-spacing: 0.05em;
-  transition: color 0.2s;
-}
-.auth-guest a:hover { color: var(--text); }
-
-/* Success state */
-.auth-success {
-  display: none;
-  text-align: center;
-  padding: 48px 0;
-}
-.auth-success.visible { display: block; }
-.success-icon {
-  font-size: 40px;
-  margin-bottom: 20px;
-}
-.success-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
-  color: var(--white);
-  margin-bottom: 8px;
-}
-.success-sub { font-size: 13px; color: var(--muted2); }
-
-/* Back to home */
-.auth-back {
-  position: fixed;
-  top: 24px; left: 24px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  text-decoration: none;
-  transition: color 0.2s;
-  z-index: 10;
-}
-.auth-back:hover { color: var(--text); }
-@media(max-width:768px){ .auth-back { display: none; } }
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.auth-box { animation: fadeIn 0.5s ease; }
-</style>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-const firebaseConfig={apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",authDomain:"animus-b3d83.firebaseapp.com",projectId:"animus-b3d83",storageBucket:"animus-b3d83.firebasestorage.app",messagingSenderId:"681221615050",appId:"1:681221615050:web:1d037cd07a8381c91b3333"};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
-const db=firebase.firestore();
-</script>
-<script>
-(function(){ if(localStorage.getItem('animus_theme')==='light') document.body.classList.add('light-mode'); })();
+var firebaseConfig = {
+  apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
+  authDomain: "animus-b3d83.firebaseapp.com",
+  projectId: "animus-b3d83",
+  storageBucket: "animus-b3d83.firebasestorage.app",
+  messagingSenderId: "681221615050",
+  appId: "1:681221615050:web:1d037cd07a8381c91b3333"
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+var db   = firebase.firestore();
 </script>
 
+<style>
+:root {
+  --bg:#080808; --surface:#0f0f0f; --surface2:#141414;
+  --border:#1e1e1e; --border2:#2a2a2a;
+  --text:#e2e2e2; --muted:#555; --muted2:#888;
+  --gold:#c8a96e; --gold2:#8a6f3e; --gold3:#f0d090;
+  --white:#f0ece4; --error:#c0392b; --green:#27ae60;
+}
+body.light-mode{--bg:#f4f1ec;--surface:#fff;--surface2:#f8f5f0;--border:#e0dbd4;--border2:#cdc7bf;--text:#1a1714;--muted:#9a9189;--muted2:#6b6259;--white:#1a1714;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+@media(max-width:768px){body{grid-template-columns:1fr;}.left-panel{display:none;}}
 
+/* LEFT */
+.left-panel{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:space-between;padding:48px;position:relative;overflow:hidden;}
+.left-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(200,169,110,0.05) 0%,transparent 70%);pointer-events:none;}
+.panel-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.12em;color:var(--white);text-decoration:none;}
+.panel-logo span{color:var(--gold);}
+.panel-big{font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,10vw,120px);letter-spacing:0.06em;line-height:0.88;color:var(--white);margin-bottom:24px;position:relative;z-index:1;}
+.panel-big span{color:var(--gold);}
+.panel-quote{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:var(--muted2);line-height:1.7;max-width:360px;border-left:2px solid var(--gold2);padding-left:20px;position:relative;z-index:1;}
+.panel-dims{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;}
+.panel-dim{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted);}
+.panel-dim::before{content:'';width:24px;height:1px;background:var(--gold2);flex-shrink:0;}
+.panel-dim strong{color:var(--muted2);font-weight:400;}
+
+/* RIGHT */
+.right-panel{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:48px 40px;min-height:100vh;}
+.auth-box{width:100%;max-width:400px;}
+.mobile-logo{display:none;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.12em;color:var(--white);text-decoration:none;margin-bottom:40px;text-align:center;}
+.mobile-logo span{color:var(--gold);}
+@media(max-width:768px){.mobile-logo{display:block;}}
+
+.auth-eyebrow{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.auth-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--white);margin-bottom:8px;line-height:1.2;}
+.auth-sub{font-size:13px;color:var(--muted2);margin-bottom:40px;line-height:1.7;}
+
+.auth-toggle{display:flex;background:var(--surface);border:1px solid var(--border);margin-bottom:32px;}
+.toggle-btn{flex:1;padding:10px;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;background:none;border:none;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.toggle-btn.active{background:var(--surface2);color:var(--text);border-bottom:2px solid var(--gold);}
+
+.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-bottom:24px;}
+.btn-google:hover{border-color:var(--gold2);background:var(--surface2);}
+.btn-google:disabled{opacity:0.5;cursor:not-allowed;}
+
+.auth-divider{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-divider span{font-size:10px;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;white-space:nowrap;}
+
+.auth-form{display:flex;flex-direction:column;gap:14px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted2);}
+.form-input{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;width:100%;}
+.form-input::placeholder{color:var(--muted);}
+.form-input:focus{border-color:var(--gold2);}
+
+.signup-only{display:none;}
+.signup-only.visible{display:flex;}
+
+.auth-error{font-size:12px;color:var(--error);padding:10px 14px;border:1px solid rgba(192,57,43,0.2);background:rgba(192,57,43,0.05);display:none;margin-bottom:4px;}
+.auth-error.visible{display:block;}
+.auth-success-msg{font-size:12px;color:var(--green);padding:10px 14px;border:1px solid rgba(39,174,96,0.2);background:rgba(39,174,96,0.05);display:none;margin-bottom:4px;}
+.auth-success-msg.visible{display:block;}
+
+.btn-submit{width:100%;padding:14px;background:var(--gold);border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;margin-top:4px;position:relative;}
+.btn-submit:hover{background:var(--gold3);}
+.btn-submit:disabled{opacity:0.6;cursor:not-allowed;}
+
+.auth-forgot{text-align:right;margin-top:-6px;}
+.auth-forgot a{font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:0.05em;transition:color 0.2s;cursor:pointer;}
+.auth-forgot a:hover{color:var(--gold);}
+
+.auth-switch{text-align:center;margin-top:32px;font-size:13px;color:var(--muted);}
+.auth-switch a{color:var(--gold);text-decoration:none;font-weight:500;cursor:pointer;}
+
+.auth-guest{text-align:center;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);}
+.auth-guest a{font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:0.05em;transition:color 0.2s;}
+.auth-guest a:hover{color:var(--text);}
+
+.auth-back{position:fixed;top:24px;left:24px;display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;z-index:10;}
+.auth-back:hover{color:var(--text);}
+@media(max-width:768px){.auth-back{display:none;}}
+
+.username-wrap{position:relative;}
+.username-wrap .form-input{padding-left:28px;}
+.username-at{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
+.username-status{font-size:11px;margin-top:4px;height:16px;}
+.username-status.ok{color:var(--green);}
+.username-status.err{color:var(--error);}
+</style>
+</head>
+<body>
+<script>(function(){ if(localStorage.getItem('animus_theme')==='light') document.body.classList.add('light-mode'); })();</script>
 
 <a href="landing.html" class="auth-back">← Back</a>
 
-<!-- LEFT PANEL -->
+<!-- LEFT -->
 <div class="left-panel">
   <a href="landing.html" class="panel-logo">ANI<span>MUS</span></a>
-
-  <div class="panel-middle">
+  <div>
     <div class="panel-big">KNOW<br><span>THY</span><br>SELF</div>
-    <p class="panel-quote">
-      "The unexamined life is not worth living." Your profile is waiting.
-    </p>
+    <p class="panel-quote">"The unexamined life is not worth living." Your profile is waiting.</p>
   </div>
-
   <div class="panel-dims">
     <div class="panel-dim"><strong>MBTI</strong> Cognitive function stack</div>
-    <div class="panel-dim"><strong>Enneagram</strong> Type, wing & tritype</div>
-    <div class="panel-dim"><strong>Philosophy</strong> School & ethics framework</div>
+    <div class="panel-dim"><strong>Enneagram</strong> Type, wing &amp; tritype</div>
+    <div class="panel-dim"><strong>Philosophy</strong> School &amp; ethics</div>
     <div class="panel-dim"><strong>Political</strong> Two-axis compass</div>
     <div class="panel-dim"><strong>Attachment</strong> Relational pattern</div>
     <div class="panel-dim"><strong>+9 more</strong> dimensions</div>
   </div>
-
-  <div class="panel-vert">Complete Personality Atlas</div>
 </div>
 
-<!-- RIGHT PANEL -->
+<!-- RIGHT -->
 <div class="right-panel">
   <div class="auth-box">
-
     <a href="landing.html" class="mobile-logo">ANI<span>MUS</span></a>
 
-    <!-- Main form content -->
     <div id="formContent">
       <div class="auth-eyebrow" id="authEyebrow">Welcome back</div>
       <h1 class="auth-title" id="authTitle">Sign in to ANIMUS</h1>
-      <p class="auth-sub" id="authSub">Access your profile, compare with friends, and track how you change over time.</p>
+      <p class="auth-sub" id="authSub">Access your profile, compare with friends, track how you change.</p>
 
-      <!-- Mode toggle -->
       <div class="auth-toggle">
-        <button class="toggle-btn active" id="toggleSignIn" onclick="setMode('signin')">Sign In</button>
-        <button class="toggle-btn" id="toggleSignUp" onclick="setMode('signup')">Create Account</button>
+        <button class="toggle-btn active" id="btnSignIn" onclick="setMode('signin')">Sign In</button>
+        <button class="toggle-btn" id="btnSignUp" onclick="setMode('signup')">Create Account</button>
       </div>
 
       <!-- Google -->
-      <button class="btn-google" id="btnGoogle" onclick="handleGoogle()">
+      <button class="btn-google" id="btnGoogle">
         <svg width="18" height="18" viewBox="0 0 18 18">
           <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
           <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
@@ -505,249 +166,231 @@ const db=firebase.firestore();
 
       <div class="auth-divider"><span>or use email</span></div>
 
-      <!-- Error -->
       <div class="auth-error" id="authError"></div>
+      <div class="auth-success-msg" id="authSuccess"></div>
 
-      <!-- Form -->
-      <form class="auth-form" id="authForm" onsubmit="handleSubmit(event)" autocomplete="on" novalidate>
-
-        <!-- Display name (signup only) -->
+      <form class="auth-form" id="authForm">
         <div class="form-group signup-only" id="fieldName">
           <label class="form-label">Display Name</label>
-          <input class="form-input" id="inputName" type="text" placeholder="Your name" autocomplete="name" />
+          <input class="form-input" id="inputName" type="text" placeholder="Your name" autocomplete="name"/>
         </div>
-
-        <!-- Username (signup only) -->
         <div class="form-group signup-only" id="fieldUsername">
           <label class="form-label">Username</label>
-          <div style="position:relative">
-            <input class="form-input" id="inputUsername" type="text" placeholder="yourname" autocomplete="username"
-              style="padding-left:28px" oninput="checkUsername(this.value)" />
-            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px">@</span>
+          <div class="username-wrap">
+            <span class="username-at">@</span>
+            <input class="form-input" id="inputUsername" type="text" placeholder="yourname" autocomplete="off" maxlength="30"/>
           </div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px" id="usernameStatus"></div>
+          <div class="username-status" id="usernameStatus"></div>
         </div>
-
-        <!-- Email -->
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input class="form-input" id="inputEmail" type="email" placeholder="you@example.com" autocomplete="email" maxlength="254" required spellcheck="false" />
+          <input class="form-input" id="inputEmail" type="email" placeholder="you@example.com" autocomplete="email"/>
         </div>
-
-        <!-- Password -->
         <div class="form-group">
           <label class="form-label">Password</label>
-          <div class="password-wrap">
-            <input class="form-input" id="inputPassword" type="password" placeholder="••••••••" autocomplete="current-password" required />
-            <button type="button" class="toggle-pass" onclick="togglePassword()">SHOW</button>
-          </div>
+          <input class="form-input" id="inputPassword" type="password" placeholder="••••••••" autocomplete="current-password"/>
         </div>
-
-        <!-- Confirm password (signup only) -->
         <div class="form-group signup-only" id="fieldConfirm">
           <label class="form-label">Confirm Password</label>
-          <div class="password-wrap">
-            <input class="form-input" id="inputConfirm" type="password" placeholder="••••••••" autocomplete="new-password" />
-            <button type="button" class="toggle-pass" onclick="toggleConfirm()">SHOW</button>
-          </div>
+          <input class="form-input" id="inputConfirm" type="password" placeholder="••••••••" autocomplete="new-password"/>
         </div>
-
-        <!-- Forgot (signin only) -->
-        <div class="auth-forgot" id="forgotWrap">
-          <a href="#" onclick="handleForgot(event)">Forgot password?</a>
+        <div class="auth-forgot" id="forgotRow">
+          <a onclick="doForgot()">Forgot password?</a>
         </div>
-
-        <button type="submit" class="btn-submit" id="submitBtn">
-          <span id="submitLabel">Sign In</span>
-          <div class="spinner"></div>
-        </button>
+        <button type="button" class="btn-submit" id="btnSubmit">Sign In</button>
       </form>
 
       <div class="auth-switch" id="authSwitch">
         Don't have an account? <a onclick="setMode('signup')">Create one →</a>
       </div>
-
       <div class="auth-guest">
         <a href="psyche-complete.html">Take the test without an account →</a>
       </div>
     </div>
 
-    <!-- Success state -->
-    <div class="auth-success" id="authSuccess">
-      <div class="success-icon">◆</div>
-      <div class="success-title">You're in.</div>
-      <p class="success-sub">Redirecting to your dashboard...</p>
+    <div id="successState" style="display:none;text-align:center;padding:48px 0">
+      <div style="font-size:40px;margin-bottom:20px">◆</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin-bottom:8px">You're in.</div>
+      <p style="font-size:13px;color:var(--muted2)">Redirecting to your dashboard...</p>
     </div>
-
   </div>
 </div>
 
 <script>
 var mode = 'signin';
-var usernameTimer = null;
-var takenUsernames = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare'];
+var unTimer = null;
 
-function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-
-// Redirect if already logged in
+// ── If already logged in, go to dashboard ──
 auth.onAuthStateChanged(function(user){
-  if(user) window.location.href = 'dashboard.html';
+  if(user && document.getElementById('successState').style.display === 'none'){
+    // Already logged in — redirect
+    showSuccess();
+  }
 });
 
-function setMode(m) {
-  mode = m;
-  var isSignup = m === 'signup';
-  document.getElementById('toggleSignIn').classList.toggle('active', !isSignup);
-  document.getElementById('toggleSignUp').classList.toggle('active', isSignup);
-  document.querySelectorAll('.signup-only').forEach(function(el){ el.classList.toggle('visible', isSignup); });
-  document.getElementById('forgotWrap').style.display = isSignup ? 'none' : '';
-  document.getElementById('authEyebrow').textContent = isSignup ? 'Create your profile' : 'Welcome back';
-  document.getElementById('authTitle').textContent = isSignup ? 'Join ANIMUS' : 'Sign in to ANIMUS';
-  document.getElementById('authSub').textContent = isSignup
-    ? 'Take the assessment, build your profile, and compare with friends.'
-    : 'Access your profile, compare with friends, and track how you change over time.';
-  document.getElementById('submitLabel').textContent = isSignup ? 'Create Account' : 'Sign In';
-  document.getElementById('authSwitch').innerHTML = isSignup
-    ? 'Already have an account? <a onclick="setMode('signin')">Sign in →</a>'
-    : 'Don't have an account? <a onclick="setMode('signup')">Create one →</a>';
-  document.getElementById('inputPassword').setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
-  clearError();
-}
+// ── Handle Google redirect result (for mobile/popup-blocked fallback) ──
+auth.getRedirectResult().then(function(result){
+  if(result && result.user){
+    ensureUserDoc(result.user, null, null).then(function(){ goToDashboard(); });
+  }
+}).catch(function(e){
+  if(e.code && e.code !== 'auth/no-redirect-operation') showError(e.message);
+});
 
-function checkUsername(val) {
-  var status = document.getElementById('usernameStatus');
-  val = val.toLowerCase().replace(/[^a-z0-9_]/g,'');
-  document.getElementById('inputUsername').value = val;
-  clearTimeout(usernameTimer);
-  if(!val || val.length < 3){ status.textContent=''; status.className='username-status'; return; }
-  status.textContent='Checking...'; status.className='username-status checking';
-  usernameTimer = setTimeout(function(){
-    if(takenUsernames.indexOf(val) > -1){
-      status.textContent='@'+escapeHTML(val)+' is taken'; status.className='username-status err';
-    } else {
-      db.collection('usernames').doc(val).get().then(function(doc){
-        if(doc.exists){ status.textContent='@'+escapeHTML(val)+' is taken'; status.className='username-status err'; }
-        else { status.textContent='@'+escapeHTML(val)+' is available ✓'; status.className='username-status ok'; }
-      }).catch(function(){
-        status.textContent='@'+escapeHTML(val)+' — checking...'; status.className='username-status';
-      });
-    }
-  }, 500);
-}
-
-function togglePassword(){
-  var inp=document.getElementById('inputPassword');
-  var btn=inp.nextElementSibling;
-  if(inp.type==='password'){inp.type='text';btn.textContent='HIDE';}
-  else{inp.type='password';btn.textContent='SHOW';}
-}
-function toggleConfirm(){
-  var inp=document.getElementById('inputConfirm');
-  var btn=inp.nextElementSibling;
-  if(inp.type==='password'){inp.type='text';btn.textContent='HIDE';}
-  else{inp.type='password';btn.textContent='SHOW';}
-}
-
-function showError(msg){ var el=document.getElementById('authError'); el.textContent=msg; el.classList.add('visible'); }
-function clearError(){ document.getElementById('authError').classList.remove('visible'); }
-function setLoading(on){ var btn=document.getElementById('submitBtn'); btn.disabled=on; btn.classList.toggle('loading',on); }
-
-function handleGoogle(){
-  clearError();
+// ── Google Sign In ──
+document.getElementById('btnGoogle').addEventListener('click', function(){
+  var btn = this;
+  btn.disabled = true;
+  btn.textContent = 'Opening Google...';
   var provider = new firebase.auth.GoogleAuthProvider();
+  provider.addScope('email');
   auth.signInWithPopup(provider)
     .then(function(result){
       return ensureUserDoc(result.user, null, null);
     })
-    .then(function(){ window.location.href='dashboard.html'; })
-    .catch(function(e){ showError(e.message||'Google sign-in failed'); });
+    .then(function(){ goToDashboard(); })
+    .catch(function(e){
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg> Continue with Google';
+      if(e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user'){
+        if(e.code === 'auth/popup-blocked'){
+          showError('Popup was blocked. Trying redirect...');
+          setTimeout(function(){ auth.signInWithRedirect(provider); }, 1500);
+        }
+        // popup-closed-by-user = do nothing
+      } else {
+        showError(friendlyError(e));
+      }
+    });
+});
+
+// ── Email submit ──
+document.getElementById('btnSubmit').addEventListener('click', doSubmit);
+document.getElementById('authForm').addEventListener('submit', function(e){ e.preventDefault(); doSubmit(); });
+
+function doSubmit(){
+  clearMessages();
+  var email = document.getElementById('inputEmail').value.trim();
+  var password = document.getElementById('inputPassword').value;
+  if(!email){ showError('Please enter your email.'); return; }
+  if(!password){ showError('Please enter your password.'); return; }
+
+  if(mode === 'signup'){
+    var name = document.getElementById('inputName').value.trim();
+    var username = document.getElementById('inputUsername').value.trim().toLowerCase();
+    var confirm = document.getElementById('inputConfirm').value;
+    if(!name){ showError('Please enter your display name.'); return; }
+    if(username.length < 3){ showError('Username must be at least 3 characters.'); return; }
+    if(password.length < 6){ showError('Password must be at least 6 characters.'); return; }
+    if(password !== confirm){ showError('Passwords do not match.'); return; }
+    setLoading(true);
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(function(r){
+        return r.user.updateProfile({displayName: name})
+          .then(function(){ return ensureUserDoc(r.user, name, username); });
+      })
+      .then(function(){ goToDashboard(); })
+      .catch(function(e){ setLoading(false); showError(friendlyError(e)); });
+  } else {
+    setLoading(true);
+    auth.signInWithEmailAndPassword(email, password)
+      .then(function(){ goToDashboard(); })
+      .catch(function(e){ setLoading(false); showError(friendlyError(e)); });
+  }
+}
+
+// ── Helpers ──
+function setMode(m){
+  mode = m;
+  var isUp = m === 'signup';
+  document.getElementById('btnSignIn').classList.toggle('active', !isUp);
+  document.getElementById('btnSignUp').classList.toggle('active', isUp);
+  document.querySelectorAll('.signup-only').forEach(function(el){ el.classList.toggle('visible', isUp); });
+  document.getElementById('forgotRow').style.display = isUp ? 'none' : '';
+  document.getElementById('authEyebrow').textContent = isUp ? 'Create your profile' : 'Welcome back';
+  document.getElementById('authTitle').textContent = isUp ? 'Join ANIMUS' : 'Sign in to ANIMUS';
+  document.getElementById('authSub').textContent = isUp ? 'Take the assessment, build your profile, compare with friends.' : 'Access your profile, compare with friends, track how you change.';
+  document.getElementById('btnSubmit').textContent = isUp ? 'Create Account' : 'Sign In';
+  document.getElementById('authSwitch').innerHTML = isUp
+    ? 'Already have an account? <a onclick="setMode(\'signin\')">Sign in →</a>'
+    : 'Don\'t have an account? <a onclick="setMode(\'signup\')">Create one →</a>';
+  document.getElementById('inputPassword').setAttribute('autocomplete', isUp ? 'new-password' : 'current-password');
+  clearMessages();
+  // Username availability
+  if(isUp){
+    document.getElementById('inputUsername').addEventListener('input', function(){
+      var val = this.value.toLowerCase().replace(/[^a-z0-9_]/g,'');
+      this.value = val;
+      checkUsername(val);
+    });
+  }
+}
+
+function checkUsername(val){
+  var st = document.getElementById('usernameStatus');
+  clearTimeout(unTimer);
+  if(val.length < 3){ st.className='username-status'; st.textContent=''; return; }
+  st.className='username-status'; st.textContent='Checking...';
+  unTimer = setTimeout(function(){
+    db.collection('usernames').doc(val).get()
+      .then(function(doc){
+        if(doc.exists){ st.className='username-status err'; st.textContent='@'+val+' is taken'; }
+        else { st.className='username-status ok'; st.textContent='@'+val+' is available ✓'; }
+      }).catch(function(){ st.className='username-status ok'; st.textContent='@'+val+' looks good'; });
+  }, 600);
 }
 
 function ensureUserDoc(user, displayName, username){
-  var name = displayName || user.displayName || user.email.split('@')[0];
-  var uname = username || name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20) || user.uid.substring(0,8);
-  return db.collection('users').doc(user.uid).get().then(function(doc){
-    if(!doc.exists){
-      var batch = db.batch();
-      batch.set(db.collection('users').doc(user.uid), {
-        displayName: name, username: uname, email: user.email,
-        photoURL: user.photoURL||'', createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        friends: [], language: localStorage.getItem('animus_lang')||'en'
-      });
-      batch.set(db.collection('usernames').doc(uname), {uid: user.uid});
-      return batch.commit();
-    }
+  var uid = user.uid;
+  var name = displayName || user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+  var uname = username || name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20) || uid.substring(0,8);
+  return db.collection('users').doc(uid).get().then(function(doc){
+    if(doc.exists) return; // already set up
+    var batch = db.batch();
+    batch.set(db.collection('users').doc(uid), {
+      displayName: name,
+      username: uname,
+      email: user.email || '',
+      photoURL: user.photoURL || '',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      friends: [],
+      language: localStorage.getItem('animus_lang') || 'en'
+    });
+    batch.set(db.collection('usernames').doc(uname), { uid: uid });
+    return batch.commit();
   });
 }
 
-function handleSubmit(e){
-  e.preventDefault();
-  clearError();
-  var email=document.getElementById('inputEmail').value.trim();
-  var password=document.getElementById('inputPassword').value;
-
-  if(mode === 'signup'){
-    var name=document.getElementById('inputName').value.trim();
-    var username=document.getElementById('inputUsername').value.trim();
-    var confirm=document.getElementById('inputConfirm').value;
-    if(!name){ showError('Please enter your display name.'); return; }
-    if(!username || username.length < 3){ showError('Username must be at least 3 characters.'); return; }
-    if(takenUsernames.indexOf(username) > -1){ showError('@'+escapeHTML(username)+' is already taken.'); return; }
-    if(password.length < 8){ showError('Password must be at least 8 characters.'); return; }
-    if(password !== confirm){ showError('Passwords do not match.'); return; }
-    setLoading(true);
-    _isSigningUp = true;
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(function(result){
-        return result.user.updateProfile({displayName: name})
-          .then(function(){ return ensureUserDoc(result.user, name, username); });
-      })
-      .then(function(){ window.location.href='dashboard.html'; })
-      .catch(function(e){ setLoading(false); showError(e.message||'Sign up failed'); });
-  } else {
-    if(!email || !password){ showError('Please enter your email and password.'); return; }
-    setLoading(true);
-    auth.signInWithEmailAndPassword(email, password)
-      .then(function(){ window.location.href='dashboard.html'; })
-      .catch(function(e){ setLoading(false); showError(e.message||'Sign in failed'); });
-  }
-}
-
-function handleForgot(e){
-  e.preventDefault();
-  var email=document.getElementById('inputEmail').value.trim();
-  if(!email){ showError('Enter your email address first.'); return; }
-  auth.sendPasswordResetEmail(email)
-    .then(function(){
-      var el=document.getElementById('authError');
-      el.style.color='var(--gold)';
-      el.textContent='Password reset email sent — check your inbox.';
-      el.classList.add('visible');
-    })
-    .catch(function(e){ showError(e.message); });
+function goToDashboard(){
+  // Save to localStorage as cache
+  auth.currentUser && localStorage.setItem('animus_uid', auth.currentUser.uid);
+  showSuccess();
+  setTimeout(function(){ window.location.href = 'dashboard.html'; }, 1200);
 }
 
 function showSuccess(){
-  document.getElementById('formContent').style.display='none';
-  document.getElementById('authSuccess').classList.add('visible');
-  if(window.opener) window.opener=null;
+  document.getElementById('formContent').style.display = 'none';
+  document.getElementById('successState').style.display = 'block';
 }
+
+function doForgot(){
+  var email = document.getElementById('inputEmail').value.trim();
+  if(!email){ showError('Enter your email address first.'); return; }
+  auth.sendPasswordResetEmail(email)
+    .then(function(){
+      showSuccessMsg('Reset email sent — check your inbox.');
+    })
+    .catch(function(e){ showError(friendlyError(e)); });
+}
+
+function friendlyError(e){
+  var m = { 'auth/email-already-in-use':'An account with this email already exists.', 'auth/user-not-found':'No account found with this email.', 'auth/wrong-password':'Incorrect password.', 'auth/weak-password':'Password must be at least 6 characters.', 'auth/invalid-email':'Please enter a valid email address.', 'auth/too-many-requests':'Too many attempts. Try again later.', 'auth/network-request-failed':'Network error. Check your connection.' };
+  return m[e.code] || e.message;
+}
+function showError(msg){ var el=document.getElementById('authError'); el.textContent=msg; el.classList.add('visible'); document.getElementById('authSuccess').classList.remove('visible'); }
+function showSuccessMsg(msg){ var el=document.getElementById('authSuccess'); el.textContent=msg; el.classList.add('visible'); document.getElementById('authError').classList.remove('visible'); }
+function clearMessages(){ document.getElementById('authError').classList.remove('visible'); document.getElementById('authSuccess').classList.remove('visible'); }
+function setLoading(on){ var btn=document.getElementById('btnSubmit'); btn.disabled=on; btn.textContent=on?(mode==='signup'?'Creating account...':'Signing in...'):(mode==='signup'?'Create Account':'Sign In'); }
 </script>
-
-
-// Smart logo nav - goes to dashboard if logged in, landing if not
-(function(){
-  function setupSmartLogo(){
-    var logos = document.querySelectorAll('.nav-logo, .panel-logo, .footer-logo');
-    auth.onAuthStateChanged(function(user){
-      logos.forEach(function(el){
-        el.href = user ? 'dashboard.html' : 'landing.html';
-      });
-    });
-  }
-  if(typeof auth !== 'undefined') setupSmartLogo();
-  else document.addEventListener('DOMContentLoaded', setupSmartLogo);
-})();
-
 </body>
 </html>

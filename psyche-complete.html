@@ -1695,7 +1695,7 @@ function score(){
   var eS={};
   eTypes.forEach(function(e){eS[e]=0;var cnt=0;
     (window._activeQ||Q).forEach(function(q,i){if(q.fn===e){eS[e]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    eS[e]=cnt?Math.round(eS[e]/cnt):30;
+    eS[e]=cnt?Math.round(eS[e]/cnt):50;
   });
 
   // Attachment
@@ -1703,7 +1703,7 @@ function score(){
   var atS={};
   atTypes.forEach(function(a){atS[a]=0;var cnt=0;
     (window._activeQ||Q).forEach(function(q,i){if(q.fn===a){atS[a]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    atS[a]=cnt?Math.round(atS[a]/cnt):30;
+    atS[a]=cnt?Math.round(atS[a]/cnt):50;
   });
 
   // Philosophy
@@ -1711,7 +1711,7 @@ function score(){
   var phS={};
   phTypes.forEach(function(p){phS[p]=0;var cnt=0;
     (window._activeQ||Q).forEach(function(q,i){if(q.fn===p){phS[p]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    phS[p]=cnt?Math.round(phS[p]/cnt):30;
+    phS[p]=cnt?Math.round(phS[p]/cnt):50;
   });
 
   // Epistemology
@@ -1719,7 +1719,7 @@ function score(){
   var epS={};
   epTypes.forEach(function(e){epS[e]=0;var cnt=0;
     (window._activeQ||Q).forEach(function(q,i){if(q.fn===e){epS[e]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    epS[e]=cnt?Math.round(epS[e]/cnt):30;
+    epS[e]=cnt?Math.round(epS[e]/cnt):50;
   });
 
   // Ethics
@@ -1727,7 +1727,7 @@ function score(){
   var etS={};
   etTypes.forEach(function(e){etS[e]=0;var cnt=0;
     (window._activeQ||Q).forEach(function(q,i){if(q.fn===e){etS[e]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    etS[e]=cnt?Math.round(etS[e]/cnt):30;
+    etS[e]=cnt?Math.round(etS[e]/cnt):50;
   });
 
   // Moral foundations — computed before Political (mfS used in polX/polY composite)
@@ -1735,7 +1735,7 @@ function score(){
   var mfS={};
   mfTypes.forEach(function(m){mfS[m]=0;var cnt=0;
     (window._activeQ||Q).forEach(function(q,i){if(q.fn===m){mfS[m]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    mfS[m]=cnt?Math.round(mfS[m]/cnt):30;
+    mfS[m]=cnt?Math.round(mfS[m]/cnt):50;
   });
 
   // Political — direct scores
@@ -1824,7 +1824,7 @@ function score(){
   var tmpS={};
   tmpTypes.forEach(function(t){tmpS[t]=0;var cnt=0;
     (window._activeQ||Q).forEach(function(q,i){if(q.fn===t){tmpS[t]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    tmpS[t]=cnt?Math.round(tmpS[t]/cnt):30;
+    tmpS[t]=cnt?Math.round(tmpS[t]/cnt):50;
   });
 
   // Instinctual variants
@@ -1832,7 +1832,7 @@ function score(){
   var ivS={};
   ivTypes.forEach(function(v){ivS[v]=0;var cnt=0;
     (window._activeQ||Q).forEach(function(q,i){if(q.fn===v){ivS[v]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    ivS[v]=cnt?Math.round(ivS[v]/cnt):30;
+    ivS[v]=cnt?Math.round(ivS[v]/cnt):50;
   });
 
   // Social
@@ -1845,7 +1845,7 @@ function score(){
 function avg(fn){
   var sum=0,cnt=0;
   (window._activeQ||Q).forEach(function(q,i){if(q.fn===fn){sum+=((answers[i]||4)-1)/6*100;cnt++;}});
-  return cnt?Math.round(sum/cnt):30;
+  return cnt?Math.round(sum/cnt):50;
 }
 
 function getMBTI(cog){
@@ -1857,25 +1857,34 @@ function getMBTI(cog){
     'Fi_Ne':'INFP','Fi_Se':'ISFP','Fe_Ni':'ENFJ','Fe_Si':'ESFJ',
     'Si_Te':'ISTJ','Si_Fe':'ISFJ','Se_Ti':'ESTP','Se_Fi':'ESFP'
   };
-  return map[dom+'_'+aux]||'INTJ';
+  if(map[dom+'_'+aux]) return map[dom+'_'+aux];
+  // Fallback: derive from highest scores
+  var intExt = (cog['Ni']+cog['Ti']+cog['Fi']+cog['Si'] > cog['Ne']+cog['Te']+cog['Fe']+cog['Se']) ? 'I' : 'E';
+  var intuSens = (cog['Ni']+cog['Ne'] > cog['Si']+cog['Se']) ? 'N' : 'S';
+  var thinkFeel = (cog['Ti']+cog['Te'] > cog['Fi']+cog['Fe']) ? 'T' : 'F';
+  var percJudge = (cog['Ti']+cog['Fi']+cog['Ni']+cog['Si'] > cog['Te']+cog['Fe']+cog['Ne']+cog['Se']) ? 'P' : 'J';
+  return intExt + intuSens + thinkFeel + percJudge;
 }
 
 function getEnneagram(eS){
   var sorted=Object.keys(eS).sort(function(a,b){return eS[b]-eS[a];});
   var top=sorted[0].replace('E','');
   var topNum=parseInt(top);
-  // Wing MUST be adjacent: only consider type-1 and type+1 (with 9 wrapping to 1)
-  var wingA = topNum===1 ? 9 : topNum-1;
-  var wingB = topNum===9 ? 1 : topNum+1;
-  var scoreA = eS['E'+wingA]||0;
-  var scoreB = eS['E'+wingB]||0;
-  var wing = String(scoreA >= scoreB ? wingA : wingB);
-  // Tritype: one from each center (gut:8,9,1 heart:2,3,4 head:5,6,7)
+  var wingA=topNum===1?9:topNum-1;
+  var wingB=topNum===9?1:topNum+1;
+  var scoreA=eS['E'+wingA]||0;
+  var scoreB=eS['E'+wingB]||0;
+  var wing=String(scoreA>=scoreB?wingA:wingB);
   var gut=['E8','E9','E1'],heart=['E2','E3','E4'],head=['E5','E6','E7'];
-  var topGut=gut.slice().sort(function(a,b){return eS[b]-eS[a];})[0].replace('E','');
-  var topHeart=heart.slice().sort(function(a,b){return eS[b]-eS[a];})[0].replace('E','');
-  var topHead=head.slice().sort(function(a,b){return eS[b]-eS[a];})[0].replace('E','');
-  return {type:top,wing:wing,tritype:topGut+'/'+topHeart+'/'+topHead,scores:eS};
+  var topGut=gut.reduce(function(a,b){return eS[a]>eS[b]?a:b;});
+  var topHeart=heart.reduce(function(a,b){return eS[a]>eS[b]?a:b;});
+  var topHead=head.reduce(function(a,b){return eS[a]>eS[b]?a:b;});
+  var t1=parseInt(topGut.replace('E','')),t2=parseInt(topHeart.replace('E','')),t3=parseInt(topHead.replace('E',''));
+  var triArr=[t1,t2,t3];
+  var domIdx=triArr.indexOf(topNum);
+  if(domIdx>0){var tmp=triArr[0];triArr[0]=triArr[domIdx];triArr[domIdx]=tmp;}
+  var rest2=[triArr[1],triArr[2]].sort(function(a,b){return (eS['E'+b]||0)-(eS['E'+a]||0);});
+  return {type:top,wing:wing,tritype:triArr[0]+'/'+rest2[0]+'/'+rest2[1],scores:eS};
 }
 
 function getAttachment(atS){
@@ -3234,6 +3243,10 @@ showResults=function(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupSmartLogo);
   else setupSmartLogo();
 })();
+</script>
+<script>
+// Smart logo
+try{firebase.auth().onAuthStateChanged(function(u){document.querySelectorAll('a.nav-logo').forEach(function(el){el.href=u?'dashboard.html':'landing.html';});});}catch(e){}
 </script>
 </body>
 </html>
