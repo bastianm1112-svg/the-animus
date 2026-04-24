@@ -434,27 +434,19 @@ body {
 .auth-box { animation: fadeIn 0.5s ease; }
 </style>
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script>
-    firebase.initializeApp({
-      apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
-      authDomain: "animus-b3d83.firebaseapp.com",
-      projectId: "animus-b3d83",
-      storageBucket: "animus-b3d83.firebasestorage.app",
-      messagingSenderId: "681221615050",
-      appId: "1:681221615050:web:1d037cd07a8381c91b3333"
-    });
-  </script>
-</head>
-<body>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-// Apply saved theme immediately to prevent flash
-(function(){
-  if(localStorage.getItem('animus_theme') === 'light') document.body.classList.add('light-mode');
-})();
+const firebaseConfig={apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",authDomain:"animus-b3d83.firebaseapp.com",projectId:"animus-b3d83",storageBucket:"animus-b3d83.firebasestorage.app",messagingSenderId:"681221615050",appId:"1:681221615050:web:1d037cd07a8381c91b3333"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.firestore();
 </script>
+<script>
+(function(){ if(localStorage.getItem('animus_theme')==='light') document.body.classList.add('light-mode'); })();
+</script>
+
 
 
 <a href="landing.html" class="auth-back">← Back</a>
@@ -592,31 +584,23 @@ body {
 
 <script>
 var mode = 'signin';
-function escapeHTML(s){
-  if(typeof s !== 'string') return '';
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-          .replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
-}
 var usernameTimer = null;
 var takenUsernames = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare'];
+
+function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// Redirect if already logged in
+auth.onAuthStateChanged(function(user){
+  if(user) window.location.href = 'dashboard.html';
+});
 
 function setMode(m) {
   mode = m;
   var isSignup = m === 'signup';
-
-  // Toggle buttons
   document.getElementById('toggleSignIn').classList.toggle('active', !isSignup);
   document.getElementById('toggleSignUp').classList.toggle('active', isSignup);
-
-  // Show/hide signup fields
-  document.querySelectorAll('.signup-only').forEach(function(el){
-    el.classList.toggle('visible', isSignup);
-  });
-
-  // Forgot password
+  document.querySelectorAll('.signup-only').forEach(function(el){ el.classList.toggle('visible', isSignup); });
   document.getElementById('forgotWrap').style.display = isSignup ? 'none' : '';
-
-  // Text
   document.getElementById('authEyebrow').textContent = isSignup ? 'Create your profile' : 'Welcome back';
   document.getElementById('authTitle').textContent = isSignup ? 'Join ANIMUS' : 'Sign in to ANIMUS';
   document.getElementById('authSub').textContent = isSignup
@@ -624,12 +608,9 @@ function setMode(m) {
     : 'Access your profile, compare with friends, and track how you change over time.';
   document.getElementById('submitLabel').textContent = isSignup ? 'Create Account' : 'Sign In';
   document.getElementById('authSwitch').innerHTML = isSignup
-    ? 'Already have an account? <a onclick="setMode(\'signin\')">Sign in →</a>'
-    : 'Don\'t have an account? <a onclick="setMode(\'signup\')">Create one →</a>';
-
-  // Update password autocomplete
+    ? 'Already have an account? <a onclick="setMode('signin')">Sign in →</a>'
+    : 'Don't have an account? <a onclick="setMode('signup')">Create one →</a>';
   document.getElementById('inputPassword').setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
-
   clearError();
 }
 
@@ -637,178 +618,136 @@ function checkUsername(val) {
   var status = document.getElementById('usernameStatus');
   val = val.toLowerCase().replace(/[^a-z0-9_]/g,'');
   document.getElementById('inputUsername').value = val;
-
   clearTimeout(usernameTimer);
-  if(!val){ status.textContent=''; return; }
-  if(val.length < 3){ status.style.color='var(--error)'; status.textContent='At least 3 characters'; return; }
-
-  status.style.color='var(--muted)'; status.textContent='Checking...';
+  if(!val || val.length < 3){ status.textContent=''; status.className='username-status'; return; }
+  status.textContent='Checking...'; status.className='username-status checking';
   usernameTimer = setTimeout(function(){
-    // Will be replaced by Firebase lookup
     if(takenUsernames.indexOf(val) > -1){
-      status.style.color='var(--error)'; status.textContent='@'+escapeHTML(val)+' is taken';
+      status.textContent='@'+escapeHTML(val)+' is taken'; status.className='username-status err';
     } else {
-      status.style.color='var(--gold)'; status.textContent='@'+escapeHTML(val)+' is available ✓';
+      db.collection('usernames').doc(val).get().then(function(doc){
+        if(doc.exists){ status.textContent='@'+escapeHTML(val)+' is taken'; status.className='username-status err'; }
+        else { status.textContent='@'+escapeHTML(val)+' is available ✓'; status.className='username-status ok'; }
+      }).catch(function(){
+        status.textContent='@'+escapeHTML(val)+' — checking...'; status.className='username-status';
+      });
     }
   }, 500);
 }
 
 function togglePassword(){
-  var inp = document.getElementById('inputPassword');
-  var btn = inp.nextElementSibling;
-  if(inp.type==='password'){ inp.type='text'; btn.textContent='HIDE'; }
-  else { inp.type='password'; btn.textContent='SHOW'; }
+  var inp=document.getElementById('inputPassword');
+  var btn=inp.nextElementSibling;
+  if(inp.type==='password'){inp.type='text';btn.textContent='HIDE';}
+  else{inp.type='password';btn.textContent='SHOW';}
 }
 function toggleConfirm(){
-  var inp = document.getElementById('inputConfirm');
-  var btn = inp.nextElementSibling;
-  if(inp.type==='password'){ inp.type='text'; btn.textContent='HIDE'; }
-  else { inp.type='password'; btn.textContent='SHOW'; }
+  var inp=document.getElementById('inputConfirm');
+  var btn=inp.nextElementSibling;
+  if(inp.type==='password'){inp.type='text';btn.textContent='HIDE';}
+  else{inp.type='password';btn.textContent='SHOW';}
 }
 
-function showError(msg){
-  var el = document.getElementById('authError');
-  el.textContent = msg;
-  el.classList.add('visible');
-}
-function clearError(){
-  document.getElementById('authError').classList.remove('visible');
-}
-
-function setLoading(on){
-  var btn = document.getElementById('submitBtn');
-  btn.disabled = on;
-  btn.classList.toggle('loading', on);
-}
+function showError(msg){ var el=document.getElementById('authError'); el.textContent=msg; el.classList.add('visible'); }
+function clearError(){ document.getElementById('authError').classList.remove('visible'); }
+function setLoading(on){ var btn=document.getElementById('submitBtn'); btn.disabled=on; btn.classList.toggle('loading',on); }
 
 function handleGoogle(){
+  clearError();
   var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider)
+  auth.signInWithPopup(provider)
     .then(function(result){
-      var user = result.user;
-      var isNew = result.additionalUserInfo.isNewUser;
-      if(isNew){
-        // Create user doc
-        return firebase.firestore().collection('users').doc(user.uid).set({
-          displayName: user.displayName || '',
-          photoURL: user.photoURL || '',
-          email: user.email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          friends: [],
-          friendRequests: { sent: [], received: [] },
-          notifications: [],
-          language: 'en'
-        }).then(function(){ return isNew; });
-      }
-      return isNew;
+      return ensureUserDoc(result.user, null, null);
     })
-    .then(function(isNew){
-      showSuccess(isNew);
-    })
-    .catch(function(e){ showError(e.message); });
+    .then(function(){ window.location.href='dashboard.html'; })
+    .catch(function(e){ showError(e.message||'Google sign-in failed'); });
 }
 
-// Simple client-side rate limiting (real rate limiting happens server-side with Firebase)
-var _submitAttempts = 0;
-var _submitLockUntil = 0;
+function ensureUserDoc(user, displayName, username){
+  var name = displayName || user.displayName || user.email.split('@')[0];
+  var uname = username || name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20) || user.uid.substring(0,8);
+  return db.collection('users').doc(user.uid).get().then(function(doc){
+    if(!doc.exists){
+      var batch = db.batch();
+      batch.set(db.collection('users').doc(user.uid), {
+        displayName: name, username: uname, email: user.email,
+        photoURL: user.photoURL||'', createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        friends: [], language: localStorage.getItem('animus_lang')||'en'
+      });
+      batch.set(db.collection('usernames').doc(uname), {uid: user.uid});
+      return batch.commit();
+    }
+  });
+}
 
 function handleSubmit(e){
   e.preventDefault();
   clearError();
-  
-  // Rate limit: max 5 attempts, then 30s lockout
-  var now = Date.now();
-  if(now < _submitLockUntil){
-    var secs = Math.ceil((_submitLockUntil - now)/1000);
-    showError('Too many attempts. Please wait ' + secs + ' seconds.');
-    return;
-  }
-  _submitAttempts++;
-  if(_submitAttempts >= 5){
-    _submitLockUntil = now + 30000;
-    _submitAttempts = 0;
-    showError('Too many attempts. Please wait 30 seconds.');
-    return;
-  }
-
-  var email = document.getElementById('inputEmail').value.trim().substring(0,254);
-  var password = document.getElementById('inputPassword').value;
-  
-  // Basic input validation
-  if(email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
-    showError('Please enter a valid email address.');
-    return;
-  }
+  var email=document.getElementById('inputEmail').value.trim();
+  var password=document.getElementById('inputPassword').value;
 
   if(mode === 'signup'){
-    var name = document.getElementById('inputName').value.trim();
-    var username = document.getElementById('inputUsername').value.trim();
-    var confirm = document.getElementById('inputConfirm').value;
-
+    var name=document.getElementById('inputName').value.trim();
+    var username=document.getElementById('inputUsername').value.trim();
+    var confirm=document.getElementById('inputConfirm').value;
     if(!name){ showError('Please enter your display name.'); return; }
     if(!username || username.length < 3){ showError('Username must be at least 3 characters.'); return; }
-    if(takenUsernames.indexOf(username) > -1){ showError('@'+username+' is already taken.'); return; }
+    if(takenUsernames.indexOf(username) > -1){ showError('@'+escapeHTML(username)+' is already taken.'); return; }
     if(password.length < 8){ showError('Password must be at least 8 characters.'); return; }
     if(password !== confirm){ showError('Passwords do not match.'); return; }
-
     setLoading(true);
-    firebase.firestore().collection('usernames').doc(username).get()
-      .then(function(doc){
-        if(doc.exists){ throw new Error('@'+username+' is already taken.'); }
-        return firebase.auth().createUserWithEmailAndPassword(email, password);
+    _isSigningUp = true;
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(function(result){
+        return result.user.updateProfile({displayName: name})
+          .then(function(){ return ensureUserDoc(result.user, name, username); });
       })
-      .then(function(cred){
-        var uid = cred.user.uid;
-        var batch = firebase.firestore().batch();
-        batch.set(firebase.firestore().collection('users').doc(uid), {
-          displayName: name, username: username, email: email, photoURL: '', bio: '',
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          friends: [], friendRequests:{sent:[],received:[]}, notifications: [],
-          language: localStorage.getItem('animus_lang') || 'en'
-        });
-        batch.set(firebase.firestore().collection('usernames').doc(username), { uid: uid });
-        return batch.commit();
-      })
-      .then(function(){ setLoading(false); showSuccess(true); })
-      .catch(function(e){ setLoading(false); showError(e.message); });
-
+      .then(function(){ window.location.href='dashboard.html'; })
+      .catch(function(e){ setLoading(false); showError(e.message||'Sign up failed'); });
   } else {
     if(!email || !password){ showError('Please enter your email and password.'); return; }
     setLoading(true);
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(function(){ setLoading(false); showSuccess(false); })
-      .catch(function(e){ setLoading(false); showError(e.message); });
+    auth.signInWithEmailAndPassword(email, password)
+      .then(function(){ window.location.href='dashboard.html'; })
+      .catch(function(e){ setLoading(false); showError(e.message||'Sign in failed'); });
   }
 }
 
 function handleForgot(e){
   e.preventDefault();
-  var email = document.getElementById('inputEmail').value.trim();
+  var email=document.getElementById('inputEmail').value.trim();
   if(!email){ showError('Enter your email address first.'); return; }
-  clearError();
-  firebase.auth().sendPasswordResetEmail(email)
+  auth.sendPasswordResetEmail(email)
     .then(function(){
-      document.getElementById('authError').style.color='var(--gold)';
-      document.getElementById('authError').textContent='Password reset email sent — check your inbox.';
-      document.getElementById('authError').classList.add('visible');
+      var el=document.getElementById('authError');
+      el.style.color='var(--gold)';
+      el.textContent='Password reset email sent — check your inbox.';
+      el.classList.add('visible');
     })
     .catch(function(e){ showError(e.message); });
 }
 
-function showSuccess(isNew){
+function showSuccess(){
   document.getElementById('formContent').style.display='none';
   document.getElementById('authSuccess').classList.add('visible');
-  setTimeout(function(){
-    if(window.opener) window.opener = null;
-    window.location.href = isNew ? 'psyche-complete.html' : 'dashboard.html';
-  }, 1800);
+  if(window.opener) window.opener=null;
 }
-
-// Redirect if already logged in
-firebase.auth().onAuthStateChanged(function(user){
-  if(user) window.location.href = 'dashboard.html';
-});
 </script>
+
+
+// Smart logo nav - goes to dashboard if logged in, landing if not
+(function(){
+  function setupSmartLogo(){
+    var logos = document.querySelectorAll('.nav-logo, .panel-logo, .footer-logo');
+    auth.onAuthStateChanged(function(user){
+      logos.forEach(function(el){
+        el.href = user ? 'dashboard.html' : 'landing.html';
+      });
+    });
+  }
+  if(typeof auth !== 'undefined') setupSmartLogo();
+  else document.addEventListener('DOMContentLoaded', setupSmartLogo);
+})();
 
 </body>
 </html>

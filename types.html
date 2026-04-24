@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANIMUS — Type Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080808;--surface:#0f0f0f;--surface2:#141414;--border:#1e1e1e;--border2:#2a2a2a;--text:#e2e2e2;--muted:#555;--muted2:#888;--gold:#c8a96e;--gold2:#8a6f3e;--gold3:#f0d090;--white:#f0ece4;}
+body.light-mode{--bg:#f4f1ec;--surface:#fff;--surface2:#f8f5f0;--border:#e0dbd4;--border2:#cdc7bf;--text:#1a1714;--muted:#9a9189;--muted2:#6b6259;--white:#1a1714;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;}
+.navbar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;z-index:200;}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;color:var(--white);text-decoration:none;margin-right:40px;}
+.nav-logo span{color:var(--gold);}
+.nav-items{display:flex;align-items:center;gap:4px;flex:1;}
+.nav-item{padding:7px 14px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;transition:all 0.15s;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--gold);}
+.nav-right{margin-left:auto;}
+.nav-avatar{width:32px;height:32px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);text-decoration:none;}
+.page{padding-top:56px;max-width:1100px;margin:0 auto;padding-left:28px;padding-right:28px;}
+.page-header{padding:48px 0 32px;border-bottom:1px solid var(--border);margin-bottom:40px;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,96px);letter-spacing:0.06em;color:var(--white);line-height:0.9;margin-bottom:12px;}
+.page-title span{color:var(--gold);}
+.page-sub{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:var(--muted2);}
+
+/* TAB NAV */
+.type-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:40px;overflow-x:auto;}
+.type-tab{padding:12px 24px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;background:none;border-left:none;border-right:none;border-top:none;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all 0.2s;}
+.type-tab:hover{color:var(--text);}
+.type-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.type-panel{display:none;}
+.type-panel.active{display:block;}
+
+/* SECTION LABEL */
+.sec-label{font-size:9px;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold2);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* TYPE CARDS */
+.types-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:48px;}
+.type-card{background:var(--surface);border:1px solid var(--border);padding:24px;cursor:pointer;transition:border-color 0.2s;}
+.type-card:hover{border-color:var(--gold2);}
+.type-card.open{border-color:var(--gold);}
+.type-code{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.08em;color:var(--white);margin-bottom:2px;}
+.type-name{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:var(--gold);margin-bottom:10px;}
+.type-tagline{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:12px;}
+.type-detail{display:none;border-top:1px solid var(--border);padding-top:14px;margin-top:4px;}
+.type-card.open .type-detail{display:block;}
+.type-detail p{font-size:12px;color:var(--muted2);line-height:1.8;margin-bottom:8px;}
+.type-detail strong{color:var(--text);}
+.type-fns{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.fn-badge{padding:3px 8px;border:1px solid var(--border2);font-size:10px;color:var(--muted2);letter-spacing:0.08em;}
+.fn-badge.dom{border-color:var(--gold);color:var(--gold);}
+
+/* DETAIL CARDS (enneagram, philosophy, politics) */
+.detail-card{background:var(--surface);border:1px solid var(--border);padding:28px;margin-bottom:12px;}
+.detail-card-header{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;}
+.detail-code{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:0.05em;color:var(--white);line-height:1;}
+.detail-name{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:var(--gold);}
+.detail-body p{font-size:13px;color:var(--muted2);line-height:1.9;margin-bottom:10px;}
+.detail-body strong{color:var(--text);}
+.detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;}
+.detail-tag{padding:4px 10px;border:1px solid var(--border2);font-size:10px;color:var(--muted);letter-spacing:0.08em;}
+.quadrant-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+.quadrant-card{background:var(--surface);border:1px solid var(--border);padding:24px;}
+.quadrant-title{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);margin-bottom:6px;letter-spacing:0.06em;}
+.quadrant-sub{font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:0.05em;}
+.quadrant-body{font-size:12px;color:var(--muted2);line-height:1.8;}
+.compass-diagram{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);max-width:500px;margin:0 auto 32px;aspect-ratio:1;}
+.compass-q{padding:24px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-size:11px;}
+.compass-q.ll{background:rgba(26,58,92,0.25);}
+.compass-q.lr{background:rgba(26,74,42,0.25);}
+.compass-q.ul{background:rgba(120,30,30,0.2);}
+.compass-q.ur{background:rgba(100,75,20,0.15);}
+.compass-q strong{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;display:block;margin-bottom:4px;}
+@media(max-width:600px){.quadrant-grid{grid-template-columns:1fr;}.compass-diagram{max-width:100%;}}
+</style>
+</head>
+<body>
+<script>(function(){ if(localStorage.getItem('animus_theme')==='light') document.body.classList.add('light-mode'); })();</script>
+
+<nav class="navbar">
+  <a href="landing.html" class="nav-logo" id="navLogo">ANI<span>MUS</span></a>
+  <div class="nav-items">
+    <a href="dashboard.html" class="nav-item">Dashboard</a>
+    <a href="psyche-complete.html" class="nav-item">Take Test</a>
+    <a href="types.html" class="nav-item active">Type Reference</a>
+  </div>
+  <div class="nav-right">
+    <a href="profile.html" class="nav-avatar" id="navAvatar">?</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">TYPE<br><span>REFERENCE</span></div>
+    <p class="page-sub">Every personality system ANIMUS measures — explained in full.</p>
+  </div>
+
+  <div class="type-tabs">
+    <button class="type-tab active" data-panel="mbti">MBTI / Cognitive Functions</button>
+    <button class="type-tab" data-panel="enneagram">Enneagram</button>
+    <button class="type-tab" data-panel="philosophy">Philosophy & Ethics</button>
+    <button class="type-tab" data-panel="politics">Political Compass</button>
+    <button class="type-tab" data-panel="other">Attachment & More</button>
+  </div>
+
+  <!-- MBTI -->
+  <div class="type-panel active" id="panel-mbti">
+    <div class="sec-label">Analysts</div>
+    <div class="types-grid">
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">INTJ</div><div class="type-name">The Architect</div>
+        <div class="type-tagline">Strategic, independent, and driven by a singular vision. Lives inside a richly constructed internal world and expects reality to conform to it.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> To understand and master systems — intellectual, personal, or structural. INTJs are not content to observe; they want to redesign.</p>
+          <p><strong>In practice:</strong> Often perceived as cold but are intensely loyal to people they respect. High standards applied to self first. Genuinely rare — among the least common types.</p>
+          <p><strong>Shadow:</strong> Can mistake confidence in their model for accuracy. The plan in their head is always more perfect than the world allows.</p>
+          <div class="type-fns"><span class="fn-badge dom">Ni</span><span class="fn-badge">Te</span><span class="fn-badge">Fi</span><span class="fn-badge">Se</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">INTP</div><div class="type-name">The Logician</div>
+        <div class="type-tagline">Precise, analytical, and endlessly curious. Seeks perfect logical consistency and treats every claim as provisional until proven.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> To understand how things work at a fundamental level. INTPs are framework builders — they want the theory, not just the answer.</p>
+          <p><strong>In practice:</strong> Appear detached but are often deeply invested internally. Can seem inconsistent because they genuinely update their views when logic demands it.</p>
+          <p><strong>Shadow:</strong> Analysis paralysis. Can spend so long refining the model that nothing gets built.</p>
+          <div class="type-fns"><span class="fn-badge dom">Ti</span><span class="fn-badge">Ne</span><span class="fn-badge">Si</span><span class="fn-badge">Fe</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ENTJ</div><div class="type-name">The Commander</div>
+        <div class="type-tagline">Decisive, strategic, and naturally commanding. Sees inefficiency the way others see dirt — as something that simply needs to be corrected.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> To build, lead, and execute. ENTJs think in systems and goals, and they're energized by the challenge of turning vision into reality.</p>
+          <p><strong>In practice:</strong> Often misread as ruthless when they're simply direct. They respect competence above almost everything else.</p>
+          <p><strong>Shadow:</strong> Can steamroll people in pursuit of the goal. Emotional undercurrents in groups may be invisible to them until things break.</p>
+          <div class="type-fns"><span class="fn-badge dom">Te</span><span class="fn-badge">Ni</span><span class="fn-badge">Se</span><span class="fn-badge">Fi</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ENTP</div><div class="type-name">The Debater</div>
+        <div class="type-tagline">Quick, inventive, and relentlessly provocative. Argues positions they don't hold just to see where the logic goes.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Intellectual stimulation. ENTPs are Ne-dominant — they thrive on possibility, novelty, and the moment when a new connection clicks.</p>
+          <p><strong>In practice:</strong> Ideas person who can out-argue almost everyone but may struggle to implement. The follow-through is the hard part.</p>
+          <p><strong>Shadow:</strong> Can mistake cleverness for wisdom. Arguing for the sake of it can look like bad faith to more value-driven types.</p>
+          <div class="type-fns"><span class="fn-badge dom">Ne</span><span class="fn-badge">Ti</span><span class="fn-badge">Fe</span><span class="fn-badge">Si</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-label">Diplomats</div>
+    <div class="types-grid">
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">INFJ</div><div class="type-name">The Advocate</div>
+        <div class="type-tagline">Visionary and intensely private. Sees patterns in human behavior most people miss, and feels a quiet but persistent calling.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Meaning and impact. INFJs want their life to stand for something — they're not content with comfort if it lacks purpose.</p>
+          <p><strong>In practice:</strong> Appear warm and accessible but maintain a carefully controlled inner world. Very few people know them fully.</p>
+          <p><strong>Shadow:</strong> Can become rigidly idealistic. When their vision of how things should be collides with reality, they can withdraw rather than adapt.</p>
+          <div class="type-fns"><span class="fn-badge dom">Ni</span><span class="fn-badge">Fe</span><span class="fn-badge">Ti</span><span class="fn-badge">Se</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">INFP</div><div class="type-name">The Mediator</div>
+        <div class="type-tagline">Deeply idealistic and fiercely individual. Holds private values that are completely non-negotiable — even if they can't always articulate them.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Authenticity and meaning. INFPs are Fi-dominant — they have a rich inner life of values, feelings, and aesthetic sense that governs everything.</p>
+          <p><strong>In practice:</strong> Often underestimated. Their quietness is not passivity — they're intensely engaged internally and will draw a hard line when values are violated.</p>
+          <p><strong>Shadow:</strong> Can idealize people and situations, then feel devastated when reality falls short.</p>
+          <div class="type-fns"><span class="fn-badge dom">Fi</span><span class="fn-badge">Ne</span><span class="fn-badge">Si</span><span class="fn-badge">Te</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ENFJ</div><div class="type-name">The Protagonist</div>
+        <div class="type-tagline">Charismatic, empathetic, and driven to develop others. Naturally takes on the emotional wellbeing of everyone in the room.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Human growth and connection. ENFJs are Fe-dominant — they're attuned to emotional atmospheres and feel responsible for them.</p>
+          <p><strong>In practice:</strong> Natural leaders who lead through inspiration and personal connection rather than authority. Often the person everyone comes to.</p>
+          <p><strong>Shadow:</strong> Can lose themselves in other people's needs. May suppress their own desires to keep the peace.</p>
+          <div class="type-fns"><span class="fn-badge dom">Fe</span><span class="fn-badge">Ni</span><span class="fn-badge">Se</span><span class="fn-badge">Ti</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ENFP</div><div class="type-name">The Campaigner</div>
+        <div class="type-tagline">Enthusiastic, creative, and driven by possibility. Sees connections and potential everywhere — in ideas, people, and situations.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Authentic connection and creative expression. ENFPs want to live fully and help others do the same.</p>
+          <p><strong>In practice:</strong> Enormously energizing to be around. Can engage with almost anyone. Starts more things than they finish — but what they start is often remarkable.</p>
+          <p><strong>Shadow:</strong> Can scatter energy across too many directions. Depth vs breadth is the central tension.</p>
+          <div class="type-fns"><span class="fn-badge dom">Ne</span><span class="fn-badge">Fi</span><span class="fn-badge">Te</span><span class="fn-badge">Si</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-label">Sentinels</div>
+    <div class="types-grid">
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ISTJ</div><div class="type-name">The Logistician</div>
+        <div class="type-tagline">Responsible, thorough, and deeply reliable. The person who keeps systems running quietly and correctly while others take credit.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Duty and competence. ISTJs take their obligations seriously and expect the same of others.</p>
+          <p><strong>In practice:</strong> Underestimated as unimaginative — actually have a rich inner world grounded in concrete experience rather than abstraction.</p>
+          <p><strong>Shadow:</strong> Can be resistant to change that challenges established procedures, even when change is clearly needed.</p>
+          <div class="type-fns"><span class="fn-badge dom">Si</span><span class="fn-badge">Te</span><span class="fn-badge">Fi</span><span class="fn-badge">Ne</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ISFJ</div><div class="type-name">The Defender</div>
+        <div class="type-tagline">Warm, meticulous, and deeply committed to the people they love. Quietly sacrifices without announcement and rarely asks for recognition.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Care and security. ISFJs protect — people, traditions, and the stability that allows others to thrive.</p>
+          <p><strong>In practice:</strong> Often the most undervalued type in personality discourse — their contribution is invisible until it's gone.</p>
+          <p><strong>Shadow:</strong> Difficulty saying no. Can build resentment quietly rather than voicing needs.</p>
+          <div class="type-fns"><span class="fn-badge dom">Si</span><span class="fn-badge">Fe</span><span class="fn-badge">Ti</span><span class="fn-badge">Ne</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ESTJ</div><div class="type-name">The Executive</div>
+        <div class="type-tagline">Organized, decisive, and focused on getting things done correctly. Natural administrators who bring structure to chaos.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Order and results. ESTJs believe in systems, rules, and clear expectations — not out of rigidity but because these genuinely work.</p>
+          <p><strong>In practice:</strong> Often the backbone of institutions. May come across as blunt but are usually reliable and fair.</p>
+          <p><strong>Shadow:</strong> Can enforce structure for its own sake, even when flexibility would serve better.</p>
+          <div class="type-fns"><span class="fn-badge dom">Te</span><span class="fn-badge">Si</span><span class="fn-badge">Ne</span><span class="fn-badge">Fi</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ESFJ</div><div class="type-name">The Consul</div>
+        <div class="type-tagline">Caring, socially attuned, and deeply invested in community harmony. Knows everyone's name and what they're going through.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Belonging and care. ESFJs create and maintain the social fabric — they notice when it tears and move to repair it.</p>
+          <p><strong>In practice:</strong> Gifted at reading rooms. Can adapt their approach to virtually anyone. Often taken for granted.</p>
+          <p><strong>Shadow:</strong> Can be overly sensitive to social disapproval. May define themselves through others' needs.</p>
+          <div class="type-fns"><span class="fn-badge dom">Fe</span><span class="fn-badge">Si</span><span class="fn-badge">Ne</span><span class="fn-badge">Ti</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-label">Explorers</div>
+    <div class="types-grid">
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ISTP</div><div class="type-name">The Virtuoso</div>
+        <div class="type-tagline">Quiet, observant, and masterfully practical. Understands how things work by taking them apart — literally or conceptually.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Mastery through direct experience. ISTPs learn by doing and trust what they can verify with their own hands and eyes.</p>
+          <p><strong>In practice:</strong> Calm under pressure to a degree that unnerves others. Act decisively when it counts, say little otherwise.</p>
+          <p><strong>Shadow:</strong> Emotional communication is a learned skill, not a natural one. Can seem withholding without realizing it.</p>
+          <div class="type-fns"><span class="fn-badge dom">Ti</span><span class="fn-badge">Se</span><span class="fn-badge">Ni</span><span class="fn-badge">Fe</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ISFP</div><div class="type-name">The Adventurer</div>
+        <div class="type-tagline">Gentle, present, and quietly intense. Has a rich inner aesthetic life and expresses values through action, not words.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Authentic expression in the present moment. ISFPs live by feel and respond to beauty in all its forms.</p>
+          <p><strong>In practice:</strong> Often surprising. Appear passive until values are threatened, at which point they act with decisive clarity.</p>
+          <p><strong>Shadow:</strong> Can struggle with long-term planning. The present moment is vivid; the future feels abstract.</p>
+          <div class="type-fns"><span class="fn-badge dom">Fi</span><span class="fn-badge">Se</span><span class="fn-badge">Ni</span><span class="fn-badge">Te</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ESTP</div><div class="type-name">The Entrepreneur</div>
+        <div class="type-tagline">Bold, pragmatic, and electrifying in the moment. Reads situations instantly and acts before others have finished processing.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Impact and immediate results. ESTPs are Se-dominant — they're fully present in physical reality and respond to it faster than anyone.</p>
+          <p><strong>In practice:</strong> Natural risk-takers who make it look easy. Excellent in crises. May bore quickly once stability is established.</p>
+          <p><strong>Shadow:</strong> Long-term consequences can feel abstract. May leave a trail of unfinished commitments.</p>
+          <div class="type-fns"><span class="fn-badge dom">Se</span><span class="fn-badge">Ti</span><span class="fn-badge">Fe</span><span class="fn-badge">Ni</span></div>
+        </div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">ESFP</div><div class="type-name">The Entertainer</div>
+        <div class="type-tagline">Spontaneous, warm, and genuinely joyful. Makes wherever they are more alive and more fun without apparent effort.</div>
+        <div class="type-detail">
+          <p><strong>Core drive:</strong> Experience and connection. ESFPs are fully alive in the present and bring others into that aliveness.</p>
+          <p><strong>In practice:</strong> Often underestimated as shallow — actually have deep emotional intelligence and situational awareness.</p>
+          <p><strong>Shadow:</strong> Conflict avoidance. Can use charm and humor to deflect situations that need direct engagement.</p>
+          <div class="type-fns"><span class="fn-badge dom">Se</span><span class="fn-badge">Fi</span><span class="fn-badge">Te</span><span class="fn-badge">Ni</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENNEAGRAM -->
+  <div class="type-panel" id="panel-enneagram">
+    <div class="sec-label">The Nine Types</div>
+    <div class="detail-card" onclick="toggleCard(this)" style="cursor:pointer">
+      <div class="detail-card-header"><div class="detail-code">1</div><div class="detail-name">The Perfectionist / Reformer</div></div>
+      <div class="detail-body">
+        <p><strong>Core fear:</strong> Being corrupt, evil, or defective. <strong>Core desire:</strong> To be good, to have integrity, to be beyond criticism.</p>
+        <p>Type 1s have an internal critic that never fully quiets — a persistent voice that points out what's wrong, what could be better, what falls short of the ideal. This isn't neurosis; it's a genuine moral seriousness that drives them to improve themselves and the world around them. At their best, 1s are principled, disciplined, and genuinely righteous in the deepest sense.</p>
+        <p><strong>Wing 1w2</strong> — the moral crusader who cares about people; more warm and interpersonally engaged than 1w9. <strong>Wing 1w9</strong> — the quiet perfectionist; more detached, idealistic, philosophical.</p>
+        <div class="detail-tags"><span class="detail-tag">Gut Center</span><span class="detail-tag">Instinctive Triad</span><span class="detail-tag">Anger repressed</span></div>
+      </div>
+    </div>
+    <div class="detail-card" onclick="toggleCard(this)" style="cursor:pointer">
+      <div class="detail-card-header"><div class="detail-code">2</div><div class="detail-name">The Helper / Giver</div></div>
+      <div class="detail-body">
+        <p><strong>Core fear:</strong> Being unwanted or unworthy of love. <strong>Core desire:</strong> To feel loved and to be needed.</p>
+        <p>Type 2s orient around relationships and the giving of care. They're attuned to what others need and find genuine satisfaction in meeting those needs. The shadow side: giving can become a strategy to secure love rather than a free expression of it. At their best, 2s are genuinely altruistic, emotionally intelligent, and warmly connected.</p>
+        <p><strong>Wing 2w1</strong> — more principled helper; serving from duty as much as love. <strong>Wing 2w3</strong> — more image-conscious; helping partly to be seen as good.</p>
+        <div class="detail-tags"><span class="detail-tag">Heart Center</span><span class="detail-tag">Shame Triad</span></div>
+      </div>
+    </div>
+    <div class="detail-card" onclick="toggleCard(this)" style="cursor:pointer">
+      <div class="detail-card-header"><div class="detail-code">3</div><div class="detail-name">The Achiever / Performer</div></div>
+      <div class="detail-body">
+        <p><strong>Core fear:</strong> Being worthless or without value. <strong>Core desire:</strong> To feel valuable and worthwhile.</p>
+        <p>Type 3s are driven to succeed, to be admired, and to embody the image of success in whatever context they inhabit. They're adaptable, charming, and highly competent — but the deepest 3 struggle to know who they are separate from their achievements and the image they project. At their best, 3s are authentic, inspiring, and generative.</p>
+        <div class="detail-tags"><span class="detail-tag">Heart Center</span><span class="detail-tag">Shame Triad</span><span class="detail-tag">Most common in USA</span></div>
+      </div>
+    </div>
+    <div class="detail-card" onclick="toggleCard(this)" style="cursor:pointer">
+      <div class="detail-card-header"><div class="detail-code">4</div><div class="detail-name">The Individualist / Romantic</div></div>
+      <div class="detail-body">
+        <p><strong>Core fear:</strong> Having no identity or personal significance. <strong>Core desire:</strong> To find themselves and their significance — to create an identity.</p>
+        <p>Type 4s experience themselves as fundamentally different from others — set apart by depth of feeling, unique aesthetic sensibility, or a persistent sense that something essential is missing that others have. This creates both their gift (genuine emotional depth, creative originality, capacity for beauty) and their wound (envy, melancholy, the feeling of being fundamentally incomplete).</p>
+        <div class="detail-tags"><span class="detail-tag">Heart Center</span><span class="detail-tag">Shame Triad</span><span class="detail-tag">Rarest type</span></div>
+      </div>
+    </div>
+    <div class="detail-card" onclick="toggleCard(this)" style="cursor:pointer">
+      <div class="detail-card-header"><div class="detail-code">5</div><div class="detail-name">The Investigator / Observer</div></div>
+      <div class="detail-body">
+        <p><strong>Core fear:</strong> Being helpless, useless, or incapable. <strong>Core desire:</strong> To be capable and competent — to have enough knowledge and resources to be self-sufficient.</p>
+        <p>Type 5s manage the world by observing it from a safe distance and accumulating knowledge as a form of security. They detach from emotional and practical demands to protect their limited energy reserves. At their best, 5s are visionary thinkers capable of extraordinary insight — they see what others miss because they're not distracted by social performance.</p>
+        <div class="detail-tags"><span class="detail-tag">Head Center</span><span class="detail-tag">Fear Triad</span><span class="detail-tag">Most introverted type</span></div>
+      </div>
+    </div>
+    <div class="detail-card" onclick="toggleCard(this)" style="cursor:pointer">
+      <div class="detail-card-header"><div class="detail-code">6</div><div class="detail-name">The Loyalist / Guardian</div></div>
+      <div class="detail-body">
+        <p><strong>Core fear:</strong> Being without support or guidance — being alone and without resources. <strong>Core desire:</strong> To have security and support.</p>
+        <p>Type 6s are defined by vigilance — a persistent awareness of what could go wrong and a drive to prepare for it. This produces both their strength (loyalty, responsibility, courage under genuine threat) and their struggle (anxiety, suspicion, second-guessing). The counterphobic 6 faces fears head-on; the phobic 6 avoids them. Both are deeply motivated by the search for a trustworthy foundation.</p>
+        <div class="detail-tags"><span class="detail-tag">Head Center</span><span class="detail-tag">Fear Triad</span><span class="detail-tag">Most common type globally</span></div>
+      </div>
+    </div>
+    <div class="detail-card" onclick="toggleCard(this)" style="cursor:pointer">
+      <div class="detail-card-header"><div class="detail-code">7</div><div class="detail-name">The Enthusiast / Epicure</div></div>
+      <div class="detail-body">
+        <p><strong>Core fear:</strong> Being deprived and in pain. <strong>Core desire:</strong> To be satisfied and content — to have their needs fulfilled.</p>
+        <p>Type 7s move toward pleasure, stimulation, and possibility as a strategy to avoid pain. They reframe difficult experiences almost automatically, keep their options open, and maintain a perpetual orientation toward what's exciting and possible. At their best, 7s are joyful, versatile, and genuinely life-giving. The shadow: depth is avoided because depth means staying with discomfort.</p>
+        <div class="detail-tags"><span class="detail-tag">Head Center</span><span class="detail-tag">Fear Triad</span><span class="detail-tag">Gluttony</span></div>
+      </div>
+    </div>
+    <div class="detail-card" onclick="toggleCard(this)" style="cursor:pointer">
+      <div class="detail-card-header"><div class="detail-code">8</div><div class="detail-name">The Challenger / Protector</div></div>
+      <div class="detail-body">
+        <p><strong>Core fear:</strong> Being controlled or violated by others. <strong>Core desire:</strong> To protect themselves and be in control of their own life.</p>
+        <p>Type 8s are defined by intensity, directness, and a refusal to be controlled. They meet the world with force because they believe vulnerability invites exploitation. But under the armor is usually deep care — 8s are often fierce protectors of those they consider theirs. At their best, 8s are powerful, magnanimous, and genuinely heroic.</p>
+        <div class="detail-tags"><span class="detail-tag">Gut Center</span><span class="detail-tag">Instinctive Triad</span><span class="detail-tag">Lust/Intensity</span></div>
+      </div>
+    </div>
+    <div class="detail-card" onclick="toggleCard(this)" style="cursor:pointer">
+      <div class="detail-card-header"><div class="detail-code">9</div><div class="detail-name">The Peacemaker / Mediator</div></div>
+      <div class="detail-body">
+        <p><strong>Core fear:</strong> Loss and separation — conflict and fragmentation. <strong>Core desire:</strong> To have inner stability, peace of mind.</p>
+        <p>Type 9s maintain peace by merging with their environment and avoiding conflict. They're genuinely good at seeing all sides of a situation, mediating between others, and creating harmony — but at the cost of sometimes losing track of their own wants, needs, and position. At their best, 9s are deeply grounded, accepting, and capable of genuine union with others.</p>
+        <div class="detail-tags"><span class="detail-tag">Gut Center</span><span class="detail-tag">Instinctive Triad</span><span class="detail-tag">Sloth</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHILOSOPHY & ETHICS -->
+  <div class="type-panel" id="panel-philosophy">
+    <div class="sec-label">Philosophical Schools</div>
+    <div class="types-grid">
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Stoic</div><div class="type-name">Stoicism</div>
+        <div class="type-tagline">Focus only on what is within your control. Everything else is indifferent.</div>
+        <div class="type-detail"><p><strong>Core idea:</strong> The good life consists of virtue alone. External circumstances — wealth, health, reputation — are preferred or dispreferred indifferents, not genuine goods. Only your judgments and responses to events are truly yours.</p><p><strong>Key thinkers:</strong> Marcus Aurelius, Epictetus, Seneca. <strong>Modern resonance:</strong> Cognitive behavioral therapy, resilience frameworks, military philosophy.</p></div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Epicurean</div><div class="type-name">Epicureanism</div>
+        <div class="type-tagline">The highest aim is tranquility, simple pleasure, and freedom from unnecessary anxiety.</div>
+        <div class="type-detail"><p><strong>Core idea:</strong> Pleasure (specifically ataraxia — tranquility) is the highest good, but Epicurus meant modest pleasure: friendship, philosophical conversation, freedom from pain. Not hedonism in the modern sense.</p><p><strong>Key thinkers:</strong> Epicurus, Lucretius. <strong>Modern resonance:</strong> Mindfulness, voluntary simplicity, anti-ambition movements.</p></div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Kantian</div><div class="type-name">Kantian Ethics</div>
+        <div class="type-tagline">Act only according to principles you could will to be universal laws.</div>
+        <div class="type-detail"><p><strong>Core idea:</strong> Morality is grounded in pure reason, not consequences. People must always be treated as ends in themselves, never merely as means. The categorical imperative is the test for any moral action.</p><p><strong>Key thinkers:</strong> Immanuel Kant. <strong>Modern resonance:</strong> Deontological ethics, human rights frameworks, international law.</p></div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Aristotelian</div><div class="type-name">Aristotelianism</div>
+        <div class="type-tagline">Human flourishing through rational activity in accordance with virtue over a complete lifetime.</div>
+        <div class="type-detail"><p><strong>Core idea:</strong> Eudaimonia (flourishing) is the proper aim of life. Virtue is a stable disposition built through practice — you become courageous by doing courageous things. Humans are social animals; the good life requires community.</p><p><strong>Key thinkers:</strong> Aristotle, Alasdair MacIntyre. <strong>Modern resonance:</strong> Virtue ethics, positive psychology, communitarianism.</p></div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Nietzschean</div><div class="type-name">Nietzscheanism</div>
+        <div class="type-tagline">Create your own values. Become who you are. The will to power as self-mastery.</div>
+        <div class="type-detail"><p><strong>Core idea:</strong> Conventional morality is a disguised form of resentment. The genuine individual creates values rather than inheriting them. The goal is self-overcoming — becoming the fullest version of what you distinctively are.</p><p><strong>Key thinkers:</strong> Friedrich Nietzsche. <strong>Modern resonance:</strong> Individualism, existentialism, certain strands of libertarianism and transhumanism.</p></div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Existentialist</div><div class="type-name">Existentialism</div>
+        <div class="type-tagline">Existence precedes essence. We are what we choose. Radical freedom, radical responsibility.</div>
+        <div class="type-detail"><p><strong>Core idea:</strong> There is no pre-given human nature or external source of meaning. We are thrown into existence and must create meaning through authentic choice. Confronting absurdity and death directly is the condition of genuine living.</p><p><strong>Key thinkers:</strong> Sartre, Camus, Heidegger, de Beauvoir. <strong>Modern resonance:</strong> Therapy, personal responsibility movements, authenticity culture.</p></div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Pragmatist</div><div class="type-name">Pragmatism</div>
+        <div class="type-tagline">Truth is what works. Judge ideas by their practical consequences.</div>
+        <div class="type-detail"><p><strong>Core idea:</strong> Abstract theories disconnected from practical consequences are not meaningful. Truth is not discovered but made — it is whatever successfully guides action and inquiry. Experimentation and fallibilism over fixed doctrine.</p><p><strong>Key thinkers:</strong> William James, John Dewey, Charles Peirce. <strong>Modern resonance:</strong> American liberal tradition, policy studies, scientific methodology.</p></div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Skeptic</div><div class="type-name">Skepticism</div>
+        <div class="type-tagline">Withhold judgment. Most of what we claim to know is actually confident belief.</div>
+        <div class="type-detail"><p><strong>Core idea:</strong> The history of human thought is a history of confident errors. The wise response is to suspend judgment in the absence of certainty — to hold beliefs provisionally and maintain epistemic humility about nearly everything.</p><p><strong>Key thinkers:</strong> Pyrrho, Hume, Montaigne. <strong>Modern resonance:</strong> Scientific skepticism, rationalist communities, epistemology.</p></div>
+      </div>
+    </div>
+    <div class="sec-label">Ethical Frameworks</div>
+    <div class="types-grid">
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Virtue</div><div class="type-name">Virtue Ethics</div>
+        <div class="type-tagline">What kind of person should I be? Ethics as character development.</div>
+        <div class="type-detail"><p>Morality is fundamentally about becoming a certain kind of person — courageous, just, temperate, wise. Rules and consequences are secondary to the cultivation of stable virtuous dispositions through practice and community.</p></div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Consequentialist</div><div class="type-name">Consequentialism</div>
+        <div class="type-tagline">The right action maximizes good outcomes for the greatest number.</div>
+        <div class="type-detail"><p>The morality of an action is determined entirely by its consequences. Utilitarianism is the most common form: maximize total wellbeing. Controversial implication: if lying or harming one person produces better aggregate outcomes, it may be required.</p></div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Deontological</div><div class="type-name">Deontology</div>
+        <div class="type-tagline">Some actions are simply right or wrong — regardless of consequences.</div>
+        <div class="type-detail"><p>Duty-based ethics grounded in rules or rights that cannot be violated even for good outcomes. Kant's categorical imperative is the canonical version. Rights-based liberalism inherits this structure.</p></div>
+      </div>
+      <div class="type-card" onclick="toggleCard(this)">
+        <div class="type-code">Egoist</div><div class="type-name">Rational Egoism</div>
+        <div class="type-tagline">Each person's rational self-interest is their primary moral obligation.</div>
+        <div class="type-detail"><p>Altruism that ignores self-interest is not virtuous but self-destructive. The fully realized person pursues their own rational values and flourishing. Ayn Rand's Objectivism is the most systematic modern expression.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POLITICS -->
+  <div class="type-panel" id="panel-politics">
+    <div class="sec-label">The Two Axes</div>
+    <p style="color:var(--muted2);font-size:13px;line-height:1.9;max-width:700px;margin-bottom:32px">The political compass measures two independent dimensions. <strong style="color:var(--text)">Economic axis</strong> (left–right): how much should the state control economic life? <strong style="color:var(--text)">Social axis</strong> (authoritarian–libertarian): how much should the state control personal life? These axes are genuinely independent — you can be economically left and socially libertarian, or economically right and socially authoritarian.</p>
+    <div class="compass-diagram">
+      <div class="compass-q ul"><strong>AUTH-LEFT</strong><span style="color:var(--muted);font-size:10px">State economy<br>Social control</span></div>
+      <div class="compass-q ur"><strong>AUTH-RIGHT</strong><span style="color:var(--muted);font-size:10px">Free market<br>Social order</span></div>
+      <div class="compass-q ll"><strong>LIB-LEFT</strong><span style="color:var(--muted);font-size:10px">State economy<br>Personal freedom</span></div>
+      <div class="compass-q lr"><strong>LIB-RIGHT</strong><span style="color:var(--muted);font-size:10px">Free market<br>Personal freedom</span></div>
+    </div>
+    <div class="quadrant-grid">
+      <div class="quadrant-card">
+        <div class="quadrant-title">Libertarian Right</div>
+        <div class="quadrant-sub">Economic Freedom · Personal Freedom</div>
+        <div class="quadrant-body">Free markets, minimal state, individual sovereignty in both economic and personal life. Ideologies: Classical Liberalism, Libertarianism, Anarcho-Capitalism, Minarchism. Thinkers: Hayek, Friedman, Rothbard, Rand.</div>
+      </div>
+      <div class="quadrant-card">
+        <div class="quadrant-title">Authoritarian Right</div>
+        <div class="quadrant-sub">Economic Freedom · Social Order</div>
+        <div class="quadrant-body">Market economics combined with strong social order, tradition, and national identity. Ideologies: Conservatism, National Conservatism, Neoconservatism, Christian Democracy. Thinkers: Burke, Scruton, Buckley.</div>
+      </div>
+      <div class="quadrant-card">
+        <div class="quadrant-title">Libertarian Left</div>
+        <div class="quadrant-sub">Economic Equality · Personal Freedom</div>
+        <div class="quadrant-body">Economic progressivism combined with strong civil liberties and personal autonomy. Ideologies: Left-Libertarianism, Libertarian Socialism, Green Liberalism, Anarchism. Thinkers: Chomsky, Kropotkin, Bookchin.</div>
+      </div>
+      <div class="quadrant-card">
+        <div class="quadrant-title">Authoritarian Left</div>
+        <div class="quadrant-sub">Economic Equality · Social Control</div>
+        <div class="quadrant-body">State control of the economy to achieve equality, combined with strong institutional authority. Ideologies: Democratic Socialism, Social Democracy, Marxism, Communism. Thinkers: Marx, Rawls, Sanders.</div>
+      </div>
+    </div>
+    <div class="sec-label">Common Ideological Labels</div>
+    <div class="types-grid">
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code" style="font-size:18px">Classical Liberal</div><div class="type-name">Moderate Lib-Right</div><div class="type-tagline">Free markets, constitutional rights, limited government, individual liberty as the foundation of all other freedoms.</div></div>
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code" style="font-size:18px">Social Democrat</div><div class="type-name">Moderate Auth-Left</div><div class="type-tagline">Market economy regulated and taxed to fund comprehensive welfare, healthcare, and education as universal rights.</div></div>
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code" style="font-size:18px">Libertarian</div><div class="type-name">Strong Lib-Right</div><div class="type-tagline">Minimal state in both economic and personal domains. Non-aggression as the foundational political principle.</div></div>
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code" style="font-size:18px">Democratic Socialist</div><div class="type-name">Moderate-Strong Auth-Left</div><div class="type-tagline">Public or worker ownership of key industries. Redistribution through democratic institutions. Markets exist but are tightly constrained.</div></div>
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code" style="font-size:18px">Neoconservative</div><div class="type-name">Auth-Right</div><div class="type-tagline">Free market economics combined with strong national defense, social conservatism, and interventionist foreign policy.</div></div>
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code" style="font-size:18px">Anarchist</div><div class="type-name">Extreme Lib (Left or Right)</div><div class="type-tagline">Abolition of all coercive hierarchies — state, capitalism, or both. Voluntary cooperation as the organizing principle of society.</div></div>
+    </div>
+  </div>
+
+  <!-- OTHER -->
+  <div class="type-panel" id="panel-other">
+    <div class="sec-label">Attachment Styles</div>
+    <div class="types-grid">
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code" style="font-size:20px">Secure</div><div class="type-name">Secure Attachment</div><div class="type-tagline">Comfortable with intimacy and independence in healthy balance. Trusts that others will be there.</div><div class="type-detail"><p>Securely attached people find relationships sustaining rather than threatening. They can depend on others without fear of abandonment and support others without losing themselves. This is the baseline of relational health — not perfection, but a reliable foundation.</p></div></div>
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code" style="font-size:20px">Anxious</div><div class="type-name">Anxious-Preoccupied</div><div class="type-tagline">Craves closeness but fears it won't last. Hypervigilant to signs of rejection or withdrawal.</div><div class="type-detail"><p>Anxiously attached people want deep connection but can't quite trust it. They monitor relationships intensely, need frequent reassurance, and may push for closeness in ways that ironically drive partners away. The wound: early relationships that were inconsistently available.</p></div></div>
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code" style="font-size:20px">Avoidant</div><div class="type-name">Dismissive-Avoidant</div><div class="type-tagline">Values independence so highly that closeness registers as a threat. Handles everything alone.</div><div class="type-detail"><p>Avoidantly attached people have learned that depending on others leads to disappointment. They suppress emotional needs, handle problems alone, and experience closeness as threatening to their autonomy. They're often high-functioning — their self-reliance is genuine. The cost is relational depth.</p></div></div>
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code" style="font-size:20px">Disorganized</div><div class="type-name">Fearful-Avoidant</div><div class="type-tagline">Simultaneously craves and fears intimacy. Relationships feel both necessary and dangerous.</div><div class="type-detail"><p>The most complex attachment pattern — people who both desperately want connection and are terrified of it. Often associated with early experiences where the caregiver was also a source of fear. Shows up as unpredictable relational behavior that can confuse even themselves.</p></div></div>
+    </div>
+    <div class="sec-label">Instinctual Variants</div>
+    <div class="types-grid">
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code">SP</div><div class="type-name">Self-Preservation</div><div class="type-tagline">Primary focus on physical security, health, resources, and a stable environment.</div><div class="type-detail"><p>SP-dominant people are oriented around the basics — safety, comfort, material security, physical health. They're careful with resources, highly self-sufficient, and tend to be private. Their relationships and ambitions are filtered through the question: is this sustainable? Is this safe?</p></div></div>
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code">SOC</div><div class="type-name">Social</div><div class="type-tagline">Primary focus on group membership, status, belonging, and one's position in hierarchies.</div><div class="type-detail"><p>SOC-dominant people are oriented around community and social position. They're attuned to group dynamics, care about their role within communities, and often have a strong sense of civic responsibility. They want to belong and to matter within their social world.</p></div></div>
+      <div class="type-card" onclick="toggleCard(this)"><div class="type-code">SX</div><div class="type-name">Sexual / Intimate</div><div class="type-tagline">Primary focus on intensity, chemistry, and one-on-one connection. Drawn to what captivates.</div><div class="type-detail"><p>SX-dominant people are driven by intensity and deep individual connection. They're drawn to whatever captivates them — a person, an idea, a project — and merge with it fully. Life organized around broad social belonging feels less alive than one intense connection. The SX instinct is about aliveness, not necessarily sexuality.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleCard(card){ card.classList.toggle('open'); }
+document.querySelectorAll('.type-tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('.type-tab').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('.type-panel').forEach(function(p){ p.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById('panel-'+this.getAttribute('data-panel')).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>

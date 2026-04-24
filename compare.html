@@ -757,5 +757,20 @@ function showToast(msg){
   t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
 }
 </script>
+
+// Smart logo nav - goes to dashboard if logged in, landing if not
+(function(){
+  function setupSmartLogo(){
+    var logos = document.querySelectorAll('.nav-logo, .panel-logo, .footer-logo');
+    auth.onAuthStateChanged(function(user){
+      logos.forEach(function(el){
+        el.href = user ? 'dashboard.html' : 'landing.html';
+      });
+    });
+  }
+  if(typeof auth !== 'undefined') setupSmartLogo();
+  else document.addEventListener('DOMContentLoaded', setupSmartLogo);
+})();
+
 </body>
 </html>

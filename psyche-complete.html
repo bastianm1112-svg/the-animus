@@ -254,6 +254,17 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
 .intro-import-btn:hover{background:var(--accent);border-color:var(--accent);color:#000;}
 .intro-import-error{font-size:10px;color:#8b2020;margin-top:8px;min-height:16px;letter-spacing:0.05em;}
 
+/* OBSERVER ESTIMATOR */
+.intro-observer{width:100%;max-width:480px;margin-bottom:16px;}
+.observer-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);padding:16px 18px;transition:border-color 0.2s;}
+.observer-icon{font-size:20px;color:var(--accent);flex-shrink:0;}
+.observer-info{flex:1;}
+.observer-title{font-size:12px;font-weight:500;color:var(--text);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:2px;}
+.observer-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+.observer-btn{background:none;border:1px solid var(--border2);color:var(--muted2);padding:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.observer-btn:hover{border-color:var(--accent2);color:var(--accent);}
+.observer-name-wrap{padding:14px 18px;background:var(--surface);border:1px solid var(--accent2);border-top:none;display:flex;flex-direction:column;}
+
 /* MODE TOGGLE */
 .intro-mode-toggle{display:flex;gap:8px;width:100%;max-width:380px;margin-bottom:20px;}
 .intro-mode-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:all 0.2s;font-family:'IBM Plex Mono',monospace;}
@@ -336,6 +347,24 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
     <div class="intro-meta-item"><strong id="metaMin">~30</strong><span data-en="Minutes" data-es="Minutos">Minutes</span></div>
   </div>
   <button class="btn-primary" id="startBtn" data-en="BEGIN" data-es="COMENZAR">BEGIN</button>
+  <!-- OBSERVER / ESTIMATOR MODE -->
+  <div class="intro-observer">
+    <div class="intro-import-divider"><span>or estimate someone else's profile</span></div>
+    <div class="observer-card">
+      <div class="observer-icon">◎</div>
+      <div class="observer-info">
+        <div class="observer-title">Test Estimator</div>
+        <div class="observer-desc">Answer based on someone's observed behaviors and habits — not your own. Attach a name to save the estimated profile.</div>
+      </div>
+      <button class="observer-btn" id="observerBtn">ESTIMATE →</button>
+    </div>
+    <div class="observer-name-wrap" id="observerNameWrap" style="display:none">
+      <input class="intro-import-input" id="observerName" type="text" placeholder="Enter their name (e.g. Marco, Mom, Friend)" maxlength="64" style="border-right:1px solid var(--border);width:100%" />
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:0.04em">Answer each question as you observe this person to behave — not how you think they should.</div>
+      <button class="intro-import-btn" id="startObserverBtn" style="margin-top:10px;width:100%">BEGIN ESTIMATOR →</button>
+    </div>
+  </div>
+
   <div class="intro-import">
     <div class="intro-import-divider"><span data-en="or view an existing profile" data-es="o ver un perfil existente">or view an existing profile</span></div>
     <div class="intro-import-row">
@@ -1283,6 +1312,39 @@ function doImport(){
 // ── FILL GAPS ──
 document.getElementById('fillBtn').addEventListener('click', function(){ doFillGaps(); });
 document.getElementById('fillInput').addEventListener('keydown', function(e){ if(e.key==='Enter') doFillGaps(); });
+
+// ── OBSERVER / ESTIMATOR MODE ──
+var observerMode = false;
+var observerSubjectName = '';
+
+document.getElementById('observerBtn').addEventListener('click', function(){
+  var wrap = document.getElementById('observerNameWrap');
+  var isOpen = wrap.style.display !== 'none';
+  wrap.style.display = isOpen ? 'none' : 'flex';
+  if(!isOpen) document.getElementById('observerName').focus();
+});
+
+document.getElementById('startObserverBtn').addEventListener('click', function(){
+  var name = document.getElementById('observerName').value.trim();
+  if(!name){ document.getElementById('observerName').style.borderColor='var(--red)'; return; }
+  observerMode = true;
+  observerSubjectName = name;
+  // Start the test in full mode for the observer
+  var activeQ = Q.slice();
+  shuffle(activeQ);
+  window._activeQ = activeQ;
+  window._observerMode = true;
+  window._observerName = name;
+  TOTAL = activeQ.length;
+  answers = new Array(TOTAL).fill(null);
+  cur = 0;
+  document.getElementById('intro').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  // Update header to show observer mode
+  document.querySelector('.qhdr-logo').innerHTML = 'ANIMUS <span style="font-size:12px;color:var(--accent2);letter-spacing:0.1em">ESTIMATOR</span>';
+  document.getElementById('qSection').textContent = 'Estimating: ' + name;
+  renderQ();
+});
 
 // Which fn codes belong to which dimension
 var DIM_FNS = {
@@ -3074,6 +3136,13 @@ function showComparison(you, them){
   document.getElementById('backToResults').addEventListener('click',function(){
     document.getElementById('compareView').style.display='none';
     document.getElementById('results').style.display='block';
+  if(window._observerMode){
+    var heroEl = document.getElementById('resHero');
+    var banner = document.createElement('div');
+    banner.style.cssText = 'background:rgba(200,169,110,0.08);border:1px solid var(--accent2);padding:12px 20px;margin-bottom:16px;font-size:12px;color:var(--muted2);letter-spacing:0.05em;';
+    banner.innerHTML = '◎ ESTIMATED PROFILE — <strong style="color:var(--text)">'+(window._observerName||'Unknown')+'</strong> — Based on observed behaviors, not self-report. Results may differ from a self-administered test.';
+    heroEl.insertBefore(banner, heroEl.firstChild);
+  }
     window.scrollTo(0,0);
   });
 
@@ -3147,6 +3216,23 @@ showResults=function(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   }
 };
 
+})();
+</script>
+
+<script>
+// Smart logo nav - goes to dashboard if logged in, landing if not
+(function(){
+  function setupSmartLogo(){
+    var logos = document.querySelectorAll('.nav-logo, .panel-logo, .footer-logo');
+    if(typeof auth === 'undefined') return;
+    auth.onAuthStateChanged(function(user){
+      logos.forEach(function(el){
+        if(el.tagName === 'A') el.href = user ? 'dashboard.html' : 'landing.html';
+      });
+    });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupSmartLogo);
+  else setupSmartLogo();
 })();
 </script>
 </body>

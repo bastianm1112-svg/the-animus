@@ -198,6 +198,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       My Profile
     </a>
+    <a href="types.html" class="nav-item">Types</a>
     <a href="psyche-complete.html" class="nav-item">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
       Take Test
@@ -568,5 +569,20 @@ function showToast(msg){
   t._timer=setTimeout(function(){ t.classList.remove('show'); },2400);
 }
 </script>
+
+// Smart logo nav - goes to dashboard if logged in, landing if not
+(function(){
+  function setupSmartLogo(){
+    var logos = document.querySelectorAll('.nav-logo, .panel-logo, .footer-logo');
+    auth.onAuthStateChanged(function(user){
+      logos.forEach(function(el){
+        el.href = user ? 'dashboard.html' : 'landing.html';
+      });
+    });
+  }
+  if(typeof auth !== 'undefined') setupSmartLogo();
+  else document.addEventListener('DOMContentLoaded', setupSmartLogo);
+})();
+
 </body>
 </html>

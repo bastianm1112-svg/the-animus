@@ -1020,7 +1020,11 @@ updateCharCount();
 
 // Load real user data from Firebase
 auth.onAuthStateChanged(function(user){
-  if(!user){ window.location.href='login.html'; return; }
+  if(!user){
+    // Don't redirect - show logged-out state instead
+    document.getElementById('navAvatar').textContent='?';
+    return;
+  }
   document.getElementById('navAvatar').textContent = (user.displayName||'?').charAt(0).toUpperCase();
   db.collection('users').doc(user.uid).get().then(function(doc){
     if(!doc.exists) return;
@@ -1182,5 +1186,20 @@ function safeAtob(encoded){
   } catch(e){ return null; }
 }
 </script>
+
+// Smart logo nav - goes to dashboard if logged in, landing if not
+(function(){
+  function setupSmartLogo(){
+    var logos = document.querySelectorAll('.nav-logo, .panel-logo, .footer-logo');
+    auth.onAuthStateChanged(function(user){
+      logos.forEach(function(el){
+        el.href = user ? 'dashboard.html' : 'landing.html';
+      });
+    });
+  }
+  if(typeof auth !== 'undefined') setupSmartLogo();
+  else document.addEventListener('DOMContentLoaded', setupSmartLogo);
+})();
+
 </body>
 </html>
