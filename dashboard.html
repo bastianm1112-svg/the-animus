@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://api.anthropic.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://api.anthropic.com; frame-ancestors 'none';">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANIMUS — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080808;--surface:#0f0f0f;--surface2:#141414;
+  --border:#1e1e1e;--border2:#2a2a2a;
+  --text:#e2e2e2;--muted:#555;--muted2:#888;
+  --gold:#c8a96e;--gold2:#8a6f3e;--gold3:#f0d090;
+  --white:#f0ece4;--green:#27ae60;--red:#c0392b;
+}
+body.light-mode{--bg:#f4f1ec;--surface:#fff;--surface2:#f8f5f0;--border:#e0dbd4;--border2:#cdc7bf;--text:#1a1714;--muted:#9a9189;--muted2:#6b6259;--white:#1a1714;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;}
+
+/* NAV */
+.navbar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;z-index:200;gap:0;}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;color:var(--white);text-decoration:none;margin-right:40px;}
+.nav-logo span{color:var(--gold);}
+.nav-items{display:flex;align-items:center;gap:4px;flex:1;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:7px 14px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;transition:all 0.15s;}
+.nav-item:hover{color:var(--text);background:var(--surface);}
+.nav-item.active{color:var(--gold);background:rgba(200,169,110,0.06);}
+.nav-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
+.notif-btn{position:relative;background:none;border:none;color:var(--muted2);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;transition:color 0.2s;border-radius:2px;}
+.notif-btn:hover{color:var(--text);background:var(--surface);}
+.notif-badge{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--gold);border-radius:50%;border:1px solid var(--bg);display:none;}
+.nav-avatar{width:32px;height:32px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);text-decoration:none;transition:border-color 0.2s;}
+.nav-avatar:hover{border-color:var(--gold2);}
+
+/* LAYOUT */
+.page{padding-top:56px;display:grid;grid-template-columns:280px 1fr 300px;min-height:100vh;}
+@media(max-width:1100px){.page{grid-template-columns:240px 1fr;}.feed-col{display:none;}}
+@media(max-width:768px){.page{grid-template-columns:1fr;}.sidebar{display:none;}}
+
+/* SIDEBAR */
+.sidebar{border-right:1px solid var(--border);padding:28px 20px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;display:flex;flex-direction:column;gap:28px;}
+.my-profile-card{background:var(--surface);border:1px solid var(--border);padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;}
+.my-avatar{width:56px;height:56px;border-radius:50%;border:2px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);overflow:hidden;}
+.my-name{font-size:14px;font-weight:500;color:var(--white);}
+.my-username{font-size:11px;color:var(--muted);letter-spacing:0.05em;}
+.my-type{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.08em;color:var(--gold);line-height:1;}
+.my-enn{font-size:11px;color:var(--muted2);margin-top:-4px;}
+.btn-view-profile{display:block;width:100%;padding:9px;border:1px solid var(--border2);color:var(--muted2);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;text-align:center;transition:all 0.2s;}
+.btn-view-profile:hover{border-color:var(--gold2);color:var(--gold);}
+.sidebar-section-label{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.sidebar-section-label a{color:var(--gold2);font-size:9px;letter-spacing:0.15em;text-decoration:none;text-transform:uppercase;transition:color 0.2s;cursor:pointer;}
+.sidebar-section-label a:hover{color:var(--gold);}
+.sidebar-search{position:relative;margin-bottom:12px;}
+.sidebar-search input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:9px 12px 9px 34px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s;}
+.sidebar-search input::placeholder{color:var(--muted);}
+.sidebar-search input:focus{border-color:var(--gold2);}
+.sidebar-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+.sidebar-nav{display:flex;flex-direction:column;gap:2px;}
+.sidebar-nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:13px;color:var(--muted2);text-decoration:none;transition:all 0.15s;border-radius:2px;}
+.sidebar-nav-item:hover{background:var(--surface);color:var(--text);}
+.sidebar-nav-item.active{background:rgba(200,169,110,0.06);color:var(--gold);}
+.sidebar-nav-item svg{opacity:0.5;flex-shrink:0;}
+.sidebar-nav-item.active svg{opacity:1;}
+
+/* MAIN */
+.main{padding:32px 28px;max-width:800px;}
+.main-header{margin-bottom:32px;}
+.main-greeting{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--white);margin-bottom:4px;}
+.main-greeting em{font-style:italic;color:var(--gold);}
+.main-date{font-size:12px;color:var(--muted);letter-spacing:0.05em;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.section-title{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;}
+.section-title::before{content:'';width:16px;height:1px;background:var(--gold2);}
+.section-link{font-size:11px;color:var(--gold2);text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s;cursor:pointer;}
+.section-link:hover{color:var(--gold);}
+
+/* FRIENDS GRID */
+.friends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:40px;}
+.friend-card{background:var(--surface);border:1px solid var(--border);padding:20px 16px;text-align:center;text-decoration:none;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;}
+.friend-card:hover{border-color:var(--gold2);transform:translateY(-2px);}
+.friend-avatar{width:44px;height:44px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);overflow:hidden;margin-bottom:2px;}
+.friend-name{font-size:12px;font-weight:500;color:var(--text);}
+.friend-username{font-size:10px;color:var(--muted);}
+.friend-type{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.08em;color:var(--gold);line-height:1;}
+.friend-enn{font-size:10px;color:var(--muted2);}
+.friend-online{position:absolute;top:10px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--green);border:1px solid var(--surface);}
+.friend-card-add{background:none;border:1px dashed var(--border2);color:var(--muted);cursor:pointer;min-height:140px;font-family:'DM Sans',sans-serif;}
+.friend-card-add:hover{border-color:var(--gold2);color:var(--gold);transform:translateY(-2px);}
+.add-icon{font-size:24px;margin-bottom:6px;line-height:1;}
+.add-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;}
+.empty-state{grid-column:1/-1;padding:32px;text-align:center;color:var(--muted);font-size:12px;letter-spacing:0.05em;}
+
+/* FEED */
+.feed-items{display:flex;flex-direction:column;gap:0;}
+.feed-item{display:flex;align-items:flex-start;gap:14px;padding:16px 0;border-bottom:1px solid var(--border);}
+.feed-item:first-child{padding-top:0;}
+.feed-item:last-child{border-bottom:none;}
+.feed-avatar{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);flex-shrink:0;}
+.feed-content{flex:1;}
+.feed-text{font-size:13px;color:var(--text);line-height:1.5;}
+.feed-text strong{color:var(--white);font-weight:500;}
+.feed-text .type-pill{display:inline-block;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.06em;color:var(--gold);background:rgba(200,169,110,0.08);padding:1px 8px;border:1px solid rgba(200,169,110,0.2);vertical-align:middle;margin:0 2px;}
+.feed-time{font-size:11px;color:var(--muted);margin-top:3px;}
+.feed-action{font-size:11px;color:var(--gold2);text-decoration:none;letter-spacing:0.05em;transition:color 0.15s;white-space:nowrap;margin-top:2px;display:inline-block;}
+.feed-action:hover{color:var(--gold);}
+
+/* RIGHT COLUMN */
+.feed-col{border-left:1px solid var(--border);padding:28px 20px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
+.feed-col-title{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.feed-col-title::before{content:'';width:12px;height:1px;background:var(--gold2);}
+.notif-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);}
+.notif-item:last-child{border-bottom:none;}
+.notif-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;}
+.notif-dot.read{background:var(--border2);}
+.notif-text{font-size:12px;color:var(--muted2);line-height:1.6;}
+.notif-text strong{color:var(--text);font-weight:500;}
+.notif-time{font-size:10px;color:var(--muted);margin-top:2px;}
+.suggest-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.suggest-item:last-child{border-bottom:none;}
+.suggest-avatar{width:32px;height:32px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--gold);flex-shrink:0;}
+.suggest-info{flex:1;}
+.suggest-name{font-size:12px;color:var(--text);font-weight:500;}
+.suggest-type{font-size:11px;color:var(--muted);}
+.btn-add-small{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--border2);background:none;color:var(--muted2);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn-add-small:hover{border-color:var(--gold2);color:var(--gold);}
+.btn-add-small.added{border-color:var(--green);color:var(--green);}
+
+/* RETAKE BANNER */
+.retake-banner{background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--gold);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:32px;}
+.retake-text{font-size:13px;color:var(--muted2);line-height:1.6;}
+.retake-text strong{color:var(--text);}
+.btn-retake{padding:9px 20px;background:var(--gold);border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;white-space:nowrap;text-decoration:none;transition:background 0.2s;}
+.btn-retake:hover{background:var(--gold3);}
+
+/* ADD FRIEND MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border2);padding:32px;max-width:440px;width:100%;animation:modalIn 0.2s ease;position:relative;}
+@keyframes modalIn{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:scale(1)}}
+.modal-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--white);margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--muted2);margin-bottom:24px;line-height:1.7;}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px 8px;}
+.modal-close:hover{color:var(--text);}
+.modal-search-wrap{position:relative;margin-bottom:16px;}
+.modal-search-wrap input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:12px 16px 12px 40px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+.modal-search-wrap input::placeholder{color:var(--muted);}
+.modal-search-wrap input:focus{border-color:var(--gold2);}
+.modal-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);}
+.search-results{display:flex;flex-direction:column;gap:8px;min-height:48px;}
+.search-result-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border:1px solid var(--border);transition:border-color 0.15s;}
+.search-result-item:hover{border-color:var(--border2);}
+.search-result-avatar{width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--gold);}
+.search-result-info{flex:1;}
+.search-result-name{font-size:13px;color:var(--text);font-weight:500;}
+.search-result-meta{font-size:11px;color:var(--muted);}
+.search-empty{font-size:13px;color:var(--muted);text-align:center;padding:16px 0;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--gold2);color:var(--text);padding:10px 24px;font-size:12px;z-index:600;opacity:0;transition:all 0.3s;pointer-events:none;letter-spacing:0.05em;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:600px){.main{padding:20px 16px;}.friends-grid{grid-template-columns:repeat(2,1fr);}.retake-banner{flex-direction:column;align-items:flex-start;}}
+</style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
+      authDomain: "animus-b3d83.firebaseapp.com",
+      projectId: "animus-b3d83",
+      storageBucket: "animus-b3d83.firebasestorage.app",
+      messagingSenderId: "681221615050",
+      appId: "1:681221615050:web:1d037cd07a8381c91b3333"
+    });
+  </script>
+</head>
+<body>
+<script>
+// Apply saved theme immediately
+(function(){ if(localStorage.getItem('animus_theme')==='light') document.body.classList.add('light-mode'); })();
+</script>
+
+<!-- NAV -->
+<nav class="navbar">
+  <a href="landing.html" class="nav-logo">ANI<span>MUS</span></a>
+  <div class="nav-items">
+    <a href="dashboard.html" class="nav-item active">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="profile.html" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      My Profile
+    </a>
+    <a href="psyche-complete.html" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Take Test
+    </a>
+  </div>
+  <div class="nav-right">
+    <button class="notif-btn" onclick="toggleNotifPanel()" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-badge" id="notifBadge"></div>
+    </button>
+    <a href="profile.html" class="nav-avatar" id="navAvatar">?</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="my-profile-card">
+        <div class="my-avatar" id="sidebarAvatar">?</div>
+        <div>
+          <div class="my-name" id="sidebarName">—</div>
+          <div class="my-username" id="sidebarUsername">@—</div>
+        </div>
+        <div class="my-type" id="sidebarType">—</div>
+        <div class="my-enn" id="sidebarEnn">—</div>
+        <a href="profile.html" class="btn-view-profile">View Profile</a>
+      </div>
+    </div>
+
+    <div>
+      <div class="sidebar-section-label">Navigate</div>
+      <div class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-nav-item active">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="profile.html" class="sidebar-nav-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          My Profile
+        </a>
+        <a href="psyche-complete.html" class="sidebar-nav-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Take Test
+        </a>
+        <a href="settings.html" class="sidebar-nav-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <div class="sidebar-section-label">
+        Friends <span style="color:var(--muted2)" id="friendCount"></span>
+        <a onclick="openAddFriend()">+ Add</a>
+      </div>
+      <div class="sidebar-search">
+        <span class="sidebar-search-icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </span>
+        <input type="text" placeholder="Search friends..." oninput="filterFriends(this.value)" />
+      </div>
+      <div class="sidebar-nav" id="friendsNav">
+        <div style="padding:8px 12px;font-size:11px;color:var(--muted)">No friends yet</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-header">
+      <div class="main-greeting" id="mainGreeting">Welcome to <em>ANIMUS</em></div>
+      <div class="main-date" id="currentDate"></div>
+    </div>
+
+    <div class="retake-banner">
+      <div class="retake-text" id="retakeBannerText">Take the assessment to build your profile.</div>
+      <a href="psyche-complete.html" class="btn-retake">Take Test →</a>
+    </div>
+
+    <div class="section-head">
+      <div class="section-title">Friends</div>
+      <a class="section-link" onclick="openAddFriend()">+ Add friend</a>
+    </div>
+
+    <div class="friends-grid" id="friendsGrid">
+      <div class="empty-state">No friends yet — add someone to get started</div>
+      <button class="friend-card friend-card-add" onclick="openAddFriend()">
+        <div class="add-icon">+</div>
+        <div class="add-label">Add Friend</div>
+      </button>
+    </div>
+
+    <div class="section-head">
+      <div class="section-title">Activity</div>
+    </div>
+
+    <div class="feed-items" id="feedItems">
+      <div style="padding:24px 0;text-align:center;color:var(--muted);font-size:12px;letter-spacing:0.05em;">
+        Activity from friends will appear here
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT COLUMN -->
+  <aside class="feed-col">
+    <div class="feed-col-title">Notifications</div>
+    <div id="notifList" style="margin-bottom:28px">
+      <div style="padding:16px 0;font-size:12px;color:var(--muted);text-align:center">No new notifications</div>
+    </div>
+    <div class="feed-col-title" style="margin-top:8px">People you may know</div>
+    <div id="suggestList">
+      <div style="padding:12px 0;font-size:12px;color:var(--muted);text-align:center">Suggestions appear after you connect with friends</div>
+    </div>
+  </aside>
+</div>
+
+<!-- ADD FRIEND MODAL -->
+<div class="modal-overlay" id="addFriendModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeAddFriend()">✕</button>
+    <div class="modal-title">Add a friend</div>
+    <p class="modal-sub">Search by username to find and add someone to your friends list.</p>
+    <div class="modal-search-wrap">
+      <span class="modal-search-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </span>
+      <input type="text" id="friendSearchInput" placeholder="Search by @username or name..."
+        oninput="searchUsers(this.value)" autocomplete="off" maxlength="64" />
+    </div>
+    <div class="search-results" id="searchResults">
+      <div class="search-empty">Start typing to search for people</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// Date & greeting
+var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var now=new Date();
+document.getElementById('currentDate').textContent=days[now.getDay()]+', '+months[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+var hour=now.getHours();
+var greeting=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
+
+// ── FIREBASE AUTH + DATA LOAD ──
+auth.onAuthStateChanged(function(user){
+  if(!user){ window.location.href='login.html'; return; }
+
+  // Set greeting
+  var name = escapeHTML(user.displayName || user.email.split('@')[0]);
+  document.getElementById('mainGreeting').innerHTML = greeting+', <em>'+name+'</em>';
+  var init = name.charAt(0).toUpperCase();
+  document.getElementById('navAvatar').textContent = init;
+  document.getElementById('sidebarAvatar').textContent = init;
+  document.getElementById('sidebarName').textContent = name;
+
+  // Load user doc
+  db.collection('users').doc(user.uid).get().then(function(doc){
+    if(doc.exists){
+      var data = doc.data();
+      var uname = data.username || '';
+      if(uname) document.getElementById('sidebarUsername').textContent = '@'+escapeHTML(uname);
+      var fc = (data.friends||[]).length;
+      if(fc) document.getElementById('friendCount').textContent = '· '+fc;
+    }
+  });
+
+  // Load latest profile
+  db.collection('profiles').doc(user.uid).get().then(function(doc){
+    if(doc.exists){
+      var p = doc.data().latest;
+      if(p && p.mbti){
+        document.getElementById('sidebarType').textContent = p.mbti;
+        var ennD = p.ennType ? p.ennType+'w'+p.ennWing : '—';
+        document.getElementById('sidebarEnn').textContent = ennD+(p.instStack?' · '+p.instStack:'');
+        document.getElementById('retakeBannerText').innerHTML = '<strong>Last assessment complete.</strong> Retake any time to see how you\'ve changed.';
+      }
+    }
+  });
+
+  // Load friends + activity
+  loadFriends(user.uid);
+  loadActivity(user.uid);
+});
+
+function loadFriends(uid){
+  db.collection('users').doc(uid).get().then(function(doc){
+    if(!doc.exists) return;
+    var friends = doc.data().friends || [];
+    if(!friends.length) return;
+    var grid = document.getElementById('friendsGrid');
+    var nav = document.getElementById('friendsNav');
+    grid.innerHTML = '';
+    nav.innerHTML = '';
+    var promises = friends.map(function(fuid){
+      return Promise.all([
+        db.collection('users').doc(fuid).get(),
+        db.collection('profiles').doc(fuid).get()
+      ]).then(function(results){
+        var uDoc = results[0]; var pDoc = results[1];
+        if(!uDoc.exists) return;
+        var u = uDoc.data();
+        var p = pDoc.exists ? pDoc.data().latest : {};
+        var init = escapeHTML((u.displayName||'?').charAt(0).toUpperCase());
+        var dname = escapeHTML(u.displayName||'');
+        var uname = escapeHTML(u.username||'');
+        var mbti = escapeHTML((p&&p.mbti)||'—');
+        var enn = p&&p.ennType ? p.ennType+'w'+p.ennWing : '—';
+        // Grid card
+        var card = document.createElement('a');
+        card.href = 'profile.html?u='+encodeURIComponent(u.username||fuid);
+        card.className = 'friend-card';
+        card.innerHTML = '<div class="friend-avatar">'+init+'</div>'
+          +'<div class="friend-name">'+dname+'</div>'
+          +'<div class="friend-username">@'+uname+'</div>'
+          +'<div class="friend-type">'+mbti+'</div>'
+          +'<div class="friend-enn">'+escapeHTML(enn)+'</div>';
+        grid.appendChild(card);
+        // Add btn
+        var addBtn = document.createElement('button');
+        addBtn.className = 'friend-card friend-card-add';
+        addBtn.onclick = openAddFriend;
+        addBtn.innerHTML = '<div class="add-icon">+</div><div class="add-label">Add Friend</div>';
+        grid.appendChild(addBtn);
+        // Sidebar
+        var si = document.createElement('a');
+        si.href = 'profile.html?u='+encodeURIComponent(u.username||fuid);
+        si.className = 'sidebar-nav-item';
+        si.innerHTML = '<div class="suggest-avatar" style="width:24px;height:24px;font-size:11px;border-radius:50%">'+init+'</div>'
+          +'<div style="flex:1"><div style="font-size:12px;color:var(--text)">'+dname+'</div>'
+          +'<div style="font-size:10px;color:var(--muted)">'+mbti+'</div></div>';
+        nav.appendChild(si);
+      });
+    });
+  });
+}
+
+function loadActivity(uid){
+  db.collection('activity').doc(uid).collection('feed')
+    .orderBy('timestamp','desc').limit(20).get()
+    .then(function(snap){
+      if(snap.empty) return;
+      var feed = document.getElementById('feedItems');
+      feed.innerHTML = '';
+      snap.forEach(function(doc){
+        var a = doc.data();
+        var item = document.createElement('div');
+        item.className = 'feed-item';
+        var timeAgo = a.timestamp ? getTimeAgo(a.timestamp.toDate()) : '';
+        item.innerHTML = '<div class="feed-avatar">'+escapeHTML((a.fromName||'?').charAt(0))+'</div>'
+          +'<div class="feed-content"><div class="feed-text">'+escapeHTML(a.text||'')+'</div>'
+          +'<div class="feed-time">'+timeAgo+'</div>'
+          +(a.link?'<a href="'+escapeHTML(a.link)+'" class="feed-action">View →</a>':'')
+          +'</div>';
+        feed.appendChild(item);
+      });
+    }).catch(function(){});
+}
+
+function getTimeAgo(date){
+  var diff = Math.floor((Date.now()-date.getTime())/1000);
+  if(diff<60) return 'Just now';
+  if(diff<3600) return Math.floor(diff/60)+' min ago';
+  if(diff<86400) return Math.floor(diff/3600)+' hr ago';
+  return Math.floor(diff/86400)+' days ago';
+}
+
+// Add friend modal
+function openAddFriend(){
+  document.getElementById('addFriendModal').classList.add('open');
+  setTimeout(function(){ document.getElementById('friendSearchInput').focus(); },100);
+}
+function closeAddFriend(){
+  document.getElementById('addFriendModal').classList.remove('open');
+  document.getElementById('searchResults').innerHTML='<div class="search-empty">Start typing to search for people</div>';
+  document.getElementById('friendSearchInput').value='';
+}
+document.getElementById('addFriendModal').addEventListener('click',function(e){ if(e.target===this) closeAddFriend(); });
+
+// Search — will be replaced by Firestore query
+var searchTimer=null;
+function searchUsers(val){
+  clearTimeout(searchTimer);
+  var res=document.getElementById('searchResults');
+  if(!val.trim()){ res.innerHTML='<div class="search-empty">Start typing to search for people</div>'; return; }
+  res.innerHTML='<div class="search-empty">Searching...</div>';
+  searchTimer=setTimeout(function(){
+    var q=val.toLowerCase().replace('@','');
+    if(q.length<2){ res.innerHTML='<div class="search-empty">Type at least 2 characters</div>'; return; }
+    firebase.firestore().collection('usernames')
+      .where(firebase.firestore.FieldPath.documentId(),'>=',q)
+      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'')
+      .limit(6).get()
+      .then(function(snap){
+        if(snap.empty){ res.innerHTML='<div class="search-empty">No users found</div>'; return; }
+        res.innerHTML='';
+        snap.docs.forEach(function(doc){
+          var searchUid=doc.data().uid;
+          firebase.firestore().collection('users').doc(searchUid).get().then(function(uDoc){
+            var p=uDoc.exists?uDoc.data():{};
+            var n=escapeHTML(p.displayName||'User');
+            var u=escapeHTML(doc.id);
+            var i=n.charAt(0).toUpperCase();
+            var currentUser=firebase.auth().currentUser;
+            var isSelf=currentUser&&currentUser.uid===searchUid;
+            if(isSelf) return;
+            res.innerHTML+='<div class="search-result-item">'
+              +'<div class="search-result-avatar">'+i+'</div>'
+              +'<div class="search-result-info">'
+              +'<div class="search-result-name">'+n+' <span style="color:var(--muted);font-weight:400">@'+u+'</span></div>'
+              +'</div>'
+              +'<button class="btn-add-small" onclick="sendFriendRequest(''+searchUid+'',''+n+'',this)">Add</button>'
+              +'</div>';
+          });
+        });
+      }).catch(function(){ res.innerHTML='<div class="search-empty">Search unavailable</div>'; });
+  },400);
+}
+
+function addFriend(btn,name){
+  btn.textContent='Sent ✓'; btn.classList.add('added'); btn.disabled=true;
+  showToast('Friend request sent to '+escapeHTML(name));
+}
+
+function sendFriendRequest(toUid, toName, btn){
+  var user=firebase.auth().currentUser;
+  if(!user){ showToast('Sign in to add friends'); return; }
+  btn.textContent='Sending...'; btn.disabled=true;
+  // Add to recipient's received requests
+  firebase.firestore().collection('users').doc(toUid).update({
+    'friendRequests.received': firebase.firestore.FieldValue.arrayUnion(user.uid)
+  }).then(function(){
+    return firebase.firestore().collection('users').doc(user.uid).update({
+      'friendRequests.sent': firebase.firestore.FieldValue.arrayUnion(toUid)
+    });
+  }).then(function(){
+    btn.textContent='Sent ✓'; btn.classList.add('added');
+    showToast('Friend request sent to '+escapeHTML(toName));
+  }).catch(function(e){ btn.textContent='Add'; btn.disabled=false; showToast('Error: '+e.message); });
+}
+
+function filterFriends(val){
+  val=val.toLowerCase();
+  document.querySelectorAll('#friendsNav .sidebar-nav-item').forEach(function(el){
+    var name=el.querySelector('div div:first-child');
+    if(name) el.style.display=name.textContent.toLowerCase().includes(val)?'':'none';
+  });
+}
+
+function toggleNotifPanel(){
+  showToast('Notifications — coming soon');
+}
+function signOut(){
+  auth.signOut().then(function(){ window.location.href='login.html'; });
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(function(){ t.classList.remove('show'); },2400);
+}
+</script>
+</body>
+</html>

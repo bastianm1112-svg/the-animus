@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com https://www.gstatic.com; connect-src 'self' https://api.anthropic.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-ancestors 'none'; base-uri 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+<meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://api.anthropic.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://api.anthropic.com; frame-ancestors 'none';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANIMUS — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --surface: #0f0f0f;
+  --surface2: #141414;
+  --border: #1e1e1e;
+  --border2: #2a2a2a;
+  --text: #e2e2e2;
+  --muted: #555;
+  --muted2: #888;
+  --gold: #c8a96e;
+  --gold2: #8a6f3e;
+  --gold3: #f0d090;
+  --white: #f0ece4;
+  --error: #c0392b;
+}
+body.light-mode {
+  --bg: #f4f1ec; --surface: #ffffff; --surface2: #f8f5f0;
+  --border: #e0dbd4; --border2: #cdc7bf;
+  --text: #1a1714; --muted: #9a9189; --muted2: #6b6259;
+  --white: #1a1714;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+@media(max-width: 768px) {
+  body { grid-template-columns: 1fr; }
+  .left-panel { display: none; }
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+}
+.left-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(200,169,110,0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+.panel-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.12em;
+  color: var(--white);
+  text-decoration: none;
+}
+.panel-logo span { color: var(--gold); }
+
+.panel-middle { position: relative; z-index: 1; }
+.panel-big {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 10vw, 120px);
+  letter-spacing: 0.06em;
+  line-height: 0.88;
+  color: var(--white);
+  margin-bottom: 24px;
+}
+.panel-big span { color: var(--gold); }
+.panel-quote {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--muted2);
+  line-height: 1.7;
+  max-width: 360px;
+  border-left: 2px solid var(--gold2);
+  padding-left: 20px;
+}
+
+.panel-dims {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+.panel-dim {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.panel-dim::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--gold2);
+  flex-shrink: 0;
+}
+.panel-dim strong { color: var(--muted2); font-weight: 400; }
+
+/* vertical label */
+.panel-vert {
+  position: absolute;
+  right: 24px; top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: var(--muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 40px;
+  min-height: 100vh;
+}
+.auth-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Mobile logo */
+.mobile-logo {
+  display: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.12em;
+  color: var(--white);
+  text-decoration: none;
+  margin-bottom: 40px;
+  text-align: center;
+}
+.mobile-logo span { color: var(--gold); }
+@media(max-width:768px){ .mobile-logo { display: block; } }
+
+.auth-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.auth-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+.auth-sub {
+  font-size: 13px;
+  color: var(--muted2);
+  margin-bottom: 40px;
+  line-height: 1.7;
+}
+
+/* Mode toggle */
+.auth-toggle {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+.toggle-btn {
+  flex: 1;
+  padding: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.toggle-btn.active {
+  background: var(--surface2);
+  color: var(--text);
+  border-bottom: 2px solid var(--gold);
+}
+
+/* Google button */
+.btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  margin-bottom: 24px;
+}
+.btn-google:hover { border-color: var(--gold2); background: var(--surface2); }
+.btn-google svg { flex-shrink: 0; }
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.auth-divider span {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Form */
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted2);
+}
+.form-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.form-input::placeholder { color: var(--muted); }
+.form-input:focus { border-color: var(--gold2); }
+.form-input.error { border-color: var(--error); }
+
+/* Password wrapper */
+.password-wrap { position: relative; }
+.password-wrap .form-input { padding-right: 44px; }
+.toggle-pass {
+  position: absolute;
+  right: 14px; top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  transition: color 0.2s;
+  padding: 0;
+}
+.toggle-pass:hover { color: var(--text); }
+
+/* Username field (signup only) */
+.signup-only { display: none; }
+.signup-only.visible { display: flex; }
+
+/* Error message */
+.auth-error {
+  font-size: 12px;
+  color: var(--error);
+  padding: 10px 14px;
+  border: 1px solid rgba(192,57,43,0.2);
+  background: rgba(192,57,43,0.05);
+  display: none;
+}
+.auth-error.visible { display: block; }
+
+/* Submit */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--gold);
+  border: none;
+  color: #000;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.btn-submit:hover { background: var(--gold3); }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-submit .spinner {
+  display: none;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(0,0,0,0.3);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  position: absolute;
+  right: 16px; top: 50%;
+  transform: translateY(-50%);
+}
+.btn-submit.loading .spinner { display: block; }
+@keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+/* Forgot password */
+.auth-forgot {
+  text-align: right;
+  margin-top: -6px;
+}
+.auth-forgot a {
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+.auth-forgot a:hover { color: var(--gold); }
+
+/* Switch mode */
+.auth-switch {
+  text-align: center;
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.auth-switch a {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+.auth-switch a:hover { color: var(--gold3); }
+
+/* Guest link */
+.auth-guest {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.auth-guest a {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+.auth-guest a:hover { color: var(--text); }
+
+/* Success state */
+.auth-success {
+  display: none;
+  text-align: center;
+  padding: 48px 0;
+}
+.auth-success.visible { display: block; }
+.success-icon {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+.success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.success-sub { font-size: 13px; color: var(--muted2); }
+
+/* Back to home */
+.auth-back {
+  position: fixed;
+  top: 24px; left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+  z-index: 10;
+}
+.auth-back:hover { color: var(--text); }
+@media(max-width:768px){ .auth-back { display: none; } }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.auth-box { animation: fadeIn 0.5s ease; }
+</style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
+      authDomain: "animus-b3d83.firebaseapp.com",
+      projectId: "animus-b3d83",
+      storageBucket: "animus-b3d83.firebasestorage.app",
+      messagingSenderId: "681221615050",
+      appId: "1:681221615050:web:1d037cd07a8381c91b3333"
+    });
+  </script>
+</head>
+<body>
+<script>
+// Apply saved theme immediately to prevent flash
+(function(){
+  if(localStorage.getItem('animus_theme') === 'light') document.body.classList.add('light-mode');
+})();
+</script>
+
+
+<a href="landing.html" class="auth-back">← Back</a>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <a href="landing.html" class="panel-logo">ANI<span>MUS</span></a>
+
+  <div class="panel-middle">
+    <div class="panel-big">KNOW<br><span>THY</span><br>SELF</div>
+    <p class="panel-quote">
+      "The unexamined life is not worth living." Your profile is waiting.
+    </p>
+  </div>
+
+  <div class="panel-dims">
+    <div class="panel-dim"><strong>MBTI</strong> Cognitive function stack</div>
+    <div class="panel-dim"><strong>Enneagram</strong> Type, wing & tritype</div>
+    <div class="panel-dim"><strong>Philosophy</strong> School & ethics framework</div>
+    <div class="panel-dim"><strong>Political</strong> Two-axis compass</div>
+    <div class="panel-dim"><strong>Attachment</strong> Relational pattern</div>
+    <div class="panel-dim"><strong>+9 more</strong> dimensions</div>
+  </div>
+
+  <div class="panel-vert">Complete Personality Atlas</div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="auth-box">
+
+    <a href="landing.html" class="mobile-logo">ANI<span>MUS</span></a>
+
+    <!-- Main form content -->
+    <div id="formContent">
+      <div class="auth-eyebrow" id="authEyebrow">Welcome back</div>
+      <h1 class="auth-title" id="authTitle">Sign in to ANIMUS</h1>
+      <p class="auth-sub" id="authSub">Access your profile, compare with friends, and track how you change over time.</p>
+
+      <!-- Mode toggle -->
+      <div class="auth-toggle">
+        <button class="toggle-btn active" id="toggleSignIn" onclick="setMode('signin')">Sign In</button>
+        <button class="toggle-btn" id="toggleSignUp" onclick="setMode('signup')">Create Account</button>
+      </div>
+
+      <!-- Google -->
+      <button class="btn-google" id="btnGoogle" onclick="handleGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18">
+          <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+          <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+          <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-divider"><span>or use email</span></div>
+
+      <!-- Error -->
+      <div class="auth-error" id="authError"></div>
+
+      <!-- Form -->
+      <form class="auth-form" id="authForm" onsubmit="handleSubmit(event)" autocomplete="on" novalidate>
+
+        <!-- Display name (signup only) -->
+        <div class="form-group signup-only" id="fieldName">
+          <label class="form-label">Display Name</label>
+          <input class="form-input" id="inputName" type="text" placeholder="Your name" autocomplete="name" />
+        </div>
+
+        <!-- Username (signup only) -->
+        <div class="form-group signup-only" id="fieldUsername">
+          <label class="form-label">Username</label>
+          <div style="position:relative">
+            <input class="form-input" id="inputUsername" type="text" placeholder="yourname" autocomplete="username"
+              style="padding-left:28px" oninput="checkUsername(this.value)" />
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px">@</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px" id="usernameStatus"></div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" id="inputEmail" type="email" placeholder="you@example.com" autocomplete="email" maxlength="254" required spellcheck="false" />
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="password-wrap">
+            <input class="form-input" id="inputPassword" type="password" placeholder="••••••••" autocomplete="current-password" required />
+            <button type="button" class="toggle-pass" onclick="togglePassword()">SHOW</button>
+          </div>
+        </div>
+
+        <!-- Confirm password (signup only) -->
+        <div class="form-group signup-only" id="fieldConfirm">
+          <label class="form-label">Confirm Password</label>
+          <div class="password-wrap">
+            <input class="form-input" id="inputConfirm" type="password" placeholder="••••••••" autocomplete="new-password" />
+            <button type="button" class="toggle-pass" onclick="toggleConfirm()">SHOW</button>
+          </div>
+        </div>
+
+        <!-- Forgot (signin only) -->
+        <div class="auth-forgot" id="forgotWrap">
+          <a href="#" onclick="handleForgot(event)">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span id="submitLabel">Sign In</span>
+          <div class="spinner"></div>
+        </button>
+      </form>
+
+      <div class="auth-switch" id="authSwitch">
+        Don't have an account? <a onclick="setMode('signup')">Create one →</a>
+      </div>
+
+      <div class="auth-guest">
+        <a href="psyche-complete.html">Take the test without an account →</a>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div class="auth-success" id="authSuccess">
+      <div class="success-icon">◆</div>
+      <div class="success-title">You're in.</div>
+      <p class="success-sub">Redirecting to your dashboard...</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var mode = 'signin';
+function escapeHTML(s){
+  if(typeof s !== 'string') return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+          .replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+}
+var usernameTimer = null;
+var takenUsernames = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare'];
+
+function setMode(m) {
+  mode = m;
+  var isSignup = m === 'signup';
+
+  // Toggle buttons
+  document.getElementById('toggleSignIn').classList.toggle('active', !isSignup);
+  document.getElementById('toggleSignUp').classList.toggle('active', isSignup);
+
+  // Show/hide signup fields
+  document.querySelectorAll('.signup-only').forEach(function(el){
+    el.classList.toggle('visible', isSignup);
+  });
+
+  // Forgot password
+  document.getElementById('forgotWrap').style.display = isSignup ? 'none' : '';
+
+  // Text
+  document.getElementById('authEyebrow').textContent = isSignup ? 'Create your profile' : 'Welcome back';
+  document.getElementById('authTitle').textContent = isSignup ? 'Join ANIMUS' : 'Sign in to ANIMUS';
+  document.getElementById('authSub').textContent = isSignup
+    ? 'Take the assessment, build your profile, and compare with friends.'
+    : 'Access your profile, compare with friends, and track how you change over time.';
+  document.getElementById('submitLabel').textContent = isSignup ? 'Create Account' : 'Sign In';
+  document.getElementById('authSwitch').innerHTML = isSignup
+    ? 'Already have an account? <a onclick="setMode(\'signin\')">Sign in →</a>'
+    : 'Don\'t have an account? <a onclick="setMode(\'signup\')">Create one →</a>';
+
+  // Update password autocomplete
+  document.getElementById('inputPassword').setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
+
+  clearError();
+}
+
+function checkUsername(val) {
+  var status = document.getElementById('usernameStatus');
+  val = val.toLowerCase().replace(/[^a-z0-9_]/g,'');
+  document.getElementById('inputUsername').value = val;
+
+  clearTimeout(usernameTimer);
+  if(!val){ status.textContent=''; return; }
+  if(val.length < 3){ status.style.color='var(--error)'; status.textContent='At least 3 characters'; return; }
+
+  status.style.color='var(--muted)'; status.textContent='Checking...';
+  usernameTimer = setTimeout(function(){
+    // Will be replaced by Firebase lookup
+    if(takenUsernames.indexOf(val) > -1){
+      status.style.color='var(--error)'; status.textContent='@'+escapeHTML(val)+' is taken';
+    } else {
+      status.style.color='var(--gold)'; status.textContent='@'+escapeHTML(val)+' is available ✓';
+    }
+  }, 500);
+}
+
+function togglePassword(){
+  var inp = document.getElementById('inputPassword');
+  var btn = inp.nextElementSibling;
+  if(inp.type==='password'){ inp.type='text'; btn.textContent='HIDE'; }
+  else { inp.type='password'; btn.textContent='SHOW'; }
+}
+function toggleConfirm(){
+  var inp = document.getElementById('inputConfirm');
+  var btn = inp.nextElementSibling;
+  if(inp.type==='password'){ inp.type='text'; btn.textContent='HIDE'; }
+  else { inp.type='password'; btn.textContent='SHOW'; }
+}
+
+function showError(msg){
+  var el = document.getElementById('authError');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+function clearError(){
+  document.getElementById('authError').classList.remove('visible');
+}
+
+function setLoading(on){
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = on;
+  btn.classList.toggle('loading', on);
+}
+
+function handleGoogle(){
+  var provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider)
+    .then(function(result){
+      var user = result.user;
+      var isNew = result.additionalUserInfo.isNewUser;
+      if(isNew){
+        // Create user doc
+        return firebase.firestore().collection('users').doc(user.uid).set({
+          displayName: user.displayName || '',
+          photoURL: user.photoURL || '',
+          email: user.email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          friends: [],
+          friendRequests: { sent: [], received: [] },
+          notifications: [],
+          language: 'en'
+        }).then(function(){ return isNew; });
+      }
+      return isNew;
+    })
+    .then(function(isNew){
+      showSuccess(isNew);
+    })
+    .catch(function(e){ showError(e.message); });
+}
+
+// Simple client-side rate limiting (real rate limiting happens server-side with Firebase)
+var _submitAttempts = 0;
+var _submitLockUntil = 0;
+
+function handleSubmit(e){
+  e.preventDefault();
+  clearError();
+  
+  // Rate limit: max 5 attempts, then 30s lockout
+  var now = Date.now();
+  if(now < _submitLockUntil){
+    var secs = Math.ceil((_submitLockUntil - now)/1000);
+    showError('Too many attempts. Please wait ' + secs + ' seconds.');
+    return;
+  }
+  _submitAttempts++;
+  if(_submitAttempts >= 5){
+    _submitLockUntil = now + 30000;
+    _submitAttempts = 0;
+    showError('Too many attempts. Please wait 30 seconds.');
+    return;
+  }
+
+  var email = document.getElementById('inputEmail').value.trim().substring(0,254);
+  var password = document.getElementById('inputPassword').value;
+  
+  // Basic input validation
+  if(email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+    showError('Please enter a valid email address.');
+    return;
+  }
+
+  if(mode === 'signup'){
+    var name = document.getElementById('inputName').value.trim();
+    var username = document.getElementById('inputUsername').value.trim();
+    var confirm = document.getElementById('inputConfirm').value;
+
+    if(!name){ showError('Please enter your display name.'); return; }
+    if(!username || username.length < 3){ showError('Username must be at least 3 characters.'); return; }
+    if(takenUsernames.indexOf(username) > -1){ showError('@'+username+' is already taken.'); return; }
+    if(password.length < 8){ showError('Password must be at least 8 characters.'); return; }
+    if(password !== confirm){ showError('Passwords do not match.'); return; }
+
+    setLoading(true);
+    firebase.firestore().collection('usernames').doc(username).get()
+      .then(function(doc){
+        if(doc.exists){ throw new Error('@'+username+' is already taken.'); }
+        return firebase.auth().createUserWithEmailAndPassword(email, password);
+      })
+      .then(function(cred){
+        var uid = cred.user.uid;
+        var batch = firebase.firestore().batch();
+        batch.set(firebase.firestore().collection('users').doc(uid), {
+          displayName: name, username: username, email: email, photoURL: '', bio: '',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          friends: [], friendRequests:{sent:[],received:[]}, notifications: [],
+          language: localStorage.getItem('animus_lang') || 'en'
+        });
+        batch.set(firebase.firestore().collection('usernames').doc(username), { uid: uid });
+        return batch.commit();
+      })
+      .then(function(){ setLoading(false); showSuccess(true); })
+      .catch(function(e){ setLoading(false); showError(e.message); });
+
+  } else {
+    if(!email || !password){ showError('Please enter your email and password.'); return; }
+    setLoading(true);
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(function(){ setLoading(false); showSuccess(false); })
+      .catch(function(e){ setLoading(false); showError(e.message); });
+  }
+}
+
+function handleForgot(e){
+  e.preventDefault();
+  var email = document.getElementById('inputEmail').value.trim();
+  if(!email){ showError('Enter your email address first.'); return; }
+  clearError();
+  firebase.auth().sendPasswordResetEmail(email)
+    .then(function(){
+      document.getElementById('authError').style.color='var(--gold)';
+      document.getElementById('authError').textContent='Password reset email sent — check your inbox.';
+      document.getElementById('authError').classList.add('visible');
+    })
+    .catch(function(e){ showError(e.message); });
+}
+
+function showSuccess(isNew){
+  document.getElementById('formContent').style.display='none';
+  document.getElementById('authSuccess').classList.add('visible');
+  setTimeout(function(){
+    if(window.opener) window.opener = null;
+    window.location.href = isNew ? 'psyche-complete.html' : 'dashboard.html';
+  }, 1800);
+}
+
+// Redirect if already logged in
+firebase.auth().onAuthStateChanged(function(user){
+  if(user) window.location.href = 'dashboard.html';
+});
+</script>
+
+</body>
+</html>
