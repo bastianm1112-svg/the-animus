@@ -316,11 +316,11 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
 </script>
 
 <nav style="position:fixed;top:0;left:0;right:0;height:48px;background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);border-bottom:1px solid #1e1e1e;display:flex;align-items:center;padding:0 20px;justify-content:space-between;z-index:300;">
-  <a href="landing.html" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.1em;color:#f0ece4;text-decoration:none;">ANI<span style="color:#c8a96e">MUS</span></a>
+  <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.1em;color:#f0ece4;text-decoration:none;">ANI<span style="color:#c8a96e">MUS</span></a>
   <div style="display:flex;gap:12px;align-items:center;">
-    <a href="dashboard.html" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">Dashboard</a>
-    <a href="profile.html" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">My Profile</a>
-    <a href="login.html" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e;text-decoration:none;border:1px solid #8a6f3e;padding:5px 14px;" onmouseover="this.style.background='#c8a96e';this.style.color='#000'" onmouseout="this.style.background='none';this.style.color='#c8a96e'">Sign In</a>
+    <a href="/dashboard" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">Dashboard</a>
+    <a href="/profile" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">My Profile</a>
+    <a href="/login" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e;text-decoration:none;border:1px solid #8a6f3e;padding:5px 14px;" onmouseover="this.style.background='#c8a96e';this.style.color='#000'" onmouseout="this.style.background='none';this.style.color='#c8a96e'">Sign In</a>
   </div>
 </nav>
 
@@ -384,7 +384,7 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
 <!-- QUIZ -->
 <div id="quiz">
   <div class="qhdr">
-    <a href="landing.html" class="qhdr-logo" style="text-decoration:none;color:inherit;">ANIMUS</a>
+    <a href="/" class="qhdr-logo" style="text-decoration:none;color:inherit;">ANIMUS</a>
     <div class="qhdr-right">
       <span class="qhdr-section" id="qSection"></span>
       <span class="qhdr-num" id="qNum">1 / —</span>
@@ -2775,7 +2775,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     var user = firebase.auth().currentUser;
     if(!user){
       showToast('Sign in to save your profile permanently');
-      setTimeout(function(){ window.location.href='login.html'; },2000);
+      setTimeout(function(){ window.location.href='/login'; },2000);
       return;
     }
     var snapshotWithMeta = Object.assign({},snapshot,{
@@ -2790,10 +2790,10 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
       return profileRef.set({latest:snapshotWithMeta,history:history,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     }).then(function(){
       showToast('Profile saved ✓');
-      setTimeout(function(){ window.location.href='profile.html'; },1800);
+      setTimeout(function(){ window.location.href='/profile'; },1800);
     }).catch(function(e){
       showToast('Saved locally — sign in to sync');
-      setTimeout(function(){ window.location.href='profile.html'; },2500);
+      setTimeout(function(){ window.location.href='/profile'; },2500);
     });
   });
 
@@ -3236,7 +3236,7 @@ showResults=function(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     if(typeof auth === 'undefined') return;
     auth.onAuthStateChanged(function(user){
       logos.forEach(function(el){
-        if(el.tagName === 'A') el.href = user ? 'dashboard.html' : 'landing.html';
+        if(el.tagName === 'A') el.href = user ? '/dashboard' : '/';
       });
     });
   }
@@ -3246,7 +3246,7 @@ showResults=function(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 </script>
 <script>
 // Smart logo
-try{firebase.auth().onAuthStateChanged(function(u){document.querySelectorAll('a.nav-logo').forEach(function(el){el.href=u?'dashboard.html':'landing.html';});});}catch(e){}
+try{firebase.auth().onAuthStateChanged(function(u){document.querySelectorAll('a.nav-logo').forEach(function(el){el.href=u?'/dashboard':'/';});});}catch(e){}
 </script>
 </body>
 </html>

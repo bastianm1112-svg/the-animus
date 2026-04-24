@@ -674,12 +674,12 @@ const auth=firebase.auth();
 
 <!-- NAV -->
 <nav id="nav">
-  <a href="landing.html" class="nav-logo">ANI<span>MUS</span></a>
+  <a href="/" class="nav-logo">ANI<span>MUS</span></a>
   <div class="nav-links">
     <a href="#about">About</a>
     <a href="#dimensions">Dimensions</a>
     <a href="#tests">The Test</a>
-    <a href="login.html" class="nav-cta">Sign In</a>
+    <a href="/login" class="nav-cta">Sign In</a>
   </div>
 </nav>
 
@@ -701,7 +701,7 @@ const auth=firebase.auth();
     </p>
 
     <div class="hero-actions">
-      <a href="psyche-complete.html" class="btn-hero-primary">
+      <a href="/test" class="btn-hero-primary">
         <span>Take the Assessment</span>
         <span>→</span>
       </a>
@@ -954,7 +954,7 @@ const auth=firebase.auth();
           <div class="test-meta-item"><strong>14</strong>Dimensions</div>
           <div class="test-meta-item"><strong>EN / ES</strong>Language</div>
         </div>
-        <a href="psyche-complete.html" class="btn-test">Begin Full Assessment →</a>
+        <a href="/test" class="btn-test">Begin Full Assessment →</a>
       </div>
       <div class="test-card reveal reveal-delay-1">
         <div class="test-q">100 <span>Q</span></div>
@@ -976,18 +976,18 @@ const auth=firebase.auth();
   <h2 class="cta-title reveal">KNOW<br><span>YOURSELF</span></h2>
   <p class="cta-sub reveal">Most people never examine the architecture of their own mind. You're already here.</p>
   <div class="cta-actions reveal">
-    <a href="psyche-complete.html" class="btn-hero-primary"><span>Take the Assessment</span><span>→</span></a>
-    <a href="login.html" class="btn-hero-secondary">Sign in to save your profile</a>
+    <a href="/test" class="btn-hero-primary"><span>Take the Assessment</span><span>→</span></a>
+    <a href="/login" class="btn-hero-secondary">Sign in to save your profile</a>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <a href="landing.html" class="footer-logo">ANI<span>MUS</span></a>
+  <a href="/" class="footer-logo">ANI<span>MUS</span></a>
   <div class="footer-copy">© 2026 ANIMUS — Know thyself completely</div>
   <div class="footer-links">
-    <a href="psyche-complete.html">Test</a>
-    <a href="login.html">Sign In</a>
+    <a href="/test">Test</a>
+    <a href="/login">Sign In</a>
   </div>
 </footer>
 
@@ -1041,7 +1041,7 @@ if('IntersectionObserver' in window){
 try {
   firebase.auth().onAuthStateChanged(function(user){
     document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){
-      el.href = user ? 'dashboard.html' : 'landing.html';
+      el.href = user ? '/dashboard' : '/';
     });
   });
 } catch(e){}

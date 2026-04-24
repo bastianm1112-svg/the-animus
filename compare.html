@@ -217,23 +217,23 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 
 <!-- NAV -->
 <nav class="navbar">
-  <a href="landing.html" class="nav-logo">ANI<span>MUS</span></a>
+  <a href="/" class="nav-logo">ANI<span>MUS</span></a>
   <div class="nav-items">
-    <a href="dashboard.html" class="nav-item">
+    <a href="/dashboard" class="nav-item">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       Dashboard
     </a>
-    <a href="profile.html" class="nav-item">
+    <a href="/profile" class="nav-item">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       My Profile
     </a>
-    <a href="compare.html" class="nav-item active">
+    <a href="/compare" class="nav-item active">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
       Compare
     </a>
   </div>
   <div class="nav-right">
-    <a href="profile.html" class="nav-avatar" id="navAvatar">?</a>
+    <a href="/profile" class="nav-avatar" id="navAvatar">?</a>
   </div>
 </nav>
 
@@ -355,7 +355,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   <!-- Share bar -->
   <div class="compare-share-bar">
     <button class="btn-share-comp btn-gold" onclick="shareComparison()">⬡ Share This Comparison</button>
-    <a href="profile.html" class="btn-share-comp btn-outline" id="viewThemBtn">View Their Profile →</a>
+    <a href="/profile" class="btn-share-comp btn-outline" id="viewThemBtn">View Their Profile →</a>
   </div>
 
   <!-- ── AI ANALYSIS ── -->
@@ -471,7 +471,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script>
 // ── LOAD COMPARISON DATA FROM FIREBASE ──
 auth.onAuthStateChanged(function(currentUser){
-  if(!currentUser){ window.location.href='login.html'; return; }
+  if(!currentUser){ window.location.href='/login'; return; }
 
   // Set nav avatar
   document.getElementById('navAvatar').textContent=(currentUser.displayName||'?').charAt(0).toUpperCase();
@@ -754,7 +754,7 @@ function showToast(msg){
 try {
   firebase.auth().onAuthStateChanged(function(user){
     document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){
-      el.href = user ? 'dashboard.html' : 'landing.html';
+      el.href = user ? '/dashboard' : '/';
     });
   });
 } catch(e){}

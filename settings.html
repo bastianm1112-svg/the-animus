@@ -309,23 +309,23 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 
 <!-- NAV -->
 <nav class="navbar">
-  <a href="landing.html" class="nav-logo">ANI<span>MUS</span></a>
+  <a href="/" class="nav-logo">ANI<span>MUS</span></a>
   <div class="nav-items">
-    <a href="dashboard.html" class="nav-item">
+    <a href="/dashboard" class="nav-item">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       Dashboard
     </a>
-    <a href="profile.html" class="nav-item">
+    <a href="/profile" class="nav-item">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       My Profile
     </a>
-    <a href="settings.html" class="nav-item active">
+    <a href="/settings" class="nav-item active">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       Settings
     </a>
   </div>
   <div class="nav-right">
-    <a href="profile.html" class="nav-avatar" id="navAvatar">?</a>
+    <a href="/profile" class="nav-avatar" id="navAvatar">?</a>
   </div>
 </nav>
 
@@ -975,14 +975,14 @@ function executeConfirmed() {
     if(!user){ showToast('Not signed in'); return; }
     user.delete().then(function(){
       showToast('Account deleted');
-      setTimeout(function(){ window.location.href='landing.html'; },1200);
+      setTimeout(function(){ window.location.href='/'; },1200);
     }).catch(function(e){
       // May need re-auth
       showToast('Please sign out and sign in again before deleting');
     });
   } else if(pendingAction === 'signout' || pendingAction === 'signout-all') {
     firebase.auth().signOut().then(function(){
-      window.location.href = 'login.html';
+      window.location.href='/login';
     });
   } else if(pendingAction === 'delete-assessment') {
     showToast('Assessment deleted');
@@ -1047,7 +1047,7 @@ auth.onAuthStateChanged(function(user){
 
 // Load from Firebase
 firebase.auth().onAuthStateChanged(function(user){
-  if(!user){ window.location.href='login.html'; return; }
+  if(!user){ window.location.href='/login'; return; }
   var uid=user.uid;
   // Nav avatar
   firebase.firestore().collection('users').doc(uid).get().then(function(doc){
@@ -1183,7 +1183,7 @@ function safeAtob(encoded){
 try {
   firebase.auth().onAuthStateChanged(function(user){
     document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){
-      el.href = user ? 'dashboard.html' : 'landing.html';
+      el.href = user ? '/dashboard' : '/';
     });
   });
 } catch(e){}

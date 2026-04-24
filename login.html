@@ -6,39 +6,31 @@
 <title>ANIMUS — Sign In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-var firebaseConfig = {
-  apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
-  authDomain: "animus-b3d83.firebaseapp.com",
-  projectId: "animus-b3d83",
-  storageBucket: "animus-b3d83.firebasestorage.app",
-  messagingSenderId: "681221615050",
-  appId: "1:681221615050:web:1d037cd07a8381c91b3333"
-};
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+if(!firebase.apps.length){
+  firebase.initializeApp({
+    apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
+    authDomain:"animus-b3d83.firebaseapp.com",
+    projectId:"animus-b3d83",
+    storageBucket:"animus-b3d83.firebasestorage.app",
+    messagingSenderId:"681221615050",
+    appId:"1:681221615050:web:1d037cd07a8381c91b3333"
+  });
+}
 var auth = firebase.auth();
 var db   = firebase.firestore();
+// Ensure session persists across browser restarts
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 </script>
-
 <style>
-:root {
-  --bg:#080808; --surface:#0f0f0f; --surface2:#141414;
-  --border:#1e1e1e; --border2:#2a2a2a;
-  --text:#e2e2e2; --muted:#555; --muted2:#888;
-  --gold:#c8a96e; --gold2:#8a6f3e; --gold3:#f0d090;
-  --white:#f0ece4; --error:#c0392b; --green:#27ae60;
-}
+:root{--bg:#080808;--surface:#0f0f0f;--surface2:#141414;--border:#1e1e1e;--border2:#2a2a2a;--text:#e2e2e2;--muted:#555;--muted2:#888;--gold:#c8a96e;--gold2:#8a6f3e;--gold3:#f0d090;--white:#f0ece4;--error:#c0392b;--green:#27ae60;}
 body.light-mode{--bg:#f4f1ec;--surface:#fff;--surface2:#f8f5f0;--border:#e0dbd4;--border2:#cdc7bf;--text:#1a1714;--muted:#9a9189;--muted2:#6b6259;--white:#1a1714;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
 @media(max-width:768px){body{grid-template-columns:1fr;}.left-panel{display:none;}}
-
-/* LEFT */
 .left-panel{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:space-between;padding:48px;position:relative;overflow:hidden;}
 .left-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(200,169,110,0.05) 0%,transparent 70%);pointer-events:none;}
 .panel-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.12em;color:var(--white);text-decoration:none;}
@@ -50,80 +42,62 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .panel-dim{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted);}
 .panel-dim::before{content:'';width:24px;height:1px;background:var(--gold2);flex-shrink:0;}
 .panel-dim strong{color:var(--muted2);font-weight:400;}
-
-/* RIGHT */
 .right-panel{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:48px 40px;min-height:100vh;}
 .auth-box{width:100%;max-width:400px;}
 .mobile-logo{display:none;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.12em;color:var(--white);text-decoration:none;margin-bottom:40px;text-align:center;}
 .mobile-logo span{color:var(--gold);}
 @media(max-width:768px){.mobile-logo{display:block;}}
-
 .auth-eyebrow{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
 .auth-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--white);margin-bottom:8px;line-height:1.2;}
-.auth-sub{font-size:13px;color:var(--muted2);margin-bottom:40px;line-height:1.7;}
-
-.auth-toggle{display:flex;background:var(--surface);border:1px solid var(--border);margin-bottom:32px;}
+.auth-sub{font-size:13px;color:var(--muted2);margin-bottom:36px;line-height:1.7;}
+.auth-toggle{display:flex;background:var(--surface);border:1px solid var(--border);margin-bottom:28px;}
 .toggle-btn{flex:1;padding:10px;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;background:none;border:none;color:var(--muted);cursor:pointer;transition:all 0.2s;}
 .toggle-btn.active{background:var(--surface2);color:var(--text);border-bottom:2px solid var(--gold);}
-
-.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-bottom:24px;}
+.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-bottom:20px;}
 .btn-google:hover{border-color:var(--gold2);background:var(--surface2);}
 .btn-google:disabled{opacity:0.5;cursor:not-allowed;}
-
-.auth-divider{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.auth-divider{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
 .auth-divider span{font-size:10px;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;white-space:nowrap;}
-
-.auth-form{display:flex;flex-direction:column;gap:14px;}
-.form-group{display:flex;flex-direction:column;gap:6px;}
+.auth-form{display:flex;flex-direction:column;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
 .form-label{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted2);}
 .form-input{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;width:100%;}
 .form-input::placeholder{color:var(--muted);}
 .form-input:focus{border-color:var(--gold2);}
-
 .signup-only{display:none;}
 .signup-only.visible{display:flex;}
-
-.auth-error{font-size:12px;color:var(--error);padding:10px 14px;border:1px solid rgba(192,57,43,0.2);background:rgba(192,57,43,0.05);display:none;margin-bottom:4px;}
+.auth-error{font-size:12px;color:var(--error);padding:10px 14px;border:1px solid rgba(192,57,43,0.3);background:rgba(192,57,43,0.06);display:none;margin-bottom:4px;line-height:1.5;}
 .auth-error.visible{display:block;}
-.auth-success-msg{font-size:12px;color:var(--green);padding:10px 14px;border:1px solid rgba(39,174,96,0.2);background:rgba(39,174,96,0.05);display:none;margin-bottom:4px;}
-.auth-success-msg.visible{display:block;}
-
-.btn-submit{width:100%;padding:14px;background:var(--gold);border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;margin-top:4px;position:relative;}
+.auth-ok{font-size:12px;color:var(--green);padding:10px 14px;border:1px solid rgba(39,174,96,0.3);background:rgba(39,174,96,0.06);display:none;margin-bottom:4px;}
+.auth-ok.visible{display:block;}
+.btn-submit{width:100%;padding:14px;background:var(--gold);border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;margin-top:4px;}
 .btn-submit:hover{background:var(--gold3);}
 .btn-submit:disabled{opacity:0.6;cursor:not-allowed;}
-
-.auth-forgot{text-align:right;margin-top:-6px;}
-.auth-forgot a{font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:0.05em;transition:color 0.2s;cursor:pointer;}
+.auth-forgot{text-align:right;}
+.auth-forgot a{font-size:11px;color:var(--muted);text-decoration:none;cursor:pointer;transition:color 0.2s;}
 .auth-forgot a:hover{color:var(--gold);}
-
-.auth-switch{text-align:center;margin-top:32px;font-size:13px;color:var(--muted);}
+.auth-switch{text-align:center;margin-top:28px;font-size:13px;color:var(--muted);}
 .auth-switch a{color:var(--gold);text-decoration:none;font-weight:500;cursor:pointer;}
-
-.auth-guest{text-align:center;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);}
-.auth-guest a{font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:0.05em;transition:color 0.2s;}
+.auth-guest{text-align:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+.auth-guest a{font-size:12px;color:var(--muted);text-decoration:none;transition:color 0.2s;}
 .auth-guest a:hover{color:var(--text);}
-
-.auth-back{position:fixed;top:24px;left:24px;display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;z-index:10;}
-.auth-back:hover{color:var(--text);}
-@media(max-width:768px){.auth-back{display:none;}}
-
-.username-wrap{position:relative;}
-.username-wrap .form-input{padding-left:28px;}
-.username-at{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
-.username-status{font-size:11px;margin-top:4px;height:16px;}
-.username-status.ok{color:var(--green);}
-.username-status.err{color:var(--error);}
+.username-at{color:var(--muted);margin-right:2px;}
+.un-status{font-size:11px;margin-top:3px;min-height:16px;}
+.un-status.ok{color:var(--green);}
+.un-status.err{color:var(--error);}
+/* Username setup screen */
+.setup-screen{display:none;}
+.setup-screen.visible{display:block;}
+.setup-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--white);margin-bottom:8px;}
+.setup-sub{font-size:13px;color:var(--muted2);margin-bottom:28px;line-height:1.7;}
 </style>
 </head>
 <body>
-<script>(function(){ if(localStorage.getItem('animus_theme')==='light') document.body.classList.add('light-mode'); })();</script>
+<script>(function(){if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');})();</script>
 
-<a href="landing.html" class="auth-back">← Back</a>
-
-<!-- LEFT -->
 <div class="left-panel">
-  <a href="landing.html" class="panel-logo">ANI<span>MUS</span></a>
+  <a href="/" class="panel-logo">ANI<span>MUS</span></a>
   <div>
     <div class="panel-big">KNOW<br><span>THY</span><br>SELF</div>
     <p class="panel-quote">"The unexamined life is not worth living." Your profile is waiting.</p>
@@ -138,259 +112,341 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   </div>
 </div>
 
-<!-- RIGHT -->
 <div class="right-panel">
-  <div class="auth-box">
-    <a href="landing.html" class="mobile-logo">ANI<span>MUS</span></a>
+<div class="auth-box">
+  <a href="/" class="mobile-logo">ANI<span>MUS</span></a>
 
-    <div id="formContent">
-      <div class="auth-eyebrow" id="authEyebrow">Welcome back</div>
-      <h1 class="auth-title" id="authTitle">Sign in to ANIMUS</h1>
-      <p class="auth-sub" id="authSub">Access your profile, compare with friends, track how you change.</p>
+  <!-- ── MAIN FORM ── -->
+  <div id="mainForm">
+    <div class="auth-eyebrow" id="eyebrow">Welcome back</div>
+    <h1 class="auth-title" id="formTitle">Sign in to ANIMUS</h1>
+    <p class="auth-sub" id="formSub">Access your profile, compare with friends, track how you change.</p>
 
-      <div class="auth-toggle">
-        <button class="toggle-btn active" id="btnSignIn" onclick="setMode('signin')">Sign In</button>
-        <button class="toggle-btn" id="btnSignUp" onclick="setMode('signup')">Create Account</button>
-      </div>
-
-      <!-- Google -->
-      <button class="btn-google" id="btnGoogle">
-        <svg width="18" height="18" viewBox="0 0 18 18">
-          <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
-          <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
-          <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
-          <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/>
-        </svg>
-        Continue with Google
-      </button>
-
-      <div class="auth-divider"><span>or use email</span></div>
-
-      <div class="auth-error" id="authError"></div>
-      <div class="auth-success-msg" id="authSuccess"></div>
-
-      <form class="auth-form" id="authForm">
-        <div class="form-group signup-only" id="fieldName">
-          <label class="form-label">Display Name</label>
-          <input class="form-input" id="inputName" type="text" placeholder="Your name" autocomplete="name"/>
-        </div>
-        <div class="form-group signup-only" id="fieldUsername">
-          <label class="form-label">Username</label>
-          <div class="username-wrap">
-            <span class="username-at">@</span>
-            <input class="form-input" id="inputUsername" type="text" placeholder="yourname" autocomplete="off" maxlength="30"/>
-          </div>
-          <div class="username-status" id="usernameStatus"></div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input class="form-input" id="inputEmail" type="email" placeholder="you@example.com" autocomplete="email"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input class="form-input" id="inputPassword" type="password" placeholder="••••••••" autocomplete="current-password"/>
-        </div>
-        <div class="form-group signup-only" id="fieldConfirm">
-          <label class="form-label">Confirm Password</label>
-          <input class="form-input" id="inputConfirm" type="password" placeholder="••••••••" autocomplete="new-password"/>
-        </div>
-        <div class="auth-forgot" id="forgotRow">
-          <a onclick="doForgot()">Forgot password?</a>
-        </div>
-        <button type="button" class="btn-submit" id="btnSubmit">Sign In</button>
-      </form>
-
-      <div class="auth-switch" id="authSwitch">
-        Don't have an account? <a onclick="setMode('signup')">Create one →</a>
-      </div>
-      <div class="auth-guest">
-        <a href="psyche-complete.html">Take the test without an account →</a>
-      </div>
+    <div class="auth-toggle">
+      <button class="toggle-btn active" onclick="setMode('signin')">Sign In</button>
+      <button class="toggle-btn" onclick="setMode('signup')">Create Account</button>
     </div>
 
-    <div id="successState" style="display:none;text-align:center;padding:48px 0">
-      <div style="font-size:40px;margin-bottom:20px">◆</div>
-      <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin-bottom:8px">You're in.</div>
-      <p style="font-size:13px;color:var(--muted2)">Redirecting to your dashboard...</p>
+    <button class="btn-google" id="btnGoogle">
+      <svg width="18" height="18" viewBox="0 0 18 18">
+        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+        <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <div class="auth-divider"><span>or use email</span></div>
+    <div class="auth-error" id="errMsg"></div>
+    <div class="auth-ok" id="okMsg"></div>
+
+    <form class="auth-form" onsubmit="doSubmit(event)">
+      <div class="form-group signup-only" id="fName">
+        <label class="form-label">Display Name</label>
+        <input class="form-input" id="inName" type="text" placeholder="Your name" autocomplete="name"/>
+      </div>
+      <div class="form-group signup-only" id="fUser">
+        <label class="form-label">Username</label>
+        <div style="display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);transition:border-color 0.2s;" id="unWrap">
+          <span class="username-at" style="padding-left:14px;font-size:14px;">@</span>
+          <input class="form-input" id="inUser" type="text" placeholder="yourname" autocomplete="off" maxlength="30"
+            style="border:none;background:none;outline:none;padding-left:4px;" oninput="checkUN(this.value)"/>
+        </div>
+        <div class="un-status" id="unStatus"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="inEmail" type="email" placeholder="you@example.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="inPw" type="password" placeholder="••••••••"/>
+      </div>
+      <div class="form-group signup-only" id="fConfirm">
+        <label class="form-label">Confirm Password</label>
+        <input class="form-input" id="inConfirm" type="password" placeholder="••••••••"/>
+      </div>
+      <div id="forgotRow" style="text-align:right;">
+        <a class="auth-forgot" onclick="doForgot()">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn-submit" id="btnSubmit">Sign In</button>
+    </form>
+
+    <div class="auth-switch" id="switchMsg">
+      Don't have an account? <a onclick="setMode('signup')">Create one →</a>
+    </div>
+    <div class="auth-guest">
+      <a href="/test">Take the test without an account →</a>
     </div>
   </div>
+
+  <!-- ── USERNAME SETUP (Google new users) ── -->
+  <div id="setupScreen" class="setup-screen">
+    <div class="auth-eyebrow">Almost done</div>
+    <div class="setup-title">Choose a username</div>
+    <p class="setup-sub">This is your public identity on ANIMUS. Your profile will be at <strong>animus.app/<span id="setupPreview">yourname</span></strong>.</p>
+    <div class="auth-error" id="setupErr"></div>
+    <div style="display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);margin-bottom:12px;" id="setupUnWrap">
+      <span style="padding-left:14px;color:var(--muted);font-size:14px;">@</span>
+      <input class="form-input" id="setupUN" type="text" placeholder="yourname" maxlength="30"
+        style="border:none;background:none;outline:none;padding-left:4px;" oninput="checkSetupUN(this.value)"/>
+    </div>
+    <div class="un-status" id="setupUNStatus"></div>
+    <button class="btn-submit" style="margin-top:16px;" onclick="finishSetup()">Finish Setup →</button>
+  </div>
+
+  <!-- ── SUCCESS ── -->
+  <div id="successScreen" style="display:none;text-align:center;padding:48px 0;">
+    <div style="font-size:40px;margin-bottom:20px;">◆</div>
+    <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin-bottom:8px;">You're in.</div>
+    <p style="font-size:13px;color:var(--muted2);">Redirecting to your dashboard...</p>
+  </div>
+</div>
 </div>
 
 <script>
 var mode = 'signin';
+var pendingGoogleUser = null; // Google user waiting for username setup
 var unTimer = null;
+var setupTimer = null;
 
-// ── If already logged in, go to dashboard ──
+// ── PERSISTENCE: keep user logged in across sessions ──
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){});
+
+// ── CHECK IF ALREADY LOGGED IN ──
+// Only auto-redirect on initial page load, not mid-auth-flow
+var authFlowInProgress = false;
+var initialCheckDone = false;
+
 auth.onAuthStateChanged(function(user){
-  if(user && document.getElementById('successState').style.display === 'none'){
-    // Already logged in — redirect
-    showSuccess();
+  // Skip if we're mid auth-flow (Google popup etc)
+  if(authFlowInProgress) return;
+  // On initial load: if user is fully set up, redirect to dashboard
+  if(!initialCheckDone){
+    initialCheckDone = true;
+    if(user){
+      db.collection('users').doc(user.uid).get().then(function(doc){
+        if(doc.exists) showSuccess();
+        // else: user exists in Auth but not Firestore — leave on login page
+      }).catch(function(){ /* network error — leave on login page */ });
+    }
   }
 });
 
-// ── Handle Google redirect result (for mobile/popup-blocked fallback) ──
+// ── HANDLE GOOGLE REDIRECT RESULT (popup-blocked fallback) ──
 auth.getRedirectResult().then(function(result){
   if(result && result.user){
-    ensureUserDoc(result.user, null, null).then(function(){ goToDashboard(); });
+    handleGoogleUser(result.user);
   }
 }).catch(function(e){
-  if(e.code && e.code !== 'auth/no-redirect-operation') showError(e.message);
+  if(e.code && e.code !== 'auth/no-redirect-operation' && e.code !== 'auth/null-user'){
+    showErr(friendly(e));
+  }
 });
 
-// ── Google Sign In ──
+// ── GOOGLE BUTTON ──
 document.getElementById('btnGoogle').addEventListener('click', function(){
   var btn = this;
   btn.disabled = true;
-  btn.textContent = 'Opening Google...';
+  btn.innerHTML = '<span style="opacity:0.6">Connecting to Google...</span>';
+  authFlowInProgress = true; // Block onAuthStateChanged redirect
   var provider = new firebase.auth.GoogleAuthProvider();
   provider.addScope('email');
+  provider.addScope('profile');
   auth.signInWithPopup(provider)
-    .then(function(result){
-      return ensureUserDoc(result.user, null, null);
-    })
-    .then(function(){ goToDashboard(); })
+    .then(function(result){ handleGoogleUser(result.user); })
     .catch(function(e){
       btn.disabled = false;
       btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg> Continue with Google';
-      if(e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user'){
-        if(e.code === 'auth/popup-blocked'){
-          showError('Popup was blocked. Trying redirect...');
-          setTimeout(function(){ auth.signInWithRedirect(provider); }, 1500);
-        }
-        // popup-closed-by-user = do nothing
-      } else {
-        showError(friendlyError(e));
+      if(e.code === 'auth/popup-blocked'){
+        var provider2 = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithRedirect(provider2);
+      } else if(e.code !== 'auth/popup-closed-by-user'){
+        showErr(friendly(e));
       }
     });
 });
 
-// ── Email submit ──
-document.getElementById('btnSubmit').addEventListener('click', doSubmit);
-document.getElementById('authForm').addEventListener('submit', function(e){ e.preventDefault(); doSubmit(); });
-
-function doSubmit(){
-  clearMessages();
-  var email = document.getElementById('inputEmail').value.trim();
-  var password = document.getElementById('inputPassword').value;
-  if(!email){ showError('Please enter your email.'); return; }
-  if(!password){ showError('Please enter your password.'); return; }
-
-  if(mode === 'signup'){
-    var name = document.getElementById('inputName').value.trim();
-    var username = document.getElementById('inputUsername').value.trim().toLowerCase();
-    var confirm = document.getElementById('inputConfirm').value;
-    if(!name){ showError('Please enter your display name.'); return; }
-    if(username.length < 3){ showError('Username must be at least 3 characters.'); return; }
-    if(password.length < 6){ showError('Password must be at least 6 characters.'); return; }
-    if(password !== confirm){ showError('Passwords do not match.'); return; }
-    setLoading(true);
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(function(r){
-        return r.user.updateProfile({displayName: name})
-          .then(function(){ return ensureUserDoc(r.user, name, username); });
-      })
-      .then(function(){ goToDashboard(); })
-      .catch(function(e){ setLoading(false); showError(friendlyError(e)); });
-  } else {
-    setLoading(true);
-    auth.signInWithEmailAndPassword(email, password)
-      .then(function(){ goToDashboard(); })
-      .catch(function(e){ setLoading(false); showError(friendlyError(e)); });
-  }
-}
-
-// ── Helpers ──
-function setMode(m){
-  mode = m;
-  var isUp = m === 'signup';
-  document.getElementById('btnSignIn').classList.toggle('active', !isUp);
-  document.getElementById('btnSignUp').classList.toggle('active', isUp);
-  document.querySelectorAll('.signup-only').forEach(function(el){ el.classList.toggle('visible', isUp); });
-  document.getElementById('forgotRow').style.display = isUp ? 'none' : '';
-  document.getElementById('authEyebrow').textContent = isUp ? 'Create your profile' : 'Welcome back';
-  document.getElementById('authTitle').textContent = isUp ? 'Join ANIMUS' : 'Sign in to ANIMUS';
-  document.getElementById('authSub').textContent = isUp ? 'Take the assessment, build your profile, compare with friends.' : 'Access your profile, compare with friends, track how you change.';
-  document.getElementById('btnSubmit').textContent = isUp ? 'Create Account' : 'Sign In';
-  document.getElementById('authSwitch').innerHTML = isUp
-    ? 'Already have an account? <a onclick="setMode(\'signin\')">Sign in →</a>'
-    : 'Don\'t have an account? <a onclick="setMode(\'signup\')">Create one →</a>';
-  document.getElementById('inputPassword').setAttribute('autocomplete', isUp ? 'new-password' : 'current-password');
-  clearMessages();
-  // Username availability
-  if(isUp){
-    document.getElementById('inputUsername').addEventListener('input', function(){
-      var val = this.value.toLowerCase().replace(/[^a-z0-9_]/g,'');
-      this.value = val;
-      checkUsername(val);
-    });
-  }
-}
-
-function checkUsername(val){
-  var st = document.getElementById('usernameStatus');
-  clearTimeout(unTimer);
-  if(val.length < 3){ st.className='username-status'; st.textContent=''; return; }
-  st.className='username-status'; st.textContent='Checking...';
-  unTimer = setTimeout(function(){
-    db.collection('usernames').doc(val).get()
-      .then(function(doc){
-        if(doc.exists){ st.className='username-status err'; st.textContent='@'+val+' is taken'; }
-        else { st.className='username-status ok'; st.textContent='@'+val+' is available ✓'; }
-      }).catch(function(){ st.className='username-status ok'; st.textContent='@'+val+' looks good'; });
-  }, 600);
-}
-
-function ensureUserDoc(user, displayName, username){
-  var uid = user.uid;
-  var name = displayName || user.displayName || (user.email ? user.email.split('@')[0] : 'User');
-  var uname = username || name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20) || uid.substring(0,8);
-  return db.collection('users').doc(uid).get().then(function(doc){
-    if(doc.exists) return; // already set up
-    var batch = db.batch();
-    batch.set(db.collection('users').doc(uid), {
-      displayName: name,
-      username: uname,
-      email: user.email || '',
-      photoURL: user.photoURL || '',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      friends: [],
-      language: localStorage.getItem('animus_lang') || 'en'
-    });
-    batch.set(db.collection('usernames').doc(uname), { uid: uid });
-    return batch.commit();
+function handleGoogleUser(user){
+  // Check if user already has a Firestore doc
+  db.collection('users').doc(user.uid).get().then(function(doc){
+    if(doc.exists){
+      // Existing user — go straight to dashboard
+      showSuccess();
+    } else {
+      // New Google user — need to pick a username
+      pendingGoogleUser = user;
+      document.getElementById('mainForm').style.display = 'none';
+      document.getElementById('setupScreen').classList.add('visible');
+      // Pre-fill with a suggested username from their Google name
+      var suggested = (user.displayName||'').toLowerCase()
+        .replace(/[^a-z0-9]/g,'').substring(0,20);
+      if(suggested){
+        document.getElementById('setupUN').value = suggested;
+        checkSetupUN(suggested);
+      }
+    }
   });
 }
 
-function goToDashboard(){
-  // Save to localStorage as cache
-  auth.currentUser && localStorage.setItem('animus_uid', auth.currentUser.uid);
-  showSuccess();
-  setTimeout(function(){ window.location.href = 'dashboard.html'; }, 1200);
+// ── EMAIL SUBMIT ──
+function doSubmit(e){
+  e.preventDefault();
+  clearMsgs();
+  var email = document.getElementById('inEmail').value.trim();
+  var pw    = document.getElementById('inPw').value;
+  if(!email){ showErr('Please enter your email.'); return; }
+  if(!pw){    showErr('Please enter your password.'); return; }
+
+  if(mode === 'signup'){
+    var name    = document.getElementById('inName').value.trim();
+    var username= document.getElementById('inUser').value.trim().toLowerCase();
+    var confirm = document.getElementById('inConfirm').value;
+    if(!name)            { showErr('Please enter your display name.'); return; }
+    if(username.length<3){ showErr('Username must be at least 3 characters.'); return; }
+    if(pw.length<6)      { showErr('Password must be at least 6 characters.'); return; }
+    if(pw !== confirm)   { showErr('Passwords do not match.'); return; }
+    setLoading(true);
+    authFlowInProgress = true;
+    auth.createUserWithEmailAndPassword(email, pw)
+      .then(function(r){
+        return r.user.updateProfile({displayName:name})
+          .then(function(){ return saveUserDoc(r.user, name, username); });
+      })
+      .then(function(){ showSuccess(); })
+      .catch(function(e2){ setLoading(false); showErr(friendly(e2)); });
+  } else {
+    setLoading(true);
+    authFlowInProgress = true;
+    auth.signInWithEmailAndPassword(email, pw)
+      .then(function(){ showSuccess(); })
+      .catch(function(e2){ setLoading(false); showErr(friendly(e2)); });
+  }
 }
 
-function showSuccess(){
-  document.getElementById('formContent').style.display = 'none';
-  document.getElementById('successState').style.display = 'block';
+// ── USERNAME SETUP (Google new users) ──
+function checkSetupUN(val){
+  val = val.toLowerCase().replace(/[^a-z0-9_]/g,'');
+  document.getElementById('setupUN').value = val;
+  document.getElementById('setupPreview').textContent = val || 'yourname';
+  var st = document.getElementById('setupUNStatus');
+  clearTimeout(setupTimer);
+  if(val.length < 3){ st.className='un-status'; st.textContent=''; return; }
+  st.className='un-status'; st.textContent='Checking...';
+  setupTimer = setTimeout(function(){
+    db.collection('usernames').doc(val).get()
+      .then(function(doc){
+        if(doc.exists){ st.className='un-status err'; st.textContent='@'+val+' is taken'; }
+        else           { st.className='un-status ok';  st.textContent='@'+val+' is available ✓'; }
+      }).catch(function(){ st.className='un-status ok'; st.textContent='@'+val+' looks good'; });
+  }, 500);
 }
 
+function finishSetup(){
+  if(!pendingGoogleUser){ showSuccess(); return; }
+  var un = document.getElementById('setupUN').value.trim().toLowerCase();
+  var errEl = document.getElementById('setupErr');
+  errEl.classList.remove('visible');
+  if(un.length < 3){ errEl.textContent='Username must be at least 3 characters.'; errEl.classList.add('visible'); return; }
+  var btn = document.querySelector('#setupScreen .btn-submit');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  // Final availability check then save
+  db.collection('usernames').doc(un).get().then(function(doc){
+    if(doc.exists){ throw new Error('@'+un+' is already taken. Please choose another.'); }
+    return saveUserDoc(pendingGoogleUser, pendingGoogleUser.displayName||'', un);
+  }).then(function(){
+    pendingGoogleUser = null;
+    showSuccess();
+  }).catch(function(e2){
+    btn.disabled=false; btn.textContent='Finish Setup →';
+    errEl.textContent = e2.message; errEl.classList.add('visible');
+  });
+}
+
+function saveUserDoc(user, displayName, username){
+  var batch = db.batch();
+  batch.set(db.collection('users').doc(user.uid), {
+    displayName: displayName || user.displayName || '',
+    username: username,
+    email: user.email || '',
+    photoURL: user.photoURL || '',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    friends: [],
+    friendRequests: {sent:[], received:[]},
+    language: localStorage.getItem('animus_lang') || 'en'
+  });
+  batch.set(db.collection('usernames').doc(username), { uid: user.uid });
+  return batch.commit();
+}
+
+// ── USERNAME CHECK (signup form) ──
+function checkUN(val){
+  val = val.toLowerCase().replace(/[^a-z0-9_]/g,'');
+  document.getElementById('inUser').value = val;
+  var st = document.getElementById('unStatus');
+  clearTimeout(unTimer);
+  if(val.length<3){ st.className='un-status'; st.textContent=''; return; }
+  st.className='un-status'; st.textContent='Checking...';
+  unTimer = setTimeout(function(){
+    db.collection('usernames').doc(val).get()
+      .then(function(doc){
+        if(doc.exists){ st.className='un-status err'; st.textContent='@'+val+' is taken'; }
+        else           { st.className='un-status ok';  st.textContent='@'+val+' is available ✓'; }
+      }).catch(function(){ st.className='un-status ok'; st.textContent='@'+val+' looks good'; });
+  }, 500);
+}
+
+// ── SET MODE ──
+function setMode(m){
+  mode = m;
+  var up = m==='signup';
+  document.querySelectorAll('.toggle-btn').forEach(function(b,i){ b.classList.toggle('active', up ? i===1 : i===0); });
+  document.querySelectorAll('.signup-only').forEach(function(el){ el.classList.toggle('visible', up); });
+  document.getElementById('forgotRow').style.display = up ? 'none' : '';
+  document.getElementById('eyebrow').textContent   = up ? 'Create your profile' : 'Welcome back';
+  document.getElementById('formTitle').textContent = up ? 'Join ANIMUS' : 'Sign in to ANIMUS';
+  document.getElementById('formSub').textContent   = up ? 'Take the assessment, build your profile, compare with friends.' : 'Access your profile, compare with friends, track how you change.';
+  document.getElementById('btnSubmit').textContent = up ? 'Create Account' : 'Sign In';
+  document.getElementById('switchMsg').innerHTML   = up
+    ? 'Already have an account? <a onclick="setMode(\'signin\')">Sign in →</a>'
+    : "Don't have an account? <a onclick=\"setMode('signup')\">Create one →</a>";
+  clearMsgs();
+}
+
+// ── FORGOT PASSWORD ──
 function doForgot(){
-  var email = document.getElementById('inputEmail').value.trim();
-  if(!email){ showError('Enter your email address first.'); return; }
+  var email = document.getElementById('inEmail').value.trim();
+  if(!email){ showErr('Enter your email address first.'); return; }
   auth.sendPasswordResetEmail(email)
-    .then(function(){
-      showSuccessMsg('Reset email sent — check your inbox.');
-    })
-    .catch(function(e){ showError(friendlyError(e)); });
+    .then(function(){ showOk('Reset email sent — check your inbox.'); })
+    .catch(function(e){ showErr(friendly(e)); });
 }
 
-function friendlyError(e){
-  var m = { 'auth/email-already-in-use':'An account with this email already exists.', 'auth/user-not-found':'No account found with this email.', 'auth/wrong-password':'Incorrect password.', 'auth/weak-password':'Password must be at least 6 characters.', 'auth/invalid-email':'Please enter a valid email address.', 'auth/too-many-requests':'Too many attempts. Try again later.', 'auth/network-request-failed':'Network error. Check your connection.' };
-  return m[e.code] || e.message;
+// ── SUCCESS / REDIRECT ──
+function showSuccess(){
+  document.getElementById('mainForm').style.display   = 'none';
+  document.getElementById('setupScreen').classList.remove('visible');
+  document.getElementById('successScreen').style.display = 'block';
+  setTimeout(function(){
+    // Use clean URL if available (Vercel), fallback to .html
+    window.location.href = '/dashboard';
+  }, 1200);
 }
-function showError(msg){ var el=document.getElementById('authError'); el.textContent=msg; el.classList.add('visible'); document.getElementById('authSuccess').classList.remove('visible'); }
-function showSuccessMsg(msg){ var el=document.getElementById('authSuccess'); el.textContent=msg; el.classList.add('visible'); document.getElementById('authError').classList.remove('visible'); }
-function clearMessages(){ document.getElementById('authError').classList.remove('visible'); document.getElementById('authSuccess').classList.remove('visible'); }
-function setLoading(on){ var btn=document.getElementById('btnSubmit'); btn.disabled=on; btn.textContent=on?(mode==='signup'?'Creating account...':'Signing in...'):(mode==='signup'?'Create Account':'Sign In'); }
+
+// ── HELPERS ──
+function setLoading(on){
+  var b = document.getElementById('btnSubmit');
+  b.disabled = on;
+  b.textContent = on ? (mode==='signup'?'Creating account...':'Signing in...') : (mode==='signup'?'Create Account':'Sign In');
+}
+function showErr(msg){ var e=document.getElementById('errMsg'); e.textContent=msg; e.classList.add('visible'); }
+function showOk(msg){ var e=document.getElementById('okMsg'); e.textContent=msg; e.classList.add('visible'); }
+function clearMsgs(){ document.getElementById('errMsg').classList.remove('visible'); document.getElementById('okMsg').classList.remove('visible'); }
+function friendly(e){
+  var m={'auth/email-already-in-use':'An account with this email already exists.','auth/user-not-found':'No account found with this email.','auth/wrong-password':'Incorrect password.','auth/weak-password':'Password must be at least 6 characters.','auth/invalid-email':'Please enter a valid email address.','auth/too-many-requests':'Too many attempts. Try again later.','auth/network-request-failed':'Network error — check your connection.','auth/invalid-credential':'Incorrect email or password.'};
+  return m[e.code]||e.message;
+}
 </script>
 </body>
 </html>
