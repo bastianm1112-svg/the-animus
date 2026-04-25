@@ -385,8 +385,7 @@ function finishSetup(){
 // FIRESTORE DOC CREATION
 // ─────────────────────────────────────────
 function saveDoc(user, displayName, username){
-  var batch = db.batch();
-  batch.set(db.collection('users').doc(user.uid), {
+  var userData = {
     displayName: displayName||user.displayName||'',
     username: username,
     email: user.email||'',
@@ -395,9 +394,32 @@ function saveDoc(user, displayName, username){
     friends: [],
     friendRequests: {sent:[], received:[]},
     language: localStorage.getItem('animus_lang')||'en'
-  });
+  };
+  // Try batch first (atomic)
+  var batch = db.batch();
+  batch.set(db.collection('users').doc(user.uid), userData);
   batch.set(db.collection('usernames').doc(username), {uid: user.uid});
-  return batch.commit();
+  return batch.commit().catch(function(batchErr){
+    console.error('Batch write failed:', batchErr.code, batchErr.message);
+    // Fallback: try individual writes
+    return db.collection('users').doc(user.uid).set(userData)
+      .then(function(){
+        return db.collection('usernames').doc(username).set({uid: user.uid});
+      })
+      .catch(function(e){
+        console.error('Individual write also failed:', e.code, e.message);
+        // Store locally so dashboard can retry
+        try{
+          localStorage.setItem('animus_pending_doc', JSON.stringify({
+            uid: user.uid,
+            displayName: userData.displayName,
+            username: username,
+            email: user.email||''
+          }));
+        }catch(_){}
+        // Don't throw - let auth succeed, dashboard will fix it
+      });
+  });
 }
 
 // ─────────────────────────────────────────
@@ -475,13 +497,15 @@ function setBtn(loading, txt){
 function showErr(e){
   var msgs = {
     'auth/email-already-in-use':'An account with this email already exists.',
-    'auth/user-not-found':'No account found with this email.',
-    'auth/wrong-password':'Incorrect email or password.',
-    'auth/invalid-credential':'Incorrect email or password.',
+    'auth/user-not-found':'No account found with this email. Try signing up.',
+    'auth/wrong-password':'Incorrect password.',
+    'auth/invalid-credential':'Incorrect email or password. Check and try again.',
     'auth/weak-password':'Password must be at least 6 characters.',
     'auth/invalid-email':'Please enter a valid email address.',
-    'auth/too-many-requests':'Too many attempts. Please try again later.',
-    'auth/network-request-failed':'Network error — check your connection.'
+    'auth/too-many-requests':'Too many failed attempts. Wait a few minutes and try again.',
+    'auth/network-request-failed':'Network error — check your connection and try again.',
+    'auth/user-disabled':'This account has been disabled.',
+    'auth/account-exists-with-different-credential':'An account exists with this email using a different sign-in method.'
   };
   var el = document.getElementById('errBox');
   el.textContent = (e && msgs[e.code]) || (e && e.message) || 'Something went wrong.';

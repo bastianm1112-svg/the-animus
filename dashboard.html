@@ -358,8 +358,36 @@ auth.onAuthStateChanged(function(user){
   document.getElementById('sidebarAvatar').textContent = init;
   document.getElementById('sidebarName').textContent = name;
 
-  // Load user doc
+  // Load user doc - create if missing (handles failed signup writes)
   db.collection('users').doc(user.uid).get().then(function(doc){
+    if(!doc.exists){
+      // Doc missing - try to create from localStorage backup or generate defaults
+      var pending = null;
+      try{ pending = JSON.parse(localStorage.getItem('animus_pending_doc')||'null'); }catch(_){}
+      var defaultUsername = (user.displayName||user.email.split('@')[0]||'user')
+        .toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20)||('user'+Date.now().toString().slice(-6));
+      var userData = {
+        displayName: (pending&&pending.displayName)||user.displayName||user.email.split('@')[0]||'User',
+        username: (pending&&pending.username)||defaultUsername,
+        email: user.email||'',
+        photoURL: user.photoURL||'',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        friends: [], friendRequests:{sent:[],received:[]},
+        language: localStorage.getItem('animus_lang')||'en'
+      };
+      // Write user doc
+      db.collection('users').doc(user.uid).set(userData)
+        .then(function(){
+          return db.collection('usernames').doc(userData.username).set({uid:user.uid});
+        })
+        .then(function(){
+          localStorage.removeItem('animus_pending_doc');
+          document.getElementById('sidebarUsername').textContent='@'+escapeHTML(userData.username);
+          document.getElementById('sidebarName').textContent=escapeHTML(userData.displayName);
+        })
+        .catch(function(e){ console.error('Auto-create doc failed:',e); });
+      return;
+    }
     if(doc.exists){
       var data = doc.data();
       var uname = data.username || '';
