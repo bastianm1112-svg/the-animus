@@ -1708,6 +1708,25 @@ function finishQuiz(){
   });
 }
 
+
+// ── HELPER: Attachment dominant type ──
+function getAttachment(atS){
+  var types = ['AT_SEC','AT_ANX','AT_AVO','AT_DIS'];
+  return types.reduce(function(a,b){ return atS[a]>atS[b]?a:b; }, types[0]);
+}
+
+// ── HELPER: Philosophy dominant school ──
+function getPhilosophy(phS){
+  var types = ['PH_STO','PH_EPI','PH_KAN','PH_ARI','PH_NIE','PH_EXI','PH_PRA','PH_SKE'];
+  return types.reduce(function(a,b){ return phS[a]>phS[b]?a:b; }, types[0]);
+}
+
+// ── HELPER: Instinctual stack (SP/SOC/SX ordered by score) ──
+function getInstinctStack(ivS){
+  var order = Object.keys(ivS).sort(function(a,b){ return ivS[b]-ivS[a]; });
+  return order.map(function(k){ return k.replace('IV_',''); }).join('/');
+}
+
 // ── SCORING ──
 var _scoreCache = null;
 
@@ -1866,10 +1885,17 @@ function callAIWithRetry(prompt,retriesLeft,onSuccess,onFail){
 
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3500,messages:[{role:'user',content:prompt}]})
+    headers:{
+      'Content-Type':'application/json',
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3000,messages:[{role:'user',content:prompt}]})
   })
-  .then(function(r){return r.json();})
+  .then(function(r){
+    if(!r.ok) throw new Error('API error '+r.status);
+    return r.json();
+  })
   .then(function(d){
     var text=(d.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('').replace(/```json|```/g,'').trim();
     var parsed=JSON.parse(text);
@@ -1877,8 +1903,10 @@ function callAIWithRetry(prompt,retriesLeft,onSuccess,onFail){
     onSuccess(parsed);
   })
   .catch(function(e){
-    console.warn('AI attempt failed:',e);
-    if(retriesLeft>1){
+    console.warn('AI attempt failed:',e.message);
+    // If CORS/network error, go straight to fallback (no point retrying)
+    var isCORS = e.message && (e.message.indexOf('Failed to fetch')>=0 || e.message.indexOf('NetworkError')>=0 || e.message.indexOf('CORS')>=0);
+    if(!isCORS && retriesLeft>1){
       setTimeout(function(){callAIWithRetry(prompt,retriesLeft-1,onSuccess,onFail);},1500);
     } else {
       retryEl.textContent='';

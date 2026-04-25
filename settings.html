@@ -850,36 +850,46 @@ function saveChanges() {
   var lang = document.getElementById('language').value;
   var theme = document.getElementById('theme').value;
 
-  // Check if username changed
-  firebase.firestore().collection('users').doc(uid).get().then(function(doc){
+  // Use set+merge so it works for new users AND existing users
+  var displayNameVal = document.getElementById('displayName').value.trim();
+
+  db.collection('users').doc(uid).get().then(function(doc){
     var currentUsername = doc.exists ? (doc.data().username||'') : '';
     var newUsername = un;
-    var saves = [];
+    var chain = Promise.resolve();
 
-    // Update user profile
-    saves.push(firebase.firestore().collection('users').doc(uid).update({
-      displayName: document.getElementById('displayName').value.trim(),
-      bio: bio,
-      language: lang
-    }));
+    // Save main user doc with set+merge (works even if doc doesn't exist)
+    chain = chain.then(function(){
+      return db.collection('users').doc(uid).set({
+        displayName: displayNameVal,
+        bio: bio,
+        language: lang,
+        email: user.email || '',
+        username: newUsername
+      }, {merge: true});
+    });
 
-    // Update username if changed
+    // Update username lookup if changed
     if(newUsername !== currentUsername && newUsername.length >= 3){
-      var batch = firebase.firestore().batch();
-      if(currentUsername) batch.delete(firebase.firestore().collection('usernames').doc(currentUsername));
-      batch.set(firebase.firestore().collection('usernames').doc(newUsername), { uid: uid });
-      batch.update(firebase.firestore().collection('users').doc(uid), { username: newUsername });
-      saves.push(batch.commit());
+      chain = chain.then(function(){
+        var batch = db.batch();
+        if(currentUsername) batch.delete(db.collection('usernames').doc(currentUsername));
+        batch.set(db.collection('usernames').doc(newUsername), { uid: uid });
+        return batch.commit();
+      });
     }
 
-    // Update email if changed
-    var newEmail = document.getElementById('email').value.trim();
-    if(newEmail && newEmail !== user.email) saves.push(user.updateEmail(newEmail));
+    // Update Firebase Auth display name
+    chain = chain.then(function(){
+      return user.updateProfile({ displayName: displayNameVal });
+    });
 
     // Update password if entered
-    if(newPw && newPw === confirmPw) saves.push(user.updatePassword(newPw));
+    if(newPw && newPw === confirmPw && newPw.length >= 6){
+      chain = chain.then(function(){ return user.updatePassword(newPw); });
+    }
 
-    return Promise.all(saves);
+    return chain;
   }).then(function(){
     dirty = false;
     document.getElementById('saveBar').classList.remove('visible');
@@ -1021,6 +1031,20 @@ auth.onAuthStateChanged(function(user){
     return;
   }
   document.getElementById('navAvatar').textContent = (user.displayName||'?').charAt(0).toUpperCase();
+
+  // ── Google connected status ──
+  var googleConn = document.getElementById('connectedStatus');
+  var googleEmailEl = document.getElementById('googleEmail');
+  if(user.providerData){
+    var gp = user.providerData.find(function(p){ return p.providerId==='google.com'; });
+    if(gp){
+      if(googleConn){ googleConn.textContent='Connected'; googleConn.className='connected-status ok'; }
+      if(googleEmailEl) googleEmailEl.textContent = gp.email||user.email||'';
+    } else {
+      if(googleConn){ googleConn.textContent='Not connected'; googleConn.className='connected-status off'; }
+    }
+  }
+
   db.collection('users').doc(user.uid).get().then(function(doc){
     var d = doc.exists ? doc.data() : {};
     // Use Firebase auth displayName as fallback if Firestore doc missing

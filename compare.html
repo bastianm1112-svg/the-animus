@@ -657,17 +657,10 @@ function generateAIAnalysis(mySnap, themSnap, myName, themName){
   if(!aiContent) return;
   aiContent.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:12px;text-align:center">Generating AI analysis...</div>';
 
-  var prompt = 'You are an expert in personality psychology, MBTI, and Enneagram. Analyze the compatibility between two people based on their personality profiles and write a detailed comparison.
-
-'
-    + 'Person 1 ('+myName+'): MBTI='+mySnap.mbti+', Enneagram='+mySnap.ennType+'w'+mySnap.ennWing+', Tritype='+mySnap.ennTritype+', Attachment='+mySnap.att+', Philosophy='+mySnap.phi+', Political: X='+mySnap.polX+' Y='+mySnap.polY+', Dominant function='+(Object.keys(mySnap.cog||{}).sort(function(a,b){return (mySnap.cog[b]||0)-(mySnap.cog[a]||0);})[0]||'?')+'
-'
-    + 'Person 2 ('+themName+'): MBTI='+themSnap.mbti+', Enneagram='+themSnap.ennType+'w'+themSnap.ennWing+', Tritype='+themSnap.ennTritype+', Attachment='+themSnap.att+', Philosophy='+themSnap.phi+', Political: X='+themSnap.polX+' Y='+themSnap.polY+', Dominant function='+(Object.keys(themSnap.cog||{}).sort(function(a,b){return (themSnap.cog[b]||0)-(themSnap.cog[a]||0);})[0]||'?')+'
-
-'
-    + 'Return JSON with exactly these keys: {"whereAlign":"2 paragraphs on where they naturally connect","whereClash":"2 paragraphs on where they will clash","dynamic":"1 paragraph on how they interact socially","mutualEffect":"1 paragraph on what each brings out in the other"}
-'
-    + 'Raw JSON only, no markdown.';
+  var prompt = 'You are an expert in MBTI and Enneagram. Analyze compatibility between two people.'
+    + ' Person 1 ('+myName+'): MBTI='+mySnap.mbti+', Enneagram='+(mySnap.ennType||'?')+'w'+(mySnap.ennWing||'?')+', Attachment='+(mySnap.att||'?')+', Philosophy='+(mySnap.phi||'?')+', Political X='+(mySnap.polX||0)+' Y='+(mySnap.polY||0)+'.'
+    + ' Person 2 ('+themName+'): MBTI='+themSnap.mbti+', Enneagram='+(themSnap.ennType||'?')+'w'+(themSnap.ennWing||'?')+', Attachment='+(themSnap.att||'?')+', Philosophy='+(themSnap.phi||'?')+', Political X='+(themSnap.polX||0)+' Y='+(themSnap.polY||0)+'.'
+    + ' Return JSON with keys: {"whereAlign":"2 paragraphs on natural connection","whereClash":"2 paragraphs on friction","dynamic":"1 paragraph on social interaction","mutualEffect":"1 paragraph on what each brings out in the other"}. Raw JSON only.';
 
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
@@ -677,10 +670,10 @@ function generateAIAnalysis(mySnap, themSnap, myName, themName){
   .then(function(d){
     var text=(d.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('').replace(/```json|```/g,'').trim();
     var ai=JSON.parse(text);
-    aiContent.innerHTML=
+        aiContent.innerHTML =
       '<div class="ai-section"><div class="ai-section-title">Where You Align</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.whereAlign,3000)+'</div></div></div>'
-      +'<div class="ai-section"><div class="ai-section-title">Where You'll Clash</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.whereClash,3000)+'</div></div></div>'
-      +'<div class="ai-section"><div class="ai-section-title">How You'd Interact</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.dynamic,1500)+'</div></div></div>'
+      +'<div class="ai-section"><div class="ai-section-title">Where You\'ll Clash</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.whereClash,3000)+'</div></div></div>'
+      +'<div class="ai-section"><div class="ai-section-title">How You\'d Interact</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.dynamic,1500)+'</div></div></div>'
       +'<div class="ai-section"><div class="ai-section-title">What Each Brings Out</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.mutualEffect,1500)+'</div></div></div>';
   }).catch(function(){
     aiContent.innerHTML='<div style="padding:20px;color:var(--muted);font-size:12px;text-align:center">AI analysis unavailable — showing score comparison only.</div>';
