@@ -214,6 +214,45 @@ var setupTimer = null;
 // ── PERSISTENCE: keep user logged in across sessions ──
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){});
 
+// ── FIRESTORE CONNECTION CHECK ──
+setTimeout(function(){
+  db.collection('usernames').limit(1).get({source:'server'})
+    .catch(function(e){
+      if(e.code==='unavailable'||e.code==='failed-precondition'||e.message.indexOf('offline')>-1){
+        var warn=document.createElement('div');
+        warn.style.cssText='background:#c0392b;color:#fff;padding:10px 16px;font-size:12px;text-align:center;position:fixed;top:0;left:0;right:0;z-index:999;letter-spacing:0.03em;';
+        warn.innerHTML='⚠ &nbsp;Firestore not connected — create your Firestore Database in the Firebase Console first';
+        document.body.appendChild(warn);
+      }
+    });
+},2000);
+
+// ── RETRY PENDING PROFILE (if Firestore was offline during signup) ──
+(function(){
+  var pending=localStorage.getItem('animus_pending_profile');
+  if(!pending) return;
+  auth.onAuthStateChanged(function(user){
+    if(!user) return;
+    try{
+      var p=JSON.parse(pending);
+      if(p.uid!==user.uid) return;
+      db.collection('users').doc(user.uid).get().then(function(doc){
+        if(doc.exists){localStorage.removeItem('animus_pending_profile');return;}
+        var batch=db.batch();
+        batch.set(db.collection('users').doc(user.uid),{
+          displayName:p.displayName||'',username:p.username||'',
+          email:p.email||'',photoURL:user.photoURL||'',
+          createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+          friends:[],friendRequests:{sent:[],received:[]},
+          language:localStorage.getItem('animus_lang')||'en'
+        });
+        batch.set(db.collection('usernames').doc(p.username),{uid:user.uid});
+        return batch.commit().then(function(){localStorage.removeItem('animus_pending_profile');});
+      });
+    }catch(e){}
+  });
+})();
+
 // ── CHECK IF ALREADY LOGGED IN ──
 // Only auto-redirect on initial page load, not mid-auth-flow
 var authFlowInProgress = false;
@@ -377,7 +416,24 @@ function saveUserDoc(user, displayName, username){
     language: localStorage.getItem('animus_lang') || 'en'
   });
   batch.set(db.collection('usernames').doc(username), { uid: user.uid });
-  return batch.commit();
+  return batch.commit().catch(function(err){
+    // If Firestore is offline/unavailable, still let the user in
+    // Auth succeeded — profile can be created next time they load
+    console.warn('Firestore write failed:', err.code, err.message);
+    if(err.code === 'unavailable' || err.code === 'failed-precondition'){
+      // Store locally so we can retry later
+      try {
+        localStorage.setItem('animus_pending_profile', JSON.stringify({
+          uid: user.uid,
+          displayName: displayName || user.displayName || '',
+          username: username,
+          email: user.email || ''
+        }));
+      } catch(e){}
+      return; // Don't throw — let auth succeed
+    }
+    throw err; // Re-throw other errors
+  });
 }
 
 // ── USERNAME CHECK (signup form) ──
