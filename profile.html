@@ -2322,8 +2322,15 @@ function loadProfileData(uid, isOwner, currentUser){
     db.collection('profiles').doc(uid).get()
   ]).then(function(results){
     var uDoc=results[0]; var pDoc=results[1];
-    if(!uDoc.exists) return;
-    var u=uDoc.data();
+    var u = uDoc.exists ? uDoc.data() : {};
+    // Fallback to Firebase Auth data if Firestore doc missing
+    if(!uDoc.exists && currentUser && isOwner){
+      u = {
+        displayName: currentUser.displayName || 'Unknown',
+        username: currentUser.email ? currentUser.email.split('@')[0] : '',
+        bio: ''
+      };
+    } else if(!uDoc.exists){ return; }
     var p=pDoc.exists ? pDoc.data() : {};
     var snap=p.latest||{};
 

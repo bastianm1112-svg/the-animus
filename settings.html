@@ -839,8 +839,12 @@ function saveChanges() {
   btn.disabled = true;
   btn.textContent = 'Saving...';
 
-  var user = firebase.auth().currentUser;
-  if(!user){ showToast('Not signed in'); btn.disabled=false; btn.textContent='Save Changes'; return; }
+  var user = auth.currentUser;
+  if(!user){
+    showToast('Loading your account... please try again in a moment');
+    btn.disabled=false; btn.textContent='Save Changes';
+    return;
+  }
   var uid = user.uid;
   var bio = document.getElementById('bio').value.trim();
   var lang = document.getElementById('language').value;
@@ -1018,12 +1022,12 @@ auth.onAuthStateChanged(function(user){
   }
   document.getElementById('navAvatar').textContent = (user.displayName||'?').charAt(0).toUpperCase();
   db.collection('users').doc(user.uid).get().then(function(doc){
-    if(!doc.exists) return;
-    var d = doc.data();
-    document.getElementById('displayName').value = d.displayName||'';
-    document.getElementById('username').value = d.username||'';
-    document.getElementById('usernamePreview').textContent = d.username||'yourname';
-    document.getElementById('bio').value = d.bio||'';
+    var d = doc.exists ? doc.data() : {};
+    // Use Firebase auth displayName as fallback if Firestore doc missing
+    document.getElementById('displayName').value = d.displayName || user.displayName || '';
+    document.getElementById('username').value = d.username || '';
+    document.getElementById('usernamePreview').textContent = d.username || 'yourname';
+    document.getElementById('bio').value = d.bio || '';
     document.getElementById('email').value = user.email||'';
     document.getElementById('googleEmail').textContent = user.email||'';
     if(user.photoURL) document.getElementById('navAvatar').innerHTML='<img src="'+user.photoURL+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';

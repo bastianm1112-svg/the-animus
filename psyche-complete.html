@@ -1565,8 +1565,8 @@ function finishFill(filteredQ, fillAnswers, baseProfile){
     var econR = averaged['PC_ECON_R']||50;
     var auth  = averaged['PC_AUTH']  ||50;
     var lib   = averaged['PC_LIB']   ||50;
-    mergedData.polX = Math.round((econR-econL)*0.7);
-    mergedData.polY = Math.round((auth-lib)*0.7);
+    mergedData.polX = Math.max(-100, Math.min(100, Math.round(econR-econL)));
+    mergedData.polY = Math.max(-100, Math.min(100, Math.round(auth-lib)));
   }
 
   var mbti = baseProfile.mbti;
@@ -1681,309 +1681,183 @@ function renderQ(){
   });
 }
 
-// ── SCORING ──
-function score(){
-  var fns=['Ni','Ne','Ti','Te','Fi','Fe','Si','Se'];
-  var s={};
-  fns.forEach(function(f){s[f]=0;var cnt=0;
-    (window._activeQ||Q).forEach(function(q,i){if(q.fn===f){s[f]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    s[f]=cnt?Math.round(s[f]/cnt):50;
-  });
-
-  // Enneagram
-  var eTypes=['E1','E2','E3','E4','E5','E6','E7','E8','E9'];
-  var eS={};
-  eTypes.forEach(function(e){eS[e]=0;var cnt=0;
-    (window._activeQ||Q).forEach(function(q,i){if(q.fn===e){eS[e]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    eS[e]=cnt?Math.round(eS[e]/cnt):50;
-  });
-
-  // Attachment
-  var atTypes=['AT_SEC','AT_ANX','AT_AVO','AT_DIS'];
-  var atS={};
-  atTypes.forEach(function(a){atS[a]=0;var cnt=0;
-    (window._activeQ||Q).forEach(function(q,i){if(q.fn===a){atS[a]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    atS[a]=cnt?Math.round(atS[a]/cnt):50;
-  });
-
-  // Philosophy
-  var phTypes=['PH_STO','PH_EPI','PH_KAN','PH_ARI','PH_NIE','PH_EXI','PH_PRA','PH_SKE'];
-  var phS={};
-  phTypes.forEach(function(p){phS[p]=0;var cnt=0;
-    (window._activeQ||Q).forEach(function(q,i){if(q.fn===p){phS[p]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    phS[p]=cnt?Math.round(phS[p]/cnt):50;
-  });
-
-  // Epistemology
-  var epTypes=['EP_RAT','EP_EMP','EP_INT','EP_SKP'];
-  var epS={};
-  epTypes.forEach(function(e){epS[e]=0;var cnt=0;
-    (window._activeQ||Q).forEach(function(q,i){if(q.fn===e){epS[e]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    epS[e]=cnt?Math.round(epS[e]/cnt):50;
-  });
-
-  // Ethics
-  var etTypes=['ET_VIR','ET_CON','ET_DEO','ET_EGO'];
-  var etS={};
-  etTypes.forEach(function(e){etS[e]=0;var cnt=0;
-    (window._activeQ||Q).forEach(function(q,i){if(q.fn===e){etS[e]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    etS[e]=cnt?Math.round(etS[e]/cnt):50;
-  });
-
-  // Moral foundations — computed before Political (mfS used in polX/polY composite)
-  var mfTypes=['MF_CARE','MF_FAIR','MF_LOY','MF_AUTH','MF_PUR','MF_LIB'];
-  var mfS={};
-  mfTypes.forEach(function(m){mfS[m]=0;var cnt=0;
-    (window._activeQ||Q).forEach(function(q,i){if(q.fn===m){mfS[m]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    mfS[m]=cnt?Math.round(mfS[m]/cnt):50;
-  });
-
-  // Political — direct scores
-  var econL=avg('PC_ECON_L');
-  var econR=avg('PC_ECON_R');
-  var auth=avg('PC_AUTH');
-  var lib=avg('PC_LIB');
-
-  // ── Borrow signal from Philosophy ──
-  var phNie=phS['PH_NIE']||50;
-  var phExi=phS['PH_EXI']||50;
-  var phSto=phS['PH_STO']||50;
-  var phKan=phS['PH_KAN']||50;
-  var phAri=phS['PH_ARI']||50;
-  var phEpi=phS['PH_EPI']||50;
-  var phPra=phS['PH_PRA']||50;
-
-  // ── Borrow signal from Ethics ──
-  var etVir=etS['ET_VIR']||50;
-  var etCon=etS['ET_CON']||50;
-  var etDeo=etS['ET_DEO']||50;
-  var etEgo=etS['ET_EGO']||50;
-
-  // ── Borrow signal from Moral Foundations ──
-  var mfCare=mfS['MF_CARE']||50;
-  var mfFair=mfS['MF_FAIR']||50;
-  var mfLoy=mfS['MF_LOY']||50;
-  var mfAuth=mfS['MF_AUTH']||50;
-  var mfPur=mfS['MF_PUR']||50;
-  var mfLib=mfS['MF_LIB']||50;
-
-  // ── ECONOMIC AXIS ──
-  // Each source contributes a signed value: positive = pulls right, negative = pulls left
-  // Direct questions are primary (70%). Secondary signals are auxiliary (30%).
-  // All raw scores are 0–100 where 50 = neutral. We subtract 50 to get a signed offset (-50 to +50).
-
-  var econDirect = (econR - econL); // direct: positive = right-leaning
-
-  // Secondary signals — each (score-50) gives direction, weight scales contribution
-  var econSecondary =
-    (phNie  - 50) * 0.5   // Nietzsche → individualist, anti-egalitarian → right
-  + (etEgo  - 50) * 0.6   // Rational egoism → strongly right
-  + (mfLib  - 50) * 0.4   // Liberty moral foundation → right/free market
-  + (phSto  - 50) * 0.2   // Stoic self-reliance → mild right
-  + (mfLoy  - 50) * 0.15  // Loyalty → mild right
-  + (phEpi  - 50) * (-0.4) // Epicurean → anti-ambition, mild left
-  + (etCon  - 50) * (-0.3) // Consequentialist → collective welfare → left
-  + (mfCare - 50) * (-0.4) // Care foundation → redistributive → left
-  + (mfFair - 50) * (-0.3) // Fairness-as-equality → left
-  + (phKan  - 50) * (-0.15)// Kantian duties → mild left
-  + (phPra  - 50) * (-0.15);// Pragmatist utility → mild left
-
-  // Normalise secondary by sum of absolute weights
-  var econSecWeightSum = 0.5+0.6+0.4+0.2+0.15+0.4+0.3+0.4+0.3+0.15+0.15; // = 3.55
-  var econSecNorm = econSecondary / econSecWeightSum; // back to -50..+50 scale
-
-  // Blend: direct 70%, secondary 30%
-  var polX = Math.round(econDirect * 0.7 + econSecNorm * 0.3);
-
-  // ── SOCIAL AXIS ──
-  // positive = authoritarian (up on compass), negative = libertarian (down)
-
-  var socDirect = (auth - lib); // direct: positive = auth-leaning
-
-  var socSecondary =
-    (mfAuth - 50) * 0.6   // Authority foundation → auth
-  + (mfLoy  - 50) * 0.4   // Loyalty → group cohesion → auth
-  + (mfPur  - 50) * 0.3   // Sanctity → social norms → auth
-  + (phAri  - 50) * 0.35  // Aristotelian polis, natural hierarchy → auth
-  + (phSto  - 50) * 0.2   // Stoic duty, accept natural order → mild auth
-  + (etVir  - 50) * 0.25  // Virtue ethics → communal standards → mild auth
-  + (mfLib  - 50) * (-0.5) // Liberty foundation → libertarian
-  + (phNie  - 50) * (-0.4) // Nietzsche → anti-herd, individual will → lib
-  + (phExi  - 50) * (-0.5) // Existentialism → radical freedom → lib
-  + (etEgo  - 50) * (-0.4) // Egoism → anti-coercion → lib
-  + (etDeo  - 50) * (-0.3) // Deontology → inviolable rights → lib
-  + (phKan  - 50) * (-0.3);// Kantian individual rights → lib
-
-  var socSecWeightSum = 0.6+0.4+0.3+0.35+0.2+0.25+0.5+0.4+0.5+0.4+0.3+0.3; // = 5.0
-  var socSecNorm = socSecondary / socSecWeightSum;
-
-  var polY = Math.round(socDirect * 0.7 + socSecNorm * 0.3);
-
-  // Temperament
-  var tmpTypes=['TMP_CHO','TMP_MEL','TMP_SAN','TMP_PHL'];
-  var tmpS={};
-  tmpTypes.forEach(function(t){tmpS[t]=0;var cnt=0;
-    (window._activeQ||Q).forEach(function(q,i){if(q.fn===t){tmpS[t]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    tmpS[t]=cnt?Math.round(tmpS[t]/cnt):50;
-  });
-
-  // Instinctual variants
-  var ivTypes=['IV_SP','IV_SOC','IV_SX'];
-  var ivS={};
-  ivTypes.forEach(function(v){ivS[v]=0;var cnt=0;
-    (window._activeQ||Q).forEach(function(q,i){if(q.fn===v){ivS[v]+=((answers[i]||4)-1)/6*100;cnt++;}});
-    ivS[v]=cnt?Math.round(ivS[v]/cnt):50;
-  });
-
-  // Social
-  var socS={dom:avg('SOC_DOM'),introvert:avg('SOC_INT'),warmth:avg('SOC_WAR'),direct:avg('SOC_DIR')};
-  var aloneS={intellectual:avg('AL_INT'),sensitive:avg('AL_SEN')};
-
-  return {cog:s,enn:eS,att:atS,phi:phS,ep:epS,eth:etS,polX:polX,polY:polY,tmp:tmpS,iv:ivS,mf:mfS,soc:socS,alone:aloneS};
-}
-
-function avg(fn){
-  var sum=0,cnt=0;
-  (window._activeQ||Q).forEach(function(q,i){if(q.fn===fn){sum+=((answers[i]||4)-1)/6*100;cnt++;}});
-  return cnt?Math.round(sum/cnt):50;
-}
-
-function getMBTI(cog){
-  var sortedFns=Object.keys(cog).sort(function(a,b){return cog[b]-cog[a];});
-  var dom=sortedFns[0],aux=sortedFns[1];
-  var map={
-    'Ni_Te':'INTJ','Ni_Fe':'INFJ','Ne_Ti':'ENTP','Ne_Fi':'ENFP',
-    'Ti_Ne':'INTP','Ti_Se':'ISTP','Te_Ni':'ENTJ','Te_Si':'ESTJ',
-    'Fi_Ne':'INFP','Fi_Se':'ISFP','Fe_Ni':'ENFJ','Fe_Si':'ESFJ',
-    'Si_Te':'ISTJ','Si_Fe':'ISFJ','Se_Ti':'ESTP','Se_Fi':'ESFP'
-  };
-  if(map[dom+'_'+aux]) return map[dom+'_'+aux];
-  // Fallback: derive from highest scores
-  var intExt = (cog['Ni']+cog['Ti']+cog['Fi']+cog['Si'] > cog['Ne']+cog['Te']+cog['Fe']+cog['Se']) ? 'I' : 'E';
-  var intuSens = (cog['Ni']+cog['Ne'] > cog['Si']+cog['Se']) ? 'N' : 'S';
-  var thinkFeel = (cog['Ti']+cog['Te'] > cog['Fi']+cog['Fe']) ? 'T' : 'F';
-  var percJudge = (cog['Ti']+cog['Fi']+cog['Ni']+cog['Si'] > cog['Te']+cog['Fe']+cog['Ne']+cog['Se']) ? 'P' : 'J';
-  return intExt + intuSens + thinkFeel + percJudge;
-}
-
-function getEnneagram(eS){
-  var sorted=Object.keys(eS).sort(function(a,b){return eS[b]-eS[a];});
-  var top=sorted[0].replace('E','');
-  var topNum=parseInt(top);
-  var wingA=topNum===1?9:topNum-1;
-  var wingB=topNum===9?1:topNum+1;
-  var scoreA=eS['E'+wingA]||0;
-  var scoreB=eS['E'+wingB]||0;
-  var wing=String(scoreA>=scoreB?wingA:wingB);
-  var gut=['E8','E9','E1'],heart=['E2','E3','E4'],head=['E5','E6','E7'];
-  var topGut=gut.reduce(function(a,b){return eS[a]>eS[b]?a:b;});
-  var topHeart=heart.reduce(function(a,b){return eS[a]>eS[b]?a:b;});
-  var topHead=head.reduce(function(a,b){return eS[a]>eS[b]?a:b;});
-  var t1=parseInt(topGut.replace('E','')),t2=parseInt(topHeart.replace('E','')),t3=parseInt(topHead.replace('E',''));
-  var triArr=[t1,t2,t3];
-  var domIdx=triArr.indexOf(topNum);
-  if(domIdx>0){var tmp=triArr[0];triArr[0]=triArr[domIdx];triArr[domIdx]=tmp;}
-  var rest2=[triArr[1],triArr[2]].sort(function(a,b){return (eS['E'+b]||0)-(eS['E'+a]||0);});
-  return {type:top,wing:wing,tritype:triArr[0]+'/'+rest2[0]+'/'+rest2[1],scores:eS};
-}
-
-function getAttachment(atS){
-  var sorted=Object.keys(atS).sort(function(a,b){return atS[b]-atS[a];});
-  return sorted[0];
-}
-
-function getPhilosophy(phS){
-  return Object.keys(phS).sort(function(a,b){return phS[b]-phS[a];})[0];
-}
-
-function getInstinctStack(ivS){
-  var order=Object.keys(ivS).sort(function(a,b){return ivS[b]-ivS[a];});
-  return order.map(function(k){return k.replace('IV_','');}).join('/');
-}
-
+// ── FINISH QUIZ (called when user completes last question) ──
 function finishQuiz(){
   document.getElementById('quiz').style.display='none';
   document.getElementById('loading').style.display='flex';
+  document.getElementById('loadStatus').textContent='Scoring your responses...';
 
-  var data=score();
-  var mbti=getMBTI(data.cog);
-  var enn=getEnneagram(data.enn);
-  var att=getAttachment(data.att);
-  var phi=getPhilosophy(data.phi);
-  var instStack=getInstinctStack(data.iv);
+  var data = score();
+  var mbti = data.mbti;
+  var enn  = data.ennResult;
+  var att  = data.att;
+  var phi  = data.phi;
+  var instStack = data.instStack;
+  var fnsSorted = Object.keys(data.cog).sort(function(a,b){return data.cog[b]-data.cog[a];});
 
-  var steps=['Mapping cognitive architecture...','Computing Enneagram tritype...','Analysing philosophical alignment...','Mapping political geometry...','Profiling attachment patterns...','Identifying historical archetypes...','Generating AI narrative...'];
-  var si=0;
-  var iv=setInterval(function(){si++;if(si<steps.length)document.getElementById('loadStatus').textContent=steps[si];},1400);
+  document.getElementById('loadStatus').textContent='Generating your profile...';
+  var prompt = buildPrompt(data);
 
-  var fnsSorted=Object.keys(data.cog).sort(function(a,b){return data.cog[b]-data.cog[a];});
-  var prompt=buildPrompt(mbti,enn,att,phi,instStack,data,fnsSorted);
-
-  callAIWithRetry(prompt,3,function(res){
-    clearInterval(iv);
+  callAIWithRetry(prompt, 3, function(aiRes){
     document.getElementById('loading').style.display='none';
-    showResults(data,mbti,enn,att,phi,instStack,fnsSorted,res,false);
-  },function(){
-    clearInterval(iv);
+    showResults(data, mbti, enn, att, phi, instStack, fnsSorted, aiRes, false);
+  }, function(){
     document.getElementById('loading').style.display='none';
-    showResults(data,mbti,enn,att,phi,instStack,fnsSorted,buildFallbackNarrative(mbti,enn,att,phi,data),true);
+    var fallback = buildFallbackNarrative(mbti, enn, att, phi, data);
+    showResults(data, mbti, enn, att, phi, instStack, fnsSorted, fallback, true);
   });
 }
 
-function buildPrompt(mbti,enn,att,phi,inst,data,fns){
-  var cogStr=fns.map(function(f,i){return f+':'+data.cog[f]+(i<4?'(pos'+(i+1)+')':'');}).join(', ');
-  // Correct axis: polX positive=economic freedom/right, polY positive=authoritarian/up
-  var econLabel=data.polX>5?'Economic Right/Free Market':(data.polX<-5?'Economic Left/State Control':'Economic Centre');
-  var authLabel=data.polY>5?'Authoritarian':(data.polY<-5?'Libertarian':'Moderate');
-  var polQuad=econLabel+' + '+authLabel;
-  var polEcon=data.cog['Te']||50; // pass Te as proxy for economic orientation detail
+// ── SCORING ──
+var _scoreCache = null;
+
+function score(){
+  // Returns a full data object with all dimension scores + derived types
+  function avg(fn){
+    var sum=0,cnt=0;
+    (window._activeQ||Q).forEach(function(q,i){
+      if(q.fn===fn){ sum+=((answers[i]||4)-1)/6*100; cnt++; }
+    });
+    return cnt ? Math.round(sum/cnt) : 50;
+  }
+
+  // Cognitive functions
+  var cog={};
+  ['Ni','Ne','Ti','Te','Fi','Fe','Si','Se'].forEach(function(f){ cog[f]=avg(f); });
+
+  // Enneagram
+  var eS={};
+  ['E1','E2','E3','E4','E5','E6','E7','E8','E9'].forEach(function(e){ eS[e]=avg(e); });
+
+  // Attachment
+  var atS={};
+  ['AT_SEC','AT_ANX','AT_AVO','AT_DIS'].forEach(function(a){ atS[a]=avg(a); });
+
+  // Philosophy
+  var phS={};
+  ['PH_STO','PH_EPI','PH_KAN','PH_ARI','PH_NIE','PH_EXI','PH_PRA','PH_SKE'].forEach(function(p){ phS[p]=avg(p); });
+
+  // Epistemology
+  var epS={};
+  ['EP_RAT','EP_EMP','EP_INT','EP_SKP'].forEach(function(e){ epS[e]=avg(e); });
+
+  // Ethics
+  var etS={};
+  ['ET_VIR','ET_CON','ET_DEO','ET_EGO'].forEach(function(e){ etS[e]=avg(e); });
+
+  // Moral foundations
+  var mfS={};
+  ['MF_CARE','MF_FAIR','MF_LOY','MF_AUTH','MF_PUR','MF_LIB'].forEach(function(m){ mfS[m]=avg(m); });
+
+  // Temperament
+  var tmpS={};
+  ['TMP_CHO','TMP_MEL','TMP_SAN','TMP_PHL'].forEach(function(t){ tmpS[t]=avg(t); });
+
+  // Instinct
+  var ivS={};
+  ['IV_SP','IV_SOC','IV_SX'].forEach(function(v){ ivS[v]=avg(v); });
+
+  // Social
+  var socS={};
+  ['SOC_DOM','SOC_INT','SOC_WAR','SOC_DIR'].forEach(function(s){ socS[s]=avg(s); });
+
+  // Alone
+  var alS={};
+  ['AL_INT','AL_SEN'].forEach(function(a){ alS[a]=avg(a); });
+
+  // ── DERIVED TYPES ──
+  var mbti = getMBTI(cog);
+  var ennResult = getEnneagram(eS);
+  var att = getAttachment(atS);
+  var phi = getPhilosophy(phS);
+  var instStack = getInstinctStack(ivS);
+
+  // ── POLITICAL (direct only — no compression) ──
+  var econL = avg('PC_ECON_L');
+  var econR = avg('PC_ECON_R');
+  var auth  = avg('PC_AUTH');
+  var lib   = avg('PC_LIB');
+  var polX = Math.max(-100, Math.min(100, Math.round(econR - econL)));
+  var polY = Math.max(-100, Math.min(100, Math.round(auth  - lib)));
+
+  var data = {
+    // Raw dimension scores (objects)
+    cog: cog, ennScores: eS, attScores: atS, phiScores: phS,
+    ep: epS, eth: etS, mf: mfS, tmp: tmpS, iv: ivS, soc: socS, alone: alS,
+    // Derived type labels (strings)
+    mbti: mbti,
+    ennResult: ennResult,  // {type, wing, tritype, scores}
+    att: att,              // e.g. 'AT_AVO'
+    phi: phi,              // e.g. 'PH_NIE'
+    instStack: instStack,  // e.g. 'SP/SX/SOC'
+    polX: polX, polY: polY
+  };
+
+  _scoreCache = data;
+  return data;
+}
+
+// ── BUILD AI PROMPT ──
+function buildPrompt(data){
+  var mbti = data.mbti;
+  var enn  = data.ennResult;
+  var att  = data.att;
+  var phi  = data.phi;
+  var inst = data.instStack;
+  var fnsSorted = Object.keys(data.cog).sort(function(a,b){return data.cog[b]-data.cog[a];});
+  var cogStr = fnsSorted.map(function(f,i){ return f+':'+data.cog[f]+(i<4?'(pos'+(i+1)+')':''); }).join(', ');
+
+  var polQuadrant = data.polX>0&&data.polY<0?'Lib-Right':
+                    data.polX>0&&data.polY>0?'Auth-Right':
+                    data.polX<0&&data.polY<0?'Lib-Left':'Auth-Left';
 
   return 'You are an expert in MBTI, Enneagram, Jungian psychology, political philosophy, and ethics.\n\n'
     +'SCORES:\n'
     +'Cognitive functions: '+cogStr+'\n'
     +'MBTI: '+mbti+', Enneagram: '+enn.type+'w'+enn.wing+' (tritype '+enn.tritype+')\n'
     +'Attachment: '+att+', Philosophy: '+phi+', Instinctual stack: '+inst+'\n'
-    +'Political compass: X='+data.polX+' (scale -100 to +100; positive=economic freedom/right, negative=state control/left) '
-    +'Y='+data.polY+' (scale -100 to +100; positive=authoritarian/up, negative=libertarian/down)\n'
-    +'Quadrant: '+polQuad+'\n'
-    +'Economic axis interpretation: '+(data.polX>60?'Hard libertarian-right — strong property rights absolutism, minimal state, possibly anarcho-capitalist tendencies':data.polX>30?'Classical liberal / libertarian — significant preference for free markets, deregulation, low taxes, personal economic sovereignty':data.polX>10?'Centre-right — moderate market preference, accepts some regulation and welfare as necessary':data.polX>-10?'True centrist on economics — no strong preference for state or market':data.polX>-30?'Centre-left / social democratic — accepts market economy but believes in redistribution, regulation, welfare state':data.polX>-60?'Democratic socialist — significant state intervention, public ownership of key sectors, skeptical of markets':'Hard left — state control of economy, redistribution as central moral imperative, possibly Marxist')+'\n'
-    +'Social axis interpretation: '+(data.polY<-60?'Strong libertarian / near-anarchist — maximum individual freedom, anti-authority, anti-state in personal life':data.polY<-30?'Libertarian — strong civil liberties, anti-paternalism, skeptical of government in personal life':data.polY<-10?'Centre-libertarian — leans toward personal freedom but accepts some social order':data.polY<10?'Moderate — balanced between social order and personal freedom':data.polY<30?'Centre-authoritarian — prefers some social norms and order, accepts state role in culture':data.polY<60?'Authoritarian — believes in strong social order, traditional institutions, state role in values':'Hard authoritarian — strong centralized authority, traditional hierarchy, social control as positive good')+'\n\n'
-    +'POLITICAL IDEOLOGY TAXONOMY for reference (use to pick the most precise label):\n'
-    +'Lib-Right quadrant (positive X, negative Y): Anarcho-Capitalist, Paleolibertarian, Classical Liberal, Libertarian, Minarchist, Fusionist Conservative, Fiscal Conservative\n'
-    +'Auth-Right quadrant (positive X, positive Y): Neoconservative, National Conservative, Christian Democrat, Traditionalist Conservative, Paleoconservative, Authoritarian Capitalist, Nationalist\n'
-    +'Lib-Left quadrant (negative X, negative Y): Left-Libertarian, Green Liberal, Progressive Libertarian, Anarcho-Communist, Libertarian Socialist, Social Anarchist\n'
-    +'Auth-Left quadrant (negative X, positive Y): Democratic Socialist, Social Democrat, Marxist, Socialist, Leninist, Maoist, Progressive Statist, Welfare Statist\n'
-    +'Centre positions: Liberal Democrat, Centrist, Third Way, Ordoliberal, Technocratic Centrist, Christian Social\n\n'
+    +'Political compass: X='+data.polX+' (positive=economic right, negative=economic left) '
+    +'Y='+data.polY+' (positive=authoritarian, negative=libertarian)\n'
+    +'Quadrant: '+polQuadrant+'\n'
+    +'Economic interpretation: '+(data.polX>60?'Hard libertarian-right':data.polX>30?'Classical liberal / libertarian':data.polX>10?'Centre-right':data.polX>-10?'True centrist':data.polX>-30?'Centre-left / social democrat':data.polX>-60?'Democratic socialist':'Hard left')+'\n'
+    +'Social interpretation: '+(data.polY<-60?'Strong libertarian / near-anarchist':data.polY<-30?'Libertarian':data.polY<-10?'Centre-libertarian':data.polY<10?'Moderate':data.polY<30?'Centre-authoritarian':data.polY<60?'Authoritarian':'Hard authoritarian')+'\n\n'
+    +'IMPORTANT: Base ALL analysis on the actual scores above. Do NOT default to INTJ assumptions. '
+    +'This person is '+mbti+' type '+enn.type+'w'+enn.wing+'. Their dominant function is '+fnsSorted[0]+'. '
+    +'Be specific to THEIR actual profile — every narrative must match their actual scores.\n\n'
     +'Return a JSON object with EXACTLY these keys:\n'
     +'{\n'
-    +'"mbtiName":"archetype name 3-4 words",\n'
-    +'"tagline":"one powerful sentence capturing their core essence",\n'
-    +'"cogNarrative":"2-3 paragraphs on cognitive style and how they think",\n'
-    +'"ennNarrative":"2 paragraphs on enneagram type motivation and pattern",\n'
-    +'"attNarrative":"1-2 paragraphs on how they experience relationships and closeness",\n'
-    +'"phiNarrative":"1-2 paragraphs on their philosophical orientation",\n'
-    +'"politicalNarrative":"3 substantial paragraphs: (1) Exact ideological position — name the specific ideology with precision, explain what they believe about the role of the state, economic policy, taxation, regulation, individual rights, social policy, and foreign policy. Be concrete and specific, not vague. (2) Psychological and philosophical roots — which cognitive functions, Enneagram type, attachment style, ethics framework, and philosophical school drive this politics. Show the through-line from personality to ideology. (3) Internal tensions — the genuine contradictions, historical failures, or uncomfortable implications of this position. What does this ideology get wrong or struggle with?",\n'
-    +'"politicalIdeology":"The single most precise ideological label. Use specific terms from the taxonomy above — not just Left/Right/Centre. Must be specific: e.g. Classical Liberal, Paleolibertarian, National Conservative, Democratic Socialist, etc.",\n'
-    +'"politicalIdeologyDesc":"3 sentences: (1) what this specific ideology believes at its core, (2) why it fits this person\'s exact scores and personality, (3) which historical tradition or movement it descends from",\n'
-    +'"similarCountries":["5 countries whose political culture, dominant ideology, or institutional structure most closely matches — format \'Country: 1-2 sentences on why specifically, including which aspects of the political culture match\'. Include diverse geographic range — not all Western. Be specific about what matches."],\n'
-    +'"similarPoliticians":["6 real politicians or political figures (mix of historical and contemporary, mix of countries) whose views most closely match — format \'Name (Country, Era/Role): 1-2 sentences on which specific positions align\'. Go beyond the obvious — include at least one non-Western figure and at least one lesser-known but precise match. Avoid generic picks."],\n'
-    +'"similarParties":["5 political parties from at least 3 different countries whose platform and ideology best matches — format \'Party Name (Country): 1-2 sentences on why specifically\'. Include parties that aren\'t just UK/US."],\n'
-    +'"politicalStrengths":"3 sentences on what this ideological position genuinely gets right — its real intellectual strengths, historical successes, and valid insights. Be honest about what works.",\n'
-    +'"politicalWeaknesses":"3 sentences on this position\'s genuine blind spots, historical failures, and internal contradictions. Be specific — cite real examples where possible.",\n'
-    +'"politicalThinkers":["4-5 intellectual influences — economists, political philosophers, legal theorists, historians whose work most resonates with this position — format \'Name: 2 sentences on their core idea and why it specifically resonates with this person\'s scores and personality\'. Include at least one economist and one political philosopher. Go deep, not obvious."],\n'
-    +'"aloneDesc":"2-3 sentences on how they are when completely alone",\n'
-    +'"socialDesc":"2-3 sentences on how they come across to others in social settings",\n'
-    +'"shadowDesc":"2-3 sentences on their shadow — blind spots and recurring challenges",\n'
+    +'"mbtiName":"archetype name 3-4 words — specific to '+mbti+', NOT generic",\n'
+    +'"tagline":"one sentence capturing '+mbti+' type '+enn.type+'w'+enn.wing+' essence",\n'
+    +'"cogNarrative":"2-3 paragraphs on '+mbti+' cognitive style — must reference '+fnsSorted[0]+' as dominant function and '+fnsSorted[1]+' as auxiliary. Describe how THEY think, not how INTJs think.",\n'
+    +'"ennNarrative":"2 paragraphs on type '+enn.type+'w'+enn.wing+' motivation and pattern — specific to this type, not generic enneagram text",\n'
+    +'"attNarrative":"1-2 paragraphs on '+att+' attachment pattern in relationships",\n'
+    +'"phiNarrative":"1-2 paragraphs on '+phi+' philosophical orientation",\n'
+    +'"politicalNarrative":"3 paragraphs: (1) Exact position for quadrant '+polQuadrant+' with X='+data.polX+' Y='+data.polY+' — name the specific ideology. (2) How their personality type '+mbti+' enn '+enn.type+'w'+enn.wing+' connects to this politics. (3) Genuine tensions and blind spots of this position.",\n'
+    +'"politicalIdeology":"specific label — e.g. Classical Liberal, Paleolibertarian, National Conservative, Democratic Socialist, Left-Libertarian",\n'
+    +'"politicalIdeologyDesc":"3 sentences on what this ideology believes and why it fits polX='+data.polX+' polY='+data.polY+'",\n'
+    +'"similarCountries":["5 countries matching polX='+data.polX+' polY='+data.polY+' — format \'Country: specific reason\'"],\n'
+    +'"similarPoliticians":["6 politicians matching this profile — format \'Name (Country): reason\' — include non-Western figures"],\n'
+    +'"similarParties":["5 parties from 3+ countries — format \'Party (Country): reason\'"],\n'
+    +'"politicalStrengths":"3 sentences on genuine strengths of this position",\n'
+    +'"politicalWeaknesses":"3 sentences on genuine blind spots and failures",\n'
+    +'"politicalThinkers":["4-5 thinkers resonant with polX='+data.polX+' polY='+data.polY+' AND '+phi+' philosophy — format \'Name: reason\'"],\n'
+    +'"aloneDesc":"2 sentences on how '+mbti+' type '+enn.type+' experiences solitude",\n'
+    +'"socialDesc":"2 sentences on how '+mbti+' type '+enn.type+' presents socially",\n'
+    +'"shadowDesc":"2 sentences on the shadow side of '+fnsSorted[0]+' dominance",\n'
     +'"figures":[\n'
-    +'  {"name":"Full Name","cat":"Historical|Celebrity|Pop Culture","type":"MBTI Enn","initials":"2-3 chars","note":"1 sentence why similar"}\n'
-    +'] (8 total: 3 historical, 2 celebrity/mainstream, 2 pop culture/fictional, 1 philosopher/thinker),\n'
-    +'"values":["6 core values as short noun phrases, most important first"],\n'
+    +'  8 real or fictional figures who share '+mbti+' enn '+enn.type+'w'+enn.wing+' profile.\n'
+    +'  Format: {"name":"Full Name","cat":"Historical|Celebrity|Pop Culture","type":"'+mbti+' '+enn.type+'w'+enn.wing+'","initials":"2-3 chars","note":"1 sentence why similar"}\n'
+    +'  Include: 3 historical, 2 celebrity, 2 pop culture/fictional, 1 philosopher. Must match '+mbti+' — not INTJ defaults.\n'
+    +'],\n'
+    +'"values":["6 core values as short noun phrases for '+mbti+' type '+enn.type+'"],\n'
     +'"big5":{"Openness":0-100,"Conscientiousness":0-100,"Extraversion":0-100,"Agreeableness":0-100,"Neuroticism":0-100},\n'
-    +'"socionics":"2-4 letter socionics type code",\n'
+    +'"socionics":"socionics type for '+mbti+'",\n'
     +'"keirsey":"one of: Rational/Idealist/Guardian/Artisan"\n'
     +'}\n'
     +'Respond ONLY with raw JSON. No markdown, no explanation, no fences.';
 }
+
+
 
 function callAIWithRetry(prompt,retriesLeft,onSuccess,onFail){
   var retryEl=document.getElementById('loadRetry');
@@ -2034,248 +1908,130 @@ var mbtiMeta={
 };
 
 function buildFallbackNarrative(mbti,enn,att,phi,data){
-  var mm=mbtiMeta[mbti]||mbtiMeta['INTJ'];
+  var mm = mbtiMeta[mbti] || {n:'The Unknown Archetype', t:'A unique configuration of mind and motivation that defies easy categorization.'};
+  var fnsSorted = Object.keys(data.cog).sort(function(a,b){return data.cog[b]-data.cog[a];});
+  var dom = fnsSorted[0] || 'Ti';
+  var aux = fnsSorted[1] || 'Ni';
+
+  // Cognitive narrative — based on actual dominant function
+  var cogDesc = {
+    'Ni': 'operates through long-range pattern recognition — you see trajectories and convergent meanings that others miss, and your thinking moves toward singular deep insights rather than broad exploration.',
+    'Ne': 'operates through expansive possibility mapping — your mind constantly generates connections, alternatives, and hypotheticals, finding energy in the sheer generative range of ideas.',
+    'Ti': 'operates through internal logical frameworks — you build precise models of how things work, holding everything to a standard of internal consistency that external authority cannot override.',
+    'Te': 'operates through external systematization — you think in terms of efficiency, structure, and measurable results, and you naturally organize the world toward functional outcomes.',
+    'Fi': 'operates through deep individual values — you have a rich interior moral compass that evaluates everything against principles felt as identity, not just as rules.',
+    'Fe': 'operates through interpersonal harmony — you are attuned to the emotional atmosphere of groups and relationships, and naturally orient toward what people need.',
+    'Si': 'operates through detailed sensory memory and established procedure — you build reliable frameworks from accumulated experience and find security in what has proven to work.',
+    'Se': 'operates through immediate sensory engagement — you are fully present to physical reality and respond to it with speed and precision that others often cannot match.'
+  };
+  var cogNarr = 'Your dominant function, '+dom+', '+(cogDesc[dom]||'shapes your entire cognitive architecture.')+'\n\nYour auxiliary function, '+aux+', '+(cogDesc[aux]||'provides crucial support.')+' Together these two functions create a characteristic way of engaging with problems, people, and ideas that others around you likely recognize as distinctly yours.';
+
+  // Social/alone — based on E/I
+  var isIntro = 'INFJ,INTJ,INFP,INTP,ISFJ,ISTJ,ISFP,ISTP'.indexOf(mbti) >= 0;
+  var isFeel  = 'Fe,Fi'.indexOf(dom) >= 0 || 'Fe,Fi'.indexOf(aux) >= 0;
+  var aloneD  = isIntro
+    ? 'In solitude you restore and clarify — your richest thinking happens in stillness, away from the noise of others\' demands and expectations. This is where your most essential self operates without filter.'
+    : 'Even as an extravert, you need pockets of solitude to process and integrate — the stimulation of the social world energizes you but reflection is where you make sense of what you have gathered.';
+  var socialD = isIntro
+    ? 'To others you often appear more reserved than you feel internally. You are selective about where you invest social energy, which can create an impression of distance that masks considerable depth and genuine warmth on your own terms.'
+    : 'You engage the social world with natural ease — your energy tends to draw others in and you find genuine stimulation in human contact. But you also have an inner life that the social face does not fully reveal.';
+  var shadowD = 'Your greatest strengths cast specific shadows. '+dom+' dominance means that your '+(dom==='Ni'?'certainty in your own vision can make you dismissive of information that does not fit your internal model':dom==='Ne'?'generative range can make follow-through and sustained commitment genuinely difficult':dom==='Ti'?'rigorous internal logic can disconnect you from the emotional intelligence that human relationships require':dom==='Te'?'drive for efficiency can override sensitivity to the human costs of optimization':dom==='Fi'?'depth of individual values can create a moral certainty that is difficult for others to engage with':dom==='Fe'?'orientation toward others\' needs can suppress your own until they resurface in unpredictable ways':dom==='Si'?'reliance on established frameworks can create resistance to change even when change is clearly necessary':'orientation toward immediate experience can make long-term strategic thinking genuinely effortful')+'.';
+
+  // Figures — based on MBTI type
+  var figsByType = {
+    'INTJ':[{name:'Friedrich Nietzsche',cat:'Historical',type:'INTJ 5w4',initials:'FN',note:'Lone visionary who built philosophy entirely from first principles.'},{name:'Isaac Newton',cat:'Historical',type:'INTJ 5w6',initials:'IN',note:'Systematizing genius who reshaped understanding of reality in solitude.'},{name:'Elon Musk',cat:'Celebrity',type:'INTJ 3w4',initials:'EM',note:'Visionary builder who uses strategic dominance to reshape industries.'},{name:'Walter White',cat:'Pop Culture',type:'INTJ 3w4',initials:'WW',note:'Shadow expression of strategic intelligence divorced from ethics.'},{name:'Batman',cat:'Pop Culture',type:'INTJ 5w6',initials:'Bm',note:'Lone, principled, strategic force operating from a private moral code.'},{name:'Hannibal Lecter',cat:'Pop Culture',type:'INTJ 5w4',initials:'HL',note:'Extreme Ti/Ni intelligence structured around aesthetic mastery.'},{name:'Carl Jung',cat:'Historical',type:'INTJ 5w4',initials:'CJ',note:'Built a complete psychological system from the inside out.'},{name:'Ayn Rand',cat:'Historical',type:'INTJ 1w2',initials:'AR',note:'Constructed a total philosophical system from rational first principles.'}],
+    'INTP':[{name:'Albert Einstein',cat:'Historical',type:'INTP 5w4',initials:'AE',note:'Built revolutionary physical models by questioning foundational assumptions.'},{name:'Charles Darwin',cat:'Historical',type:'INTP 5w6',initials:'CD',note:'Constructed the framework of evolution through patient systematic observation.'},{name:'Immanuel Kant',cat:'Historical',type:'INTP 5w6',initials:'IK',note:'Built the most rigorous formal system in the history of Western philosophy.'},{name:'House (MD)',cat:'Pop Culture',type:'INTP 5w4',initials:'HM',note:'Ti-dominant diagnostician who treats logic as the highest value.'},{name:'Sherlock Holmes',cat:'Pop Culture',type:'INTP 5w6',initials:'SH',note:'Pure analytical engine who solves through systematic deduction.'},{name:'L (Death Note)',cat:'Pop Culture',type:'INTP 5w4',initials:'L',note:'Hyper-analytical detective who operates entirely from logical inference.'},{name:'Blaise Pascal',cat:'Historical',type:'INTP 5w6',initials:'BP',note:'Combined mathematical genius with deep philosophical uncertainty.'},{name:'Kurt Gödel',cat:'Historical',type:'INTP 5w4',initials:'KG',note:'Proved the limits of formal systems from within them.'}],
+    'ENTJ':[{name:'Napoleon Bonaparte',cat:'Historical',type:'ENTJ 8w7',initials:'NB',note:'Systemic military genius who restructured entire nations by force of will.'},{name:'Julius Caesar',cat:'Historical',type:'ENTJ 3w4',initials:'JC',note:'Combined political acumen, military genius, and personal charisma into dominance.'},{name:'Steve Jobs',cat:'Celebrity',type:'ENTJ 1w2',initials:'SJ',note:'Visionary commander who reshaped multiple industries through strategic force.'},{name:'Frank Underwood',cat:'Pop Culture',type:'ENTJ 3w4',initials:'FU',note:'The shadow expression of strategic dominance and ruthless instrumentalism.'},{name:'Tywin Lannister',cat:'Pop Culture',type:'ENTJ 1w9',initials:'TL',note:'Master strategist who bends institutions to serve his long-term vision.'},{name:'Margaret Thatcher',cat:'Historical',type:'ENTJ 1w2',initials:'MT',note:'Commanding ideological force who remade British economic policy.'},{name:'Gordon Ramsay',cat:'Celebrity',type:'ENTJ 8w7',initials:'GR',note:'High-standards commander who drives excellence through demanding leadership.'},{name:'Jack Welch',cat:'Historical',type:'ENTJ 3w4',initials:'JW',note:'Te-dominant CEO who systematized GE into a performance machine.'}],
+    'ENTP':[{name:'Leonardo da Vinci',cat:'Historical',type:'ENTP 7w6',initials:'LD',note:'Polymathic generator who moved fluidly across every domain of knowledge.'},{name:'Voltaire',cat:'Historical',type:'ENTP 7w8',initials:'Vo',note:'Provocateur who used wit and contradiction to dismantle orthodoxy.'},{name:'Robert Downey Jr.',cat:'Celebrity',type:'ENTP 7w8',initials:'RD',note:'Irreverent performer who improvises brilliantly within and around structure.'},{name:'Tony Stark',cat:'Pop Culture',type:'ENTP 3w4',initials:'TS',note:'Ne/Ti inventor-provocateur who constantly reframes problems as opportunities.'},{name:'The Joker (Ledger)',cat:'Pop Culture',type:'ENTP 7w8',initials:'JK',note:'Shadow expression: using contradiction and chaos as philosophical positions.'},{name:'Socrates',cat:'Historical',type:'ENTP 5w6',initials:'So',note:'The original dialectician — pursuing truth through relentless questioning.'},{name:'Benjamin Franklin',cat:'Historical',type:'ENTP 7w6',initials:'BF',note:'Polymathic inventor-diplomat who applied ingenuity to every domain.'},{name:'Mark Twain',cat:'Historical',type:'ENTP 7w8',initials:'MT',note:'Satirist who used humor to deliver devastating social critique.'}],
+    'INFJ':[{name:'Carl Jung',cat:'Historical',type:'INFJ 4w5',initials:'CJ',note:'Mapped the depths of the unconscious through symbolic pattern recognition.'},{name:'Mahatma Gandhi',cat:'Historical',type:'INFJ 1w2',initials:'MG',note:'Channeled Ni/Fe into a vision of nonviolent transformation that changed history.'},{name:'Nelson Mandela',cat:'Historical',type:'INFJ 8w9',initials:'NM',note:'Long-range vision combined with strategic patience and moral authority.'},{name:'Atticus Finch',cat:'Pop Culture',type:'INFJ 1w2',initials:'AF',note:'The moral compass in human form — principled, warm, deeply visionary.'},{name:'Yoda',cat:'Pop Culture',type:'INFJ 5w4',initials:'Yo',note:'The archetypal Ni/Fe sage: sees patterns others miss and teaches through relationship.'},{name:'Martin Luther King Jr.',cat:'Historical',type:'INFJ 2w1',initials:'ML',note:'Synthesized prophetic vision and interpersonal warmth into transformative moral leadership.'},{name:'Dostoevsky',cat:'Historical',type:'INFJ 4w5',initials:'FD',note:'Explored the deepest recesses of human psychology through visionary fiction.'},{name:'Tolkien',cat:'Historical',type:'INFJ 5w4',initials:'JT',note:'Created entire worlds from a singular integrated mythological vision.'}],
+    'INFP':[{name:'J.R.R. Tolkien',cat:'Historical',type:'INFP 4w5',initials:'JT',note:'Created Middle-earth from a deeply personal interior mythology.'},{name:'Virginia Woolf',cat:'Historical',type:'INFP 4w5',initials:'VW',note:'Stream-of-consciousness pioneer who made inner life the subject of art.'},{name:'Albert Camus',cat:'Historical',type:'INFP 4w5',initials:'AC',note:'Existentialist who combined philosophical depth with profound human warmth.'},{name:'Frodo Baggins',cat:'Pop Culture',type:'INFP 9w1',initials:'FB',note:'The reluctant hero whose internal moral clarity carries him through impossible terrain.'},{name:'Anne Frank',cat:'Historical',type:'INFP 4w3',initials:'AF',note:'Preserved profound interiority and human hope under the most crushing conditions.'},{name:'Sylvia Plath',cat:'Historical',type:'INFP 4w5',initials:'SP',note:'Gave voice to the inner world with devastating precision and unflinching honesty.'},{name:'William Shakespeare',cat:'Historical',type:'INFP 4w5',initials:'WS',note:'Explored the full range of human interiority through character and language.'},{name:'Vincent van Gogh',cat:'Historical',type:'INFP 4w5',initials:'VG',note:'Channeled intense personal vision into art that reshaped how humans see color.'}],
+    'ENFJ':[{name:'Martin Luther King Jr.',cat:'Historical',type:'ENFJ 2w1',initials:'ML',note:'Fe-dominant leader who moved masses through moral vision and interpersonal warmth.'},{name:'Oprah Winfrey',cat:'Celebrity',type:'ENFJ 2w3',initials:'OW',note:'Natural catalyst for human growth who builds authentic connection at scale.'},{name:'Barack Obama',cat:'Historical',type:'ENFJ 3w2',initials:'BO',note:'Aspirational leader who inspires through vision, narrative, and interpersonal mastery.'},{name:'Michael Scott',cat:'Pop Culture',type:'ENFJ 2w3',initials:'MS',note:'Fe in overdrive — desperately wants connection and approval from his "family".'},{name:'Emma Woodhouse',cat:'Pop Culture',type:'ENFJ 3w2',initials:'EW',note:'Fe-dominant social orchestrator who means well but over-manages others lives.'},{name:'Nelson Mandela',cat:'Historical',type:'ENFJ 1w2',initials:'NM',note:'Used relational mastery and moral authority to reconcile a divided nation.'},{name:'Tony Robbins',cat:'Celebrity',type:'ENFJ 3w2',initials:'TR',note:'Peak-state catalyst who transforms audiences through emotional mobilization.'},{name:'Morpheus',cat:'Pop Culture',type:'ENFJ 1w2',initials:'Mo',note:'The archetypal mentor-catalyst who sees potential and calls it forth.'}],
+    'ENFP':[{name:'Robin Williams',cat:'Celebrity',type:'ENFP 7w6',initials:'RW',note:'Ne/Fi in full expression — boundless creative range channeled through deep human warmth.'},{name:'Walt Disney',cat:'Historical',type:'ENFP 7w6',initials:'WD',note:'Visionary world-builder who created entirely new imaginative territories.'},{name:'Mark Twain',cat:'Historical',type:'ENFP 7w8',initials:'MT',note:'Restless adventurer whose warmth and wit captured the full range of American experience.'},{name:'Anne of Green Gables',cat:'Pop Culture',type:'ENFP 4w3',initials:'AG',note:'Ne/Fi archetype: imagination, warmth, and authentic self-expression against convention.'},{name:'Pippi Longstocking',cat:'Pop Culture',type:'ENFP 7w8',initials:'PL',note:'Joyful anarchist who refuses social constraint and lives entirely on her own terms.'},{name:'Carl Rogers',cat:'Historical',type:'ENFP 2w1',initials:'CR',note:'Founded person-centered therapy — the belief that human potential unfolds in genuine warmth.'},{name:'Ellen DeGeneres',cat:'Celebrity',type:'ENFP 7w6',initials:'ED',note:'Authentic entertainer who built connection through genuine warmth and irreverent humor.'},{name:'Elizabeth Bennet',cat:'Pop Culture',type:'ENFP 3w4',initials:'EB',note:'Witty, independent, emotionally perceptive — refuses to perform for social approval.'}]
+  };
+
+  // Default figures for types not in the map
+  var defaultFigs = [
+    {name:'Socrates',cat:'Historical',type:'Unknown',initials:'So',note:'Relentless questioner who pursued truth through dialogue and self-examination.'},
+    {name:'Marcus Aurelius',cat:'Historical',type:'ISTJ 1w9',initials:'MA',note:'Philosopher-emperor who practiced disciplined self-governance under enormous pressure.'},
+    {name:'Marie Curie',cat:'Historical',type:'INTJ 5w4',initials:'MC',note:'Pioneer scientist who combined systematic rigor with extraordinary personal determination.'},
+    {name:'Atticus Finch',cat:'Pop Culture',type:'INFJ 1w2',initials:'AF',note:'The moral compass — principled, fair, and deeply committed to human dignity.'},
+    {name:'Sherlock Holmes',cat:'Pop Culture',type:'INTP 5w6',initials:'SH',note:'Analytical detective who cuts through noise to essential truth.'},
+    {name:'Tolkien',cat:'Historical',type:'INFJ 5w4',initials:'JT',note:'Visionary world-builder who created from a singular integrated imagination.'},
+    {name:'Albert Camus',cat:'Historical',type:'INFP 4w5',initials:'AC',note:'Existentialist who combined philosophical seriousness with profound human warmth.'},
+    {name:'Hannah Arendt',cat:'Historical',type:'INTP 5w6',initials:'HA',note:'Political philosopher who analyzed power, freedom, and human action with rare precision.'}
+  ];
+
+  var figures = figsByType[mbti] || defaultFigs;
+
+  // Values — based on type
+  var valuesByType = {
+    'INTJ':['Intellectual Mastery','Autonomy','Strategic Excellence','Authentic Vision','Moral Integrity','Independence'],
+    'INTP':['Logical Precision','Theoretical Depth','Intellectual Freedom','Epistemic Honesty','Originality','Competence'],
+    'ENTJ':['Strategic Power','Organizational Excellence','Results','Leadership','Competence','Decisive Action'],
+    'ENTP':['Intellectual Stimulation','Creative Freedom','Originality','Debate','Conceptual Range','Autonomy'],
+    'INFJ':['Deep Meaning','Human Flourishing','Authenticity','Visionary Purpose','Integrity','Connection'],
+    'INFP':['Authentic Self','Creative Expression','Deep Values','Moral Purity','Idealism','Inner Freedom'],
+    'ENFJ':['Human Growth','Relational Depth','Shared Vision','Service','Authenticity','Community'],
+    'ENFP':['Authentic Connection','Creative Freedom','Human Potential','Enthusiasm','Personal Growth','Meaning'],
+    'ISTJ':['Duty','Reliability','Order','Competence','Tradition','Integrity'],
+    'ISFJ':['Care','Devotion','Security','Community','Loyalty','Service'],
+    'ESTJ':['Order','Standards','Results','Leadership','Accountability','Tradition'],
+    'ESFJ':['Harmony','Care','Community','Belonging','Loyalty','Service'],
+    'ISTP':['Mastery','Efficiency','Independence','Precision','Freedom','Pragmatism'],
+    'ISFP':['Aesthetic Truth','Authentic Expression','Freedom','Compassion','Present Moment','Individual Integrity'],
+    'ESTP':['Action','Impact','Skill','Freedom','Challenge','Boldness'],
+    'ESFP':['Joy','Connection','Present Experience','Warmth','Creative Expression','Authenticity']
+  };
+  var values = valuesByType[mbti] || ['Authenticity','Excellence','Freedom','Depth','Growth','Integrity'];
+
+  // Big5 — derived from actual cog scores
+  var big5 = {
+    Openness:        Math.round(data.cog['Ne']*0.35 + data.cog['Ni']*0.35 + data.cog['Ti']*0.15 + data.cog['Fi']*0.15),
+    Conscientiousness:Math.round(data.cog['Te']*0.35 + data.cog['Si']*0.35 + data.cog['Fi']*0.15 + data.cog['Ni']*0.15),
+    Extraversion:    Math.round(data.cog['Se']*0.3  + data.cog['Fe']*0.35 + data.cog['Ne']*0.35),
+    Agreeableness:   Math.round(data.cog['Fe']*0.45 + data.cog['Fi']*0.3  + data.cog['Si']*0.25),
+    Neuroticism:     Math.round((100-data.cog['Te'])*0.25 + (100-data.cog['Ti'])*0.25 + data.cog['Fi']*0.25 + (100-data.cog['Si'])*0.25)
+  };
+
+  var polX = data.polX||0, polY = data.polY||0;
+  var polQuad = polX>0&&polY<0?'lib-right':polX>0&&polY>0?'auth-right':polX<0&&polY<0?'lib-left':'auth-left';
+  var polNarr = {
+    'lib-right':'Your economic and social positions combine to place you in the libertarian-right quadrant — favoring market freedom while skeptical of state authority over personal life.',
+    'auth-right':'You combine market-oriented economics with a preference for social order, tradition, and strong institutions — a conservative synthesis that values both economic freedom and social cohesion.',
+    'lib-left':'You combine economic progressivism with strong civil libertarianism — skeptical of both state power and concentrated private power, standing in the left-libertarian tradition.',
+    'auth-left':'You favor collective economic management with strong institutional authority to enforce it — standing in the social democratic or democratic socialist tradition.'
+  };
+  var polIdeology = (polX>50&&polY<-30)?'Paleolibertarian / Classical Liberal':(polX>30&&polY<-10)?'Classical Liberal / Libertarian':(polX>10&&polY<-5)?'Centre-Right / Fusionist':(polX>30&&polY>20)?'National Conservative':(polX>10&&polY>10)?'Neoconservative':(polX<-50&&polY<-20)?'Left-Libertarian / Libertarian Socialist':(polX<-30&&polY<-10)?'Progressive Libertarian':(polX<-50&&polY>20)?'Democratic Socialist / Marxist':(polX<-20&&polY>10)?'Social Democrat':(polX<-10)?'Centre-Left':(polX>10)?'Centre-Right':'Centrist';
+
+  var socionicsByMBTI = {INTJ:'LII',INTP:'ILI',ENTJ:'LSE',ENTP:'ILE',INFJ:'EII',INFP:'IEI',ENFJ:'ESE',ENFP:'IEE',ISTJ:'LSI',ISFJ:'ESI',ESTJ:'SLE',ESFJ:'SEE',ISTP:'SLI',ISFP:'SEI',ESTP:'LSE',ESFP:'SEE'};
+  var keirseyByMBTI = {INTJ:'Rational',INTP:'Rational',ENTJ:'Rational',ENTP:'Rational',INFJ:'Idealist',INFP:'Idealist',ENFJ:'Idealist',ENFP:'Idealist',ISTJ:'Guardian',ISFJ:'Guardian',ESTJ:'Guardian',ESFJ:'Guardian',ISTP:'Artisan',ISFP:'Artisan',ESTP:'Artisan',ESFP:'Artisan'};
+
   return {
-    mbtiName:mm.n,
-    tagline:mm.t,
-    cogNarrative:'Your dominant cognitive function structures how you perceive and process reality at the most fundamental level. The pattern of your function stack reveals a mind that prioritizes '+Object.keys(data.cog).sort(function(a,b){return data.cog[b]-data.cog[a];})[0]+' above all else — this shapes every intellectual instinct, every judgment, every creative impulse you have.\n\nYour auxiliary function serves as the outward expression of this inner architecture. Together, your top two functions create a characteristic way of engaging with problems, people, and ideas that others around you likely recognize as distinctly yours.',
-    ennNarrative:'Your Enneagram type reveals the motivational engine beneath your personality — the core fear and desire that drives you even when you cannot see it. Type '+enn.type+' patterns shape not just behavior but the entire structure of how you relate to yourself, others, and the world.\n\nYour tritype of '+enn.tritype+' adds three-dimensional depth — showing how your head, heart, and gut centers each operate with their own distinct pattern.',
-    attNarrative:'Your attachment style shapes the invisible architecture of your close relationships — how you seek connection, respond to intimacy, and navigate vulnerability with those who matter to you.',
-    phiNarrative:'Your philosophical alignment reveals the conceptual framework through which you interpret existence, knowledge, and ethical life. This is not merely an intellectual preference but a structural orientation that shapes how you interpret everything.',
-    aloneDesc:'In solitude you are most fully yourself — the person behind every performance and adaptation falls away and something more essential remains. Your inner world is rich, demanding, and largely private.',
-    socialDesc:'To others you present a composed and often formidable exterior. You are selective about what you reveal and to whom, creating a sense of depth and mystery that people find either compelling or opaque depending on their orientation.',
-    shadowDesc:'Your greatest strengths cast specific shadows. The same capacities that make you effective in your domain tend to create blind spots — areas of life, relationship, or self-understanding that remain underdeveloped or avoided.',
-    figures:[
-      {name:'Friedrich Nietzsche',cat:'Historical',type:'INTJ 5w4',initials:'FN',note:'Lone visionary who built a philosophical system entirely from first principles and personal conviction.'},
-      {name:'Isaac Newton',cat:'Historical',type:'INTJ 5w6',initials:'IN',note:'Systematizing genius who reshaped humanity\'s understanding of reality in near-total solitude.'},
-      {name:'Carl Jung',cat:'Historical',type:'INFJ 4w5',initials:'CJ',note:'Mapped the depths of the unconscious using symbolic convergent thinking.'},
-      {name:'Elon Musk',cat:'Celebrity',type:'INTJ 3w4',initials:'EM',note:'Visionary builder who uses strategic dominance to reshape entire industries.'},
-      {name:'Jordan Peterson',cat:'Celebrity',type:'INFJ 1w9',initials:'JP',note:'Synthesizes psychology, philosophy, and meaning-making into a coherent worldview.'},
-      {name:'Walter White',cat:'Pop Culture',type:'INTJ 3w4',initials:'WW',note:'The shadow expression of strategic intelligence divorced from ethical constraint.'},
-      {name:'Batman',cat:'Pop Culture',type:'INTJ 5w6',initials:'Bm',note:'The archetype of lone, principled, strategic force operating from a private moral code.'},
-      {name:'Aristotle',cat:'Philosopher',type:'INTP 5w6',initials:'Ar',note:'Built systematic frameworks across every domain of human knowledge with extraordinary rigor.'}
-    ],
-    values:['Intellectual Mastery','Autonomy','Authentic Expression','Strategic Power','Moral Integrity','Independence'],
-    big5:{
-      Openness:Math.round(data.cog['Ne']*0.4+data.cog['Ni']*0.4+data.cog['Ti']*0.2),
-      Conscientiousness:Math.round(data.cog['Te']*0.4+data.cog['Si']*0.4+data.cog['Fi']*0.2),
-      Extraversion:Math.round(data.cog['Se']*0.3+data.cog['Fe']*0.4+data.cog['Ne']*0.3),
-      Agreeableness:Math.round(data.cog['Fe']*0.5+data.cog['Fi']*0.3+data.cog['Si']*0.2),
-      Neuroticism:Math.round((100-data.cog['Te'])*0.3+(100-data.cog['Ti'])*0.3+data.cog['Fi']*0.2+(100-data.cog['Si'])*0.2)
-    },
-    politicalNarrative: (function(){
-      var x=data.polX, y=data.polY;
-      var quadrant = x>0&&y<0?'lib-right':x>0&&y>0?'auth-right':x<0&&y<0?'lib-left':'auth-left';
-      var p1 = {
-        'lib-right': 'Your political position sits in the libertarian-right quadrant — a commitment to economic freedom combined with a strong skepticism of state authority over personal life. This is not a casual preference but a principled orientation: you believe that individuals are the best judges of their own interests, that voluntary exchange produces better outcomes than coercive redistribution, and that political authority is inherently prone to overreach and corruption. The specific ideological tradition you most closely inhabit combines classical liberalism\'s insistence on natural rights and limited government with a libertarian suspicion of all hierarchies that cannot justify themselves through consent.',
-        'auth-right': 'Your political position sits in the authoritarian-right quadrant — a combination of market-oriented economics with a belief in the value of social order, traditional institutions, and national identity. You believe that human beings are not autonomous rational actors but particular persons embedded in specific cultures and communities, and that these cultural inheritances represent genuine goods worth preserving through political institutions. The tension in your position is between economic individualism and social conservatism — the market dissolves exactly the traditional structures and communities you value.',
-        'lib-left': 'Your political position sits in the libertarian-left quadrant — combining economic progressivism with a strong defense of civil liberties and personal freedom. You believe that both concentrated state power and concentrated private power are threats to genuine human freedom, and that the libertarian who only worries about government while ignoring corporate monopolies is missing half the picture. Your position draws on traditions of mutualism, anarchism, and libertarian socialism that predate the left/right distinction as currently understood.',
-        'auth-left': 'Your political position sits in the authoritarian-left quadrant — a commitment to economic equality and collective welfare combined with a belief that achieving these goals requires strong institutional mechanisms and democratic authority. You believe that unregulated markets systematically produce unjust distributions of power and resources, and that correcting these distributions requires more than voluntary charity — it requires democratic institutions with real enforcement power. Your tradition runs from social democracy through democratic socialism to more radical left positions.'
-      };
-      var p2 = 'The psychological roots of this position run deep. Your '+(x>0?'preference for economic freedom connects to your core values of individual autonomy and self-determination — the same drive that makes you resistant to social conformity also makes you resistant to economic coercion. Your rational egoism ethical framework provides philosophical grounding: you believe individuals pursuing their own rational interests, constrained by voluntary agreements, produce better collective outcomes than any imposed scheme of redistribution.':'skepticism of unregulated markets connects to your core concern with fairness and the reduction of unjust suffering. You see the market not as a neutral allocation mechanism but as a power structure that systematically advantages those who already hold capital — and your ethics framework, which weights collective welfare heavily, drives you toward institutional corrections.')+' Your philosophical orientation reinforces this: '+(x>0&&y<0?'the Nietzschean and individualist traditions you draw from are deeply suspicious of any collective claim that subordinates individual excellence to group outcomes.':x<0&&y>0?'the communitarian and progressive traditions you draw from recognize that individual freedom requires material conditions — freedom from want is a prerequisite for freedom of choice.':'your philosophical orientation provides both the intellectual tools to critique existing arrangements and the ethical framework to evaluate alternatives.');
-      var p3 = 'The internal tensions in this position are real and worth confronting honestly. '+(x>0&&y<0?'Classical liberalism and libertarianism assume a level playing field that historical reality has never provided — unequal starting conditions compound over time, and the formal freedom to succeed in a market means little if the material conditions for competition are radically unequal. There is also a deeper tension: your Enneagram type drives you toward strong moral judgments about how things should be, which sits uneasily with libertarianism\'s structural resistance to imposing standards on others. The principled person who also happens to believe in minimal government has to reckon with what happens when others use their freedom in ways that seem clearly wrong.':x>0&&y>0?'National conservatism must confront the historical record of nationalist movements — when cultural cohesion is elevated above individual rights, the costs are typically paid by minorities and dissenters. The conservative who values tradition must also ask which traditions deserve preservation and on what grounds, a question that cannot be answered from within tradition alone.':x<0&&y<0?'Left-libertarianism faces the coordination problem: voluntary cooperation has produced remarkable institutions, but it has not yet demonstrated that it can organize a complex industrial society without some form of hierarchical authority. The theory is compelling; the implementation path remains unclear, and the historical experiments have been limited in scale.':'Social democracy and democratic socialism must reckon with the knowledge problem and the principal-agent problem: even democratically accountable bureaucracies develop their own interests, information, and inertia that diverge from those they are meant to serve. The welfare states built in the 20th century are now straining under fiscal pressures that the original architects did not anticipate.');
-      return p1[quadrant]+'\n\n'+p2+'\n\n'+p3;
-    })(),
-    politicalIdeology: (data.polX > 50 && data.polY < -30) ? 'Paleolibertarian / Classical Liberal' :
-                       (data.polX > 30 && data.polY < -10) ? 'Classical Liberal / Libertarian' :
-                       (data.polX > 15 && data.polY < -5)  ? 'Fusionist Conservative / Libertarian-Leaning' :
-                       (data.polX > 30 && data.polY > 20)  ? 'National Conservative' :
-                       (data.polX > 15 && data.polY > 10)  ? 'Neoconservative / Fiscal Conservative' :
-                       (data.polX < -50 && data.polY < -20)? 'Left-Libertarian / Libertarian Socialist' :
-                       (data.polX < -30 && data.polY < -10)? 'Progressive Libertarian / Green Liberal' :
-                       (data.polX < -50 && data.polY > 20) ? 'Democratic Socialist / Marxist' :
-                       (data.polX < -20 && data.polY > 10) ? 'Social Democrat / Progressive Statist' :
-                       (data.polX < -10) ? 'Social Democrat / Centre-Left' :
-                       (data.polX > 10)  ? 'Centre-Right Liberal / Ordoliberal' : 'Technocratic Centrist / Third Way',
-    politicalIdeologyDesc: (function(){
-      var x=data.polX, y=data.polY;
-      var econ = x>30?'strongly favors free markets, private property, low taxation, and minimal state economic intervention'
-               : x>10?'leans toward market solutions while accepting some regulatory oversight and welfare as pragmatically necessary'
-               : x>-10?'occupies a centrist economic position, accepting both market mechanisms and state intervention depending on context'
-               : x>-30?'supports a regulated market economy with significant redistribution, welfare provisions, and democratic oversight of capital'
-               :'believes in substantial state control or public ownership of key economic sectors, viewing unregulated markets as structurally unjust';
-      var soc = y<-30?'holds strongly libertarian views on personal freedom — deeply skeptical of state authority over individual life, social norms, and civil liberties'
-              : y<-10?'leans libertarian on social issues — prefers minimal government interference in personal choices and civil liberties'
-              : y<10?'holds moderate social views, balancing individual freedom with a degree of social order and community norms'
-              : y<30?'leans toward social order and traditional institutions, believing some communal norms and authority structures are necessary for cohesion'
-              :'holds significantly authoritarian social views — believes strong centralized authority, traditional hierarchy, or social discipline is essential';
-      return 'This position '+econ+'. On the social axis, this person '+soc+'. The combination places them in a specific ideological tradition with a coherent underlying theory of the proper relationship between the individual, the state, and the market.';
-    })(),
-    politicalStrengths: (function(){
-      var x=data.polX, y=data.polY;
-      if(x>20&&y<-10) return 'Classical liberalism and libertarianism have produced the strongest empirical case for economic freedom — the historical correlation between secure property rights, free exchange, and material prosperity is robust. The non-aggression principle provides a clean, internally consistent foundation for political ethics that avoids the messy utilitarian calculus of competing interests.';
-      if(x>20&&y>10) return 'National conservatism correctly identifies that human beings are not abstract rational actors but particular people embedded in specific cultures, histories, and communities. The insight that social cohesion, shared identity, and institutional trust are genuine goods that markets alone cannot produce is one the pure libertarian misses.';
-      if(x<-20&&y<-10) return 'Left-libertarianism correctly identifies that both state power and concentrated private power threaten individual freedom — the libertarian who only worries about the state while ignoring corporate monopolies misses half the picture. The emphasis on mutual aid, voluntary cooperation, and decentralized organization has produced genuinely working institutions.';
-      if(x<-20&&y>10) return 'Social democracy has produced the most durable welfare states in history — Scandinavian countries demonstrate that comprehensive social provision, strong labor protections, and high equality are compatible with functioning market economies and liberal democratic institutions. The insight that the market produces unjust distributions that political institutions must correct reflects a genuine moral intuition about fairness.';
-      return 'The centrist position benefits from epistemic humility — recognizing that both pure market ideology and pure statism have failed in their extreme forms, and that political reality requires constant pragmatic adjustment rather than ideological purity. This position is less intellectually elegant but often more practically effective.';
-    })(),
-    politicalWeaknesses: (function(){
-      var x=data.polX, y=data.polY;
-      if(x>20&&y<-10) return 'The deepest problem for classical liberalism is that it assumes a level playing field that does not exist — unequal starting conditions mean that formally free markets produce substantively unfair outcomes, and those who win early rounds accumulate advantages that compound over time. The libertarian theory of legitimacy struggles with the question of how existing property distributions, many rooted in historical violence and expropriation, can be morally justified.';
-      if(x>20&&y>10) return 'National conservatism\'s strength — its rootedness in particular communities and traditions — is also its weakness: it struggles to articulate principles that transcend particular national interests, making it poorly equipped to address genuinely transnational problems. The historical track record of nationalist movements elevating cultural cohesion over individual rights is a serious moral and empirical liability.';
-      if(x<-20&&y<-10) return 'Left-libertarian and anarchist positions face the coordination problem — without some form of hierarchical authority, it is historically very difficult to organize complex societies, defend against external threats, or enforce agreements between parties with asymmetric power. The vision is compelling but the implementation path remains unclear.';
-      if(x<-20&&y>10) return 'Social democracy and democratic socialism have consistently struggled with the knowledge problem — central or democratic planning of complex economic systems produces systematic inefficiencies that private price signals handle automatically. The welfare state also generates principal-agent problems, bureaucratic capture, and perverse incentive structures that the theory understates.';
-      return 'Centrist technocracy\'s weakness is that it tends to mistake the absence of strong ideology for the absence of ideology altogether — the assumption that complex political questions have technical solutions determined by experts is itself a strong ideological position, one that consistently underestimates the legitimate role of values and democratic deliberation in determining collective goals.';
-    })(),
-    similarPoliticians: (function(){
-      var x=data.polX, y=data.polY;
-      if(x>30&&y<-20) return [
-        'Milton Friedman (USA, 1912-2006): Developed the most rigorous modern defense of free markets and monetary policy; his Capitalism and Freedom remains the clearest statement of classical liberal economics',
-        'Friedrich Hayek (Austria/UK, 1899-1992): Argued that decentralized price signals contain more information than any central planner can access — the epistemic case for markets over planning',
-        'Ron Paul (USA, contemporary): The most consistent modern libertarian in mainstream American politics — anti-war, anti-Fed, anti-drug-war, across-the-board reduction of state power',
-        'Frédéric Bastiat (France, 1801-1850): The clearest early expositor of economic liberalism — his The Law demolishes the logic of legal plunder with elegant simplicity',
-        'Barry Goldwater (USA, 1909-1998): The original fusionist conservative — combining free market economics with social libertarianism before the religious right reshaped American conservatism',
-        'Lee Kuan Yew (Singapore, 1923-2015): Pragmatic economic liberalism combined with strong institutional governance — demonstrated that economic freedom and stable authority are not incompatible'
-      ];
-      if(x>20&&y>15) return [
-        'Edmund Burke (Ireland/UK, 1729-1797): Father of modern conservatism — argued that organic social institutions embody accumulated wisdom that rational reformers recklessly destroy',
-        'Roger Scruton (UK, 1944-2020): The most intellectually rigorous modern conservative philosopher — articulated why the nation-state, cultural inheritance, and local loyalty are genuine goods',
-        'William F. Buckley Jr. (USA, 1925-2008): Fused free market economics with social conservatism into the modern American conservative movement',
-        'Margaret Thatcher (UK, 1925-2013): Combined free market economics with strong national identity and institutional authority — the defining neoconservative stateswoman',
-        'Irving Kristol (USA, 1920-2009): The intellectual father of neoconservatism — a former leftist who concluded that markets and traditional institutions were more reliable than progressive social engineering',
-        'Shinzo Abe (Japan, 1954-2022): National conservatism in an East Asian context — combining economic liberalism with cultural nationalism and institutional strength'
-      ];
-      if(x<-30&&y<-15) return [
-        'Noam Chomsky (USA, contemporary): Libertarian socialist who combines radical critique of state and corporate power with defense of civil liberties and anti-imperialism',
-        'Mikhail Bakunin (Russia, 1814-1876): The father of collectivist anarchism — argued that both the state and capitalism are instruments of domination that must be abolished together',
-        'Peter Kropotkin (Russia, 1842-1921): Argued that mutual aid rather than competition is the dominant principle in both nature and human society — the most empirically-grounded anarchist',
-        'Murray Bookchin (USA, 1921-2006): Developed libertarian municipalism — the idea that face-to-face democratic assemblies at the local level can replace both state and market coordination',
-        'Emma Goldman (USA, 1869-1940): Combined anarchism with feminism and free speech absolutism — one of the most consistent opponents of all forms of coercive authority',
-        'Rosa Luxemburg (Germany, 1871-1919): Democratic socialist who sharply criticized both Leninist authoritarianism and reformist gradualism — political freedom and economic democracy as inseparable'
-      ];
-      if(x<-20&&y>15) return [
-        'Bernie Sanders (USA, contemporary): Democratic socialist who has pushed mainstream American politics leftward on economic inequality, healthcare, and corporate power',
-        'Clement Attlee (UK, 1883-1967): Built the British welfare state after WWII — demonstrated that democratic socialism could be implemented through parliamentary means',
-        'Olof Palme (Sweden, 1927-1986): The defining social democratic statesman — showed that comprehensive welfare provision, labor rights, and economic equality are achievable',
-        'Salvador Allende (Chile, 1908-1973): Attempted democratic socialist transformation in Chile — his trajectory illustrates both the possibilities and limits of left electoral politics',
-        'Lula da Silva (Brazil, contemporary): Brazilian social democracy in a developing economy context — combining redistributive policy with democratic institutions',
-        'Thomas Sankara (Burkina Faso, 1949-1987): Pan-African socialist leader whose brief rule combined anti-imperialism, feminism, and economic self-reliance'
-      ];
-      return [
-        'Angela Merkel (Germany, 1954-): Christian democratic centrism — pragmatic, technocratic, instinctively ordoliberal, suspicious of ideological extremes',
-        'Tony Blair (UK, 1953-): Third Way politics — attempted to synthesize free market efficiency with social democratic goals, creating a durable but ideologically incoherent centre',
-        'Emmanuel Macron (France, 1977-): Liberal centrism — pro-European, economically reformist, socially liberal, institutionally pro-establishment',
-        'Bill Clinton (USA, 1946-): Democratic Leadership Council centrism — moved the Democratic Party toward market-friendly economics while retaining social liberal commitments',
-        'Justin Trudeau (Canada, 1971-): Progressive liberal centrism — socially progressive, rhetorically ambitious, institutionally moderate'
-      ];
-    })(),
-    similarParties: (function(){
-      var x=data.polX, y=data.polY;
-      if(x>30&&y<-15) return [
-        'Libertarian Party (USA): The most consistent standard-bearer for economic freedom combined with civil libertarianism — the platform that most directly matches this position',
-        'Freedom Party of Austria (FPÖ): Right-libertarian economic positions combined with Austrian liberalism — historically aligned with Hayek\'s tradition',
-        'Swedish Moderate Party: Centre-right economic liberalism in a Scandinavian context — accepts welfare state framework while pushing for market reforms',
-        'Liberal Democratic Party of Russia (before 2022): Paradoxically named but economically liberal in certain respects — illustrates how liberal labels are used differently across contexts',
-        'ACT New Zealand: Classical liberal party advocating free markets, personal freedom, and minimal government in one of the world\'s more economically free nations'
-      ];
-      if(x>15&&y>10) return [
-        'Conservative Party (UK): The historic party of Burkean conservatism — combines market economics with institutional tradition and national identity',
-        'Republican Party USA (pre-2016 establishment): Neoconservative synthesis of free markets, strong defense, and social conservatism',
-        'Fidesz (Hungary): National conservative party combining economic nationalism with social conservatism and strong state authority — the European model for this position',
-        'Law and Justice Party (Poland, PiS): Catholic social conservatism combined with economic nationalism and welfare for traditional families',
-        'National Rally (France, RN): Right-wing nationalist party with statist economic tendencies — represents the European populist right'
-      ];
-      if(x<-25&&y<-10) return [
-        'Green Party (Germany): Combines environmental politics with left-libertarian social positions and moderate economic progressivism',
-        'Left Party (Sweden, Vänsterpartiet): Democratic socialist party that explicitly combines economic redistribution with civil libertarianism',
-        'Podemos (Spain): Left-populist party combining anti-austerity economics with direct democracy and social liberalism',
-        'Syriza (Greece): Left-wing coalition that governed Greece during the debt crisis — democratic socialist in economics, libertarian on civil rights',
-        'Socialist Party of France (PS): Centre-left social democracy — the French tradition of combining state-led economics with Republican liberalism'
-      ];
-      if(x<-20&&y>10) return [
-        'Labour Party (UK): The historic party of British social democracy — NHS, welfare state, workers\' rights as its core achievements',
-        'Social Democratic Party (Germany, SPD): The oldest social democratic party — built the German welfare state within an ordoliberal framework',
-        'Swedish Social Democrats (SAP): Built the most comprehensive welfare state in the world — the defining social democratic governing party globally',
-        'Workers\' Party (Brazil, PT): Latin American democratic socialism — redistributive economic policy through democratic institutions',
-        'Democratic Socialists of America (DSA): The growing left flank of American progressivism — explicitly socialist while committed to democratic methods'
-      ];
-      return [
-        'Liberal Democratic Party (UK, LibDem): Centrist social liberalism — economically moderate, pro-European, socially progressive',
-        'Democrats (USA): Centre-left coalition — internally divided between social democrats and Third Way centrists',
-        'En Marche / Renaissance (France): Liberal centrist movement — pro-market, pro-European, technocratic',
-        'FDP Free Democratic Party (Germany): Classical liberal party — economic liberalism, civil liberties, pro-market reform',
-        'Australian Labor Party: Centre-left social democracy in an Anglo tradition — accepts market economy, supports welfare state and union rights'
-      ];
-    })(),
-    similarCountries: (function(){
-      var x=data.polX, y=data.polY;
-      if(x>30&&y<-15) return [
-        'Switzerland: Combines exceptionally high economic freedom (low taxes, minimal regulation) with radical political decentralization and direct democracy — the closest real-world approximation of classical liberal ideals with libertarian social institutions',
-        'New Zealand: Underwent the most thorough free-market reform of any developed country in the 1980s; retains strong civil liberties tradition and personal freedom alongside economic liberalism',
-        'United States (classical liberal tradition): The original experiment in constitutionally limited government and enumerated powers — despite significant drift from founding ideals, retains the strongest libertarian constitutional tradition',
-        'Singapore: High economic freedom index combined with rule of law, low corruption, and pragmatic governance — demonstrates that economic liberalism and institutional strength are compatible even outside Western traditions',
-        'Estonia: The most consistently classical liberal post-Soviet state — low flat taxes, minimal regulation, digital governance, strong property rights, and consistent commitment to both economic and personal freedom'
-      ];
-      if(x>15&&y>10) return [
-        'United Kingdom: The home of Burkean conservatism — Parliamentary tradition, institutional continuity, combination of market economics and cultural nationalism defines the mainstream right',
-        'Japan: Conservative political culture with market economics, strong national identity, social cohesion, and long-term institutional stability — the East Asian model of conservative governance',
-        'Poland: Strong Catholic social conservatism, national identity politics, and market economics within EU institutions — the defining post-communist national conservative state',
-        'Hungary: National conservative governance combining illiberal democracy with cultural nationalism and economic protectionism — the most explicit challenge to liberal internationalism from the right',
-        'Israel: Combines market economics with strong national identity, security-focused governance, and culturally conservative social values in a democratic framework'
-      ];
-      if(x<-25&&y<-10) return [
-        'Iceland: Combines strong social welfare with exceptional personal freedom, civil liberties, and decentralized governance — the most libertarian welfare state',
-        'Netherlands: Liberal social culture with strong civil liberties, drug decriminalization, personal autonomy, combined with regulated market economics and social provision',
-        'Denmark: Social democratic welfare state with genuinely high levels of personal freedom, trust, and civil liberties — demonstrates that social provision and individual autonomy are compatible',
-        'Uruguay: The most socially libertarian country in Latin America — legalized marijuana, abortion, same-sex marriage, combined with social democratic economic policy',
-        'New Zealand: Strong civil libertarian tradition, personal freedom, combined with centre-left economic policy and social democratic institutions'
-      ];
-      if(x<-20&&y>10) return [
-        'Sweden: The defining social democratic state — comprehensive welfare, low inequality, strong labor protections, high trust institutions, all within a functioning market economy',
-        'Denmark: Social democratic welfare state with active labor market policies, comprehensive social insurance, and strong democratic institutions',
-        'Finland: Nordic social democracy combining high equality, comprehensive welfare, and strong public institutions with a market economy and exceptional educational outcomes',
-        'Norway: Social democratic governance of a resource-rich economy — sovereign wealth fund, strong welfare state, high equality, maintained within democratic institutions',
-        'Bolivia: Latin American socialism under Morales — resource nationalism, indigenous rights, poverty reduction, and social democratic governance in a developing economy context'
-      ];
-      return [
-        'Germany: Ordoliberal social market economy — explicitly rejects both pure laissez-faire and state socialism in favor of a rules-based market with social provision and institutional stability',
-        'Canada: Liberal centrist democracy — accepts market economy with universal healthcare, multicultural social policy, and moderate redistributive taxation',
-        'Australia: Centre-left/centre-right alternation within a liberal democratic framework — economic liberalism combined with welfare state and pragmatic social policy',
-        'Netherlands: Pragmatic centrist coalition politics — economically moderate, socially liberal, institutionally stable',
-        'South Korea: East Asian developmental state that combined strategic state intervention with market mechanisms to achieve rapid industrialization — technocratic centrist model'
-      ];
-    })(),
-    politicalThinkers: (function(){
-      var x=data.polX, y=data.polY;
-      if(x>25&&y<-10) return [
-        'Friedrich Hayek: His knowledge problem argument — that no central authority can possess the dispersed local knowledge encoded in price signals — remains the most powerful epistemic case against economic planning. For someone with a Ti-dominant cognitive profile, the argument that knowledge is fundamentally decentralized and tacit resonates deeply.',
-        'John Locke: The foundational theorist of natural rights and limited government — his argument that legitimate state authority derives from consent and is limited by natural rights provides the philosophical bedrock of classical liberalism. His labor theory of property connects directly to intuitions about self-ownership.',
-        'Ayn Rand: Her systematic defense of rational self-interest as a virtue rather than a vice speaks directly to profiles combining Nietzschean philosophy with high rational egoism scores. Objectivism provides a complete integrated system — metaphysics, epistemology, ethics, and politics in a coherent framework.',
-        'Murray Rothbard: The most rigorous systematic developer of libertarian political theory — his ethics of liberty applies the non-aggression principle with absolute consistency, including to areas Rand and Hayek hedged on.',
-        'Frédéric Bastiat: The clearest expositor of the seen vs. the unseen — his insight that economic analysis requires tracing not just immediate effects but all downstream consequences is the foundation of good economic reasoning.'
-      ];
-      if(x>15&&y>10) return [
-        'Edmund Burke: His critique of the French Revolution — that abstract rational principles cannot substitute for the accumulated wisdom embedded in organic institutions — is the founding text of modern conservatism. For someone with strong Si and institutional awareness, the Burkean insight about continuity as genuine knowledge resonates.',
-        'Roger Scruton: The most philosophically rigorous modern conservative — his work on beauty, home, and loyalty provides a positive account of what conservatism is for rather than merely what it opposes.',
-        'Russell Kirk: Articulated the six canons of conservatism — prescription, continuity, convention, prudence, variety, and imperfectability — giving the tradition intellectual structure beyond mere opposition to change.',
-        'Samuel Huntington: His clash of civilizations thesis and defense of national identity as a genuine political good provides the intellectual framework for national conservatism\'s foreign policy and cultural politics.',
-        'Carl Schmitt: The most incisive critic of liberal constitutionalism — his analysis of sovereignty, the state of exception, and the friend/enemy distinction are essential reading for understanding the limits of procedural liberalism.'
-      ];
-      if(x<-25&&y<-10) return [
-        'Peter Kropotkin: His Mutual Aid demonstrates with empirical detail that cooperation rather than competition is the dominant evolutionary strategy — providing a scientific foundation for anarchist social theory rather than relying on pure normative argument.',
-        'Mikhail Bakunin: His critique of Marxism — that a workers\' state would merely transfer oppression from capitalists to party bureaucrats — proved prophetic. The argument that state power corrupts regardless of who wields it is the core libertarian insight.',
-        'Murray Bookchin: Libertarian municipalism — the theory that genuine democracy can only exist at the face-to-face scale of neighborhoods and towns, not in the abstraction of the nation-state — provides a concrete institutional alternative to both capitalism and statism.',
-        'David Graeber: His anthropological work on debt, bureaucracy, and the origins of money demolishes many assumptions of mainstream economics and provides an empirical foundation for left-libertarian critique.',
-        'Ursula K. Le Guin: Through fiction, Le Guin explored anarchist social organization more rigorously and imaginatively than most political theorists — The Dispossessed remains the most compelling thought experiment in left-libertarian politics.'
-      ];
-      if(x<-20&&y>10) return [
-        'Karl Marx: The analysis of how capital accumulation structures social relations, political institutions, and consciousness remains indispensable even for those who reject the prescriptive conclusions. His materialist analysis of ideology is intellectually essential.',
-        'John Rawls: His difference principle — that inequalities are only just if they benefit the least advantaged members of society — provides the most philosophically rigorous foundation for social democratic redistribution within a liberal framework.',
-        'Antonio Gramsci: His concept of cultural hegemony — that ruling ideas are not merely imposed but actively consented to through civil society — explains why economic injustice persists even in formally democratic systems.',
-        'Thomas Piketty: His empirical demonstration that capital accumulation systematically outpaces economic growth (r > g) provides the modern economic foundation for social democratic taxation policy.',
-        'Amartya Sen: His capabilities approach — measuring justice not by resource distribution but by what people can actually do and be — provides a humanist framework for social democracy that transcends both utilitarian calculation and abstract rights theory.'
-      ];
-      return [
-        'John Stuart Mill: His harm principle — that state power is only legitimate when preventing harm to others — remains the clearest liberal attempt to define the boundaries of acceptable authority. His defense of free speech as epistemically necessary, not just instrumentally valuable, is philosophically rigorous.',
-        'John Dewey: Pragmatist political philosophy that treats democracy as an ongoing experiment rather than a fixed set of institutions — useful for those skeptical of ideological purity.',
-        'Isaiah Berlin: The distinction between positive and negative liberty — freedom from coercion versus freedom to achieve — maps directly onto the core debate between left and right and helps clarify what each side actually wants.',
-        'Robert Dahl: The most systematic theorist of polyarchy and democratic pluralism — his work on how power actually distributes in formally democratic systems is essential empirical grounding for political theory.',
-        'Hannah Arendt: Her analysis of the conditions for genuine political action — distinct from economics and from violence — and her critique of totalitarianism from both left and right remain indispensable.'
-      ];
-    })()
+    mbtiName: mm.n,
+    tagline: mm.t,
+    cogNarrative: cogNarr,
+    ennNarrative: 'Type '+enn.type+' is driven by a core fear and desire that shapes every major life decision, even when invisible. The '+enn.type+'w'+enn.wing+' wing configuration adds specific texture to how this motivation expresses itself.\n\nYour tritype of '+enn.tritype+' reflects how your head, heart, and gut centers each operate with their own characteristic pattern. This three-number code gives a more complete picture of motivation than the single type alone.',
+    attNarrative: 'Your attachment pattern shapes how you seek and experience closeness — the invisible architecture that determines what feels safe, what feels threatening, and what you do when vulnerability is required.',
+    phiNarrative: 'Your philosophical alignment toward '+phi.replace('PH_','')+' reflects a structural orientation that goes beyond intellectual preference — it shapes how you interpret knowledge, ethics, and the nature of reality.',
+    aloneDesc: aloneD,
+    socialDesc: socialD,
+    shadowDesc: shadowD,
+    figures: figures,
+    values: values,
+    big5: big5,
+    politicalNarrative: polNarr[polQuad]+' Your political position at X='+polX+' Y='+polY+' reflects both your direct answers to political questions and the underlying value structure your personality has developed.',
+    politicalIdeology: polIdeology,
+    politicalIdeologyDesc: 'This position reflects a specific tradition with its own intellectual history, strengths, and genuine blind spots. Explore the political tab for a full analysis.',
+    politicalStrengths: 'This position has genuine intellectual coherence and real historical achievements. Its strongest moments tend to come when it operates within its core assumptions about human nature and the proper role of institutions.',
+    politicalWeaknesses: 'Every political position has blind spots that become visible under pressure. This position is most vulnerable when its foundational assumptions about human nature or institutional behavior prove incorrect in specific contexts.',
+    politicalThinkers: ['Key thinkers in this tradition have shaped its most coherent arguments. See the political tab for personalized recommendations based on your exact profile.'],
+    similarCountries: ['Country analysis requires full AI processing — take the test and save results to see personalized comparisons.'],
+    similarPoliticians: ['Politician comparisons require full AI processing — take the test and save results to see personalized matches.'],
+    similarParties: ['Party comparisons require full AI processing — take the test and save results.'],
+    socionics: socionicsByMBTI[mbti] || '—',
+    keirsey: keirseyByMBTI[mbti] || 'Rational'
   };
 }
-
 // ── RENDER RESULTS ──
 var TABS=[
   {id:'overview',label:'Overview'},
@@ -2390,7 +2146,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   var ennNames={1:'The Perfectionist',2:'The Helper',3:'The Achiever',4:'The Individualist',5:'The Investigator',6:'The Loyalist',7:'The Enthusiast',8:'The Challenger',9:'The Peacemaker'};
   var tmpNames={TMP_CHO:'Choleric',TMP_MEL:'Melancholic',TMP_SAN:'Sanguine',TMP_PHL:'Phlegmatic'};
   var sortedTmp=Object.keys(data.tmp).sort(function(a,b){return data.tmp[b]-data.tmp[a];});
-  var sortedEnn=Object.keys(data.enn).sort(function(a,b){return data.enn[b]-data.enn[a];});
+  var sortedEnn=Object.keys(data.ennScores||{}).sort(function(a,b){return data.ennScores[b]-data.ennScores[a];});
   var attLabels={AT_SEC:'Secure',AT_ANX:'Anxious',AT_AVO:'Avoidant',AT_DIS:'Disorganized'};
   var ivLabels={IV_SP:'Self-Preservation',IV_SOC:'Social',IV_SX:'Sexual/Intimate'};
   var sortedIV=Object.keys(data.iv).sort(function(a,b){return data.iv[b]-data.iv[a];});
@@ -2410,7 +2166,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'<div class="card2"><div class="card-title">All 9 Types Scored</div>'
     +sortedEnn.map(function(e){
       var n=e.replace('E','');
-      var s=data.enn[e];
+      var s=data.ennScores[e];
       return '<div class="bar-row" style="margin-bottom:8px">'
         +'<div class="bar-label" style="min-width:24px"><strong>'+n+'</strong></div>'
         +'<div class="bar-wrap"><div class="bar-fill'+(e===sortedEnn[0]?'':' dim')+'" style="width:0%" data-w="'+s+'"></div></div>'
@@ -2430,8 +2186,8 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'<div class="section-label">Attachment Style</div>'
     +(sanitizeText(ai.attNarrative,2000)?'<div class="narrative-block"><div class="narrative-title">'+attLabels[att]+'</div><div class="narrative-text">'+sanitizeText(ai.attNarrative,2000)+'</div></div>':'')
     +'<div class="card"><div class="card-title">All Styles Scored</div>'
-    +Object.keys(data.att).sort(function(a,b){return data.att[b]-data.att[a];}).map(function(a){
-      var s=data.att[a];
+    +Object.keys(data.attScores||data.att||{}).sort(function(a,b){return (data.attScores||data.att||{})[b]-(data.attScores||data.att||{})[a];}).map(function(a){
+      var s=(data.attScores||{})[a];
       return '<div class="bar-row"><div class="bar-label"><strong>'+attLabels[a]+'</strong></div>'
         +'<div class="bar-wrap"><div class="bar-fill'+(a===att?'':' dim')+'" style="width:0%" data-w="'+s+'"></div></div>'
         +'<div class="bar-num">'+s+'</div></div>';
