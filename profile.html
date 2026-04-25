@@ -2292,7 +2292,7 @@ function shareProfile(){
 }
 
 function downloadPDF(){ showToast('Opening PDF download...'); window.print(); }
-function editBio(){ window.location.href='settings.html'; }
+function editBio(){ window.location.href='/settings'; }
 
 // ── LOAD PROFILE DATA FROM FIREBASE ──
 auth.onAuthStateChanged(function(currentUser){
@@ -2379,7 +2379,7 @@ function loadProfileData(uid, isOwner, currentUser){
       var heroActions=document.querySelector('.hero-actions');
       if(heroActions && currentUser){
         var uname=u.username||uid;
-        heroActions.innerHTML='<a href="compare.html?u='+encodeURIComponent(uname)+'" class="btn-action-profile btn-primary-profile">⇌ Compare</a>'
+        heroActions.innerHTML='<a href="/compare?u='+encodeURIComponent(uname)+'" class="btn-action-profile btn-primary-profile">⇌ Compare</a>'
           +'<button class="btn-action-profile btn-secondary-profile" onclick="shareProfile()">Share</button>';
       }
       document.querySelectorAll('.owner-only').forEach(function(el){el.style.display='none';});
@@ -2406,7 +2406,7 @@ function loadProfileData(uid, isOwner, currentUser){
     var heroActions = document.querySelector('.hero-actions');
     if(heroActions){
       heroActions.innerHTML =
-        '<a href="compare.html?u='+encodeURIComponent(u)+'" class="btn-action-profile btn-primary-profile">⇌ Compare</a>'
+        '<a href="/compare?u='+encodeURIComponent(u)+'" class="btn-action-profile btn-primary-profile">⇌ Compare</a>'
         +'<button class="btn-action-profile btn-secondary-profile" onclick="shareProfile()">Share</button>';
     }
     // Swap sidebar Compare buttons
