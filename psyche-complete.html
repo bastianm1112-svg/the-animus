@@ -58,17 +58,29 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
 .q-section-badge{display:inline-flex;align-items:center;gap:8px;font-size:9px;letter-spacing:0.3em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;padding:4px 12px;border:1px solid var(--border2);}
 .q-dot{width:4px;height:4px;background:var(--accent);border-radius:50%;}
 .q-text{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,4vw,32px);line-height:1.25;color:var(--text);margin-bottom:44px;font-weight:300;}
+.mc-choices{display:flex;flex-direction:column;gap:6px;width:100%;max-width:560px;}
+.mc-choice{background:var(--surface);border:1px solid var(--border);color:var(--muted2);cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.04em;line-height:1.5;transition:border-color 0.12s,background 0.12s,color 0.12s;display:flex;align-items:center;gap:0;width:100%;text-align:left;padding:0;}
+.mc-choice:hover{border-color:var(--accent2);background:var(--surface2);color:var(--text);}
+.mc-choice.selected{border-color:var(--accent);background:rgba(184,149,90,0.07);color:var(--text);}
+.mc-letter{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;color:var(--muted);min-width:44px;width:44px;display:flex;align-items:center;justify-content:center;padding:14px 0;border-right:1px solid var(--border);flex-shrink:0;transition:color 0.12s,border-color 0.12s;}
+.mc-choice:hover .mc-letter{color:var(--accent2);border-color:var(--accent2);}
+.mc-choice.selected .mc-letter{color:var(--accent);border-color:var(--accent);}
+.mc-content{padding:14px 16px;flex:1;}
+.mc-text{display:block;}
 .scale-wrap{display:flex;flex-direction:column;gap:10px;}
 .scale-row{display:flex;gap:6px;}
 .scale-btn{flex:1;min-height:52px;background:var(--surface);border:1px solid var(--border);color:var(--muted2);cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
 .scale-btn:hover{border-color:var(--accent2);color:var(--text);}
 .scale-btn.sel{border-color:var(--accent);background:#1a1208;color:var(--accent);}
 .scale-lbls{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;letter-spacing:0.1em;padding:0 2px;}
-.agree-grid{display:flex;flex-direction:column;gap:8px;}
-.agree-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:14px 20px;text-align:left;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;transition:all 0.15s;display:flex;align-items:center;gap:16px;width:100%;}
-.agree-btn:hover{border-color:var(--accent2);background:var(--surface2);color:var(--accent);}
-.agree-btn.sel{border-color:var(--accent);background:#1a1208;color:var(--accent);}
-.agree-lbl{font-size:9px;color:var(--muted);min-width:18px;letter-spacing:0.05em;}
+.agree-grid{display:flex;flex-direction:column;gap:6px;width:100%;max-width:560px;}
+.agree-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted2);cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.04em;line-height:1.5;transition:border-color 0.12s,background 0.12s,color 0.12s;display:flex;align-items:center;gap:0;width:100%;text-align:left;padding:0;}
+.agree-btn:hover{border-color:var(--accent2);background:var(--surface2);color:var(--text);}
+.agree-btn.sel{border-color:var(--accent);background:rgba(184,149,90,0.07);color:var(--text);}
+.agree-letter{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;color:var(--muted);min-width:44px;width:44px;height:100%;display:flex;align-items:center;justify-content:center;padding:14px 0;border-right:1px solid var(--border);flex-shrink:0;transition:color 0.12s,border-color 0.12s;}
+.agree-btn:hover .agree-letter{color:var(--accent2);border-color:var(--accent2);}
+.agree-btn.sel .agree-letter{color:var(--accent);border-color:var(--accent);}
+.agree-label{padding:14px 16px;flex:1;}
 .agree-btn.sel .agree-lbl{color:var(--accent2);}
 .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:44px;}
 .btn-sec{background:none;border:1px solid var(--border);color:var(--muted);padding:10px 28px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;cursor:pointer;transition:all 0.15s;}
@@ -338,7 +350,7 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
     </button>
     <button class="intro-mode-btn" id="modeShort">
       <span class="mode-label" data-en="Short" data-es="Corto">Short</span>
-      <span class="mode-sub" data-en="100 questions · ~12 min" data-es="100 preguntas · ~12 min">100 questions · ~12 min</span>
+      <span class="mode-sub" data-en="100 questions · ~15 min" data-es="100 preguntas · ~15 min">100 questions · ~12 min</span>
     </button>
   </div>
   <div class="intro-meta">
@@ -514,302 +526,290 @@ function safeAtob(encoded){
 
 
 // ═══════════════════════════════════════════════════════════════
-// QUESTION BANK — 280 questions across 14 dimensions
+// QUESTION BANK — 280 questions (140 MC + 140 Likert) across 14 dimensions
 // ═══════════════════════════════════════════════════════════════
 var Q = [
-  // ── COGNITIVE FUNCTIONS (72q) ──
-  {sec:"Cognitive",fn:"Ni",t:"I often sense where a situation is heading long before others notice the signals.",type:"s",e:"Do you often just know how something will turn out — before anyone else sees it coming?"},
-  {sec:"Cognitive",fn:"Ni",t:"I prefer having one deep, all-encompassing vision rather than multiple open possibilities.",type:"a",e:"Would you rather have one clear powerful vision to work toward instead of keeping lots of options open?"},
-  {sec:"Cognitive",fn:"Ni",t:"My best insights arrive as sudden wordless knowings — like the answer was always there.",type:"s",e:"Do your best ideas arrive as a sudden gut feeling — not step by step, just suddenly there?"},
-  {sec:"Cognitive",fn:"Ni",t:"I find patterns across unrelated fields and feel compelled to unify them into one framework.",type:"a",e:"Do you notice how completely unrelated things secretly follow the same pattern, and feel the urge to connect them?"},
-  {sec:"Cognitive",fn:"Ni",t:"I'm often described as uncannily accurate in predicting how things will unfold.",type:"s",e:"Do people tell you that you're weirdly good at predicting what's going to happen?"},
-  {sec:"Cognitive",fn:"Ni",t:"I think in symbols, metaphors, and convergent meaning more than in concrete details.",type:"a",e:"Do you tend to think in images, symbols, or metaphors more than in facts and specifics?"},
-  {sec:"Cognitive",fn:"Ni",t:"I have a persistent internal image of how things should be and I work backwards from it.",type:"s",e:"Do you have a clear picture in your head of how something should be, and then figure out how to get there?"},
-  {sec:"Cognitive",fn:"Ni",t:"I trust my gut convictions even when I cannot articulate a logical basis for them.",type:"a",e:"Do you trust a strong inner conviction even when you can't fully explain why you believe it?"},
-  {sec:"Cognitive",fn:"Ni",t:"Time feels non-linear to me — past, present, and future often collapse into a single insight.",type:"s",e:"Does time feel weird to you — like past, present, and future sometimes blur together into one moment of understanding?"},
-  {sec:"Cognitive",fn:"Ne",t:"I get excited about a new idea the moment I sense its potential — even before thinking it through.",type:"s",e:"Do you get pumped about a new idea immediately — before you've even thought it all the way through?"},
-  {sec:"Cognitive",fn:"Ne",t:"I prefer exploring many possibilities at once rather than committing to a single path.",type:"a",e:"Do you prefer keeping lots of options open rather than locking in on just one?"},
-  {sec:"Cognitive",fn:"Ne",t:"I constantly make unexpected connections between things others would never associate.",type:"s",e:"Do you often link two totally unrelated things together in a way that surprises other people?"},
-  {sec:"Cognitive",fn:"Ne",t:"I'm more energized by brainstorming than executing — the idea is more exciting than the follow-through.",type:"a",e:"Is coming up with the idea way more exciting to you than actually doing the work to make it happen?"},
-  {sec:"Cognitive",fn:"Ne",t:"I often riff on ideas out loud, letting conversation take me somewhere unexpected.",type:"s",e:"Do you like thinking out loud and letting conversations go wherever they lead, even somewhere you didn't plan?"},
-  {sec:"Cognitive",fn:"Ne",t:"I find it genuinely difficult to close off options, even when a decision is overdue.",type:"a",e:"Is it hard for you to commit to one choice and close off the other options — even when you really need to decide?"},
-  {sec:"Cognitive",fn:"Ne",t:"My mind generates alternative interpretations even when a situation seems clear to others.",type:"s",e:"Even when something seems obvious to everyone else, does your mind automatically come up with other ways to see it?"},
-  {sec:"Cognitive",fn:"Ne",t:"I get more excited by what if than by what is.",type:"a",e:"Are possibilities and hypotheticals more exciting to you than the way things actually are right now?"},
-  {sec:"Cognitive",fn:"Ne",t:"I often notice ironies, paradoxes, or hidden absurdities in ordinary situations.",type:"s",e:"Do you tend to spot the funny contradiction or hidden weirdness in everyday situations that others just walk past?"},
-  {sec:"Cognitive",fn:"Ti",t:"I build internal models of how things work and judge new information against those models.",type:"s",e:"Do you build a mental picture of how something works, and then use it to test whether new information makes sense?"},
-  {sec:"Cognitive",fn:"Ti",t:"I care more about whether an idea is logically consistent than whether it produces results.",type:"a",e:"Does it bother you more if an idea is internally inconsistent than if it just doesn't work in practice?"},
-  {sec:"Cognitive",fn:"Ti",t:"I prefer to fully understand something before forming an opinion — I resist premature conclusions.",type:"s",e:"Do you hold off forming an opinion until you really get something — and resist jumping to conclusions?"},
-  {sec:"Cognitive",fn:"Ti",t:"I find most conventional wisdom shallow and enjoy finding the exceptions and edge cases.",type:"a",e:"Do you find most popular wisdom oversimplified, and enjoy poking at the edge cases and exceptions?"},
-  {sec:"Cognitive",fn:"Ti",t:"When analyzing a problem I naturally strip away context and reduce it to its abstract structure.",type:"s",e:"When you think through a problem, do you naturally strip away all the messy details to find the core structure underneath?"},
-  {sec:"Cognitive",fn:"Ti",t:"I often work through problems completely in my head before speaking.",type:"a",e:"Do you usually figure things out fully in your own head before you say anything out loud?"},
-  {sec:"Cognitive",fn:"Ti",t:"I can hold two contradictory models simultaneously and am comfortable suspending judgment.",type:"s",e:"Can you comfortably hold two opposite ideas in your head at the same time without needing to pick one yet?"},
-  {sec:"Cognitive",fn:"Ti",t:"I find it hard to trust an argument unless I can trace every step of its internal logic myself.",type:"a",e:"Do you find it hard to trust a conclusion unless you can personally follow every step of the logic that got there?"},
-  {sec:"Cognitive",fn:"Ti",t:"I'm more interested in the elegance of a theory than in its practical usefulness.",type:"s",e:"Is a clean beautiful theory more interesting to you than one that just works but is messy?"},
-  {sec:"Cognitive",fn:"Te",t:"I naturally reorganize systems, workflows, and environments to be more efficient.",type:"s",e:"Do you automatically spot ways to make processes faster or better and feel the urge to fix them?"},
-  {sec:"Cognitive",fn:"Te",t:"I respect expertise that produces tangible measurable results — not just theoretical knowledge.",type:"a",e:"Do you respect people more for what they can actually do and produce, rather than what they know in theory?"},
-  {sec:"Cognitive",fn:"Te",t:"I tend to take charge in group settings, especially when things are disorganized.",type:"s",e:"When a group situation is messy or directionless, do you naturally step up and take charge?"},
-  {sec:"Cognitive",fn:"Te",t:"I prefer data, research, and objective benchmarks over intuition when making decisions.",type:"a",e:"When making a decision, do you prefer hard data and research over going with your gut?"},
-  {sec:"Cognitive",fn:"Te",t:"I think in terms of goals, strategies, and outcomes — and I build plans to achieve them.",type:"s",e:"Do you naturally think in terms of goals and plans — always working out how to get from here to a result?"},
-  {sec:"Cognitive",fn:"Te",t:"I can be blunt when inefficiency or incompetence is slowing things down.",type:"a",e:"Do you tend to speak pretty directly when someone's incompetence or disorganization is wasting time?"},
-  {sec:"Cognitive",fn:"Te",t:"I hold myself and others to high standards of productivity and follow-through.",type:"s",e:"Do you hold yourself and the people around you to high standards — and feel frustrated when they aren't met?"},
-  {sec:"Cognitive",fn:"Te",t:"I'm energized by accomplishment and feel unsettled when there's nothing to show for effort.",type:"a",e:"Does getting things done energize you — and does it bother you when you've worked hard but have nothing concrete to show?"},
-  {sec:"Cognitive",fn:"Te",t:"I prefer explicit logical explanations over storytelling when someone needs convincing.",type:"s",e:"When you need to convince someone, do you prefer giving them clear logical reasons rather than a story or emotional appeal?"},
-  {sec:"Cognitive",fn:"Fi",t:"I have a deep private set of values that I rarely compromise — even under social pressure.",type:"s",e:"Do you have a set of personal values so deep that you won't go against them even if people push you to?"},
-  {sec:"Cognitive",fn:"Fi",t:"I feel things intensely on the inside even when I appear calm on the outside.",type:"a",e:"Do you often feel a lot more on the inside than what you show on the outside?"},
-  {sec:"Cognitive",fn:"Fi",t:"I'm highly attuned to whether my actions align with who I feel I truly am.",type:"s",e:"Does it bother you when what you're doing doesn't feel true to who you really are?"},
-  {sec:"Cognitive",fn:"Fi",t:"Authenticity matters more to me than social harmony — I'd rather be honest than liked.",type:"a",e:"Is being real and honest more important to you than keeping the peace or being liked?"},
-  {sec:"Cognitive",fn:"Fi",t:"I can feel immediate strong reactions to ethical violations I cannot always justify logically.",type:"s",e:"Do you sometimes feel a gut-level reaction to something being wrong — even if you can't fully explain why?"},
-  {sec:"Cognitive",fn:"Fi",t:"I'm more moved by the suffering of a specific individual than by statistics about widespread harm.",type:"a",e:"Does one person's specific suffering move you more than numbers about millions being affected?"},
-  {sec:"Cognitive",fn:"Fi",t:"I protect my inner world carefully and only share it with those I fully trust.",type:"s",e:"Do you keep your real thoughts and feelings private and only open up to people you deeply trust?"},
-  {sec:"Cognitive",fn:"Fi",t:"I find it hard to act against my values even when it would be strategically advantageous.",type:"a",e:"Is it hard for you to do something that goes against your values — even if it would benefit you?"},
-  {sec:"Cognitive",fn:"Fi",t:"I often feel a sense of personal calling — that certain things matter uniquely to me.",type:"s",e:"Do you feel like certain things in life are meant specifically for you — almost like a calling?"},
-  {sec:"Cognitive",fn:"Fe",t:"I naturally adjust my tone and energy to match the emotional atmosphere of the room.",type:"s",e:"Do you automatically shift how you talk and act based on the mood of the people around you?"},
-  {sec:"Cognitive",fn:"Fe",t:"I'm motivated by group wellbeing and feel responsible for the emotional climate around me.",type:"a",e:"Do you feel like the emotional atmosphere around you is partly your responsibility to manage?"},
-  {sec:"Cognitive",fn:"Fe",t:"I pick up on subtle shifts in how people feel — even when they say nothing is wrong.",type:"s",e:"Can you tell when someone's feeling off — even when they say everything's fine?"},
-  {sec:"Cognitive",fn:"Fe",t:"I find sustained conflict uncomfortable and naturally try to repair ruptures in relationships.",type:"a",e:"Does ongoing conflict make you uncomfortable, and do you naturally try to fix it and restore the peace?"},
-  {sec:"Cognitive",fn:"Fe",t:"I feel a pull to encourage and affirm the people I care about — even when barely warranted.",type:"s",e:"Do you feel a natural urge to encourage and support the people you care about — even if they haven't really earned it?"},
-  {sec:"Cognitive",fn:"Fe",t:"I make decisions partly based on how they'll affect the people I'm responsible for.",type:"a",e:"When making decisions, do you consider how they'll affect the people in your life as part of the equation?"},
-  {sec:"Cognitive",fn:"Fe",t:"I'm skilled at reading what others need emotionally in a given moment.",type:"s",e:"Are you good at sensing what someone needs emotionally right now — without them having to say it?"},
-  {sec:"Cognitive",fn:"Fe",t:"The wellbeing of others weighs heavily on me even when I haven't done anything wrong.",type:"a",e:"Do you feel weighed down by other people's pain or unhappiness even when it's not your fault?"},
-  {sec:"Cognitive",fn:"Fe",t:"I naturally take on the role of mediator, supporter, or caretaker in group dynamics.",type:"s",e:"In groups, do you naturally end up being the one who smooths things over, supports people, or keeps everyone okay?"},
-  {sec:"Cognitive",fn:"Si",t:"I rely heavily on past experience to navigate current decisions — if it worked before, it's likely right.",type:"s",e:"When making decisions, do you lean on what worked in the past — if it worked before, why change it?"},
-  {sec:"Cognitive",fn:"Si",t:"I have a strong sense of duty and feel genuine discomfort when I neglect responsibilities.",type:"a",e:"Do you feel genuinely uneasy or guilty when you skip something you're supposed to do?"},
-  {sec:"Cognitive",fn:"Si",t:"I tend to prefer familiar routines and environments over new unpredictable ones.",type:"s",e:"Do you prefer sticking to familiar routines and places over new or unpredictable situations?"},
-  {sec:"Cognitive",fn:"Si",t:"I remember experiences through vivid sensory impressions — smells, textures, sounds that anchor a memory.",type:"a",e:"Are your memories tied to vivid sensory details — a smell, a sound, a texture — that take you right back?"},
-  {sec:"Cognitive",fn:"Si",t:"Tradition and continuity feel important to me as a foundation for identity.",type:"s",e:"Do traditions, routines, and continuity feel like an important part of who you are?"},
-  {sec:"Cognitive",fn:"Si",t:"I'm internally consistent over time — I rarely change my habits or preferences dramatically.",type:"a",e:"Are you pretty consistent — you don't dramatically change your habits, tastes, or preferences very often?"},
-  {sec:"Cognitive",fn:"Si",t:"I pay careful attention to my physical sensations and internal state throughout the day.",type:"s",e:"Are you aware of your body's sensations and your internal state — tension, hunger, tiredness — throughout the day?"},
-  {sec:"Cognitive",fn:"Si",t:"I naturally compare the present to the past to understand what has changed.",type:"a",e:"Do you often think about how things are different from how they used to be, to understand what's going on now?"},
-  {sec:"Cognitive",fn:"Si",t:"I feel more grounded when I have consistent structure and clear expectations.",type:"s",e:"Do you feel calmer and more stable when you have a clear routine and know what's expected of you?"},
-  {sec:"Cognitive",fn:"Se",t:"I'm highly attuned to the physical world — sights, sounds, movement, and energy in my environment.",type:"s",e:"Are you very aware of what's going on around you physically — sounds, movement, the energy in a space?"},
-  {sec:"Cognitive",fn:"Se",t:"I trust my instincts and act in the moment without needing to plan everything in advance.",type:"a",e:"Do you trust your gut and just act — without needing a plan worked out ahead of time?"},
-  {sec:"Cognitive",fn:"Se",t:"I feel most alive when fully immersed in an intense present-moment experience.",type:"s",e:"Do you feel most alive when you're completely in the moment — doing something intense and real?"},
-  {sec:"Cognitive",fn:"Se",t:"I get restless when not physically engaged or when an environment feels stale.",type:"a",e:"Do you get antsy and restless when you're not doing something physical or when your environment feels boring?"},
-  {sec:"Cognitive",fn:"Se",t:"I'm naturally observant — I notice changes in my physical environment that others miss.",type:"s",e:"Do you tend to notice things in your surroundings that other people walk straight past?"},
-  {sec:"Cognitive",fn:"Se",t:"I tend to be bold and opportunistic — when I sense opportunity, I move fast.",type:"a",e:"When you see an opportunity, do you move fast — you don't hesitate or overthink it?"},
-  {sec:"Cognitive",fn:"Se",t:"I enjoy aesthetics, physical sensation, and the tangible pleasures of the immediate world.",type:"s",e:"Do you enjoy beautiful things, physical sensations, and the simple pleasures of the here and now?"},
-  {sec:"Cognitive",fn:"Se",t:"I trust what I can perceive directly over abstract theories or internal impressions.",type:"a",e:"Do you trust what you can actually see, hear, and touch more than abstract ideas or gut feelings?"},
-  {sec:"Cognitive",fn:"Se",t:"I'm at my best when taking decisive action rather than ruminating or strategizing.",type:"s",e:"Are you at your best when you're just doing something — rather than overthinking or planning?"},
-  // ── ENNEAGRAM (27q) ──
-  {sec:"Enneagram",fn:"E1",t:"I have a strong internal critic that constantly points out how things could be better.",type:"s",e:"Do you have a constant inner voice pointing out flaws and ways things could be improved?"},
-  {sec:"Enneagram",fn:"E1",t:"I feel a persistent sense of responsibility to correct things that are wrong or imperfect.",type:"a",e:"Do you feel a nagging responsibility to fix or correct things that are wrong or not good enough?"},
-  {sec:"Enneagram",fn:"E1",t:"I frequently notice errors and flaws that others seem perfectly comfortable ignoring.",type:"s",e:"Do you keep noticing mistakes and imperfections that other people just don't seem to care about?"},
-  {sec:"Enneagram",fn:"E2",t:"I feel most fulfilled when I'm actively supporting and caring for the people around me.",type:"s",e:"Does taking care of others and being there for people give you a deep sense of purpose?"},
-  {sec:"Enneagram",fn:"E2",t:"I sometimes feel resentful when my efforts to help go unacknowledged.",type:"a",e:"Do you sometimes feel bitter or resentful when you've helped a lot but nobody seems to notice or thank you?"},
-  {sec:"Enneagram",fn:"E2",t:"I find it difficult to ask for help myself, even when I clearly need it.",type:"s",e:"Even when you clearly need help, is it hard for you to actually ask for it?"},
-  {sec:"Enneagram",fn:"E3",t:"I'm highly motivated by achievement and have a strong drive to succeed and be recognized.",type:"s",e:"Are you strongly driven to succeed, achieve things, and be recognized for it?"},
-  {sec:"Enneagram",fn:"E3",t:"I adapt my presentation and identity to fit what a given environment rewards.",type:"a",e:"Do you shift how you present yourself based on what a particular situation or crowd rewards?"},
-  {sec:"Enneagram",fn:"E3",t:"I sometimes struggle to know what I actually want separate from what I think I should want.",type:"s",e:"Do you ever find it hard to separate what you actually want from what you think you're supposed to want?"},
-  {sec:"Enneagram",fn:"E4",t:"I have a persistent feeling that something essential is missing from my life that others have.",type:"s",e:"Do you have an ongoing feeling that something important is missing in your life that other people seem to have?"},
-  {sec:"Enneagram",fn:"E4",t:"I'm drawn to melancholy, longing, and beauty in a way that feels uniquely mine.",type:"a",e:"Are you drawn to sad or bittersweet feelings, longing, and intense beauty in a way that feels specifically yours?"},
-  {sec:"Enneagram",fn:"E4",t:"I feel most alive in intense emotional experiences — even painful ones.",type:"s",e:"Do intense emotions — even painful ones — make you feel most alive and real?"},
-  {sec:"Enneagram",fn:"E5",t:"I manage my energy carefully and feel drained when called upon to give more than I planned.",type:"s",e:"Do you carefully manage how much energy you give out, and feel depleted when people demand more than you budgeted for?"},
-  {sec:"Enneagram",fn:"E5",t:"I feel most secure when I have accumulated enough knowledge or resources to be self-sufficient.",type:"a",e:"Does having enough knowledge or resources to handle things on your own make you feel safe?"},
-  {sec:"Enneagram",fn:"E5",t:"I observe situations carefully before engaging and prefer to think before speaking.",type:"s",e:"Do you prefer to watch and think first before jumping in — rather than engaging right away?"},
-  {sec:"Enneagram",fn:"E6",t:"I'm acutely aware of what could go wrong and mentally prepare for various scenarios.",type:"s",e:"Do you tend to think through what could go wrong and mentally prepare for different worst-case scenarios?"},
-  {sec:"Enneagram",fn:"E6",t:"I test the trustworthiness of people and institutions before fully committing to them.",type:"a",e:"Do you test whether people or systems are actually trustworthy before you fully rely on them?"},
-  {sec:"Enneagram",fn:"E6",t:"I can swing between trusting my own judgment and doubting it completely.",type:"s",e:"Do you sometimes feel totally confident in your judgment and other times doubt it completely?"},
-  {sec:"Enneagram",fn:"E7",t:"I'm highly oriented toward pleasure, novelty, and stimulating future possibilities.",type:"s",e:"Are you drawn to pleasure, new experiences, and exciting possibilities more than most people?"},
-  {sec:"Enneagram",fn:"E7",t:"I reframe painful or difficult experiences into something more positive almost automatically.",type:"a",e:"Do you automatically find a positive spin or silver lining in hard situations — almost without trying?"},
-  {sec:"Enneagram",fn:"E7",t:"Commitment to one path feels like a loss of freedom — even when I know it's necessary.",type:"s",e:"Does locking yourself into one path feel like giving up freedom — even when you know it's the right move?"},
-  {sec:"Enneagram",fn:"E8",t:"I'm direct, confrontational, and refuse to be controlled or dominated by others.",type:"s",e:"Are you direct to the point of bluntness, and do you hate being controlled or pushed around?"},
-  {sec:"Enneagram",fn:"E8",t:"I feel a strong instinct to protect those I see as vulnerable or being taken advantage of.",type:"a",e:"Do you feel a powerful urge to protect people who seem vulnerable or are being exploited?"},
-  {sec:"Enneagram",fn:"E8",t:"I find weakness in myself uncomfortable and work hard to project strength.",type:"s",e:"Does showing weakness make you uncomfortable, so you work hard to project strength instead?"},
-  {sec:"Enneagram",fn:"E9",t:"I tend to minimize my own agenda to maintain peace and avoid friction with others.",type:"s",e:"Do you often set your own wants aside to avoid conflict and keep things peaceful?"},
-  {sec:"Enneagram",fn:"E9",t:"I find it genuinely difficult to identify and assert what I personally want.",type:"a",e:"Is it genuinely hard for you to know what you want — and even harder to actually say it out loud?"},
-  {sec:"Enneagram",fn:"E9",t:"I'm good at seeing multiple sides of a conflict and helping people find common ground.",type:"s",e:"Are you good at seeing both sides of a disagreement and helping people meet in the middle?"},
-  // ── ATTACHMENT (16q) ──
-  {sec:"Attachment",fn:"AT_SEC",t:"I generally trust that people I care about will be there for me when I need them.",type:"s",e:"Do you generally trust that the people you love will actually show up for you when you need them?"},
-  {sec:"Attachment",fn:"AT_SEC",t:"I'm comfortable depending on others and having others depend on me.",type:"a",e:"Are you okay with leaning on people and having people lean on you — does that feel natural, not scary?"},
-  {sec:"Attachment",fn:"AT_SEC",t:"Intimacy doesn't make me feel trapped or overwhelmed — I welcome closeness.",type:"s",e:"Does getting close to someone feel good rather than smothering or overwhelming?"},
-  {sec:"Attachment",fn:"AT_SEC",t:"I rarely worry about being abandoned or about people not caring enough about me.",type:"a",e:"Do you usually not worry that people will leave you or secretly not care about you?"},
-  {sec:"Attachment",fn:"AT_ANX",t:"I often worry that people I care about don't love me as much as I love them.",type:"s",e:"Do you often worry that you care more about people than they care about you?"},
-  {sec:"Attachment",fn:"AT_ANX",t:"I tend to become preoccupied with relationships and spend a lot of mental energy on them.",type:"a",e:"Do you spend a lot of mental energy thinking about your relationships — more than most people?"},
-  {sec:"Attachment",fn:"AT_ANX",t:"I need frequent reassurance that others value and care about me.",type:"s",e:"Do you need regular reassurance from people that they actually like and care about you?"},
-  {sec:"Attachment",fn:"AT_ANX",t:"I sometimes feel that others pull away just as I'm getting closer to them.",type:"a",e:"Does it seem like people pull back or get distant right when you're starting to feel close to them?"},
-  {sec:"Attachment",fn:"AT_AVO",t:"I prefer to handle problems on my own — depending on others makes me uncomfortable.",type:"s",e:"Do you prefer dealing with problems yourself rather than relying on someone else for help?"},
-  {sec:"Attachment",fn:"AT_AVO",t:"I tend to suppress or dismiss my emotional needs to avoid vulnerability.",type:"a",e:"Do you push your emotional needs down or tell yourself they don't matter — to avoid feeling exposed?"},
-  {sec:"Attachment",fn:"AT_AVO",t:"I value independence so highly that intimacy often feels threatening to my autonomy.",type:"s",e:"Does getting too close to someone feel like a threat to your independence?"},
-  {sec:"Attachment",fn:"AT_AVO",t:"When people get too close, I feel a strong urge to create distance.",type:"a",e:"When someone starts getting too close, do you feel the urge to push them back or create space?"},
-  {sec:"Attachment",fn:"AT_DIS",t:"I sometimes feel confused about whether I want closeness or distance in relationships.",type:"s",e:"Do you sometimes feel genuinely confused about whether you want to be closer to people or further away?"},
-  {sec:"Attachment",fn:"AT_DIS",t:"My past experiences make it difficult for me to trust that closeness is safe.",type:"a",e:"Have past experiences made it hard for you to believe that getting close to someone is actually safe?"},
-  {sec:"Attachment",fn:"AT_DIS",t:"I sometimes feel fearful of intimacy but simultaneously crave connection.",type:"s",e:"Do you sometimes both want connection deeply and also feel afraid of it at the same time?"},
-  {sec:"Attachment",fn:"AT_DIS",t:"My behavior in close relationships can feel unpredictable or confusing — even to me.",type:"a",e:"Does your own behavior in close relationships sometimes confuse even you — like you're not sure why you acted that way?"},
-  // ── PHILOSOPHY (24q) ──
-  {sec:"Philosophy",fn:"PH_STO",t:"I believe one should focus only on what is within one's control and remain indifferent to the rest.",type:"s",e:"Do you think the right approach is to focus on what you can control and stop caring about what you can't?"},
-  {sec:"Philosophy",fn:"PH_STO",t:"Emotions that aren't based in reason are distortions that cloud judgment and should be corrected.",type:"a",e:"Do you think feelings that aren't rooted in logic are basically errors that you should fix rather than follow?"},
-  {sec:"Philosophy",fn:"PH_STO",t:"Virtue is the only true good — external circumstances like wealth or status are ultimately indifferent.",type:"s",e:"Do you think being a good person is the only thing that truly matters — and that money, status, and success are basically neutral?"},
-  {sec:"Philosophy",fn:"PH_EPI",t:"The highest aim of life is tranquility, pleasure, and freedom from unnecessary anxiety.",type:"s",e:"Is the goal of a good life basically peace, simple pleasures, and not being eaten up by unnecessary stress?"},
-  {sec:"Philosophy",fn:"PH_EPI",t:"Friendship and community are the greatest sources of lasting happiness.",type:"a",e:"Are close friendships and a tight community the most reliable source of lasting happiness?"},
-  {sec:"Philosophy",fn:"PH_EPI",t:"Most of what humans pursue — status, power, ambition — creates more suffering than it relieves.",type:"s",e:"Do you think chasing status, power, and big ambitions usually makes people more miserable, not less?"},
-  {sec:"Philosophy",fn:"PH_KAN",t:"An action is moral only if it could consistently be made into a universal law for all people.",type:"s",e:"Is an action only truly moral if you'd be okay with everyone doing the same thing in the same situation?"},
-  {sec:"Philosophy",fn:"PH_KAN",t:"People must always be treated as ends in themselves — never merely as means to achieve a goal.",type:"a",e:"Should people always be treated as valuable in themselves — never just used as a tool to get what you want?"},
-  {sec:"Philosophy",fn:"PH_KAN",t:"Duty and principle should override consequences when making ethical decisions.",type:"s",e:"Should you do the right thing regardless of the outcome — even if breaking a rule would lead to better results?"},
-  {sec:"Philosophy",fn:"PH_ARI",t:"Human flourishing — living excellently according to one's nature — is the proper aim of life.",type:"s",e:"Is the real goal of life to become the best version of yourself — to truly flourish as a human being?"},
-  {sec:"Philosophy",fn:"PH_ARI",t:"Virtue is not a feeling or belief but a stable disposition to act excellently that is built through practice.",type:"a",e:"Is being a good person not about feelings but about habits — skills you build up through actually doing good repeatedly?"},
-  {sec:"Philosophy",fn:"PH_ARI",t:"The good life is one of rational activity in accordance with virtue over a complete lifetime.",type:"s",e:"Is a good life basically one where you consistently act wisely and virtuously over your whole life — not just occasionally?"},
-  {sec:"Philosophy",fn:"PH_NIE",t:"Creating your own values beyond conventional morality is the mark of a genuine individual.",type:"s",e:"Is making your own values — rather than inheriting society's — what truly sets an individual apart?"},
-  {sec:"Philosophy",fn:"PH_NIE",t:"Most moral systems are disguised forms of resentment — power dressed up as virtue.",type:"a",e:"Do you think most mainstream morality is actually just resentment and envy dressed up to look like virtue?"},
-  {sec:"Philosophy",fn:"PH_NIE",t:"The goal of human life is to become who you are — to fully realize your unique potential.",type:"s",e:"Is the whole point of life to become fully and completely yourself — to realize what's uniquely in you?"},
-  {sec:"Philosophy",fn:"PH_EXI",t:"Existence precedes essence — there is no pre-given human nature, only choices that define us.",type:"s",e:"Do you think there's no fixed human nature — you are defined entirely by your choices, not by what you were born as?"},
-  {sec:"Philosophy",fn:"PH_EXI",t:"Radical freedom and radical responsibility are the defining conditions of human existence.",type:"a",e:"Are humans completely free — and completely responsible for everything they do as a result?"},
-  {sec:"Philosophy",fn:"PH_EXI",t:"Authentic existence requires confronting absurdity, meaninglessness, and death directly.",type:"s",e:"Does living genuinely require you to face the fact that life is absurd, nothing is guaranteed, and death is real?"},
-  {sec:"Philosophy",fn:"PH_PRA",t:"The worth of an idea should be judged by its practical consequences and utility.",type:"s",e:"Should ideas be judged by what they actually do and produce — not by whether they sound right in theory?"},
-  {sec:"Philosophy",fn:"PH_PRA",t:"Abstract theories disconnected from practical human life are largely useless.",type:"a",e:"Are theories that have no real-world impact on how people live basically a waste of time?"},
-  {sec:"Philosophy",fn:"PH_PRA",t:"Truth is not discovered but made — it's what works in the context of human experience.",type:"s",e:"Is truth not some fixed thing out there to be found, but something we create — whatever works for us?"},
-  {sec:"Philosophy",fn:"PH_SKE",t:"We should withhold judgment on nearly everything and suspend belief in the absence of certainty.",type:"s",e:"Should you hold back your judgment on most things unless you're actually certain — rather than just guessing?"},
-  {sec:"Philosophy",fn:"PH_SKE",t:"Most of what people claim to know is actually belief dressed in the costume of knowledge.",type:"a",e:"Is most of what people call knowledge actually just confident belief — dressed up to sound more certain than it is?"},
-  {sec:"Philosophy",fn:"PH_SKE",t:"The history of human thought is largely a history of confident errors.",type:"s",e:"Is human intellectual history basically a long record of people being very confident about things that later turned out to be wrong?"},
-  // ── EPISTEMOLOGY (12q) ──
-  {sec:"Epistemology",fn:"EP_RAT",t:"Reason alone — independent of sensory experience — can arrive at genuine knowledge.",type:"s",e:"Can pure logical thinking — without needing to observe anything — actually produce real knowledge?"},
-  {sec:"Epistemology",fn:"EP_RAT",t:"Mathematics and logic are the closest human beings come to certain truth.",type:"a",e:"Are math and logic the most reliable forms of truth we have — more trustworthy than anything else?"},
-  {sec:"Epistemology",fn:"EP_RAT",t:"I trust rigorous logical argument over empirical observation when the two conflict.",type:"s",e:"If a logical argument contradicts what you observe, do you tend to trust the logic over what you see?"},
-  {sec:"Epistemology",fn:"EP_EMP",t:"All genuine knowledge ultimately derives from sensory experience and observation.",type:"s",e:"Does all real knowledge ultimately come from observing the world — not from pure thinking?"},
-  {sec:"Epistemology",fn:"EP_EMP",t:"Claims that cannot be tested or falsified through evidence are not meaningful knowledge.",type:"a",e:"If a claim can't be tested or proven wrong through evidence, is it basically not real knowledge?"},
-  {sec:"Epistemology",fn:"EP_EMP",t:"I distrust conclusions that aren't grounded in observable, measurable reality.",type:"s",e:"Are you skeptical of conclusions that can't be backed up by something you can actually observe or measure?"},
-  {sec:"Epistemology",fn:"EP_INT",t:"Some knowledge arrives directly — as immediate insight or intuition — without inference.",type:"s",e:"Does some knowledge just arrive — instantly, as a direct knowing — without you having to reason it out step by step?"},
-  {sec:"Epistemology",fn:"EP_INT",t:"I've had experiences of just knowing something that later proved accurate — beyond explanation.",type:"a",e:"Have you had moments where you just knew something — and it turned out to be right — with no clear logical reason?"},
-  {sec:"Epistemology",fn:"EP_INT",t:"Intuition is not merely feeling — it's a distinct form of cognition that can outperform reasoning.",type:"s",e:"Is intuition more than just a feeling — is it a real way of knowing that can sometimes be more accurate than careful reasoning?"},
-  {sec:"Epistemology",fn:"EP_SKP",t:"Genuine knowledge is so difficult to establish that we should maintain deep uncertainty about most things.",type:"s",e:"Is real knowledge so hard to establish that we should basically stay uncertain about most things?"},
-  {sec:"Epistemology",fn:"EP_SKP",t:"Every epistemological position — including skepticism — is itself uncertain.",type:"a",e:"Is even skepticism itself uncertain — does the claim we can't really know things also fall under its own doubt?"},
-  {sec:"Epistemology",fn:"EP_SKP",t:"I'm skeptical of my own certainties as much as I am of other people's.",type:"s",e:"Do you question your own strong beliefs and certainties just as hard as you question other people's?"},
-  // ── ETHICS (12q) ──
-  {sec:"Ethics",fn:"ET_VIR",t:"The moral quality of an action depends primarily on the character and virtues of the person acting.",type:"s",e:"Is whether an action is moral mostly about what kind of person is doing it — their character — rather than the action itself?"},
-  {sec:"Ethics",fn:"ET_VIR",t:"Asking what a person of excellent character would do is more useful than following rules.",type:"a",e:"Is asking what would a truly good person do here more useful than following a fixed moral rule?"},
-  {sec:"Ethics",fn:"ET_VIR",t:"Ethics is fundamentally about becoming a certain kind of person — not following prescriptions.",type:"s",e:"Is ethics basically about becoming a good person — not about following a list of rules?"},
-  {sec:"Ethics",fn:"ET_CON",t:"The morality of an action is determined solely by its consequences — especially its effects on wellbeing.",type:"s",e:"Is an action only moral or immoral based on what it actually causes — especially whether it helps or harms people?"},
-  {sec:"Ethics",fn:"ET_CON",t:"If lying would produce better outcomes than telling the truth, lying is the right thing to do.",type:"a",e:"If lying would genuinely produce better results than telling the truth, is lying actually the right choice?"},
-  {sec:"Ethics",fn:"ET_CON",t:"We should always try to maximize good outcomes for the greatest number of people.",type:"s",e:"Should we always be trying to produce the best possible outcome for the most people?"},
-  {sec:"Ethics",fn:"ET_DEO",t:"Certain actions are simply right or wrong regardless of their consequences.",type:"s",e:"Are some actions just inherently right or wrong — no matter what the consequences turn out to be?"},
-  {sec:"Ethics",fn:"ET_DEO",t:"There are moral rules that should never be broken — even when breaking them might produce better outcomes.",type:"a",e:"Are there moral rules that should never be broken — even if breaking them would actually make things better?"},
-  {sec:"Ethics",fn:"ET_DEO",t:"Moral integrity requires refusing to do wrong even when doing wrong would lead to better results.",type:"s",e:"Does being a person of integrity mean refusing to do something wrong — even when it would cause a better outcome?"},
-  {sec:"Ethics",fn:"ET_EGO",t:"Each individual is fundamentally responsible for their own interests and flourishing.",type:"s",e:"Is each person ultimately responsible for their own wellbeing and success — not anyone else's job?"},
-  {sec:"Ethics",fn:"ET_EGO",t:"Altruism that ignores one's own rational self-interest is not a virtue but a form of self-destruction.",type:"a",e:"Is giving to others while ignoring your own genuine needs not noble — but actually a form of self-harm?"},
-  {sec:"Ethics",fn:"ET_EGO",t:"A person living fully according to their own rational values is more admirable than one who sacrifices themselves.",type:"s",e:"Is someone who lives boldly by their own values more admirable than someone who constantly sacrifices themselves for others?"},
-  // ── POLITICAL COMPASS (40q) ──
-  {sec:"Political",fn:"PC_ECON_L",t:"The government has a responsibility to reduce economic inequality through redistribution.",type:"s",e:"Should the government actively redistribute wealth to reduce the gap between rich and poor?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"Key industries — healthcare, utilities, housing — should be state-controlled or heavily regulated.",type:"a",e:"Should essential services like healthcare and housing be run or tightly controlled by the government?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"Workers deserve a greater share of corporate profits and decision-making power.",type:"s",e:"Should workers get a bigger cut of company profits and more say in how the company is run?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"Free markets, left to themselves, create exploitation and should be constrained by democratic control.",type:"a",e:"If left alone, do free markets naturally exploit people — and should governments rein them in?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"Universal basic services — healthcare, education, housing — are rights that society owes its members.",type:"s",e:"Are healthcare, education, and housing basic rights that society must provide to everyone?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"The primary purpose of an economy is to serve human needs, not to generate private profit.",type:"a",e:"Should an economy exist to meet people's needs — not to make money for private individuals?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"Extreme concentrations of wealth are a threat to democracy and should be actively broken up.",type:"s",e:"Does massive wealth held by a tiny few undermine democracy — and should it be broken up?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"The gap between the richest and poorest members of society reflects a moral failure that demands correction.",type:"a",e:"Is a huge wealth gap between rich and poor a moral problem that needs to be fixed?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"Corporations have too much power over politics and everyday life and need to be reined in.",type:"s",e:"Do big corporations have too much influence over governments and people's lives?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"A society's moral worth is best measured by how it treats its most vulnerable members.",type:"a",e:"Is the best test of a society's values how it treats its weakest and most vulnerable people?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"Free market competition — not government intervention — is the most efficient allocator of resources.",type:"s",e:"Does free competition between businesses allocate resources better than government control?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"Taxation beyond what is strictly necessary for basic government functions is a form of coercion.",type:"a",e:"Is collecting taxes beyond basic government needs basically forcing people to give up money that's rightfully theirs?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"Economic freedom and strong property rights are the foundation of all other freedoms.",type:"s",e:"Does freedom start with owning your stuff and trading freely — and all other freedoms flow from that?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"Businesses should be free to operate with minimal government interference.",type:"a",e:"Should businesses be largely free to run themselves without the government telling them what to do?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"Wealth created by individuals through their own effort and risk rightfully belongs to them.",type:"s",e:"If someone builds wealth through their own hard work and risk, does that money rightfully belong to them?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"Government welfare programs tend to create dependency and undermine self-reliance.",type:"a",e:"Do government handout programs often end up making people dependent rather than self-sufficient?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"The profit motive, channeled through free markets, produces better outcomes than central planning.",type:"s",e:"Does letting people pursue profit in a free market produce better results than government planning?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"Entrepreneurship and private investment are the primary engines of human progress and prosperity.",type:"a",e:"Is most human progress driven by entrepreneurs and private investors — not governments?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"Lower taxes and smaller government lead to better economic outcomes for everyone.",type:"s",e:"Do lower taxes and a smaller government generally make the economy work better for everyone?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"Individuals are better judges of how to spend their own money than government bureaucracies.",type:"a",e:"Does each person know how to spend their own money better than any government official?"},
-  {sec:"Political",fn:"PC_AUTH",t:"A strong centralized authority is necessary to maintain social order and national security.",type:"s",e:"Does society need a strong central government to keep order and protect people?"},
-  {sec:"Political",fn:"PC_AUTH",t:"Traditional institutions — family, religion, state — provide necessary stability and should be preserved.",type:"a",e:"Do traditional structures like family, religion, and the state provide essential stability worth protecting?"},
-  {sec:"Political",fn:"PC_AUTH",t:"Individual liberty must sometimes be curtailed for the greater good of society.",type:"s",e:"Should individual freedoms sometimes be limited when it's genuinely better for society as a whole?"},
-  {sec:"Political",fn:"PC_AUTH",t:"Some degree of hierarchy and authority in society is natural, inevitable, and beneficial.",type:"a",e:"Is some level of hierarchy and authority in any society natural and actually a good thing?"},
-  {sec:"Political",fn:"PC_AUTH",t:"Social cohesion requires shared values and norms that the state has a legitimate role in upholding.",type:"s",e:"Does keeping society together require shared values — and does government have a role in maintaining them?"},
-  {sec:"Political",fn:"PC_AUTH",t:"A nation's culture and identity are worth protecting through law and policy.",type:"a",e:"Should governments use laws and policy to protect national culture and identity?"},
-  {sec:"Political",fn:"PC_AUTH",t:"Security and stability are more important political goods than maximum individual freedom.",type:"s",e:"Is a safe stable society more important than maximizing everyone's personal freedom?"},
-  {sec:"Political",fn:"PC_AUTH",t:"Strong leadership and decisive authority produce better outcomes than diffuse democratic deliberation.",type:"a",e:"Does strong decisive leadership produce better outcomes than slow democratic debate?"},
-  {sec:"Political",fn:"PC_AUTH",t:"People generally need guidance from authoritative institutions to live well and avoid harmful choices.",type:"s",e:"Do most people need guidance from authorities — government, religion, tradition — to make good choices?"},
-  {sec:"Political",fn:"PC_AUTH",t:"The bonds of community, tradition, and shared identity should constrain individual behavior.",type:"a",e:"Should community ties, traditions, and shared identity appropriately limit what individuals do?"},
-  {sec:"Political",fn:"PC_LIB",t:"Individual freedom should be maximized and government power over personal life minimized.",type:"s",e:"Should personal freedom be as large as possible, with government having as little power over your life as possible?"},
-  {sec:"Political",fn:"PC_LIB",t:"No authority — government, religion, or tradition — has the right to dictate personal choices.",type:"a",e:"Does no authority have the right to tell you how to live your personal life?"},
-  {sec:"Political",fn:"PC_LIB",t:"Decentralization of power is more important than the efficiency gains of centralized governance.",type:"s",e:"Is spreading power away from central authorities more important than the efficiency of centralized control?"},
-  {sec:"Political",fn:"PC_LIB",t:"Civil liberties and individual rights should be inviolable even against majority democratic opinion.",type:"a",e:"Should individual rights be protected even when the majority democratically votes to remove them?"},
-  {sec:"Political",fn:"PC_LIB",t:"Voluntary cooperation without coercion is the ideal basis for social organization.",type:"s",e:"Is a society built on people freely choosing to cooperate — without being forced — the ideal?"},
-  {sec:"Political",fn:"PC_LIB",t:"The state has no legitimate authority over what consenting adults choose to do or believe.",type:"a",e:"Should the government have no say over what adults choose to do or believe — as long as everyone consents?"},
-  {sec:"Political",fn:"PC_LIB",t:"Drug prohibition, censorship, and other paternalistic laws do more harm than good.",type:"s",e:"Do laws that try to protect people from themselves — like banning drugs or restricting speech — cause more problems than they solve?"},
-  {sec:"Political",fn:"PC_LIB",t:"People should be free to live according to their own conception of the good life without interference.",type:"a",e:"Should people be free to live however they define a good life — without anyone else interfering?"},
-  {sec:"Political",fn:"PC_LIB",t:"Most political problems stem from too much state power, not too little.",type:"s",e:"Are most political and social problems caused by governments having too much power?"},
-  {sec:"Political",fn:"PC_LIB",t:"The individual conscience is a more reliable moral guide than any collective authority.",type:"a",e:"Is your own conscience a more reliable moral guide than any government, church, or social tradition?"},
-  // ── TEMPERAMENT (16q) ──
-  {sec:"Temperament",fn:"TMP_CHO",t:"I'm action-oriented, decisive, and naturally take the lead in most situations.",type:"s",e:"Do you naturally step up, make decisions, and take charge in most situations?"},
-  {sec:"Temperament",fn:"TMP_CHO",t:"I have strong opinions and am not afraid to challenge others when I believe they're wrong.",type:"a",e:"Do you hold strong views and readily push back on people you think are wrong?"},
-  {sec:"Temperament",fn:"TMP_CHO",t:"I'm highly goal-driven and can become impatient with slow-moving people or processes.",type:"s",e:"Are you very goal-focused, and do you get impatient with people or processes that move too slowly?"},
-  {sec:"Temperament",fn:"TMP_CHO",t:"I prefer to act and correct course if needed rather than wait until everything is certain.",type:"a",e:"Do you prefer to just act and fix mistakes later — rather than waiting until you're completely sure?"},
-  {sec:"Temperament",fn:"TMP_MEL",t:"I'm deeply reflective and spend significant time analyzing my own thoughts and motivations.",type:"s",e:"Do you spend a lot of time thinking deeply about your own thoughts, motivations, and inner life?"},
-  {sec:"Temperament",fn:"TMP_MEL",t:"I tend to take a pessimistic or cautious view and carefully consider what could go wrong.",type:"a",e:"Do you tend toward caution and think carefully about what could go wrong before acting?"},
-  {sec:"Temperament",fn:"TMP_MEL",t:"I have high standards for myself and others and am rarely fully satisfied with any outcome.",type:"s",e:"Do you hold yourself and others to very high standards — and rarely feel fully satisfied with any result?"},
-  {sec:"Temperament",fn:"TMP_MEL",t:"I'm deeply sensitive to criticism and take perceived failures seriously.",type:"a",e:"Does criticism hit you hard, and do you take failures seriously rather than brushing them off?"},
-  {sec:"Temperament",fn:"TMP_SAN",t:"I'm naturally optimistic, sociable, and able to lift the mood of those around me.",type:"s",e:"Are you naturally upbeat and social, and do you tend to make the atmosphere better wherever you go?"},
-  {sec:"Temperament",fn:"TMP_SAN",t:"I enjoy being the center of attention and am energized by social interaction.",type:"a",e:"Do you like being the center of attention and feel energized after spending time with people?"},
-  {sec:"Temperament",fn:"TMP_SAN",t:"I tend to start many projects enthusiastically but have difficulty maintaining focus over time.",type:"s",e:"Do you start things with a lot of excitement but struggle to keep the focus going over time?"},
-  {sec:"Temperament",fn:"TMP_SAN",t:"I process emotions quickly and move on — I don't dwell on setbacks for long.",type:"a",e:"Do you process emotions fast and move on — you don't sit in bad feelings or setbacks for long?"},
-  {sec:"Temperament",fn:"TMP_PHL",t:"I'm calm, stable, and consistent — it takes a lot to genuinely upset or destabilize me.",type:"s",e:"Are you generally calm and steady — it takes a lot to actually rattle or destabilize you?"},
-  {sec:"Temperament",fn:"TMP_PHL",t:"I prefer to observe and think before acting and can be slow to make decisions.",type:"a",e:"Do you prefer to watch, listen, and think before acting — sometimes taking a while to make decisions?"},
-  {sec:"Temperament",fn:"TMP_PHL",t:"I tend to be highly reliable and dependable — people know what to expect from me.",type:"s",e:"Are you reliable and consistent — people can count on you to show up and follow through?"},
-  {sec:"Temperament",fn:"TMP_PHL",t:"I prefer harmony and cooperation to conflict, even when conflict might be more efficient.",type:"a",e:"Do you prefer keeping things peaceful and cooperative — even when a direct confrontation might solve things faster?"},
-  // ── INSTINCTUAL VARIANTS (12q) ──
-  {sec:"Instinctual",fn:"IV_SP",t:"I pay close attention to my physical health, finances, resources, and long-term security.",type:"s",e:"Do you pay careful attention to your health, money, and resources — always keeping an eye on your long-term security?"},
-  {sec:"Instinctual",fn:"IV_SP",t:"I need to feel physically and materially grounded before I can focus on much else.",type:"a",e:"Do you need to feel stable and secure physically and financially before you can really focus on anything else?"},
-  {sec:"Instinctual",fn:"IV_SP",t:"I tend to be highly self-sufficient and am very careful about how I use my time and energy.",type:"s",e:"Do you prefer handling things yourself and are careful about how you spend your time and energy?"},
-  {sec:"Instinctual",fn:"IV_SP",t:"Building and maintaining a stable, comfortable life environment is a central concern for me.",type:"a",e:"Is creating and maintaining a stable comfortable living situation one of your central priorities?"},
-  {sec:"Instinctual",fn:"IV_SOC",t:"I'm highly aware of my position within groups and social hierarchies.",type:"s",e:"Are you very aware of where you stand in groups — your status, role, and position relative to others?"},
-  {sec:"Instinctual",fn:"IV_SOC",t:"Recognition, belonging, and status within my community matter deeply to me.",type:"a",e:"Does being recognized, belonging, and having a respected place in your community matter a lot to you?"},
-  {sec:"Instinctual",fn:"IV_SOC",t:"I often think about how my actions will be perceived by others and by society.",type:"s",e:"Do you often think about how what you're doing looks to other people and to society generally?"},
-  {sec:"Instinctual",fn:"IV_SOC",t:"Being part of something larger than myself — a cause, community, or movement — is important to me.",type:"a",e:"Is being part of something bigger than yourself — a cause, community, or movement — genuinely important to you?"},
-  {sec:"Instinctual",fn:"IV_SX",t:"When I connect with something — a person, idea, or project — I become intensely focused on it.",type:"s",e:"When something captures your attention — a person, an idea, a project — do you become deeply and intensely absorbed in it?"},
-  {sec:"Instinctual",fn:"IV_SX",t:"I'm drawn to intensity, chemistry, and deep one-on-one connection more than broad social engagement.",type:"a",e:"Are you more drawn to intense one-on-one chemistry and connection than to socializing broadly with groups?"},
-  {sec:"Instinctual",fn:"IV_SX",t:"I'm attracted to what captivates me regardless of whether it's practical or sensible.",type:"s",e:"Are you drawn to what captivates you — even when it's impractical or doesn't make logical sense?"},
-  {sec:"Instinctual",fn:"IV_SX",t:"I tend to merge intensely with people or ideas I'm passionate about — almost losing myself in them.",type:"a",e:"When you're passionate about someone or something, do you tend to lose yourself in it — almost merging with it completely?"},
-  // ── SOCIAL & INTERPERSONAL (12q) ──
-  {sec:"Social",fn:"SOC_DOM",t:"I naturally assert my presence in most social situations — people tend to follow my lead.",type:"s",e:"Do you naturally take up space in social situations and find people tend to follow your lead?"},
-  {sec:"Social",fn:"SOC_DOM",t:"I find it easy to command respect and attention without having to demand it.",type:"a",e:"Do you find that people respect and pay attention to you without you having to ask for it?"},
-  {sec:"Social",fn:"SOC_INT",t:"I prefer deep one-on-one conversation to group social interaction.",type:"s",e:"Do you prefer a real one-on-one conversation over being in a group social setting?"},
-  {sec:"Social",fn:"SOC_INT",t:"I need significant time alone to recharge and feel like myself.",type:"a",e:"Do you genuinely need a good chunk of alone time to recharge and feel like yourself again?"},
-  {sec:"Social",fn:"SOC_INT",t:"I find small talk draining and rarely initiate social interactions.",type:"s",e:"Does small talk drain you — and do you rarely go out of your way to start social interactions?"},
-  {sec:"Social",fn:"SOC_INT",t:"I'm selective about who I allow into my inner world and trust very few people deeply.",type:"a",e:"Do you keep your real self protected and only truly open up to a very small number of people?"},
-  {sec:"Social",fn:"SOC_WAR",t:"People I know well describe me as warm, open, and easy to be around.",type:"s",e:"Would the people who know you well describe you as warm, open, and easy to be around?"},
-  {sec:"Social",fn:"SOC_WAR",t:"I genuinely enjoy other people and find most people interesting or lovable in some way.",type:"a",e:"Do you genuinely like people — and find most of them interesting or endearing in some way?"},
-  {sec:"Social",fn:"SOC_DIR",t:"I say what I mean directly and find indirect or passive communication frustrating.",type:"s",e:"Do you say what you mean directly and get frustrated when people hint or communicate passively instead?"},
-  {sec:"Social",fn:"SOC_DIR",t:"I'm comfortable delivering uncomfortable truths when I think they need to be said.",type:"a",e:"Are you comfortable telling people difficult truths when you think they need to hear it?"},
-  {sec:"Social",fn:"SOC_DIR",t:"I prefer bluntness over diplomatic ambiguity — even when it creates friction.",type:"s",e:"Do you prefer being blunt and clear over being diplomatically vague — even if it causes some friction?"},
-  {sec:"Social",fn:"SOC_DIR",t:"People sometimes find my directness confrontational even when I don't intend it to be.",type:"a",e:"Do people sometimes react to you as confrontational or harsh — even when you weren't trying to be?"},
-  // ── ALONE SELF (9q) ──
-  {sec:"Alone Self",fn:"AL_INT",t:"When alone I'm primarily in my own head — analyzing, planning, imagining, or theorizing.",type:"s",e:"When you're alone, is your mind mostly busy — analyzing, planning, imagining, or building ideas?"},
-  {sec:"Alone Self",fn:"AL_INT",t:"I'm most authentically myself when alone — social situations require some performance from me.",type:"a",e:"Are you most truly yourself when you're alone — and does being around people require some adjustment?"},
-  {sec:"Alone Self",fn:"AL_INT",t:"I find long periods of solitude genuinely restorative rather than uncomfortable.",type:"s",e:"Do long stretches of being alone feel genuinely refreshing and good — not lonely or uncomfortable?"},
-  {sec:"Alone Self",fn:"AL_INT",t:"I pursue my intellectual interests with great intensity when no one is watching.",type:"a",e:"When nobody's around, do you dive into your intellectual interests with serious intensity?"},
-  {sec:"Alone Self",fn:"AL_SEN",t:"When alone I tend to be highly self-critical and hold internal conversations with an inner judge.",type:"s",e:"When you're alone, do you tend to be hard on yourself — with an inner voice that criticizes and judges you?"},
-  {sec:"Alone Self",fn:"AL_SEN",t:"Solitude gives me space to feel the full weight of emotions I suppress in public.",type:"a",e:"Does being alone let you feel emotions you've been holding back around other people?"},
-  {sec:"Alone Self",fn:"AL_SEN",t:"Left to myself I naturally gravitate toward melancholy or deep reflection.",type:"s",e:"When left to yourself, do you naturally drift toward a reflective, quiet, or even melancholy mood?"},
-  {sec:"Alone Self",fn:"AL_SEN",t:"I have a rich inner life that most people around me have no idea exists.",type:"a",e:"Do you have a deep rich inner world that the people around you mostly have no idea about?"},
-  {sec:"Alone Self",fn:"AL_INT",t:"I use solitude productively — to create, build, read, or refine my understanding of things.",type:"s",e:"Do you use your alone time productively — reading, creating, building, or deepening your understanding of things?"},
-  // ── MORAL FOUNDATIONS (8q) ──
-  {sec:"Moral",fn:"MF_CARE",t:"Compassion for those who suffer is the most fundamental moral motivation.",type:"s",e:"Is caring about people who suffer the most basic and important moral drive there is?"},
-  {sec:"Moral",fn:"MF_FAIR",t:"Fairness and equal treatment are the bedrock of a just society.",type:"a",e:"Is treating everyone fairly and equally the most essential foundation of a just society?"},
-  {sec:"Moral",fn:"MF_LOY",t:"Loyalty to one's group and honoring commitments are genuine moral virtues.",type:"s",e:"Is being loyal to your group and keeping your commitments a genuinely important moral virtue?"},
-  {sec:"Moral",fn:"MF_AUTH",t:"Respect for legitimate authority and social hierarchy is morally important.",type:"a",e:"Is respecting proper authority and the natural hierarchy of society morally important?"},
-  {sec:"Moral",fn:"MF_PUR",t:"There are actions that are simply degrading or impure — even if no one is directly harmed.",type:"s",e:"Are there things that are just wrong or degrading — even when nobody actually gets hurt by them?"},
-  {sec:"Moral",fn:"MF_LIB",t:"The freedom of individuals from coercion is the most fundamental moral principle.",type:"a",e:"Is the most basic moral principle simply that nobody should be forced or coerced against their will?"},
-  {sec:"Moral",fn:"MF_FAIR",t:"I'm highly sensitive to cheating, exploitation, and people taking more than their fair share.",type:"s",e:"Does cheating, exploitation, or someone taking more than their fair share bother you strongly?"},
-  {sec:"Moral",fn:"MF_CARE",t:"When I see someone suffering — even a stranger — I feel a strong pull to help.",type:"a",e:"When you see someone in pain — even a total stranger — do you feel a strong urge to do something to help?"},
-  // ── EXTRA 20 QUESTIONS (total: 280) ──
-  {sec:"Cognitive",fn:"Ti",t:"I often find myself redesigning systems in my head just for the intellectual satisfaction of it.",type:"s",e:"Do you mentally rebuild or improve things just because it feels satisfying — not because you have to?"},
-  {sec:"Cognitive",fn:"Fe",t:"When someone close to me is hurting, I feel a physical pull to do something — I cannot simply observe.",type:"a",e:"When someone you care about is in pain, do you feel a strong urge to act — like you physically can't just watch?"},
-  {sec:"Cognitive",fn:"Ni",t:"I often distrust my own certainties precisely because they feel so clear and inevitable.",type:"s",e:"Do you sometimes question your strongest gut feelings — almost suspicious of how confident they make you feel?"},
-  {sec:"Cognitive",fn:"Se",t:"I notice when people shift their posture, tone, or energy — often before they say a word.",type:"a",e:"Are you good at picking up subtle physical or emotional changes in people before they say anything?"},
-  {sec:"Cognitive",fn:"Ne",t:"I find single-answer explanations deeply unsatisfying — reality always seems to have more layers.",type:"s",e:"Do you feel frustrated by simple explanations? Does reality always seem more complex and layered to you?"},
-  {sec:"Enneagram",fn:"E3",t:"I'm highly aware of how I come across and adjust my presentation based on the audience.",type:"s",e:"Are you conscious of your image and do you shift how you present yourself depending on who you're with?"},
-  {sec:"Enneagram",fn:"E7",t:"I find it difficult to stay with one thing long enough to master it — something new always pulls me away.",type:"a",e:"Do you struggle to stick with one thing long enough to truly master it, because new things keep pulling your attention?"},
-  {sec:"Enneagram",fn:"E4",t:"I have a persistent sense that others experience life in a simpler, less intense way than I do.",type:"s",e:"Do you feel most people experience life less deeply or intensely than you — like your inner world is on a different frequency?"},
-  {sec:"Enneagram",fn:"E8",t:"I respect people who can push back against me — I distrust those who just go along with everything I say.",type:"a",e:"Do you actually respect people more when they challenge you, and distrust those who always agree?"},
-  {sec:"Enneagram",fn:"E5",t:"I need to mentally prepare before social events — I budget my energy like a resource that can run out.",type:"s",e:"Before social situations, do you mentally prepare and budget your energy, knowing it will drain and need to be restored alone?"},
-  {sec:"Political",fn:"PC_ECON_R",t:"Minimum wage laws, however well-intentioned, ultimately harm the workers they are meant to protect.",type:"s",e:"Do you believe minimum wage laws end up hurting workers by reducing jobs — even if they're meant to help?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"Profit extracted from labour is fundamentally a form of exploitation that no market mechanism can justify.",type:"a",e:"Do you think that when a company profits from workers labour, it is always exploitation the free market can't justify?"},
-  {sec:"Political",fn:"PC_AUTH",t:"Open borders are a threat to national sovereignty and cultural cohesion and should be firmly resisted.",type:"s",e:"Do you think unrestricted immigration undermines a nation's ability to govern itself and maintain a shared culture?"},
-  {sec:"Political",fn:"PC_LIB",t:"Laws against victimless crimes — drug use, gambling, consensual adult behaviour — should be abolished.",type:"a",e:"Should laws that punish people for things that don't harm anyone else — like adult drug use — simply be removed?"},
-  {sec:"Political",fn:"PC_ECON_L",t:"The housing crisis exists because homes are treated as investment assets rather than places to live.",type:"s",e:"Do you think housing is expensive because investors treat homes as a way to make money rather than places to live?"},
-  {sec:"Philosophy",fn:"PH_ARI",t:"A good life cannot be lived in isolation — human beings are fundamentally social and political animals.",type:"s",e:"Do you believe a truly good life requires community — that you can't flourish completely alone?"},
-  {sec:"Ethics",fn:"ET_EGO",t:"The demand that individuals sacrifice their genuine interests for the collective is a form of moral coercion.",type:"a",e:"Do you think asking someone to sacrifice what's good for them for the sake of the group is a kind of moral coercion?"},
-  {sec:"Philosophy",fn:"PH_SKE",t:"Even our most basic logical intuitions — like the law of non-contradiction — cannot be proven without circularity.",type:"s",e:"Do you think even our most fundamental logical rules can't actually be proven without going in circles?"},
-  {sec:"Ethics",fn:"ET_CON",t:"If a small injustice to one person would prevent enormous suffering for thousands, it is morally required.",type:"a",e:"If doing something slightly unfair to one person would prevent massive suffering for thousands, are you morally obligated to do it?"},
-  {sec:"Philosophy",fn:"PH_STO",t:"The wise person is indifferent to death — not because life has no value, but because death is simply not within our control.",type:"s",e:"Do you think a wise person accepts death calmly — not because life is worthless, but because death is outside your control?"},
+  {sec:"Cognitive","fn":"Ni","t":"A major decision is coming up. How do you approach it?","type":"mc","choices":[{l:"A",t:"I get a strong inner sense of the right answer before I can explain it","s":7},{l:"B",t:"I research all available options and compare them systematically","s":2},{l:"C",t:"I ask people I trust for their perspectives","s":3},{l:"D",t:"I go with whatever feels good in the moment","s":1}]},
+  {sec:"Cognitive","fn":"Ni","t":"When reading a complex situation, you tend to:","type":"mc","choices":[{l:"A",t:"See the underlying pattern that explains everything at once","s":7},{l:"B",t:"Break it into logical components and analyze each one","s":2},{l:"C",t:"Focus on how it affects the people involved","s":3},{l:"D",t:"Notice the concrete facts and details on the surface","s":1}]},
+  {sec:"Cognitive","fn":"Ni","t":"Your strongest predictions about the future come from:","type":"mc","choices":[{l:"A",t:"An internal image that feels inevitable \u2014 I just know","s":7},{l:"B",t:"Careful analysis of trends and data","s":2},{l:"C",t:"Talking things through with others to see patterns","s":3},{l:"D",t:"What's happening right now in front of me","s":1}]},
+  {sec:"Cognitive","fn":"Ni","t":"When working on a long project, what drives you most?","type":"mc","choices":[{l:"A",t:"A singular clear vision of the end result I'm working toward","s":7},{l:"B",t:"Hitting measurable milestones along the way","s":3},{l:"C",t:"The people I'm doing it for or with","s":2},{l:"D",t:"Figuring things out as I go based on what emerges","s":1}]},
+  {sec:"Cognitive","fn":"Ni","t":"Which best describes how your insights usually arrive?","type":"mc","choices":[{l:"A",t:"Sudden, fully-formed \u2014 like the answer was always there","s":7},{l:"B",t:"Through step-by-step logical reasoning","s":2},{l:"C",t:"Through discussion and feedback from others","s":3},{l:"D",t:"Through hands-on experience and trial and error","s":4}]},
+  {sec:"Cognitive","fn":"Ni","t":"In a conversation, you're more likely to:","type":"mc","choices":[{l:"A",t:"Sense what the person really means beneath what they're saying","s":7},{l:"B",t:"Focus on the logical consistency of what they're arguing","s":2},{l:"C",t:"Pick up on how they're feeling emotionally","s":4},{l:"D",t:"Respond to the specific words and facts they use","s":1}]},
+  {sec:"Cognitive","fn":"Ni","t":"When something is wrong but you can't explain why, you:","type":"mc","choices":[{l:"A",t:"Trust the feeling \u2014 it's almost always right","s":7},{l:"B",t:"Dismiss it until you can back it up with evidence","s":1},{l:"C",t:"Ask others if they sense it too before acting","s":3},{l:"D",t:"Gather more data before drawing any conclusion","s":2}]},
+  {sec:"Cognitive","fn":"Ne","t":"When brainstorming, you tend to:","type":"mc","choices":[{l:"A",t:"Generate dozens of ideas and keep expanding \u2014 more options is better","s":7},{l:"B",t:"Converge quickly on one strong direction and refine it","s":1},{l:"C",t:"Generate ideas based on what others seem excited about","s":3},{l:"D",t:"Focus on ideas that are concrete and immediately doable","s":2}]},
+  {sec:"Cognitive","fn":"Ne","t":"Starting something new versus finishing something old:","type":"mc","choices":[{l:"A",t:"Starting is almost always more exciting \u2014 beginnings are where the energy is","s":7},{l:"B",t:"Finishing is more satisfying \u2014 closure matters more to me","s":1},{l:"C",t:"Depends entirely on who needs what from me","s":3},{l:"D",t:"I prefer projects with clear steps and a definite end","s":2}]},
+  {sec:"Cognitive","fn":"Ne","t":"Two unrelated topics come up in conversation. You instinctively:","type":"mc","choices":[{l:"A",t:"Get excited about the surprising connection between them","s":7},{l:"B",t:"Keep them separate \u2014 mixing topics muddies clarity","s":1},{l:"C",t:"Use the connection to help the other person see something new","s":4},{l:"D",t:"Stay focused on whichever topic is most relevant right now","s":2}]},
+  {sec:"Cognitive","fn":"Ne","t":"When you encounter a new problem, your first instinct is to:","type":"mc","choices":[{l:"A",t:"Explore as many possible angles and solutions as you can think of","s":7},{l:"B",t:"Apply a proven framework or method that works","s":2},{l:"C",t:"Ask others how they've handled similar situations","s":3},{l:"D",t:"Start trying things hands-on until something clicks","s":4}]},
+  {sec:"Cognitive","fn":"Ne","t":"Your conversations typically:","type":"mc","choices":[{l:"A",t:"Jump between topics as new connections spark \u2014 it feels alive","s":7},{l:"B",t:"Follow one thread to its conclusion before moving on","s":1},{l:"C",t:"Revolve around the other person and their experiences","s":3},{l:"D",t:"Stay grounded in concrete situations and real events","s":2}]},
+  {sec:"Cognitive","fn":"Ne","t":"Rules and established procedures feel:","type":"mc","choices":[{l:"A",t:"Like obstacles \u2014 there's almost always a better way if you look for it","s":7},{l:"B",t:"Like useful structures that prevent costly mistakes","s":2},{l:"C",t:"Like things that should be evaluated based on their impact on people","s":4},{l:"D",t:"Like foundations \u2014 stability is more valuable than novelty","s":1}]},
+  {sec:"Cognitive","fn":"Ne","t":"The idea of exploring a completely unfamiliar field feels:","type":"mc","choices":[{l:"A",t:"Genuinely exciting \u2014 there's so much to discover","s":7},{l:"B",t:"Interesting but I'd prefer depth in one area over breadth in many","s":2},{l:"C",t:"Worth it if it helps me connect better with others","s":3},{l:"D",t:"Risky \u2014 I'd rather build expertise in something proven","s":1}]},
+  {sec:"Cognitive","fn":"Ti","t":"When you learn something new, you need to:","type":"mc","choices":[{l:"A",t:"Understand how it works internally \u2014 the underlying logic \u2014 before I accept it","s":7},{l:"B",t:"See that it produces results \u2014 I trust outcomes over theory","s":2},{l:"C",t:"See how it applies to real people and situations","s":3},{l:"D",t:"Try it myself to see what actually happens","s":4}]},
+  {sec:"Cognitive","fn":"Ti","t":"In an argument, what matters most to you?","type":"mc","choices":[{l:"A",t:"Logical consistency \u2014 if the reasoning has a flaw, the conclusion fails","s":7},{l:"B",t:"Whether the conclusion actually works in practice","s":3},{l:"C",t:"Whether both sides feel heard and respected","s":2},{l:"D",t:"What the evidence and data say","s":4}]},
+  {sec:"Cognitive","fn":"Ti","t":"An expert claims something that doesn't make logical sense to you. You:","type":"mc","choices":[{l:"A",t:"Question it until you understand why \u2014 authority doesn't override logic","s":7},{l:"B",t:"Defer to their expertise and adjust your view","s":2},{l:"C",t:"Try to understand where the disconnect is and find common ground","s":3},{l:"D",t:"Look for empirical evidence to settle it","s":4}]},
+  {sec:"Cognitive","fn":"Ti","t":"When you're alone, what do you most often think about?","type":"mc","choices":[{l:"A",t:"Problems I'm trying to solve or frameworks I'm refining","s":7},{l:"B",t:"Plans and strategies for goals I'm working toward","s":3},{l:"C",t:"Relationships and what people said or felt","s":2},{l:"D",t:"What I've recently experienced \u2014 replaying events","s":1}]},
+  {sec:"Cognitive","fn":"Ti","t":"You prefer explanations that are:","type":"mc","choices":[{l:"A",t:"Precise and internally coherent, even if complex","s":7},{l:"B",t:"Efficient and result-oriented","s":3},{l:"C",t:"Relatable with human context and examples","s":2},{l:"D",t:"Grounded in tangible, concrete evidence","s":4}]},
+  {sec:"Cognitive","fn":"Ti","t":"Inconsistencies in someone's reasoning make you:","type":"mc","choices":[{l:"A",t:"Immediately notice and feel compelled to point them out","s":7},{l:"B",t:"Overlook if the outcome they're reaching for is good","s":2},{l:"C",t:"Gently raise so everyone can think it through together","s":3},{l:"D",t:"Set aside for now and focus on what needs to get done","s":1}]},
+  {sec:"Cognitive","fn":"Ti","t":"Your ideal intellectual environment is:","type":"mc","choices":[{l:"A",t:"Solo deep work on a complex problem \u2014 no interruptions","s":7},{l:"B",t:"Collaborative execution toward a shared concrete goal","s":2},{l:"C",t:"Discussion and debate with people whose minds challenge mine","s":5},{l:"D",t:"Hands-on work where I can see real-world results","s":1}]},
+  {sec:"Cognitive","fn":"Te","t":"When a group isn't making progress, you tend to:","type":"mc","choices":[{l:"A",t:"Step in, identify the bottleneck, and restructure how things are organized","s":7},{l:"B",t:"Think through the problem privately and then offer a solution","s":4},{l:"C",t:"Check in on the team to see if interpersonal issues are blocking things","s":2},{l:"D",t:"Let it unfold and see what naturally emerges","s":1}]},
+  {sec:"Cognitive","fn":"Te","t":"Success to you means primarily:","type":"mc","choices":[{l:"A",t:"Measurable results \u2014 completed goals, visible outcomes","s":7},{l:"B",t:"Having understood something deeply and correctly","s":3},{l:"C",t:"Having made a positive difference in people's lives","s":2},{l:"D",t:"Having had rich, authentic experiences","s":1}]},
+  {sec:"Cognitive","fn":"Te","t":"Feedback should be:","type":"mc","choices":[{l:"A",t:"Direct and specific \u2014 sugarcoating wastes time","s":7},{l:"B",t:"Logically structured so the recipient understands the reasoning","s":5},{l:"C",t:"Delivered with sensitivity to how it will land emotionally","s":2},{l:"D",t:"Given only when explicitly asked for","s":1}]},
+  {sec:"Cognitive","fn":"Te","t":"When leading a project you naturally focus on:","type":"mc","choices":[{l:"A",t:"Creating clear timelines, assigning roles, and tracking progress","s":7},{l:"B",t:"Making sure the conceptual framework is sound before executing","s":4},{l:"C",t:"Making sure everyone on the team feels supported and motivated","s":2},{l:"D",t:"Responding to what the situation demands as it unfolds","s":1}]},
+  {sec:"Cognitive","fn":"Te","t":"When someone gives you an idea, you immediately think:","type":"mc","choices":[{l:"A",t:"How do we actually implement this? What are the steps?","s":7},{l:"B",t:"Is this logically sound? Are the premises correct?","s":4},{l:"C",t:"How will this affect the people involved?","s":2},{l:"D",t:"Has something like this been tried before? What happened?","s":3}]},
+  {sec:"Cognitive","fn":"Te","t":"Your relationship with rules and systems is:","type":"mc","choices":[{l:"A",t:"I build them \u2014 good systems make everything more efficient","s":7},{l:"B",t:"I work within them but question their logic when needed","s":4},{l:"C",t:"I evaluate them by their effect on people","s":2},{l:"D",t:"I find them constraining \u2014 I prefer flexibility","s":1}]},
+  {sec:"Cognitive","fn":"Te","t":"Decisions should be based primarily on:","type":"mc","choices":[{l:"A",t:"Objective criteria, measurable data, and established best practices","s":7},{l:"B",t:"Internal logical analysis \u2014 what is most consistent and correct","s":5},{l:"C",t:"What produces the best outcome for everyone affected","s":3},{l:"D",t:"Instinct and experience built up over time","s":2}]},
+  {sec:"Cognitive","fn":"Fi","t":"When making a moral decision, you rely on:","type":"mc","choices":[{l:"A",t:"A deep internal sense of what feels right \u2014 even if I can't fully explain it","s":7},{l:"B",t:"Universal principles that should apply to everyone equally","s":3},{l:"C",t:"What produces the best outcome for the people involved","s":4},{l:"D",t:"Logical consistency \u2014 what follows from the premises","s":2}]},
+  {sec:"Cognitive","fn":"Fi","t":"When someone shares a popular opinion you disagree with:","type":"mc","choices":[{l:"A",t:"I hold my ground internally even if I don't always voice it","s":7},{l:"B",t:"I present my logical counter-argument","s":3},{l:"C",t:"I try to understand their perspective before responding","s":4},{l:"D",t:"I often go along \u2014 harmony matters more than winning","s":1}]},
+  {sec:"Cognitive","fn":"Fi","t":"Authenticity to you means:","type":"mc","choices":[{l:"A",t:"Living in alignment with my own deep values, regardless of what others think","s":7},{l:"B",t:"Being honest and consistent in what I say to others","s":4},{l:"C",t:"Being emotionally genuine in my relationships","s":5},{l:"D",t:"Doing what I actually believe produces good outcomes","s":3}]},
+  {sec:"Cognitive","fn":"Fi","t":"When a cause conflicts with what society expects of you, you:","type":"mc","choices":[{l:"A",t:"Follow the cause \u2014 social approval doesn't override what I know is right","s":7},{l:"B",t:"Weigh the logical merits of each side before deciding","s":3},{l:"C",t:"Consider how acting on the cause will affect those close to me","s":4},{l:"D",t:"Usually go with what's socially expected \u2014 conflict isn't worth it","s":1}]},
+  {sec:"Cognitive","fn":"Fi","t":"Your inner emotional world is:","type":"mc","choices":[{l:"A",t:"Rich and complex \u2014 something I protect and rarely share fully","s":7},{l:"B",t:"Something I'm aware of but mostly keep separate from my thinking","s":3},{l:"C",t:"Something I share openly \u2014 it connects me to others","s":2},{l:"D",t:"Less prominent than my external experiences and activities","s":1}]},
+  {sec:"Cognitive","fn":"Fi","t":"What makes something meaningful to you is:","type":"mc","choices":[{l:"A",t:"That it aligns with who I truly am and what I personally value","s":7},{l:"B",t:"That it's logically worthwhile and makes sense to pursue","s":3},{l:"C",t:"That it matters to the people I care about","s":4},{l:"D",t:"That it produces visible, tangible results in the world","s":2}]},
+  {sec:"Cognitive","fn":"Fi","t":"When you witness something that violates your values, you feel:","type":"mc","choices":[{l:"A",t:"A deep visceral wrongness \u2014 I can't let it pass even if I say nothing","s":7},{l:"B",t:"The urge to identify what principle was violated and address it","s":3},{l:"C",t:"Concern for whoever was hurt \u2014 I want to help them","s":4},{l:"D",t:"Irritation, but I move on fairly quickly","s":2}]},
+  {sec:"Cognitive","fn":"Fe","t":"When you walk into a room, you naturally:","type":"mc","choices":[{l:"A",t:"Read the emotional atmosphere and adjust to make everyone comfortable","s":7},{l:"B",t:"Assess the situation and identify what needs to get done","s":2},{l:"C",t:"Observe quietly before engaging","s":3},{l:"D",t:"Take in the physical environment and what's happening concretely","s":1}]},
+  {sec:"Cognitive","fn":"Fe","t":"In a conflict between two friends, you instinctively:","type":"mc","choices":[{l:"A",t:"Try to restore the relationship and help both sides feel understood","s":7},{l:"B",t:"Analyze who is actually right and say so","s":2},{l:"C",t:"Sit with it privately before offering any input","s":3},{l:"D",t:"Focus on solving the practical problem causing the conflict","s":4}]},
+  {sec:"Cognitive","fn":"Fe","t":"What you find most rewarding about relationships is:","type":"mc","choices":[{l:"A",t:"Genuine warmth, mutual care, and feeling truly connected","s":7},{l:"B",t:"Intellectual stimulation and honest exchange of ideas","s":2},{l:"C",t:"Deep one-on-one understanding \u2014 being fully known","s":5},{l:"D",t:"Shared activities and doing things together","s":3}]},
+  {sec:"Cognitive","fn":"Fe","t":"When someone is upset, your first move is to:","type":"mc","choices":[{l:"A",t:"Comfort them and make them feel heard and supported","s":7},{l:"B",t:"Help them think through the problem logically","s":2},{l:"C",t:"Give them space unless they ask for help","s":3},{l:"D",t:"Do something practical to fix whatever caused the problem","s":4}]},
+  {sec:"Cognitive","fn":"Fe","t":"Group harmony matters to you:","type":"mc","choices":[{l:"A",t:"Deeply \u2014 tension in a group is hard for me to ignore or tolerate","s":7},{l:"B",t:"Somewhat \u2014 but not more than getting the right answer","s":3},{l:"C",t:"Only to the extent that it doesn't compromise my values","s":4},{l:"D",t:"Less than getting things done well and efficiently","s":2}]},
+  {sec:"Cognitive","fn":"Fe","t":"Your sense of right and wrong comes primarily from:","type":"mc","choices":[{l:"A",t:"Shared values and what most people would recognize as good","s":7},{l:"B",t:"Internal personal values I've worked out for myself","s":3},{l:"C",t:"What produces the most good for the most people","s":5},{l:"D",t:"Universal logical principles that apply regardless of context","s":2}]},
+  {sec:"Cognitive","fn":"Fe","t":"Being liked by others is:","type":"mc","choices":[{l:"A",t:"Important \u2014 I care about being seen positively and maintaining warm relations","s":7},{l:"B",t:"Nice but secondary to being respected for competence","s":3},{l:"C",t:"Less important than staying true to my personal values","s":2},{l:"D",t:"Irrelevant \u2014 I focus on results, not social approval","s":1}]},
+  {sec:"Cognitive","fn":"Si","t":"When facing a new challenge, you prefer to:","type":"mc","choices":[{l:"A",t:"Draw on past experience \u2014 what worked before is the best guide","s":7},{l:"B",t:"Reason through it from first principles","s":3},{l:"C",t:"Ask others who've faced something similar","s":4},{l:"D",t:"Dive in and adapt as you go \u2014 experience is created, not remembered","s":1}]},
+  {sec:"Cognitive","fn":"Si","t":"Traditions and established customs feel:","type":"mc","choices":[{l:"A",t:"Valuable \u2014 they encode wisdom accumulated over generations","s":7},{l:"B",t:"Worth evaluating \u2014 some deserve preservation, others need updating","s":4},{l:"C",t:"Less important than what feels right to me personally","s":2},{l:"D",t:"Somewhat limiting \u2014 I'd rather do what works now","s":1}]},
+  {sec:"Cognitive","fn":"Si","t":"Your memory works best with:","type":"mc","choices":[{l:"A",t:"Detailed, concrete experiences \u2014 I remember exactly how things were","s":7},{l:"B",t:"Patterns and abstract principles that I've extracted from experience","s":3},{l:"C",t:"Emotional moments \u2014 who was there, how it felt","s":4},{l:"D",t:"What I'm actively doing right now \u2014 the past fades quickly","s":1}]},
+  {sec:"Cognitive","fn":"Si","t":"Consistency and routine in your daily life feels:","type":"mc","choices":[{l:"A",t:"Comforting and productive \u2014 structure helps me function at my best","s":7},{l:"B",t:"Useful but I can adapt when needed","s":4},{l:"C",t:"Fine, but I'd prioritize the needs of others over my own routine","s":3},{l:"D",t:"Somewhat suffocating \u2014 I prefer spontaneity","s":1}]},
+  {sec:"Cognitive","fn":"Si","t":"When someone wants to change how things have always been done, you:","type":"mc","choices":[{l:"A",t:"Need compelling evidence that the new way is clearly better","s":7},{l:"B",t:"Evaluate the logic of the proposed change first","s":4},{l:"C",t:"Consider how the people affected will experience the transition","s":3},{l:"D",t:"Embrace it \u2014 change is usually worth exploring","s":1}]},
+  {sec:"Cognitive","fn":"Si","t":"Your relationship with details is:","type":"mc","choices":[{l:"A",t:"I notice and retain concrete details others miss \u2014 accuracy matters","s":7},{l:"B",t:"I care about details when they affect the logical structure of something","s":4},{l:"C",t:"Details matter most when they affect people's wellbeing","s":3},{l:"D",t:"I tend to overlook details in favor of the big picture","s":1}]},
+  {sec:"Cognitive","fn":"Si","t":"A place you've been to many times feels:","type":"mc","choices":[{l:"A",t:"Rich with layered memories \u2014 each visit adds to a detailed inner archive","s":7},{l:"B",t:"Familiar in a useful practical sense \u2014 I know how things work there","s":4},{l:"C",t:"Meaningful because of the people and relationships associated with it","s":3},{l:"D",t:"Comfortable but less interesting than somewhere new","s":1}]},
+  {sec:"Cognitive","fn":"Se","t":"When you're most alive and energized, you're usually:","type":"mc","choices":[{l:"A",t:"Fully immersed in a vivid physical experience \u2014 moving, creating, doing","s":7},{l:"B",t:"Deep in thought working through an interesting problem","s":2},{l:"C",t:"In a genuine moment of connection with someone I care about","s":3},{l:"D",t:"Executing on a well-made plan and seeing it come together","s":4}]},
+  {sec:"Cognitive","fn":"Se","t":"Your relationship with risk is:","type":"mc","choices":[{l:"A",t:"I'm drawn to it \u2014 the intensity is part of what makes life feel real","s":7},{l:"B",t:"I assess risks logically and take calculated ones","s":3},{l:"C",t:"I weigh risks in terms of how they affect people around me","s":4},{l:"D",t:"I prefer to minimize risk through careful planning and preparation","s":1}]},
+  {sec:"Cognitive","fn":"Se","t":"When making a decision under pressure, you:","type":"mc","choices":[{l:"A",t:"Act immediately and adjust \u2014 hesitation is the real risk","s":7},{l:"B",t:"Think it through quickly before committing","s":3},{l:"C",t:"Check in with others who'll be affected before acting","s":2},{l:"D",t:"Fall back on established procedures and proven approaches","s":4}]},
+  {sec:"Cognitive","fn":"Se","t":"Your ideal environment for getting things done is:","type":"mc","choices":[{l:"A",t:"Dynamic, hands-on, with real things happening \u2014 not just planning","s":7},{l:"B",t:"Quiet and uninterrupted so I can think deeply","s":2},{l:"C",t:"Collaborative \u2014 working alongside people I connect with","s":3},{l:"D",t:"Structured and organized with clear processes","s":4}]},
+  {sec:"Cognitive","fn":"Se","t":"You tend to notice most in your environment:","type":"mc","choices":[{l:"A",t:"Movement, aesthetics, and the physical details of what's around me","s":7},{l:"B",t:"The underlying patterns and what they might mean","s":2},{l:"C",t:"The emotional states and body language of people around me","s":4},{l:"D",t:"How things compare to how they've been before","s":3}]},
+  {sec:"Cognitive","fn":"Se","t":"Boredom for you comes from:","type":"mc","choices":[{l:"A",t:"Lack of stimulation \u2014 too much sitting still and nothing happening","s":7},{l:"B",t:"Running out of interesting problems to think through","s":2},{l:"C",t:"Being isolated from people for too long","s":3},{l:"D",t:"Disruption of routine and unpredictability","s":1}]},
+  {sec:"Cognitive","fn":"Se","t":"You trust most:","type":"mc","choices":[{l:"A",t:"Your direct senses and immediate experience in the moment","s":7},{l:"B",t:"Logical analysis and careful reasoning","s":2},{l:"C",t:"The feelings and gut reactions of people close to me","s":3},{l:"D",t:"Established knowledge and proven experience","s":4}]},
+  {sec:"Enneagram","fn":"E1","t":"When something is done incorrectly, you feel:","type":"mc","choices":[{l:"A",t:"Compelled to fix it \u2014 wrong is wrong, and it needs to be right","s":7},{l:"B",t:"Mildly annoyed but able to move on if it's not critical","s":4},{l:"C",t:"Focused on who it affects rather than whether it's technically correct","s":3},{l:"D",t:"Mostly indifferent unless it creates a practical problem","s":1}]},
+  {sec:"Enneagram","fn":"E1","t":"Your inner critic is:","type":"mc","choices":[{l:"A",t:"Constant and demanding \u2014 I hold myself to very high standards","s":7},{l:"B",t:"Present but manageable \u2014 I notice mistakes but don't dwell","s":4},{l:"C",t:"Mostly concerned with whether I was good enough for others","s":3},{l:"D",t:"Relatively quiet \u2014 I accept myself pretty easily","s":1}]},
+  {sec:"Enneagram","fn":"E2","t":"You feel most valuable when:","type":"mc","choices":[{l:"A",t:"Someone needs me and I'm able to give them exactly what they need","s":7},{l:"B",t:"I've accomplished something I'm proud of independently","s":2},{l:"C",t:"I've understood something deeply and correctly","s":3},{l:"D",t:"I've protected myself or something I care about","s":4}]},
+  {sec:"Enneagram","fn":"E2","t":"Asking for help for yourself feels:","type":"mc","choices":[{l:"A",t:"Genuinely difficult \u2014 I'm much more comfortable giving than receiving","s":7},{l:"B",t:"Fine when I'm genuinely stuck and it makes practical sense","s":3},{l:"C",t:"Natural \u2014 we all need help and there's no shame in it","s":1},{l:"D",t:"Uncomfortable \u2014 I prefer handling things completely on my own","s":5}]},
+  {sec:"Enneagram","fn":"E3","t":"What motivates you most to work hard?","type":"mc","choices":[{l:"A",t:"Achieving success and being recognized for it","s":7},{l:"B",t:"Getting things right for its own sake","s":3},{l:"C",t:"Being useful to the people I care about","s":2},{l:"D",t:"Feeling secure and comfortable in my circumstances","s":4}]},
+  {sec:"Enneagram","fn":"E3","t":"When you present yourself to others, you tend to:","type":"mc","choices":[{l:"A",t:"Adapt to what will come across well in this particular context","s":7},{l:"B",t:"Be consistent \u2014 I present myself the same way regardless of audience","s":3},{l:"C",t:"Focus on being warm and connecting rather than impressive","s":2},{l:"D",t:"Avoid putting on any kind of performance \u2014 I keep it private","s":4}]},
+  {sec:"Enneagram","fn":"E4","t":"When life feels ordinary, you:","type":"mc","choices":[{l:"A",t:"Feel a deep restlessness \u2014 ordinary is never enough for very long","s":7},{l:"B",t:"Feel relieved \u2014 ordinary means things are stable and working","s":1},{l:"C",t:"Use it as a chance to rest and reconnect with people","s":3},{l:"D",t:"Find productive routines to fill the space","s":2}]},
+  {sec:"Enneagram","fn":"E4","t":"You identify most with:","type":"mc","choices":[{l:"A",t:"Being unique \u2014 I am not like others and I feel that deeply","s":7},{l:"B",t:"Being capable \u2014 what I can do defines me more than how I feel","s":2},{l:"C",t:"Being caring \u2014 relationships are at the center of who I am","s":3},{l:"D",t:"Being safe \u2014 security and stability are my foundation","s":1}]},
+  {sec:"Enneagram","fn":"E5","t":"Your relationship with your personal energy is:","type":"mc","choices":[{l:"A",t:"Finite and precious \u2014 I ration it and need significant alone time to recharge","s":7},{l:"B",t:"Mostly stable \u2014 I give what's needed without thinking too much about it","s":3},{l:"C",t:"Renewable through connection \u2014 being with the right people energizes me","s":2},{l:"D",t:"Activated by doing and physical engagement rather than thinking","s":1}]},
+  {sec:"Enneagram","fn":"E5","t":"Knowledge and understanding feel like:","type":"mc","choices":[{l:"A",t:"A form of security \u2014 the more I know, the more capable I feel","s":7},{l:"B",t:"A tool for getting things done effectively","s":3},{l:"C",t:"A way to connect \u2014 shared understanding brings people together","s":2},{l:"D",t:"Interesting but less important than direct experience","s":1}]},
+  {sec:"Enneagram","fn":"E6","t":"How do you relate to authority?","type":"mc","choices":[{l:"A",t:"I test it \u2014 authority has to earn my trust, not just claim it","s":7},{l:"B",t:"I respect it when it's competent and defer to expertise","s":4},{l:"C",t:"I care more about the person behind the authority than the role","s":3},{l:"D",t:"I follow what makes logical sense regardless of who says it","s":2}]},
+  {sec:"Enneagram","fn":"E6","t":"When things are going well, you tend to:","type":"mc","choices":[{l:"A",t:"Wonder what could go wrong \u2014 good times make me watchful","s":7},{l:"B",t:"Enjoy it and take it at face value","s":1},{l:"C",t:"Share the good feeling with others around me","s":3},{l:"D",t:"Use the stability to get more done","s":4}]},
+  {sec:"Enneagram","fn":"E7","t":"When something painful or difficult comes up, you:","type":"mc","choices":[{l:"A",t:"Tend to reframe it, find the upside, or move toward something positive","s":7},{l:"B",t:"Sit with it and work through it fully before moving on","s":3},{l:"C",t:"Lean on the people around me to process it together","s":4},{l:"D",t:"Accept it stoically and get back to what needs doing","s":2}]},
+  {sec:"Enneagram","fn":"E7","t":"Your ideal life has:","type":"mc","choices":[{l:"A",t:"Variety, adventure, and always something new to look forward to","s":7},{l:"B",t:"Deep expertise in things I care about and meaningful work","s":3},{l:"C",t:"Close relationships and genuine belonging","s":4},{l:"D",t:"Stability, security, and a reliable foundation","s":1}]},
+  {sec:"Enneagram","fn":"E8","t":"When someone challenges or confronts you, you:","type":"mc","choices":[{l:"A",t:"Meet it head-on \u2014 backing down signals weakness","s":7},{l:"B",t:"Engage logically to understand and rebut their position","s":4},{l:"C",t:"Try to understand where they're coming from first","s":3},{l:"D",t:"Avoid escalation \u2014 conflict rarely solves anything","s":1}]},
+  {sec:"Enneagram","fn":"E8","t":"Control over your own life feels:","type":"mc","choices":[{l:"A",t:"Non-negotiable \u2014 I cannot function well when others control my circumstances","s":7},{l:"B",t:"Important but I can adapt when necessary","s":4},{l:"C",t:"Less important than the quality of my relationships","s":2},{l:"D",t:"Comfortable but I can let things flow without needing to control everything","s":3}]},
+  {sec:"Enneagram","fn":"E9","t":"When there's a conflict you're involved in, you naturally:","type":"mc","choices":[{l:"A",t:"Seek a resolution that everyone can live with \u2014 tension is hard to sustain","s":7},{l:"B",t:"Figure out who's right and advocate for that position","s":2},{l:"C",t:"Focus on the feelings of the people involved","s":4},{l:"D",t:"Handle it decisively and move on","s":3}]},
+  {sec:"Enneagram","fn":"E9","t":"Your own needs and preferences:","type":"mc","choices":[{l:"A",t:"Often feel less urgent than keeping the peace with others","s":7},{l:"B",t:"Are something I pursue without needing anyone else's approval","s":2},{l:"C",t:"Are something I share openly in close relationships","s":4},{l:"D",t:"Are clear to me but I'm selective about when I assert them","s":3}]},
+  {sec:"Politics","fn":"PC_ECON_R","t":"Who should control major industries?","type":"mc","choices":[{l:"A",t:"Private entrepreneurs and investors \u2014 markets allocate resources best","s":7},{l:"B",t:"Worker-owned cooperatives \u2014 those who do the work should own it","s":3},{l:"C",t:"The government \u2014 too important to leave to profit motive","s":1},{l:"D",t:"Large private corporations with government oversight","s":5}]},
+  {sec:"Politics","fn":"PC_ECON_R","t":"Taxes on the wealthy should be:","type":"mc","choices":[{l:"A",t:"Substantially lower \u2014 high taxes punish success and reduce investment","s":7},{l:"B",t:"Moderate \u2014 some redistribution is fair but shouldn't discourage enterprise","s":4},{l:"C",t:"Much higher \u2014 extreme wealth inequality is a social failure","s":1},{l:"D",t:"Abolished \u2014 taxation is fundamentally coercive","s":6}]},
+  {sec:"Politics","fn":"PC_ECON_R","t":"The minimum wage should be:","type":"mc","choices":[{l:"A",t:"Eliminated \u2014 wages should be set entirely by market forces","s":7},{l:"B",t:"Low and minimal \u2014 just a floor to prevent extreme exploitation","s":5},{l:"C",t:"A living wage \u2014 no one working full-time should struggle to survive","s":2},{l:"D",t:"High and indexed to cost of living \u2014 workers deserve economic dignity","s":1}]},
+  {sec:"Politics","fn":"PC_ECON_R","t":"Government regulation of business should be:","type":"mc","choices":[{l:"A",t:"Dramatically reduced \u2014 overregulation stifles growth and innovation","s":7},{l:"B",t:"Streamlined \u2014 only the essential rules that prevent clear harms","s":5},{l:"C",t:"Maintained \u2014 markets left to themselves produce serious harm","s":2},{l:"D",t:"Significantly expanded \u2014 corporations must be tightly controlled","s":1}]},
+  {sec:"Politics","fn":"PC_ECON_R","t":"The best way to help the poor is:","type":"mc","choices":[{l:"A",t:"Economic growth and free markets \u2014 a rising tide lifts all boats","s":7},{l:"B",t:"Targeted temporary assistance that encourages self-sufficiency","s":5},{l:"C",t:"Comprehensive welfare programs funded by progressive taxation","s":2},{l:"D",t:"Structural redistribution of wealth and worker ownership","s":1}]},
+  {sec:"Politics","fn":"PC_ECON_L","t":"Housing should be:","type":"mc","choices":[{l:"A",t:"A public right \u2014 government should ensure everyone has affordable housing","s":7},{l:"B",t:"Mostly market-driven with some targeted support for the poorest","s":3},{l:"C",t:"Entirely private \u2014 government housing programs create dependency","s":1},{l:"D",t:"A mix \u2014 private market for most, strong safety net for the vulnerable","s":4}]},
+  {sec:"Politics","fn":"PC_ECON_L","t":"Healthcare should be organized as:","type":"mc","choices":[{l:"A",t:"Universal single-payer \u2014 healthcare is a right, not a commodity","s":7},{l:"B",t:"Mixed \u2014 public option alongside private insurance","s":4},{l:"C",t:"Primarily private \u2014 competition drives quality and innovation","s":2},{l:"D",t:"Entirely private \u2014 individuals should bear full responsibility for their health","s":1}]},
+  {sec:"Politics","fn":"PC_ECON_L","t":"When a company becomes hugely profitable:","type":"mc","choices":[{l:"A",t:"The workers who created the value should share in it substantially","s":7},{l:"B",t:"Shareholders who took the risk deserve the reward","s":2},{l:"C",t:"Profits should be taxed heavily to fund public services","s":5},{l:"D",t:"It's up to the company \u2014 government shouldn't dictate distribution","s":1}]},
+  {sec:"Politics","fn":"PC_ECON_L","t":"Public services like transport and utilities should be:","type":"mc","choices":[{l:"A",t:"State-owned \u2014 too important and too prone to exploitation to be private","s":7},{l:"B",t:"Regulated private monopolies with strong oversight","s":4},{l:"C",t:"Privatized \u2014 competition makes them better and cheaper","s":2},{l:"D",t:"Community-owned cooperatives, neither state nor private","s":5}]},
+  {sec:"Politics","fn":"PC_ECON_L","t":"Wealth inequality is:","type":"mc","choices":[{l:"A",t:"A serious injustice that requires redistribution by policy","s":7},{l:"B",t:"Concerning but best addressed through opportunity not redistribution","s":3},{l:"C",t:"A natural outcome of talent and effort \u2014 inequality is fine","s":1},{l:"D",t:"Problematic mainly when it translates into unequal political power","s":5}]},
+  {sec:"Politics","fn":"PC_AUTH","t":"Law and order in society should be maintained through:","type":"mc","choices":[{l:"A",t:"Strong enforcement and serious consequences \u2014 deterrence works","s":7},{l:"B",t:"A balance of enforcement and addressing root causes","s":4},{l:"C",t:"Primarily addressing poverty, inequality, and social conditions","s":2},{l:"D",t:"Minimal state intervention \u2014 communities should manage themselves","s":1}]},
+  {sec:"Politics","fn":"PC_AUTH","t":"Immigration should be:","type":"mc","choices":[{l:"A",t:"Strictly controlled \u2014 national identity and cohesion matter","s":7},{l:"B",t:"Managed with skill-based selection and clear limits","s":5},{l:"C",t:"Relatively open \u2014 diversity strengthens societies","s":2},{l:"D",t:"Entirely open \u2014 borders are an unjust imposition","s":1}]},
+  {sec:"Politics","fn":"PC_AUTH","t":"National identity and patriotism are:","type":"mc","choices":[{l:"A",t:"Important foundations of social cohesion and collective purpose","s":7},{l:"B",t:"Useful but shouldn't override individual rights","s":4},{l:"C",t:"Often used to suppress dissent and normalize inequality","s":2},{l:"D",t:"Obstacles to global cooperation and human solidarity","s":1}]},
+  {sec:"Politics","fn":"PC_AUTH","t":"In a crisis, strong centralized leadership is:","type":"mc","choices":[{l:"A",t:"Essential \u2014 decisiveness requires concentrated authority","s":7},{l:"B",t:"Useful but must remain accountable and temporary","s":4},{l:"C",t:"Dangerous \u2014 crises are when rights are most at risk","s":1},{l:"D",t:"Unnecessary \u2014 communities can coordinate without top-down control","s":2}]},
+  {sec:"Politics","fn":"PC_AUTH","t":"Traditional social institutions (family, religion, national heritage) should be:","type":"mc","choices":[{l:"A",t:"Actively protected and promoted by the state","s":7},{l:"B",t:"Respected but left to individuals to choose","s":4},{l:"C",t:"Neither promoted nor protected \u2014 the state should be neutral","s":3},{l:"D",t:"Critically examined \u2014 many traditions perpetuate inequality","s":1}]},
+  {sec:"Politics","fn":"PC_LIB","t":"Drug policy should be:","type":"mc","choices":[{l:"A",t:"Full legalization \u2014 adults should choose what they put in their bodies","s":7},{l:"B",t:"Decriminalization of personal use \u2014 treatment over punishment","s":5},{l:"C",t:"Current approach with some reform for minor offenses","s":3},{l:"D",t:"Strict prohibition \u2014 drug use harms individuals and communities","s":1}]},
+  {sec:"Politics","fn":"PC_LIB","t":"Government surveillance of citizens is:","type":"mc","choices":[{l:"A",t:"A fundamental violation of rights that should be stopped","s":7},{l:"B",t:"Acceptable only with strict judicial oversight and transparency","s":5},{l:"C",t:"Necessary for national security when targeted appropriately","s":3},{l:"D",t:"Justified if it keeps the population safe","s":1}]},
+  {sec:"Politics","fn":"PC_LIB","t":"Censorship of speech should be:","type":"mc","choices":[{l:"A",t:"Essentially never \u2014 free expression is near-absolute","s":7},{l:"B",t:"Only for direct incitement to violence \u2014 nothing else","s":6},{l:"C",t:"Applied to hate speech and dangerous misinformation","s":3},{l:"D",t:"Broadly applied when speech threatens social stability","s":1}]},
+  {sec:"Politics","fn":"PC_LIB","t":"The right to own firearms is:","type":"mc","choices":[{l:"A",t:"Fundamental \u2014 individuals have the right to self-defense with any means","s":7},{l:"B",t:"Valid but requiring reasonable regulation and background checks","s":4},{l:"C",t:"Something that should be significantly restricted for public safety","s":2},{l:"D",t:"Something that should be banned for civilians entirely","s":1}]},
+  {sec:"Politics","fn":"PC_LIB","t":"The state's role in personal lifestyle choices (diet, religion, relationships) should be:","type":"mc","choices":[{l:"A",t:"Zero \u2014 completely outside government jurisdiction","s":7},{l:"B",t:"Minimal \u2014 only when there's direct harm to others","s":6},{l:"C",t:"Moderate \u2014 some community standards are worth upholding","s":3},{l:"D",t:"Active \u2014 the state should promote good values and social norms","s":1}]},
+  {sec:"Philosophy","fn":"PH_STO","t":"When something bad happens that you couldn't control, you:","type":"mc","choices":[{l:"A",t:"Focus on how I respond \u2014 that's the only thing in my power","s":7},{l:"B",t:"Try to fix the situation or prevent recurrence","s":4},{l:"C",t:"Talk through my feelings with someone I trust","s":3},{l:"D",t:"Look for the opportunity or meaning embedded in it","s":5}]},
+  {sec:"Philosophy","fn":"PH_STO","t":"Emotions should be:","type":"mc","choices":[{l:"A",t:"Examined and governed by reason \u2014 not suppressed but not indulged","s":7},{l:"B",t:"Trusted as important signals \u2014 even when inconvenient","s":3},{l:"C",t:"Fully expressed \u2014 authenticity requires emotional honesty","s":2},{l:"D",t:"Less important than what actually works in practice","s":4}]},
+  {sec:"Philosophy","fn":"PH_NIE","t":"Moral values are:","type":"mc","choices":[{l:"A",t:"Created by each individual \u2014 there are no values given to us from outside","s":7},{l:"B",t:"Derived from universal reason \u2014 they apply to everyone equally","s":2},{l:"C",t:"Grounded in what produces the most wellbeing for the most people","s":3},{l:"D",t:"Inherited from tradition and tested over time \u2014 we don't create them fresh","s":4}]},
+  {sec:"Philosophy","fn":"PH_NIE","t":"The most important thing in life is to:","type":"mc","choices":[{l:"A",t:"Become the fullest version of yourself \u2014 self-overcoming above all else","s":7},{l:"B",t:"Do your duty \u2014 live up to the standards that reason demands","s":2},{l:"C",t:"Contribute to others' happiness and reduce their suffering","s":3},{l:"D",t:"Maintain tranquility and freedom from disturbance","s":4}]},
+  {sec:"Philosophy","fn":"PH_EXI","t":"Meaning in life comes from:","type":"mc","choices":[{l:"A",t:"What you choose and commit to \u2014 it doesn't exist until you create it","s":7},{l:"B",t:"Fulfilling your nature as a rational being","s":2},{l:"C",t:"Relationships and contributing to something beyond yourself","s":3},{l:"D",t:"Doing what you know to be right according to proven principles","s":4}]},
+  {sec:"Philosophy","fn":"PH_EXI","t":"Death and impermanence should be:","type":"mc","choices":[{l:"A",t:"Confronted directly \u2014 they define what it means to truly live","s":7},{l:"B",t:"Accepted calmly \u2014 they're outside our control so we shouldn't fear them","s":5},{l:"C",t:"Met with hope \u2014 there's meaning beyond what we can see","s":3},{l:"D",t:"Practically managed \u2014 plan for it, then get on with living","s":2}]},
+  {sec:"Philosophy","fn":"PH_KAN","t":"Lying to protect someone from pain is:","type":"mc","choices":[{l:"A",t:"Always wrong \u2014 the rule against lying must be universal","s":7},{l:"B",t:"Sometimes right \u2014 outcomes matter more than rule-following","s":2},{l:"C",t:"A judgment call that depends on the relationship and stakes","s":4},{l:"D",t:"Fine if the lie aligns with your own honest values","s":3}]},
+  {sec:"Philosophy","fn":"PH_KAN","t":"People should be treated as:","type":"mc","choices":[{l:"A",t:"Ends in themselves \u2014 never merely as means to someone else's goal","s":7},{l:"B",t:"Contributors to collective wellbeing \u2014 valued for what they produce","s":3},{l:"C",t:"Individuals with their own authentic stories and values","s":4},{l:"D",t:"Members of a community whose traditions define their duties","s":2}]},
+  {sec:"Philosophy","fn":"PH_ARI","t":"The good life consists of:","type":"mc","choices":[{l:"A",t:"Developing virtues and flourishing as a rational social being over time","s":7},{l:"B",t:"Maximizing happiness and pleasure while minimizing suffering","s":2},{l:"C",t:"Acting according to duty and universal moral law","s":3},{l:"D",t:"Creating and living by your own values with full authenticity","s":4}]},
+  {sec:"Philosophy","fn":"PH_ARI","t":"Character is built through:","type":"mc","choices":[{l:"A",t:"Repeated practice of virtuous actions \u2014 you become what you repeatedly do","s":7},{l:"B",t:"Pure reasoning about what's right and then acting on it","s":3},{l:"C",t:"Authentic self-expression and following your genuine values","s":4},{l:"D",t:"Aligning yourself with the experiences that produce the most happiness","s":2}]},
+  {sec:"Philosophy","fn":"PH_EPI","t":"The ideal life has:","type":"mc","choices":[{l:"A",t:"Simple pleasures, close friendships, and freedom from anxiety","s":7},{l:"B",t:"Achievement, recognition, and meaningful accomplishment","s":2},{l:"C",t:"Constant growth, challenge, and self-overcoming","s":3},{l:"D",t:"Clear duties fulfilled and a stable community maintained","s":4}]},
+  {sec:"Philosophy","fn":"PH_EPI","t":"Ambition and the pursuit of power are:","type":"mc","choices":[{l:"A",t:"Sources of unnecessary suffering \u2014 better to want less and be content","s":7},{l:"B",t:"The expression of human excellence when channeled well","s":2},{l:"C",t:"Worth pursuing when they allow you to help more people","s":3},{l:"D",t:"Legitimate when they serve justice and the common good","s":4}]},
+  {sec:"Philosophy","fn":"PH_PRA","t":"A philosophical idea should be judged by:","type":"mc","choices":[{l:"A",t:"Whether it actually works and produces good results in practice","s":7},{l:"B",t:"Whether it is internally consistent and logically valid","s":3},{l:"C",t:"Whether it is morally sound regardless of its outcomes","s":2},{l:"D",t:"Whether it aligns with human nature and what flourishing looks like","s":4}]},
+  {sec:"Philosophy","fn":"PH_PRA","t":"Truth is:","type":"mc","choices":[{l:"A",t:"What works \u2014 ideas that guide successful action are true","s":7},{l:"B",t:"What is logically necessary \u2014 derived from reason alone","s":3},{l:"C",t:"What we can directly experience and verify empirically","s":5},{l:"D",t:"Unknowable with certainty \u2014 we should hold all claims loosely","s":4}]},
+  {sec:"Philosophy","fn":"PH_SKE","t":"When presented with a confident claim, your default is:","type":"mc","choices":[{l:"A",t:"Skepticism \u2014 extraordinary claims need extraordinary evidence","s":7},{l:"B",t:"Provisional acceptance if the source is credible","s":3},{l:"C",t:"Evaluation based on logical structure and consistency","s":4},{l:"D",t:"Testing it against practical experience","s":2}]},
+  {sec:"Philosophy","fn":"PH_SKE","t":"Certainty about moral questions is:","type":"mc","choices":[{l:"A",t:"Probably impossible \u2014 we should act on best judgment while remaining humble","s":7},{l:"B",t:"Achievable through rigorous reasoning","s":2},{l:"C",t:"Available through direct moral intuition","s":3},{l:"D",t:"Less important than getting the practical outcomes right","s":4}]},
+  {sec:"Ethics","fn":"ET_VIR","t":"The right thing to do in a hard situation is determined by:","type":"mc","choices":[{l:"A",t:"What a person of genuinely good character would do in this situation","s":7},{l:"B",t:"Which action produces the best consequences for everyone involved","s":3},{l:"C",t:"Which action follows the correct moral rule regardless of consequences","s":2},{l:"D",t:"What genuinely advances my own rational self-interest","s":4}]},
+  {sec:"Ethics","fn":"ET_VIR","t":"Ethics is primarily about:","type":"mc","choices":[{l:"A",t:"Who you are \u2014 your character, habits, and dispositions","s":7},{l:"B",t:"What you do \u2014 the consequences of your actions","s":3},{l:"C",t:"What you're obligated to do \u2014 your duties and rights","s":2},{l:"D",t:"What rational self-interest actually requires","s":4}]},
+  {sec:"Ethics","fn":"ET_CON","t":"A harmful action is made right if:","type":"mc","choices":[{l:"A",t:"It produces a substantially better outcome for more people overall","s":7},{l:"B",t:"Nothing \u2014 some actions are simply wrong regardless of consequences","s":2},{l:"C",t:"It aligns with a virtuous person's judgment","s":3},{l:"D",t:"It serves my genuine long-term rational interest","s":4}]},
+  {sec:"Ethics","fn":"ET_CON","t":"Five strangers vs. one friend \u2014 a trolley is coming. You:","type":"mc","choices":[{l:"A",t:"Pull the lever \u2014 five lives outweigh one regardless of relationship","s":7},{l:"B",t:"Don't pull \u2014 I won't actively sacrifice anyone, even for a good outcome","s":2},{l:"C",t:"Save my friend \u2014 loyalty is a genuine moral value","s":3},{l:"D",t:"Act based on rational self-preservation \u2014 which choice is better for me?","s":4}]},
+  {sec:"Ethics","fn":"ET_DEO","t":"If a lie would prevent serious harm, you should:","type":"mc","choices":[{l:"A",t:"Not lie \u2014 the duty of honesty cannot be overridden by consequences","s":7},{l:"B",t:"Lie \u2014 preventing serious harm is more important than rule-following","s":2},{l:"C",t:"Ask what a person of good character would genuinely do here","s":3},{l:"D",t:"Act in whatever way serves my rational long-term interest best","s":4}]},
+  {sec:"Ethics","fn":"ET_DEO","t":"Rights are:","type":"mc","choices":[{l:"A",t:"Inviolable \u2014 they cannot be overridden even for good consequences","s":7},{l:"B",t:"Important but can be limited when they conflict with collective welfare","s":3},{l:"C",t:"Grounded in virtue \u2014 what genuinely good people recognize as due to others","s":4},{l:"D",t:"Based on rational self-interest \u2014 I have rights because respecting them is rational","s":5}]},
+  {sec:"Ethics","fn":"ET_EGO","t":"Your primary moral obligation is to:","type":"mc","choices":[{l:"A",t:"Yourself \u2014 rational self-interest is the foundation of ethical life","s":7},{l:"B",t:"Everyone equally \u2014 impartial concern for all people","s":2},{l:"C",t:"Those close to you \u2014 specific loyalties ground ethics","s":3},{l:"D",t:"The universal moral law \u2014 duty applies to everyone regardless","s":4}]},
+  {sec:"Ethics","fn":"ET_EGO","t":"Sacrificing your interests for others is:","type":"mc","choices":[{l:"A",t:"Not a virtue \u2014 self-sacrifice is not morally required or admirable","s":7},{l:"B",t:"Sometimes right when it produces substantially greater good","s":3},{l:"C",t:"The basis of genuine virtue \u2014 caring for others over self","s":2},{l:"D",t:"Admirable when done for those you genuinely love and choose","s":4}]},
+  {sec:"Attachment","fn":"AT_SEC","t":"In close relationships, you generally feel:","type":"mc","choices":[{l:"A",t:"Secure \u2014 I trust that people I love will be there for me","s":7},{l:"B",t:"Anxious \u2014 I often worry about losing important people","s":2},{l:"C",t:"Independent \u2014 I don't rely on others much for emotional support","s":3},{l:"D",t:"Ambivalent \u2014 I want closeness but it also feels scary","s":4}]},
+  {sec:"Attachment","fn":"AT_SEC","t":"When someone you love is distant or unavailable, you:","type":"mc","choices":[{l:"A",t:"Feel fine \u2014 they'll come back, and I trust the relationship","s":7},{l:"B",t:"Feel anxious and need reassurance fairly quickly","s":2},{l:"C",t:"Appreciate the space and don't think too much about it","s":3},{l:"D",t:"Feel hurt but pull back rather than reaching out","s":4}]},
+  {sec:"Attachment","fn":"AT_ANX","t":"In relationships, your biggest fear is:","type":"mc","choices":[{l:"A",t:"Being abandoned or left by someone I love","s":7},{l:"B",t:"Being controlled or losing my independence","s":2},{l:"C",t:"Being trapped in a relationship that no longer fits","s":3},{l:"D",t:"Opening up and being genuinely known \u2014 and then rejected","s":5}]},
+  {sec:"Attachment","fn":"AT_ANX","t":"When a relationship feels uncertain, you tend to:","type":"mc","choices":[{l:"A",t:"Need frequent reassurance \u2014 uncertainty in relationships is very hard for me","s":7},{l:"B",t:"Give both of you space and trust it'll resolve","s":2},{l:"C",t:"Withdraw and protect yourself emotionally","s":3},{l:"D",t:"Analyze what's happening but try not to react too quickly","s":4}]},
+  {sec:"Attachment","fn":"AT_AVO","t":"When a relationship gets very close and intimate, you:","type":"mc","choices":[{l:"A",t:"Often feel the urge to create some distance \u2014 closeness is uncomfortable","s":7},{l:"B",t:"Lean in \u2014 deeper connection is what I want","s":1},{l:"C",t:"Feel safe as long as the other person doesn't become too dependent on me","s":4},{l:"D",t:"Feel ambivalent \u2014 I want it but also fear it","s":5}]},
+  {sec:"Attachment","fn":"AT_AVO","t":"Asking for emotional support from others feels:","type":"mc","choices":[{l:"A",t:"Very uncomfortable \u2014 I handle things on my own","s":7},{l:"B",t:"Natural \u2014 people who care about you want to support you","s":1},{l:"C",t:"Fine in extreme situations but not for ordinary difficulties","s":5},{l:"D",t:"Uncomfortable because I worry about being a burden","s":3}]},
+  {sec:"Attachment","fn":"AT_DIS","t":"When someone tries to get emotionally close to you, you feel:","type":"mc","choices":[{l:"A",t:"Both drawn to it and frightened by it at the same time","s":7},{l:"B",t:"Welcoming \u2014 connection is what I want","s":1},{l:"C",t:"Somewhat resistant \u2014 I prefer to keep things at a comfortable distance","s":5},{l:"D",t:"Fine as long as it develops slowly and I can trust them first","s":3}]},
+  {sec:"Attachment","fn":"AT_DIS","t":"Relationships have most often felt like:","type":"mc","choices":[{l:"A",t:"Both necessary and threatening \u2014 safety and danger at once","s":7},{l:"B",t:"A source of genuine comfort and strength","s":1},{l:"C",t:"Something I prefer to manage at a distance to stay self-sufficient","s":4},{l:"D",t:"Rewarding when I find the right person but hard to fully trust","s":5}]},
+  {sec:"Instinct","fn":"IV_SP","t":"When you think about your basic needs, you:","type":"mc","choices":[{l:"A",t:"Think carefully about health, finances, and physical security \u2014 they feel fundamental","s":7},{l:"B",t:"Prioritize your position and relationships in your social world","s":2},{l:"C",t:"Focus on depth of connection with specific people over practical security","s":3},{l:"D",t:"Take what you need as it comes \u2014 security isn't something I plan obsessively","s":4}]},
+  {sec:"Instinct","fn":"IV_SP","t":"Your spending and resource management style is:","type":"mc","choices":[{l:"A",t:"Careful and deliberate \u2014 I think seriously about building financial security","s":7},{l:"B",t:"Social \u2014 I spend freely on experiences and people I care about","s":3},{l:"C",t:"Driven by desire and intensity \u2014 I spend on what captivates me","s":2},{l:"D",t:"Relaxed \u2014 I don't track it closely and trust things will work out","s":4}]},
+  {sec:"Instinct","fn":"IV_SOC","t":"Your sense of belonging and community matters to you:","type":"mc","choices":[{l:"A",t:"Deeply \u2014 I'm very aware of my place within groups and communities","s":7},{l:"B",t:"Less so \u2014 I care more about my physical and material security","s":2},{l:"C",t:"Through individual connections more than group membership","s":3},{l:"D",t:"In a loose way \u2014 I enjoy people but don't need a defined community","s":4}]},
+  {sec:"Instinct","fn":"IV_SOC","t":"When you do something worthwhile, you want:","type":"mc","choices":[{l:"A",t:"It to matter within a broader group or social context","s":7},{l:"B",t:"The personal satisfaction of knowing I did well","s":3},{l:"C",t:"One specific person who matters to me to see and appreciate it","s":4},{l:"D",t:"Tangible results \u2014 recognition is less important than real-world impact","s":2}]},
+  {sec:"Instinct","fn":"IV_SX","t":"Your energy is most alive when:","type":"mc","choices":[{l:"A",t:"There's deep chemistry and intensity with a specific person or pursuit","s":7},{l:"B",t:"I'm physically active and engaged with my immediate environment","s":3},{l:"C",t:"I'm participating meaningfully in a community or group","s":2},{l:"D",t:"I'm achieving concrete goals and seeing results","s":4}]},
+  {sec:"Instinct","fn":"IV_SX","t":"You're most drawn to:","type":"mc","choices":[{l:"A",t:"Intensity, chemistry, and connection that feels electric","s":7},{l:"B",t:"Stability, security, and a reliable foundation","s":2},{l:"C",t:"Belonging, community, and shared purpose","s":3},{l:"D",t:"Achievement, mastery, and tangible results","s":4}]},
+  {sec:"Temperament","fn":"TMP_MEL","t":"When working on something important, you:","type":"mc","choices":[{l:"A",t:"Need it to be done right \u2014 correctness matters more than speed","s":7},{l:"B",t:"Push hard to get it done efficiently, even if imperfect","s":2},{l:"C",t:"Focus first on how it will affect the people involved","s":3},{l:"D",t:"Keep the atmosphere light and collaborative \u2014 perfectionism can be counterproductive","s":1}]},
+  {sec:"Temperament","fn":"TMP_MEL","t":"Your natural emotional baseline tends to be:","type":"mc","choices":[{l:"A",t:"Thoughtful, serious, and sometimes prone to deep concern or sadness","s":7},{l:"B",t:"Driven and focused \u2014 emotions are managed tools, not a baseline","s":2},{l:"C",t:"Warm and engaged \u2014 I'm generally positive in relation to others","s":3},{l:"D",t:"Calm and even \u2014 rarely very high or very low","s":4}]},
+  {sec:"Temperament","fn":"TMP_CHO","t":"Your natural pace of decision-making is:","type":"mc","choices":[{l:"A",t:"Fast \u2014 I act on instinct and adjust later if needed","s":7},{l:"B",t:"Deliberate \u2014 I take time to think things through first","s":2},{l:"C",t:"Relational \u2014 I want to know how others feel before deciding","s":3},{l:"D",t:"Steady \u2014 I match the pace to what the situation requires","s":4}]},
+  {sec:"Temperament","fn":"TMP_CHO","t":"In a group, you tend to:","type":"mc","choices":[{l:"A",t:"Take charge and move things forward \u2014 leadership comes naturally","s":7},{l:"B",t:"Think before speaking \u2014 I contribute carefully selected insights","s":2},{l:"C",t:"Focus on everyone getting along and feeling included","s":3},{l:"D",t:"Do my part reliably without needing to lead or dominate","s":4}]},
+  {sec:"Temperament","fn":"TMP_SAN","t":"Social energy for you is:","type":"mc","choices":[{l:"A",t:"Abundant \u2014 people energize me and I love connecting widely","s":7},{l:"B",t:"Selective \u2014 I prefer depth with a few over breadth with many","s":2},{l:"C",t:"Warm but boundaried \u2014 I care deeply but need recharge time","s":4},{l:"D",t:"Steady \u2014 I'm comfortable either way and adapt to what's needed","s":3}]},
+  {sec:"Temperament","fn":"TMP_SAN","t":"Your approach to fun and leisure is:","type":"mc","choices":[{l:"A",t:"Spontaneous and social \u2014 the more energy in the room the better","s":7},{l:"B",t:"Solitary and focused \u2014 I recharge through quiet activity","s":2},{l:"C",t:"With the people I care about \u2014 fun is relational for me","s":4},{l:"D",t:"Comfortable and low-key \u2014 peace and quiet are genuinely enjoyable","s":3}]},
+  {sec:"Temperament","fn":"TMP_PHL","t":"When there's conflict or urgency around you, you tend to:","type":"mc","choices":[{l:"A",t:"Stay calm and composed \u2014 I don't get swept up in others' urgency","s":7},{l:"B",t:"Get activated and decisive \u2014 I move into action mode","s":2},{l:"C",t:"Try to calm everyone down and find a resolution","s":3},{l:"D",t:"Analyze carefully before responding \u2014 urgency doesn't change my process","s":4}]},
+  {sec:"Temperament","fn":"TMP_PHL","t":"Change in your environment or routine feels:","type":"mc","choices":[{l:"A",t:"Fine \u2014 I adapt easily and don't need things to stay the same","s":7},{l:"B",t:"Interesting when I initiate it, uncomfortable when imposed on me","s":3},{l:"C",t:"Something to navigate together with the people around me","s":4},{l:"D",t:"Disruptive \u2014 consistency and stability support my best work","s":2}]}
+,
+  {sec:"Cognitive","fn":"Ni","t":"I often know the answer before I can explain my reasoning.","lo":"Never","hi":"Always","type":"s"},
+  {sec:"Cognitive","fn":"Ni","t":"I think more in patterns and long-term trajectories than immediate details.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Ni","t":"I find myself predicting how situations will unfold well before others see it.","lo":"Rarely","hi":"Constantly","type":"s"},
+  {sec:"Cognitive","fn":"Ni","t":"I am more interested in what something means symbolically than what it is literally.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Ni","t":"I tend to form a single strong vision of the future and work backward from it.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Cognitive","fn":"Ni","t":"Ideas converge for me into one unified insight rather than remaining as many separate options.","lo":"Disagree","hi":"Agree","type":"s"},
+  {sec:"Cognitive","fn":"Ni","t":"I often feel certain about things I cannot fully justify to others.","lo":"Rarely true","hi":"Very true","type":"s"},
+  {sec:"Cognitive","fn":"Ne","t":"I constantly generate new possibilities and get excited by what could be.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Cognitive","fn":"Ne","t":"I see connections between ideas that seem unrelated to most people.","lo":"Rarely","hi":"All the time","type":"s"},
+  {sec:"Cognitive","fn":"Ne","t":"I get bored with routine and find new approaches even when old ones work fine.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Ne","t":"I often explore multiple hypotheses simultaneously rather than committing to one.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Cognitive","fn":"Ne","t":"The beginning of a project excites me far more than finishing it.","lo":"Disagree","hi":"Agree","type":"s"},
+  {sec:"Cognitive","fn":"Ne","t":"I frequently play devil\'s advocate even for positions I personally disagree with.","lo":"Rarely","hi":"Often","type":"s"},
+  {sec:"Cognitive","fn":"Ne","t":"Brainstorming sessions are where I do my best thinking.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Ti","t":"I need to understand the underlying logic of something before I accept it as true.","lo":"Not important to me","hi":"Essential to me","type":"s"},
+  {sec:"Cognitive","fn":"Ti","t":"I build my own internal framework for understanding topics rather than relying on what experts say.","lo":"Rarely","hi":"Always","type":"s"},
+  {sec:"Cognitive","fn":"Ti","t":"Finding a flaw in someone\'s argument is more natural to me than agreeing with it.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Cognitive","fn":"Ti","t":"I value logical precision and am bothered when people use terms inconsistently.","lo":"Doesn\'t bother me","hi":"Bothers me a lot","type":"s"},
+  {sec:"Cognitive","fn":"Ti","t":"I prefer to figure things out independently rather than asking for help.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Ti","t":"I often think I understand something better than the official explanation.","lo":"Rarely","hi":"Often","type":"s"},
+  {sec:"Cognitive","fn":"Ti","t":"I am more interested in whether something is logically consistent than whether it works in practice.","lo":"Disagree","hi":"Agree","type":"s"},
+  {sec:"Cognitive","fn":"Te","t":"I naturally organize people and resources to get things done efficiently.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Cognitive","fn":"Te","t":"I prefer measurable results over theoretical understanding.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Te","t":"I find it easy to make decisions and move on rather than second-guessing myself.","lo":"Rarely","hi":"Very easily","type":"s"},
+  {sec:"Cognitive","fn":"Te","t":"I tend to point out inefficiencies in systems and processes I encounter.","lo":"Never","hi":"Constantly","type":"s"},
+  {sec:"Cognitive","fn":"Te","t":"I prefer having clear metrics and goals rather than working toward vague ideals.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Te","t":"I am more comfortable directing others than working without authority.","lo":"Disagree","hi":"Agree","type":"s"},
+  {sec:"Cognitive","fn":"Te","t":"External benchmarks and facts matter more to me than personal feelings in arguments.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Cognitive","fn":"Fi","t":"I have a strong internal sense of personal values that I protect carefully.","lo":"Not like me","hi":"Deeply like me","type":"s"},
+  {sec:"Cognitive","fn":"Fi","t":"I often know what I feel but find it difficult to put into words.","lo":"Rarely","hi":"Almost always","type":"s"},
+  {sec:"Cognitive","fn":"Fi","t":"I am more driven by authenticity than by social approval.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Fi","t":"I take it personally when my values are criticized even if the criticism is indirect.","lo":"Never","hi":"Always","type":"s"},
+  {sec:"Cognitive","fn":"Fi","t":"I have a few deep relationships I treasure far more than many superficial ones.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Fi","t":"I feel things very deeply but rarely show it on the surface.","lo":"Not like me","hi":"Exactly like me","type":"s"},
+  {sec:"Cognitive","fn":"Fi","t":"My actions are guided more by what feels right to me than by external rules.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Fe","t":"I naturally attune to the emotional atmosphere in a room and feel affected by it.","lo":"Not at all","hi":"Very strongly","type":"s"},
+  {sec:"Cognitive","fn":"Fe","t":"I feel a strong need to maintain harmony in group situations.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Fe","t":"I find it easy to express warmth and care for others openly.","lo":"Difficult","hi":"Very easy","type":"s"},
+  {sec:"Cognitive","fn":"Fe","t":"I adjust how I communicate based on what I sense others need emotionally.","lo":"Never","hi":"Constantly","type":"s"},
+  {sec:"Cognitive","fn":"Fe","t":"The wellbeing of the people around me feels like my personal responsibility.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Fe","t":"Group cohesion matters more to me than winning an argument.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Fe","t":"I often suppress my own feelings to avoid making others uncomfortable.","lo":"Never","hi":"Often","type":"s"},
+  {sec:"Cognitive","fn":"Si","t":"I have a strong sense of how things should be done based on how they have always been done.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Cognitive","fn":"Si","t":"My past experiences provide a reliable guide for how to handle new situations.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Si","t":"I find comfort in established routines and disruption genuinely stressful.","lo":"Not at all","hi":"Very much so","type":"s"},
+  {sec:"Cognitive","fn":"Si","t":"I have a highly detailed memory of specific past experiences.","lo":"Weak memory","hi":"Very detailed memory","type":"s"},
+  {sec:"Cognitive","fn":"Si","t":"I prefer a proven approach over an experimental one even when outcomes are uncertain.","lo":"Disagree","hi":"Agree","type":"s"},
+  {sec:"Cognitive","fn":"Si","t":"Traditional values and institutions deserve respect even when I don\'t personally agree with them.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Si","t":"I often return to familiar places and experiences because of their sentimental meaning.","lo":"Never","hi":"Often","type":"s"},
+  {sec:"Cognitive","fn":"Se","t":"I am highly attuned to my physical environment and notice sensory details others miss.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Cognitive","fn":"Se","t":"I feel most alive when I am actively engaged in the physical world.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Se","t":"I react quickly and decisively in the moment without needing to plan ahead.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Cognitive","fn":"Se","t":"I get bored with abstract theory and prefer tangible hands-on work.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Cognitive","fn":"Se","t":"I am drawn to intense experiences — physical challenges, aesthetic thrills, high-stakes situations.","lo":"Not at all","hi":"Strongly","type":"s"},
+  {sec:"Cognitive","fn":"Se","t":"I trust my five senses more than my hunches or theoretical models.","lo":"Disagree","hi":"Agree","type":"s"},
+  {sec:"Cognitive","fn":"Se","t":"Living in the present moment comes naturally to me.","lo":"Rarely","hi":"Always","type":"s"},
+  {sec:"Enneagram","fn":"E1","t":"I have a persistent inner critic that tells me when I or others fall short of the standard.","lo":"Not like me","hi":"Exactly like me","type":"s"},
+  {sec:"Enneagram","fn":"E1","t":"I feel a strong moral obligation to do what is right even when it is inconvenient.","lo":"Rarely","hi":"Always","type":"s"},
+  {sec:"Enneagram","fn":"E2","t":"I naturally notice what others need and feel drawn to provide it.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Enneagram","fn":"E2","t":"My sense of worth is tied to how much I am needed and appreciated by others.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Enneagram","fn":"E3","t":"I am highly aware of how I am perceived and work hard to project success.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Enneagram","fn":"E3","t":"My identity is closely tied to my accomplishments and achievements.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Enneagram","fn":"E4","t":"I feel fundamentally different from others and struggle to feel fully understood.","lo":"Not at all","hi":"Very strongly","type":"s"},
+  {sec:"Enneagram","fn":"E4","t":"I am drawn to beauty, melancholy, and deep emotion more than most people seem to be.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Enneagram","fn":"E5","t":"I need significant time alone to recharge and think.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Enneagram","fn":"E5","t":"I prefer to observe and understand before participating.","lo":"Rarely","hi":"Almost always","type":"s"},
+  {sec:"Enneagram","fn":"E6","t":"I frequently anticipate things going wrong and prepare for worst-case scenarios.","lo":"Rarely","hi":"Constantly","type":"s"},
+  {sec:"Enneagram","fn":"E6","t":"I look for reliable authorities or frameworks I can trust before committing to a course of action.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Enneagram","fn":"E7","t":"I move quickly from one exciting experience or idea to the next.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Enneagram","fn":"E7","t":"I avoid staying too long with pain, boredom, or difficult emotions.","lo":"Rarely","hi":"Consistently","type":"s"},
+  {sec:"Enneagram","fn":"E8","t":"I project strength and have no patience for weakness or passivity.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Enneagram","fn":"E8","t":"I would rather be feared than ignored and I rarely back down from confrontation.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Enneagram","fn":"E9","t":"I tend to go along with others rather than assert my own preferences.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Enneagram","fn":"E9","t":"I feel an almost physical aversion to conflict and will do much to avoid it.","lo":"Not at all","hi":"Very strongly","type":"s"},
+  {sec:"Ethics","fn":"ET_VIR","t":"Good character developed through practice is more important than following rules or maximizing outcomes.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Ethics","fn":"ET_VIR","t":"The question of what kind of person I should become is more fundamental than what I should do.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Ethics","fn":"ET_CON","t":"An action is right if it produces the best overall outcome for the most people.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Ethics","fn":"ET_CON","t":"Even painful or difficult actions can be justified if they lead to greater overall wellbeing.","lo":"Disagree","hi":"Agree","type":"s"},
+  {sec:"Ethics","fn":"ET_DEO","t":"Some actions are simply wrong regardless of their consequences.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Ethics","fn":"ET_DEO","t":"People must always be treated as ends in themselves and never merely as means.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Ethics","fn":"ET_EGO","t":"The primary moral obligation each person has is to pursue their own rational self-interest.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Ethics","fn":"ET_EGO","t":"Genuine altruism that ignores one\'s own interests is not virtuous but self-destructive.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_STO","t":"The only things worth caring about are the ones fully within your control.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_STO","t":"External circumstances — wealth, reputation, health — are ultimately indifferent to true virtue.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_EPI","t":"The goal of life is tranquility and freedom from unnecessary anxiety, not glory or achievement.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_EPI","t":"Simple pleasures and close friendships are more valuable than ambition and wealth.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_KAN","t":"Morality must be based on universal principles that apply to everyone equally regardless of outcomes.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_KAN","t":"It is always wrong to use a person purely as a means to an end even for a good cause.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_ARI","t":"Human flourishing requires living in community with others and developing virtues through practice.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_ARI","t":"There is a specific way of living that is objectively better for human beings as such.","lo":"Disagree","hi":"Agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_NIE","t":"Individuals should create their own values rather than inherit them from tradition or consensus.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_NIE","t":"The drive to surpass limits and become more than you currently are is the highest human aspiration.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_EXI","t":"There is no pre-given purpose to life — meaning must be created through authentic personal choice.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_EXI","t":"Confronting the absence of inherent meaning is essential for living an authentic life.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_PRA","t":"The truth of an idea is determined by whether it works in practice, not by abstract logic alone.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_PRA","t":"I judge ideas by their practical consequences rather than their theoretical elegance.","lo":"Rarely","hi":"Always","type":"s"},
+  {sec:"Philosophy","fn":"PH_SKE","t":"Most of what humans claim to know with certainty is actually confident belief built on weak foundations.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Philosophy","fn":"PH_SKE","t":"Suspending judgment in the absence of compelling evidence is intellectually responsible, not weak.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_ECON_R","t":"Free markets allocate resources more efficiently than government planning.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_ECON_R","t":"Low taxation is essential for a free and prosperous society.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_ECON_R","t":"Businesses should be free to operate with minimal government regulation.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_ECON_R","t":"Private property rights are foundational to a just society.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_ECON_R","t":"Economic competition drives innovation and benefits everyone in the long run.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_ECON_L","t":"Governments have a duty to reduce economic inequality through redistribution.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_ECON_L","t":"Key industries like healthcare and energy should be publicly owned or heavily regulated.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_ECON_L","t":"Workers deserve a much larger share of the profits their labor creates.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_ECON_L","t":"Unchecked markets inevitably produce unjust concentrations of wealth and power.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_ECON_L","t":"A strong welfare state is necessary to ensure everyone\'s basic needs are met.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_AUTH","t":"A strong central authority is necessary to maintain social order and national cohesion.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_AUTH","t":"Traditional social institutions deserve state protection even when individuals disagree with them.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_AUTH","t":"Some restrictions on personal freedom are justified to preserve social stability.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_AUTH","t":"National identity and cultural continuity should be actively promoted by government.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_AUTH","t":"Citizens have a duty to respect established laws and institutions even when they disagree.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_LIB","t":"Adults should be free to make their own personal choices without government interference.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_LIB","t":"Civil liberties must be protected even when doing so makes governance more difficult.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_LIB","t":"The state has no right to legislate personal morality.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_LIB","t":"Drug laws and other victimless crime laws should be abolished.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Politics","fn":"PC_LIB","t":"Individual autonomy is the most fundamental political value.","lo":"Strongly disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Attachment","fn":"AT_SEC","t":"I feel comfortable depending on others and having them depend on me.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Attachment","fn":"AT_SEC","t":"I rarely worry about being abandoned or not being loved enough.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Attachment","fn":"AT_ANX","t":"I often worry that the people I care about don\'t value me as much as I value them.","lo":"Never","hi":"Constantly","type":"s"},
+  {sec:"Attachment","fn":"AT_ANX","t":"I need frequent reassurance that I am loved and valued to feel secure in relationships.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Attachment","fn":"AT_AVO","t":"I feel uncomfortable when others want to get too emotionally close to me.","lo":"Never","hi":"Often","type":"s"},
+  {sec:"Attachment","fn":"AT_AVO","t":"I prefer handling problems alone rather than turning to others for support.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Attachment","fn":"AT_DIS","t":"I simultaneously crave closeness and feel terrified by it.","lo":"Not at all","hi":"Strongly","type":"s"},
+  {sec:"Attachment","fn":"AT_DIS","t":"Relationships feel unpredictable and frightening even with people I trust.","lo":"Never","hi":"Often","type":"s"},
+  {sec:"Instinct","fn":"IV_SP","t":"I pay close attention to my physical health, financial security, and personal resources.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Instinct","fn":"IV_SP","t":"Creating a stable, safe personal environment is among my highest priorities.","lo":"Not important","hi":"Top priority","type":"s"},
+  {sec:"Instinct","fn":"IV_SOC","t":"I am highly aware of my social status, role, and belonging within groups.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Instinct","fn":"IV_SOC","t":"My sense of self depends significantly on how I am positioned within my community.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Instinct","fn":"IV_SX","t":"I am drawn to intense one-on-one connections and feel most alive in states of deep engagement.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Instinct","fn":"IV_SX","t":"I become completely absorbed in whatever captivates me — a person, an idea, a project.","lo":"Rarely","hi":"Constantly","type":"s"},
+  {sec:"Temperament","fn":"TMP_CHO","t":"I am naturally optimistic and energetic — I move quickly between interests and activities.","lo":"Not like me","hi":"Exactly like me","type":"s"},
+  {sec:"Temperament","fn":"TMP_CHO","t":"I bounce back from setbacks quickly and prefer to keep things light rather than heavy.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Temperament","fn":"TMP_MEL","t":"I tend toward perfectionism, seriousness, and a deep internal standard few others see.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Temperament","fn":"TMP_MEL","t":"My inner life is rich and complex in ways that are difficult to fully communicate to others.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Temperament","fn":"TMP_SAN","t":"I am sociable, enthusiastic, and energized by people — I love being in the middle of things.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Temperament","fn":"TMP_SAN","t":"I process emotions externally and talk through my feelings rather than sitting with them alone.","lo":"Disagree","hi":"Strongly agree","type":"s"},
+  {sec:"Temperament","fn":"TMP_PHL","t":"I am calm, patient, and diplomatic — I avoid unnecessary conflict and seek common ground.","lo":"Not like me","hi":"Very like me","type":"s"},
+  {sec:"Temperament","fn":"TMP_PHL","t":"I can get along with almost anyone and tend to make people feel comfortable around me.","lo":"Rarely","hi":"Consistently","type":"s"}
 ];
 
 var ES = {
@@ -1155,25 +1155,25 @@ function setTestMode(mode) {
   document.getElementById('modeFull').classList.toggle('active', mode === 'full');
   document.getElementById('modeShort').classList.toggle('active', mode === 'short');
   document.getElementById('metaQ').textContent = mode === 'full' ? '280' : '100';
+  document.getElementById('metaMin').textContent = mode === 'full' ? '~30' : '~15';
   document.getElementById('metaMin').textContent = mode === 'full' ? '~30' : '~12';
 }
 
 // Short test allocation — 100 questions spread across all 14 dimensions
 var SHORT_ALLOC = {
-  Ni:3, Ne:3, Ti:3, Te:3, Fi:3, Fe:3, Si:3, Se:3,
-  E1:1, E2:1, E3:1, E4:1, E5:1, E6:1, E7:1, E8:1, E9:1,
-  AT_SEC:2, AT_ANX:2, AT_AVO:2, AT_DIS:2,
-  PH_STO:1, PH_EPI:1, PH_KAN:1, PH_ARI:1,
-  PH_NIE:1, PH_EXI:1, PH_PRA:1, PH_SKE:1,
-  EP_RAT:1, EP_EMP:1, EP_INT:1, EP_SKP:1,
-  ET_VIR:1, ET_CON:1, ET_DEO:1, ET_EGO:1,
-  PC_ECON_L:3, PC_ECON_R:3, PC_AUTH:3, PC_LIB:3,
-  TMP_CHO:2, TMP_MEL:2, TMP_SAN:2, TMP_PHL:2,
-  IV_SP:2, IV_SOC:2, IV_SX:2,
-  SOC_DOM:2, SOC_INT:2, SOC_WAR:1, SOC_DIR:1,
-  AL_INT:3, AL_SEN:2,
-  MF_CARE:1, MF_FAIR:1, MF_LOY:1, MF_AUTH:1, MF_PUR:1, MF_LIB:1
-};
+  Ni:4,Ne:4,Ti:4,Te:4,Fi:4,Fe:4,Si:4,Se:4,
+  E1:1,E2:1,E3:1,E4:1,E5:1,E6:1,E7:1,E8:1,E9:1,
+  PC_ECON_R:3,PC_ECON_L:3,PC_AUTH:3,PC_LIB:3,
+  PH_NIE:1,PH_STO:1,PH_KAN:1,PH_ARI:1,PH_EXI:1,PH_EPI:1,PH_PRA:1,PH_SKE:1,
+  ET_VIR:1,ET_CON:1,ET_DEO:1,ET_EGO:1,
+  AT_SEC:3,AT_ANX:3,AT_AVO:3,AT_DIS:3,
+  IV_SP:1,IV_SOC:1,IV_SX:1,
+  EP_RAT:1,EP_EMP:1,EP_INT:1,EP_SKP:1,
+  MF_CARE:1,MF_FAIR:1,MF_LOY:1,MF_AUTH:1,MF_PUR:1,MF_LIB:1,
+  TMP_CHO:1,TMP_MEL:1,TMP_SAN:1,TMP_PHL:1,
+  SOC_DOM:1,SOC_INT:1,SOC_WAR:1,SOC_DIR:1,
+  AL_INT:1,AL_SEN:1
+};;
 
 // buildShortSet inlined in startBtn handler
 
@@ -1183,20 +1183,27 @@ document.getElementById('modeShort').addEventListener('click', function(){ setTe
 
 // ── START ──
 document.getElementById('startBtn').addEventListener('click', function(){
-  // Build active question set
   var activeQ;
   if(testMode === 'short') {
-    // Build short set from fresh copy of Q
-    var byFn = {};
-    Q.forEach(function(q){ if(!byFn[q.fn]) byFn[q.fn]=[]; byFn[q.fn].push(q); });
+    // Short test: half MC, half Likert per dimension = 50+50 = 100 total
+    var byFnMC = {}, byFnS = {};
+    Q.forEach(function(q){
+      if(q.type==='mc'){ if(!byFnMC[q.fn]) byFnMC[q.fn]=[]; byFnMC[q.fn].push(q); }
+      else { if(!byFnS[q.fn]) byFnS[q.fn]=[]; byFnS[q.fn].push(q); }
+    });
     activeQ = [];
     Object.keys(SHORT_ALLOC).forEach(function(fn){
-      var pool = (byFn[fn]||[]).slice();
-      shuffle(pool);
-      activeQ = activeQ.concat(pool.slice(0, SHORT_ALLOC[fn]));
+      var alloc = SHORT_ALLOC[fn];
+      var mcPool = (byFnMC[fn]||[]).slice(); shuffle(mcPool);
+      var sPool  = (byFnS[fn]||[]).slice();  shuffle(sPool);
+      var mcCount = Math.floor(alloc/2);
+      var sCount  = alloc - mcCount;
+      activeQ = activeQ.concat(mcPool.slice(0,mcCount));
+      activeQ = activeQ.concat(sPool.slice(0,sCount));
     });
     shuffle(activeQ);
   } else {
+    // Full test: all 280 (140 MC + 140 Likert) shuffled
     activeQ = Q.slice();
     shuffle(activeQ);
   }
@@ -1204,6 +1211,7 @@ document.getElementById('startBtn').addEventListener('click', function(){
   TOTAL = activeQ.length;
   answers = new Array(TOTAL).fill(null);
   cur = 0;
+  _explainCache = {};
   document.getElementById('intro').style.display='none';
   document.getElementById('quiz').style.display='block';
   renderQ();
@@ -1338,6 +1346,7 @@ document.getElementById('startObserverBtn').addEventListener('click', function()
   TOTAL = activeQ.length;
   answers = new Array(TOTAL).fill(null);
   cur = 0;
+  _explainCache = {};
   document.getElementById('intro').style.display='none';
   document.getElementById('quiz').style.display='block';
   // Update header to show observer mode
@@ -1599,85 +1608,104 @@ function renderQ(){
   var pct=Math.round((cur/TOTAL)*100);
   document.getElementById('pbarFill').style.width=pct+'%';
   document.getElementById('qNum').textContent=(cur+1)+' / '+TOTAL;
-  document.getElementById('qSection').textContent='';
+  document.getElementById('qSection').textContent=q.sec||'';
 
   var _esEntry = ES[q.t] || {};
   var qText = (lang==='es' && (_esEntry.es_t || q.es_t)) ? (_esEntry.es_t || q.es_t) : q.t;
-  var hasExplain = !!(q.e || _esEntry.es);
   var explainText = lang==='es'
     ? (_esEntry.es || q.es || q.e || '')
-    : (q.e || '');
+    : (q.e || _explainCache[cur] || '');
   var lbl = scaleLabels[lang]||scaleLabels['en'];
 
-  var explainOpenTxt = lang==='es' ? 'SIMPLIFICAR PREGUNTA' : 'SIMPLIFY QUESTION';
-  var explainCloseTxt = lang==='es' ? 'CERRAR EXPLICACIÓN' : 'CLOSE EXPLANATION';
+  var h = '<div class="q-header-row"><div class="q-text">'+qText+'</div></div>';
 
-  var html='<div class="q-header-row">'
-    +'<div class="q-text">'+qText+'</div>'
-    +'</div>';
+  // Always show simplify button
+  h += '<button class="btn-explain" id="btnExplain">&#9711; '+(lang==='es'?'Simplificar pregunta':'Simplify question')+'</button>';
+  h += '<div class="explain-bubble" id="explainBubble">'+(explainText||'')+'</div>';
 
-  if(hasExplain){
-    html+='<button class="btn-explain" id="btnExplain">'
-      +'<span class="btn-explain-icon">◎</span>'+explainOpenTxt+'</button>';
-    html+='<div class="explain-bubble" id="explainBubble">'+explainText+'</div>';
-  }
-
-  if(q.type==='s'){
-    html+='<div class="scale-wrap"><div class="scale-row">';
+  if(q.type==='mc' && q.choices){
+    h += '<div class="mc-choices">';
+    q.choices.forEach(function(c){
+      var sel = answers[cur]===c.s ? ' selected' : '';
+      h += '<button class="mc-choice'+sel+'" data-v="'+c.s+'">'
+        + '<span class="mc-letter">'+c.l+'</span>'
+        + '<div class="mc-content"><span class="mc-text">'+escapeHTML(c.t)+'</span></div>'
+        + '</button>';
+    });
+    h += '</div>';
+  } else if(q.type==='s'){
+    h += '<div class="scale-wrap"><div class="scale-row">';
     for(var i=1;i<=7;i++){
-      var c=answers[cur]===i?'scale-btn sel':'scale-btn';
-      html+='<button class="'+c+'" data-v="'+i+'">'+i+'</button>';
+      var sc = answers[cur]===i ? 'scale-btn sel' : 'scale-btn';
+      h += '<button class="'+sc+'" data-v="'+i+'">'+i+'</button>';
     }
-    html+='</div><div class="scale-lbls"><span>'+lbl.lo+'</span><span>'+lbl.hi+'</span></div></div>';
+    h += '</div><div class="scale-lbls"><span>'+lbl.lo+'</span><span>'+lbl.hi+'</span></div></div>';
   } else {
-    html+='<div class="agree-grid">';
-    for(var j=0;j<lbl.opts.length;j++){
-      var v=j+1;
-      var c2=answers[cur]===v?'agree-btn sel':'agree-btn';
-      html+='<button class="'+c2+'" data-v="'+v+'"><span class="agree-lbl">'+String.fromCharCode(65+j)+'</span>'+lbl.opts[j]+'</button>';
+    var opts = lbl.opts;
+    h += '<div class="agree-grid">';
+    for(var j=0;j<opts.length;j++){
+      var v = j+1;
+      var sel2 = answers[cur]===v ? ' sel' : '';
+      var letter = String.fromCharCode(65+j);
+      h += '<button class="agree-btn'+sel2+'" data-v="'+v+'">'
+        + '<span class="agree-letter">'+letter+'</span>'
+        + '<span class="agree-label">'+opts[j]+'</span>'
+        + '</button>';
     }
-    html+='</div>';
+    h += '</div>';
   }
 
-  var isLast=cur===TOTAL-1;
-  var hasAns=answers[cur]!==null;
-  var backTxt  = lang==='es' ? '&#8592; ATRÁS'   : '&#8592; BACK';
-  var nextTxt  = lang==='es' ? 'SIGUIENTE &#8594;' : 'NEXT &#8594;';
-  var resTxt   = lang==='es' ? 'VER RESULTADOS &#8594;' : 'SEE RESULTS &#8594;';
-  html+='<div class="nav-row">'
-    +'<button class="btn-sec" id="bBtn"'+(cur===0?' disabled':'')+'">'+backTxt+'</button>'
-    +'<button class="btn-next'+(hasAns?'':' disabled')+'" id="nBtn"'+(hasAns?'':' disabled')+'>'
-    +(isLast?resTxt:nextTxt)+'</button>'
-    +'</div>';
+  var isLast = cur===TOTAL-1;
+  var hasAns = answers[cur]!==null;
+  h += '<div class="nav-row">'
+    + '<button class="btn-sec" id="bBtn"'+(cur===0?' disabled':'')+'>&#8592; '+(lang==='es'?'ATRÁS':'BACK')+'</button>'
+    + '<button class="btn-next'+(hasAns?'':' disabled')+'" id="nBtn"'+(hasAns?'':' disabled')+'>'
+    + (isLast?(lang==='es'?'VER RESULTADOS &#8594;':'SEE RESULTS &#8594;'):(lang==='es'?'SIGUIENTE &#8594;':'NEXT &#8594;'))+'</button>'
+    + '</div>';
 
-  var body=document.getElementById('qBody');
-  body.innerHTML=html;
+  var body = document.getElementById('qBody');
+  body.innerHTML = h;
   window.scrollTo(0,0);
 
-  // Explain button toggle
-  var btnEx=document.getElementById('btnExplain');
-  var bubbleEl=document.getElementById('explainBubble');
+  var btnEx = document.getElementById('btnExplain');
+  var bubbleEl = document.getElementById('explainBubble');
   if(btnEx && bubbleEl){
-    btnEx.addEventListener('click',function(){
-      bubbleEl.classList.toggle('open');
-      var isOpen = bubbleEl.classList.contains('open');
-      var openTxt  = lang==='es' ? 'SIMPLIFICAR PREGUNTA' : 'SIMPLIFY QUESTION';
-      var closeTxt = lang==='es' ? 'CERRAR EXPLICACIÓN'   : 'CLOSE EXPLANATION';
-      btnEx.innerHTML = '<span class="btn-explain-icon">'+(isOpen?'×':'◎')+'</span>'+(isOpen?closeTxt:openTxt);
+    btnEx.addEventListener('click', function(){
+      var open = bubbleEl.classList.toggle('open');
+      btnEx.innerHTML = (open?'&times; ':'&#9711; ')+(lang==='es'?(open?'Cerrar':'Simplificar pregunta'):(open?'Close':'Simplify question'));
+      // If opening and no cached explanation, call Anthropic directly
+      if(open && !_explainCache[cur] && !bubbleEl.textContent.trim()){
+        bubbleEl.textContent = lang==='es' ? 'Simplificando...' : 'Simplifying...';
+        var qText2 = (window._activeQ||Q)[cur].t;
+        fetch('/api/simplify',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({question:qText2})
+        }).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function(d){
+          var txt=(d.simplified||'').trim().replace(/^["']|["']$/g,'');
+          if(txt){ _explainCache[cur]=txt; bubbleEl.textContent=txt; }
+          else { bubbleEl.textContent=lang==='es'?'No disponible':'Unavailable'; }
+        }).catch(function(e){
+          console.warn('Simplify failed:',e);
+          bubbleEl.textContent=lang==='es'?'No disponible':'Simplification unavailable';
+        });
+      }
     });
   }
 
   body.querySelectorAll('[data-v]').forEach(function(b){
-    b.addEventListener('click',function(){
-      answers[cur]=parseInt(this.getAttribute('data-v'),10);
+    b.addEventListener('click', function(){
+      answers[cur] = parseInt(this.getAttribute('data-v'), 10);
       renderQ();
     });
   });
-  var bb=document.getElementById('bBtn');
-  var nb=document.getElementById('nBtn');
-  if(bb&&!bb.disabled) bb.addEventListener('click',function(){cur--;renderQ();});
-  if(nb&&!nb.disabled) nb.addEventListener('click',function(){
-    if(isLast) finishQuiz(); else {cur++;renderQ();}
+
+  var bb = document.getElementById('bBtn');
+  var nb = document.getElementById('nBtn');
+  if(bb && !bb.disabled) bb.addEventListener('click', function(){ cur--; renderQ(); });
+  if(nb && !nb.disabled) nb.addEventListener('click', function(){
+    if(isLast) finishQuiz(); else { cur++; renderQ(); }
   });
 }
 
@@ -1727,15 +1755,32 @@ function getInstinctStack(ivS){
   return order.map(function(k){ return k.replace('IV_',''); }).join('/');
 }
 
+// ── MC CHOICE SELECTION ──
+function pickMC(btn, score){
+  answers[cur] = score;
+  // Update visual state
+  document.querySelectorAll('.mc-choice').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  // Enable next button
+  var nb = document.getElementById('nBtn');
+  if(nb){ nb.disabled=false; nb.classList.remove('disabled'); }
+}
+
 // ── SCORING ──
 var _scoreCache = null;
+var _explainCache = {}; // per-question simplified text cache
 
 function score(){
   // Returns a full data object with all dimension scores + derived types
   function avg(fn){
     var sum=0,cnt=0;
     (window._activeQ||Q).forEach(function(q,i){
-      if(q.fn===fn){ sum+=((answers[i]||4)-1)/6*100; cnt++; }
+      if(q.fn===fn){
+        var raw=answers[i];
+        if(raw===null||raw===undefined) return;
+        // MC: raw is already 1-7 score; Likert: same format
+        sum+=(raw-1)/6*100; cnt++;
+      }
     });
     return cnt ? Math.round(sum/cnt) : 50;
   }
@@ -1883,14 +1928,10 @@ function callAIWithRetry(prompt,retriesLeft,onSuccess,onFail){
   var attempt=4-retriesLeft;
   if(attempt>0) retryEl.textContent='Retry '+attempt+' of 3...';
 
-  fetch('https://api.anthropic.com/v1/messages',{
+  fetch('/api/score',{
     method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3000,messages:[{role:'user',content:prompt}]})
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({prompt:prompt})
   })
   .then(function(r){
     if(!r.ok) throw new Error('API error '+r.status);
@@ -2538,8 +2579,8 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     att:att, phi:phi, instStack:instStack,
     polX:data.polX, polY:data.polY,
     // All score dimensions
-    cog:data.cog, enn:data.enn, att2:data.att, tmp:data.tmp, iv:data.iv,
-    mf:data.mf, eth:data.eth, ep:data.ep, phiS:data.phi,
+    cog:data.cog, enn:data.ennScores, att2:data.attScores, tmp:data.tmp, iv:data.iv,
+    mf:data.mf, eth:data.eth, ep:data.ep, phiS:data.phiScores,
     soc:data.soc, alone:data.alone,
     // AI output
     big5:ai.big5||{}, values:ai.values||[],

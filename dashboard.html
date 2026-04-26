@@ -519,38 +519,42 @@ function searchUsers(val){
   if(!val.trim()){ res.innerHTML='<div class="search-empty">Start typing to search for people</div>'; return; }
   res.innerHTML='<div class="search-empty">Searching...</div>';
   searchTimer=setTimeout(function(){
-    var q=val.toLowerCase().replace('@','');
+    var q=val.toLowerCase().replace(/^@/,'').replace(/[^a-z0-9_]/g,'');
     if(q.length<2){ res.innerHTML='<div class="search-empty">Type at least 2 characters</div>'; return; }
+    var currentUser=firebase.auth().currentUser;
     firebase.firestore().collection('usernames')
       .where(firebase.firestore.FieldPath.documentId(),'>=',q)
-      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'')
-      .limit(6).get()
+      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'\uf8ff')
+      .limit(8).get()
       .then(function(snap){
-        if(snap.empty){ res.innerHTML='<div class="search-empty">No users found</div>'; return; }
-        res.innerHTML='';
-        snap.docs.forEach(function(doc){
-          var searchUid=doc.data().uid;
-          firebase.firestore().collection('users').doc(searchUid).get().then(function(uDoc){
-            var p=uDoc.exists?uDoc.data():{};
-            var n=escapeHTML(p.displayName||'User');
-            var u=escapeHTML(doc.id);
-            var i=n.charAt(0).toUpperCase();
-            var currentUser=firebase.auth().currentUser;
-            var isSelf=currentUser&&currentUser.uid===searchUid;
-            if(isSelf) return;
+        if(snap.empty){ res.innerHTML='<div class="search-empty">No users found for @'+escapeHTML(q)+'</div>'; return; }
+        var docs=snap.docs.filter(function(d){ return !currentUser||d.data().uid!==currentUser.uid; });
+        if(!docs.length){ res.innerHTML='<div class="search-empty">No other users found</div>'; return; }
+        var promises=docs.map(function(d){
+          return firebase.firestore().collection('users').doc(d.data().uid).get()
+            .then(function(uDoc){ return {username:d.id,uid:d.data().uid,user:uDoc.exists?uDoc.data():{}}; });
+        });
+        return Promise.all(promises).then(function(results){
+          res.innerHTML='';
+          results.forEach(function(r){
+            var n=escapeHTML(r.user.displayName||'User');
+            var u=escapeHTML(r.username);
+            var init=n.charAt(0).toUpperCase();
             res.innerHTML+='<div class="search-result-item">'
-              +'<div class="search-result-avatar">'+i+'</div>'
+              +'<div class="search-result-avatar">'+init+'</div>'
               +'<div class="search-result-info">'
               +'<div class="search-result-name">'+n+' <span style="color:var(--muted);font-weight:400">@'+u+'</span></div>'
               +'</div>'
-              +'<button class="btn-add-small" data-uid="'+searchUid+'" data-name="'+escapeHTML(n)+'" onclick="var b=this;sendFriendRequest(b.dataset.uid,b.dataset.name,b)">Add</button>'
+              +'<button class="btn-add-small" data-uid="'+escapeHTML(r.uid)+'" data-name="'+n+'" onclick="var b=this;sendFriendRequest(b.dataset.uid,b.dataset.name,b)">Add</button>'
               +'</div>';
           });
         });
-      }).catch(function(){ res.innerHTML='<div class="search-empty">Search unavailable</div>'; });
+      }).catch(function(e){
+        console.error('Search error:',e);
+        res.innerHTML='<div class="search-empty">Search unavailable</div>';
+      });
   },400);
 }
-
 function addFriend(btn,name){
   btn.textContent='Sent ✓'; btn.classList.add('added'); btn.disabled=true;
   showToast('Friend request sent to '+escapeHTML(name));
