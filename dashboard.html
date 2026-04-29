@@ -162,10 +162,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 @media(max-width:600px){.main{padding:20px 16px;}.friends-grid{grid-template-columns:repeat(2,1fr);}.retake-banner{flex-direction:column;align-items:flex-start;}}
 </style>
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
+  if(!firebase.apps.length){
     firebase.initializeApp({
       apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
       authDomain: "animus-b3d83.firebaseapp.com",
@@ -174,6 +175,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       messagingSenderId: "681221615050",
       appId: "1:681221615050:web:1d037cd07a8381c91b3333"
     });
+  }
+  var auth = firebase.auth();
+  var db = firebase.firestore();
   </script>
 </head>
 <body>
@@ -361,7 +365,6 @@ auth.onAuthStateChanged(function(user){
   // Load user doc - create if missing (handles failed signup writes)
   db.collection('users').doc(user.uid).get().then(function(doc){
     if(!doc.exists){
-      // Doc missing - try to create from localStorage backup or generate defaults
       var pending = null;
       try{ pending = JSON.parse(localStorage.getItem('animus_pending_doc')||'null'); }catch(_){}
       var defaultUsername = (user.displayName||user.email.split('@')[0]||'user')
@@ -375,7 +378,6 @@ auth.onAuthStateChanged(function(user){
         friends: [], friendRequests:{sent:[],received:[]},
         language: localStorage.getItem('animus_lang')||'en'
       };
-      // Write user doc
       db.collection('users').doc(user.uid).set(userData)
         .then(function(){
           return db.collection('usernames').doc(userData.username).set({uid:user.uid});
@@ -397,7 +399,6 @@ auth.onAuthStateChanged(function(user){
     }
   });
 
-  // Load latest profile
   db.collection('profiles').doc(user.uid).get().then(function(doc){
     if(doc.exists){
       var p = doc.data().latest;
@@ -410,12 +411,15 @@ auth.onAuthStateChanged(function(user){
     }
   });
 
-  // Load friends + activity
   loadFriends(user.uid);
   loadActivity(user.uid);
   loadNotifs(user.uid);
   loadPendingRequests(user.uid);
 });
+
+function loadPendingRequests(uid) {
+  loadNotifs(uid);
+}
 
 function loadFriends(uid){
   db.collection('users').doc(uid).get().then(function(doc){
@@ -440,7 +444,6 @@ function loadFriends(uid){
         var uname = escapeHTML(u.username||'');
         var mbti = escapeHTML((p&&p.mbti)||'—');
         var enn = p&&p.ennType ? p.ennType+'w'+p.ennWing : '—';
-        // Grid card
         var card = document.createElement('a');
         card.href = 'profile.html?u='+encodeURIComponent(u.username||fuid);
         card.className = 'friend-card';
@@ -450,13 +453,6 @@ function loadFriends(uid){
           +'<div class="friend-type">'+mbti+'</div>'
           +'<div class="friend-enn">'+escapeHTML(enn)+'</div>';
         grid.appendChild(card);
-        // Add btn
-        var addBtn = document.createElement('button');
-        addBtn.className = 'friend-card friend-card-add';
-        addBtn.onclick = openAddFriend;
-        addBtn.innerHTML = '<div class="add-icon">+</div><div class="add-label">Add Friend</div>';
-        grid.appendChild(addBtn);
-        // Sidebar
         var si = document.createElement('a');
         si.href = 'profile.html?u='+encodeURIComponent(u.username||fuid);
         si.className = 'sidebar-nav-item';
@@ -465,6 +461,13 @@ function loadFriends(uid){
           +'<div style="font-size:10px;color:var(--muted)">'+mbti+'</div></div>';
         nav.appendChild(si);
       });
+    });
+    Promise.all(promises).then(function(){
+      var addBtn = document.createElement('button');
+      addBtn.className = 'friend-card friend-card-add';
+      addBtn.onclick = openAddFriend;
+      addBtn.innerHTML = '<div class="add-icon">+</div><div class="add-label">Add Friend</div>';
+      grid.appendChild(addBtn);
     });
   });
 }
@@ -499,7 +502,6 @@ function getTimeAgo(date){
   return Math.floor(diff/86400)+' days ago';
 }
 
-// Add friend modal
 function openAddFriend(){
   document.getElementById('addFriendModal').classList.add('open');
   setTimeout(function(){ document.getElementById('friendSearchInput').focus(); },100);
@@ -511,7 +513,6 @@ function closeAddFriend(){
 }
 document.getElementById('addFriendModal').addEventListener('click',function(e){ if(e.target===this) closeAddFriend(); });
 
-// Search — will be replaced by Firestore query
 var searchTimer=null;
 function searchUsers(val){
   clearTimeout(searchTimer);
@@ -524,7 +525,7 @@ function searchUsers(val){
     var currentUser=firebase.auth().currentUser;
     firebase.firestore().collection('usernames')
       .where(firebase.firestore.FieldPath.documentId(),'>=',q)
-      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'\uf8ff')
+      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'')
       .limit(8).get()
       .then(function(snap){
         if(snap.empty){ res.innerHTML='<div class="search-empty">No users found for @'+escapeHTML(q)+'</div>'; return; }
@@ -634,7 +635,6 @@ function declineFriendRequest(fromUid){
   }).then(function(){ loadNotifs(user.uid); });
 }
 
-
 function filterFriends(val){
   val=val.toLowerCase();
   document.querySelectorAll('#friendsNav .sidebar-nav-item').forEach(function(el){
@@ -654,7 +654,6 @@ function loadNotifs(uid){
       return;
     }
     document.getElementById('notifBadge').style.display='block';
-    // Load names for each requester
     var promises = received.map(function(uid2){
       return db.collection('users').doc(uid2).get().then(function(d){
         return d.exists ? {uid:uid2, name:d.data().displayName||'Someone'} : null;
@@ -691,7 +690,7 @@ function showToast(msg){
 }
 </script>
 
-
+<script>
 // Smart logo: dashboard if logged in, landing if not
 try {
   firebase.auth().onAuthStateChanged(function(user){

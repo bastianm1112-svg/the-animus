@@ -22,7 +22,7 @@ if(!firebase.apps.length){
 }
 var auth = firebase.auth();
 var db = firebase.firestore();
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(e){ console.warn('Persistence error:', e); });
 </script>
 <style>
 :root{--bg:#080808;--surface:#0f0f0f;--surface2:#141414;--border:#1e1e1e;--border2:#2a2a2a;--text:#e2e2e2;--muted:#555;--muted2:#888;--gold:#c8a96e;--gold2:#8a6f3e;--gold3:#f0d090;--white:#f0ece4;--error:#c0392b;--green:#27ae60;}
@@ -86,7 +86,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .un-status{font-size:11px;margin-top:3px;min-height:15px;}
 .un-status.ok{color:var(--green);}
 .un-status.bad{color:var(--error);}
-/* screens */
 .screen{display:none;}
 .screen.show{display:block;}
 .setup-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--white);margin-bottom:6px;}
@@ -103,7 +102,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <a href="/" class="panel-logo">ANI<span>MUS</span></a>
   <div>
     <div class="panel-big">KNOW<br><span>THY</span><br>SELF</div>
-    <p class="panel-quote">"The unexamined life is not worth living." Your profile is waiting.</p>
+    <p class="panel-quote">“The unexamined life is not worth living.” Your profile is waiting.</p>
   </div>
   <div class="panel-dims">
     <div class="panel-dim"><strong>MBTI</strong> Cognitive function stack</div>
@@ -119,7 +118,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <div class="auth-box">
   <a href="/" class="mobile-logo">ANI<span>MUS</span></a>
 
-  <!-- MAIN LOGIN FORM -->
   <div id="screenMain" class="screen show">
     <div class="auth-eyebrow" id="eyebrow">Welcome back</div>
     <h1 class="auth-title" id="title">Sign in to ANIMUS</h1>
@@ -180,7 +178,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </div>
   </div>
 
-  <!-- USERNAME SETUP (new Google users only) -->
   <div id="screenSetup" class="screen">
     <div class="auth-eyebrow">One more step</div>
     <div class="setup-title">Choose a username</div>
@@ -195,7 +192,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <button class="btn-submit" style="margin-top:20px" onclick="finishSetup()">Finish →</button>
   </div>
 
-  <!-- SUCCESS -->
   <div id="screenSuccess" class="screen">
     <div class="success-icon">◆</div>
     <div class="success-title">You're in.</div>
@@ -205,35 +201,22 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 </div>
 
 <script>
-// ─────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────
 var mode = 'signin';
-var googleUser = null; // pending Google user awaiting username
+var googleUser = null;
 var unTimer = null;
 var setupTimer = null;
-// Flag: true while we are actively running an auth operation
-// Prevents onAuthStateChanged from auto-redirecting mid-flow
 var busy = false;
 
-// ─────────────────────────────────────────
-// ON LOAD: check if already signed in
-// ─────────────────────────────────────────
 auth.onAuthStateChanged(function(user){
-  if(busy) return; // mid-flow, do nothing
-  if(!user) return; // not signed in, stay on page
-  // Already signed in — go straight to dashboard
+  if(busy) return;
+  if(!user) return;
   goToDashboard();
 });
 
-// Handle redirect result (popup-blocked fallback)
 auth.getRedirectResult()
   .then(function(r){ if(r && r.user){ busy=true; handleGoogle(r.user); } })
   .catch(function(e){ if(e.code && e.code!=='auth/no-redirect-operation') showErr(e); });
 
-// ─────────────────────────────────────────
-// GOOGLE
-// ─────────────────────────────────────────
 document.getElementById('btnGoogle').addEventListener('click', function(){
   busy = true;
   var btn = this;
@@ -258,14 +241,11 @@ document.getElementById('btnGoogle').addEventListener('click', function(){
 });
 
 function handleGoogle(user){
-  // Check Firestore for existing profile
   db.collection('users').doc(user.uid).get()
     .then(function(doc){
       if(doc.exists){
-        // Returning user — go to dashboard
         goToDashboard();
       } else {
-        // New user — show username setup
         googleUser = user;
         var suggested = (user.displayName||'')
           .toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20);
@@ -278,15 +258,11 @@ function handleGoogle(user){
       }
     })
     .catch(function(e){
-      // Firestore read failed — let them in anyway, create doc on dashboard
       console.warn('Firestore read failed:', e);
       goToDashboard();
     });
 }
 
-// ─────────────────────────────────────────
-// EMAIL SUBMIT
-// ─────────────────────────────────────────
 function doSubmit(e){
   e.preventDefault();
   clearMsgs();
@@ -335,9 +311,6 @@ function doSubmit(e){
   }
 }
 
-// ─────────────────────────────────────────
-// USERNAME SETUP (Google new users)
-// ─────────────────────────────────────────
 function checkSetupUN(val){
   val = val.toLowerCase().replace(/[^a-z0-9_]/g,'');
   document.getElementById('setupUN').value = val;
@@ -381,9 +354,6 @@ function finishSetup(){
     });
 }
 
-// ─────────────────────────────────────────
-// FIRESTORE DOC CREATION
-// ─────────────────────────────────────────
 function saveDoc(user, displayName, username){
   var userData = {
     displayName: displayName||user.displayName||'',
@@ -395,20 +365,17 @@ function saveDoc(user, displayName, username){
     friendRequests: {sent:[], received:[]},
     language: localStorage.getItem('animus_lang')||'en'
   };
-  // Try batch first (atomic)
   var batch = db.batch();
   batch.set(db.collection('users').doc(user.uid), userData);
   batch.set(db.collection('usernames').doc(username), {uid: user.uid});
   return batch.commit().catch(function(batchErr){
     console.error('Batch write failed:', batchErr.code, batchErr.message);
-    // Fallback: try individual writes
     return db.collection('users').doc(user.uid).set(userData)
       .then(function(){
         return db.collection('usernames').doc(username).set({uid: user.uid});
       })
       .catch(function(e){
         console.error('Individual write also failed:', e.code, e.message);
-        // Store locally so dashboard can retry
         try{
           localStorage.setItem('animus_pending_doc', JSON.stringify({
             uid: user.uid,
@@ -417,14 +384,10 @@ function saveDoc(user, displayName, username){
             email: user.email||''
           }));
         }catch(_){}
-        // Don't throw - let auth succeed, dashboard will fix it
       });
   });
 }
 
-// ─────────────────────────────────────────
-// USERNAME CHECK (email signup form)
-// ─────────────────────────────────────────
 function checkUN(val){
   val = val.toLowerCase().replace(/[^a-z0-9_]/g,'');
   document.getElementById('iUser').value = val;
@@ -441,9 +404,6 @@ function checkUN(val){
   }, 500);
 }
 
-// ─────────────────────────────────────────
-// MODE TOGGLE
-// ─────────────────────────────────────────
 function setMode(m){
   mode = m;
   var up = m==='signup';
@@ -462,9 +422,6 @@ function setMode(m){
   clearMsgs();
 }
 
-// ─────────────────────────────────────────
-// FORGOT PASSWORD
-// ─────────────────────────────────────────
 function doForgot(){
   var email = v('iEmail');
   if(!email){ showErr({message:'Enter your email address first.'}); return; }
@@ -473,17 +430,11 @@ function doForgot(){
     .catch(showErr);
 }
 
-// ─────────────────────────────────────────
-// NAVIGATION
-// ─────────────────────────────────────────
 function goToDashboard(){
   showScreen('screenSuccess');
   setTimeout(function(){ window.location.href = '/dashboard'; }, 1000);
 }
 
-// ─────────────────────────────────────────
-// UI HELPERS
-// ─────────────────────────────────────────
 function showScreen(id){
   ['screenMain','screenSetup','screenSuccess'].forEach(function(s){
     document.getElementById(s).classList.toggle('show', s===id);
