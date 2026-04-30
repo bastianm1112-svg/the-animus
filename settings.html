@@ -74,8 +74,8 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .settings-page-sub { font-size: 13px; color: var(--muted2); }
 
 /* Section */
-.settings-section { display: none; }
-.settings-section.active { display: block; }
+.settings-section { display: none; opacity: 0; transition: opacity 0.2s; }
+.settings-section.active { display: block; opacity: 1; }
 
 .settings-group { margin-bottom: 36px; }
 .settings-group-title {
@@ -306,6 +306,14 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
     var auth = firebase.auth();
     var db = firebase.firestore();
   </script>
+<style>
+.nav-hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--text);align-items:center;justify-content:center;}
+.nav-mobile-menu{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:199;padding:8px 0;}
+.nav-mobile-menu.open{display:block;}
+.nav-mobile-item{display:flex;align-items:center;gap:10px;padding:13px 24px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;transition:color 0.15s;}
+.nav-mobile-item.active,.nav-mobile-item:hover{color:var(--gold);}
+@media(max-width:768px){.nav-items{display:none!important;}.nav-hamburger{display:flex!important;}}
+</style>
 </head>
 <body>
 
@@ -328,8 +336,16 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   </div>
   <div class="nav-right">
     <a href="/profile" class="nav-avatar" id="navAvatar">?</a>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
   </div>
 </nav>
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <a href="/dashboard" class="nav-mobile-item">Dashboard</a>
+  <a href="/profile" class="nav-mobile-item">Profile</a>
+  <a href="/types" class="nav-mobile-item">Types</a>
+  <a href="/compare" class="nav-mobile-item">Compare</a>
+  <a href="/settings" class="nav-mobile-item active">Settings</a>
+</div>
 
 <div class="page">
 
@@ -1223,6 +1239,16 @@ try {
     });
   });
 } catch(e){}
+</script>
+<script>
+function toggleMobileMenu(){
+  document.getElementById('navMobileMenu').classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  var menu=document.getElementById('navMobileMenu');
+  var btn=document.getElementById('navHamburger');
+  if(menu&&btn&&!menu.contains(e.target)&&!btn.contains(e.target)){menu.classList.remove('open');}
+});
 </script>
 </body>
 </html>
