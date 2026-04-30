@@ -160,6 +160,20 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
 @media(max-width:600px){.main{padding:20px 16px;}.friends-grid{grid-template-columns:repeat(2,1fr);}.retake-banner{flex-direction:column;align-items:flex-start;}}
+/* MOBILE NAV */
+.nav-hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--text);align-items:center;justify-content:center;}
+.nav-mobile-menu{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:199;padding:8px 0;}
+.nav-mobile-menu.open{display:block;}
+.nav-mobile-item{display:flex;align-items:center;gap:10px;padding:13px 24px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;transition:color 0.15s;}
+.nav-mobile-item.active,.nav-mobile-item:hover{color:var(--gold);}
+@media(max-width:768px){.nav-items{display:none;}.nav-hamburger{display:flex;}}
+/* SKELETON */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface2) 50%,var(--surface) 75%);background-size:800px 100%;animation:shimmer 1.4s infinite;border-radius:2px;}
+.skeleton-card{height:140px;background:var(--surface);border:1px solid var(--border);animation:shimmer 1.4s infinite;background-size:800px 100%;background-image:linear-gradient(90deg,var(--surface) 25%,var(--surface2) 50%,var(--surface) 75%);}
+.skeleton-line{height:12px;margin-bottom:6px;}
+/* FEED ICONS */
+.feed-icon{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--gold);}
 </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -205,6 +219,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </a>
   </div>
   <div class="nav-right">
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <button class="notif-btn" onclick="toggleNotifPanel()" title="Notifications">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <div class="notif-badge" id="notifBadge"></div>
@@ -212,6 +227,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <a href="/profile" class="nav-avatar" id="navAvatar">?</a>
   </div>
 </nav>
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <a href="/dashboard" class="nav-mobile-item active">Dashboard</a>
+  <a href="/profile" class="nav-mobile-item">My Profile</a>
+  <a href="/types" class="nav-mobile-item">Types</a>
+  <a href="/test" class="nav-mobile-item">Take Test</a>
+  <a href="/settings" class="nav-mobile-item">Settings</a>
+</div>
 
 <div class="page">
 
@@ -357,7 +379,8 @@ auth.onAuthStateChanged(function(user){
   // Set greeting
   var name = escapeHTML(user.displayName || user.email.split('@')[0]);
   document.getElementById('mainGreeting').innerHTML = greeting+', <em>'+name+'</em>';
-  var init = name.charAt(0).toUpperCase();
+  var nameParts = name.split(/s+/).filter(Boolean);
+  var init = nameParts.length > 1 ? (nameParts[0].charAt(0) + nameParts[nameParts.length-1].charAt(0)).toUpperCase() : name.charAt(0).toUpperCase();
   document.getElementById('navAvatar').textContent = init;
   document.getElementById('sidebarAvatar').textContent = init;
   document.getElementById('sidebarName').textContent = name;
@@ -406,7 +429,15 @@ auth.onAuthStateChanged(function(user){
         document.getElementById('sidebarType').textContent = p.mbti;
         var ennD = p.ennType ? p.ennType+'w'+p.ennWing : '—';
         document.getElementById('sidebarEnn').textContent = ennD+(p.instStack?' · '+p.instStack:'');
-        document.getElementById('retakeBannerText').innerHTML = '<strong>Last assessment complete.</strong> Retake any time to see how you\'ve changed.';
+      var now = Date.now();
+      var hist = p.history && p.history.length ? p.history : [];
+      var lastDate = hist.length ? hist[hist.length-1].timestamp : null;
+      var daysSince = lastDate ? Math.floor((now - lastDate.toDate().getTime()) / 86400000) : null;
+      if(daysSince !== null && daysSince > 90){
+        document.getElementById('retakeBannerText').innerHTML = '<strong>It's been ' + daysSince + ' days since your last assessment.</strong> See how you've changed.';
+      } else {
+        document.getElementById('retakeBannerText').innerHTML = '<strong>Last assessment complete.</strong> Retake any time to see how you've changed.';
+      }
       }
     }
   });
@@ -415,6 +446,7 @@ auth.onAuthStateChanged(function(user){
   loadActivity(user.uid);
   loadNotifs(user.uid);
   loadPendingRequests(user.uid);
+  loadSuggestions(user.uid);
 });
 
 function loadPendingRequests(uid) {
@@ -484,9 +516,18 @@ function loadActivity(uid){
         var item = document.createElement('div');
         item.className = 'feed-item';
         var timeAgo = a.timestamp ? getTimeAgo(a.timestamp.toDate()) : '';
-        item.innerHTML = '<div class="feed-avatar">'+escapeHTML((a.fromName||'?').charAt(0))+'</div>'
-          +'<div class="feed-content"><div class="feed-text">'+escapeHTML(a.text||'')+'</div>'
-          +'<div class="feed-time">'+timeAgo+'</div>'
+        var txt = a.text || '';
+        var iconSVG;
+        if(txt.indexOf('friend request') > -1 && txt.indexOf('accepted') === -1){
+          iconSVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>';
+        } else if(txt.indexOf('accepted') > -1){
+          iconSVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+        } else {
+          iconSVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+        }
+        item.innerHTML = '<div class="feed-icon">' + iconSVG + '</div>'
+          +'<div class="feed-content"><div class="feed-text">' + escapeHTML(a.text||'') + '</div>'
+          +'<div class="feed-time">' + timeAgo + '</div>'
           +(a.link?'<a href="'+escapeHTML(a.link)+'" class="feed-action">View →</a>':'')
           +'</div>';
         feed.appendChild(item);
@@ -675,6 +716,60 @@ function loadNotifs(uid){
 }
 
 function toggleNotifPanel(){
+function loadSuggestions(uid){
+  db.collection('users').doc(uid).get().then(function(doc){
+    if(!doc.exists) return;
+    var myFriends = doc.data().friends || [];
+    if(!myFriends.length) return;
+    var seen = {};
+    myFriends.forEach(function(f){ seen[f]=true; });
+    seen[uid]=true;
+    var candidates = {};
+    var pending = myFriends.map(function(fuid){
+      return db.collection('users').doc(fuid).get().then(function(fd){
+        if(!fd.exists) return;
+        (fd.data().friends||[]).forEach(function(ff){
+          if(!seen[ff]) candidates[ff] = (candidates[ff]||0)+1;
+        });
+      });
+    });
+    Promise.all(pending).then(function(){
+      var sorted = Object.keys(candidates).sort(function(a,b){ return candidates[b]-candidates[a]; }).slice(0,5);
+      if(!sorted.length) return;
+      var suggestList = document.getElementById('suggestList');
+      suggestList.innerHTML = '';
+      var promises = sorted.map(function(suid){
+        return Promise.all([db.collection('users').doc(suid).get(), db.collection('profiles').doc(suid).get()]).then(function(r){
+          var su = r[0].exists ? r[0].data() : null;
+          var sp = r[1].exists ? r[1].data().latest : {};
+          if(!su) return;
+          var sname = escapeHTML(su.displayName||'User');
+          var stype = escapeHTML((sp&&sp.mbti)||'');
+          var init = sname.charAt(0).toUpperCase();
+          suggestList.innerHTML += '<div class="suggest-item">'
+            +'<div class="suggest-avatar">'+init+'</div>'
+            +'<div class="suggest-info"><div class="suggest-name">'+sname+'</div>'
+            +(stype?'<div class="suggest-type">'+stype+'</div>':'')+'</div>'
+            +'<button class="btn-add-small" data-uid="'+escapeHTML(suid)+'" data-name="'+sname+'" onclick="sendFriendRequest(this.dataset.uid,this.dataset.name,this)">Add</button>'
+            +'</div>';
+        });
+      });
+      return Promise.all(promises);
+    });
+  });
+}
+
+function toggleMobileMenu(){
+  document.getElementById('navMobileMenu').classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  var menu=document.getElementById('navMobileMenu');
+  var btn=document.getElementById('navHamburger');
+  if(menu && btn && !menu.contains(e.target) && !btn.contains(e.target)){
+    menu.classList.remove('open');
+  }
+});
+
   var col = document.querySelector('.feed-col');
   if(col) col.scrollIntoView({behavior:'smooth'});
 }
