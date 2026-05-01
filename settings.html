@@ -571,7 +571,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
             <div class="field-desc">Used throughout the site and during the assessment.</div>
           </div>
           <div class="field-control">
-            <select class="s-select" id="language" onchange="markDirty()">
+            <select class="s-select" id="language" onchange="applyLanguage(this.value); markDirty()">
               <option value="en">English</option>
               <option value="es">Español (Paraguay)</option>
             </select>
@@ -1112,7 +1112,9 @@ auth.onAuthStateChanged(function(user){
     document.getElementById('usernamePreview').textContent=username||'yourname';
     document.getElementById('bio').value=p.bio||'';
     document.getElementById('email').value=email;
-    document.getElementById('language').value=p.language||localStorage.getItem('animus_lang')||'en';
+    var resolvedLang = p.language || localStorage.getItem('animus_lang') || 'en';
+    document.getElementById('language').value = resolvedLang;
+    applyLanguage(resolvedLang);
     document.getElementById('theme').value=localStorage.getItem('animus_theme')||'dark';
     updateCharCount();
     // Google email
@@ -1148,8 +1150,96 @@ function applyTheme(theme) {
 }
 
 // Language
+var _i18n_es = {
+  'Dashboard':'Panel','My Profile':'Mi Perfil','Settings':'Ajustes',
+  'Profile':'Perfil','Compare':'Comparar','Types':'Tipos',
+  'Account & Security':'Cuenta y Seguridad','Appearance':'Apariencia',
+  'Notifications':'Notificaciones','Privacy':'Privacidad',
+  'Data & Export':'Datos y Exportación','Sign Out':'Cerrar Sesión',
+  'How you appear to others on ANIMUS.':'Cómo aparecés ante los demás en ANIMUS.',
+  'Manage your login credentials and connected accounts.':'Administrá tus credenciales y cuentas conectadas.',
+  'Customize how ANIMUS looks and feels.':'Personalizá el aspecto de ANIMUS.',
+  'Choose what you get notified about inside ANIMUS.':'Elegí sobre qué te notifica ANIMUS.',
+  'Control who can see your profile and data.':'Controlá quién puede ver tu perfil y datos.',
+  'Photo':'Foto','Identity':'Identidad','Email':'Correo','Password':'Contraseña',
+  'Connected Accounts':'Cuentas Conectadas','Danger Zone':'Zona de Peligro',
+  'Theme':'Tema','Language':'Idioma','Assessment Preferences':'Preferencias del Test',
+  'Activity':'Actividad','Profile Visibility':'Visibilidad del Perfil',
+  'Display Name':'Nombre de Pantalla','Username':'Usuario','Bio':'Biografía',
+  'Email Address':'Dirección de Correo','Current Password':'Contraseña Actual',
+  'New Password':'Nueva Contraseña','Confirm New Password':'Confirmar Contraseña',
+  'Color Theme':'Tema de Color','Show Simplify Button':'Mostrar Botón de Simplificación',
+  'Default Test Mode':'Modo de Test Predeterminado',
+  'Your name shown on your profile and to friends.':'Tu nombre visible en tu perfil y para amigos.',
+  'Used to sign in and receive notifications.':'Usado para iniciar sesión y recibir notificaciones.',
+  'Minimum 8 characters.':'Mínimo 8 caracteres.',
+  'Choose between dark and light mode across all pages.':'Elegí entre modo oscuro y claro.',
+  'Used throughout the site and during the assessment.':'Usado en todo el sitio y durante el test.',
+  'Which version opens by default when you start the test.':'Qué versión abre por defecto al iniciar el test.',
+  'Show the plain-English simplification button on each question.':'Mostrar el botón de simplificación en cada pregunta.',
+  'You have unsaved changes':'Tenés cambios sin guardar',
+  'Friend requests':'Solicitudes de amistad','Friend joined':'Amigo se unió',
+  'Friend retook assessment':'Amigo realizó el test','Profile comparison':'Comparación de perfil',
+  'When someone sends you a friend request':'Cuando alguien te envía una solicitud de amistad',
+  'When someone you know creates an account':'Cuando alguien que conocés crea una cuenta',
+  'Sign out of all devices':'Cerrar sesión en todos los dispositivos',
+  'Delete account':'Eliminar cuenta',
+  'Revokes all active sessions everywhere.':'Revoca todas las sesiones activas en todos lados.',
+  'Permanently deletes your profile, results, and all data. This cannot be undone.':'Elimina permanentemente tu perfil, resultados y todos los datos. No se puede deshacer.',
+  'Public Profile':'Perfil Público','Show Retake History':'Mostrar Historial de Retoma',
+  "Show in Friends' Suggestions":'Aparecer en Sugerencias de Amigos',
+  'Public':'Público','Hidden':'Oculto','Visible':'Visible','Enabled':'Activado'
+};
+
 function applyLanguage(lang) {
   localStorage.setItem('animus_lang', lang);
+  var map = lang === 'es' ? _i18n_es : null;
+
+  // Pure-text elements (no child elements with content)
+  var pureSelectors = [
+    '.settings-page-title','.settings-page-sub','.settings-group-title',
+    '.field-label','.settings-nav-title','.save-bar-text',
+    '.notif-title','.notif-desc','.danger-item-title','.danger-item-desc',
+    '.nav-mobile-item','.toggle-label'
+  ];
+  pureSelectors.forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(el){
+      if(!el.children.length){
+        if(!el.getAttribute('data-en')) el.setAttribute('data-en', el.textContent.trim());
+        var key = el.getAttribute('data-en');
+        el.textContent = (map && map[key]) ? map[key] : key;
+      }
+    });
+  });
+
+  // field-desc (may have child elements — only translate plain ones)
+  document.querySelectorAll('.field-desc').forEach(function(el){
+    if(!el.children.length){
+      if(!el.getAttribute('data-en')) el.setAttribute('data-en', el.textContent.trim());
+      var key = el.getAttribute('data-en');
+      el.textContent = (map && map[key]) ? map[key] : key;
+    }
+  });
+
+  // Nav items and settings sidebar buttons (SVG + text node)
+  document.querySelectorAll('.nav-item, .settings-nav-item').forEach(function(el){
+    if(!el.getAttribute('data-en')){
+      for(var i=el.childNodes.length-1;i>=0;i--){
+        var n=el.childNodes[i];
+        if(n.nodeType===3 && n.textContent.trim()){
+          el.setAttribute('data-en', n.textContent.trim()); break;
+        }
+      }
+    }
+    var key = el.getAttribute('data-en');
+    if(!key) return;
+    for(var i=el.childNodes.length-1;i>=0;i--){
+      var n=el.childNodes[i];
+      if(n.nodeType===3 && n.textContent.trim()){
+        n.textContent = (map && map[key]) ? ' '+map[key]+' ' : ' '+key+' '; break;
+      }
+    }
+  });
 }
 
 // Load saved preferences
@@ -1252,3 +1342,4 @@ document.addEventListener('click',function(e){
 </script>
 </body>
 </html>
+
