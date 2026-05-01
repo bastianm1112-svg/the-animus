@@ -417,6 +417,11 @@ auth.onAuthStateChanged(function(user){
       var data = doc.data();
       var uname = data.username || '';
       if(uname) document.getElementById('sidebarUsername').textContent = '@'+escapeHTML(uname);
+      var firestoreName = data.displayName || '';
+      if(firestoreName) {
+        document.getElementById('sidebarName').textContent = escapeHTML(firestoreName);
+        document.getElementById('mainGreeting').innerHTML = greeting+', <em>'+escapeHTML(firestoreName)+'</em>';
+      }
       var fc = (data.friends||[]).length;
       if(fc) document.getElementById('friendCount').textContent = '· '+fc;
     }
@@ -434,9 +439,9 @@ auth.onAuthStateChanged(function(user){
       var lastDate = hist.length ? hist[hist.length-1].timestamp : null;
       var daysSince = lastDate ? Math.floor((now - lastDate.toDate().getTime()) / 86400000) : null;
       if(daysSince !== null && daysSince > 90){
-        document.getElementById('retakeBannerText').innerHTML = '<strong>It's been ' + daysSince + ' days since your last assessment.</strong> See how you've changed.';
+        document.getElementById('retakeBannerText').innerHTML = '<strong>It’s been ' + daysSince + ' days since your last assessment.</strong> See how you’ve changed.';
       } else {
-        document.getElementById('retakeBannerText').innerHTML = '<strong>Last assessment complete.</strong> Retake any time to see how you've changed.';
+        document.getElementById('retakeBannerText').innerHTML = '<strong>Last assessment complete.</strong> Retake any time to see how you’ve changed.';
       }
       }
     }
@@ -716,6 +721,10 @@ function loadNotifs(uid){
 }
 
 function toggleNotifPanel(){
+  var col = document.querySelector('.feed-col');
+  if(col) col.scrollIntoView({behavior:'smooth'});
+}
+
 function loadSuggestions(uid){
   db.collection('users').doc(uid).get().then(function(doc){
     if(!doc.exists) return;
@@ -769,10 +778,6 @@ document.addEventListener('click',function(e){
     menu.classList.remove('open');
   }
 });
-
-  var col = document.querySelector('.feed-col');
-  if(col) col.scrollIntoView({behavior:'smooth'});
-}
 function signOut(){
   auth.signOut().then(function(){ window.location.href='/login'; });
 }
