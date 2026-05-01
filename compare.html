@@ -171,6 +171,13 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .gap-med { background: rgba(200,169,110,0.12); color: var(--gold); border: 1px solid rgba(200,169,110,0.25); }
 .gap-high { background: rgba(192,57,43,0.1); color: #c0392b; border: 1px solid rgba(192,57,43,0.2); }
 
+/* Friends picker */
+.friends-picker-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+.friends-picker-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted2); white-space: nowrap; }
+.friends-picker-select { flex: 1; background: var(--surface2); border: 1px solid var(--border2); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 12px; border-radius: 4px; cursor: pointer; max-width: 320px; }
+.friends-picker-select:focus { outline: none; border-color: var(--gold2); }
+.friends-picker-select option { background: var(--surface2); color: var(--text); }
+
 /* Share button */
 .compare-share-bar { display: flex; gap: 10px; margin-bottom: 32px; }
 .btn-share-comp { display: flex; align-items: center; gap: 7px; padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: none; }
@@ -370,6 +377,14 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <!-- CONTENT -->
 <div class="compare-content">
 
+  <!-- Friends picker -->
+  <div class="friends-picker-bar" id="friendsPickerBar" style="display:none">
+    <span class="friends-picker-label">Compare with</span>
+    <select class="friends-picker-select" id="friendsPickerSelect" onchange="if(this.value) window.location.href='/compare?u='+encodeURIComponent(this.value)">
+      <option value="">— Choose a friend —</option>
+    </select>
+  </div>
+
   <!-- Share bar -->
   <div class="compare-share-bar">
     <button class="btn-share-comp btn-gold" onclick="shareComparison()">⬡ Share This Comparison</button>
@@ -494,6 +509,31 @@ auth.onAuthStateChanged(function(currentUser){
   // Set nav avatar
   document.getElementById('navAvatar').textContent=(currentUser.displayName||'?').charAt(0).toUpperCase();
 
+  // Populate friends picker
+  db.collection('users').doc(currentUser.uid).get().then(function(doc){
+    if(!doc.exists) return;
+    var friends = (doc.data().friends||[]).filter(function(v,i,a){return a.indexOf(v)===i;});
+    if(!friends.length) return;
+    var select = document.getElementById('friendsPickerSelect');
+    var currentU = new URLSearchParams(window.location.search).get('u')||'';
+    Promise.all(friends.map(function(fuid){
+      return db.collection('users').doc(fuid).get();
+    })).then(function(docs){
+      docs.forEach(function(d){
+        if(!d.exists) return;
+        var u = d.data();
+        var uname = u.username||'';
+        if(!uname) return;
+        var opt = document.createElement('option');
+        opt.value = uname;
+        opt.textContent = (u.displayName||uname) + ' (@'+uname+')';
+        if(uname === currentU) opt.selected = true;
+        select.appendChild(opt);
+      });
+      document.getElementById('friendsPickerBar').style.display='flex';
+    });
+  });
+
   var params = new URLSearchParams(window.location.search);
   var u = params.get('u');
   if(!u){ return; } // no target user — show blank state
@@ -542,7 +582,7 @@ auth.onAuthStateChanged(function(currentUser){
       document.getElementById('themName').textContent = themName;
       document.getElementById('themUsername').textContent = '@' + themUname2;
       document.getElementById('themAvatar').textContent = themName.charAt(0).toUpperCase();
-      document.getElementById('viewThemBtn').href = 'profile.html?u=' + encodeURIComponent(u);
+      document.getElementById('viewThemBtn').href = '/profile?u=' + encodeURIComponent(u);
       document.getElementById('viewThemBtn').textContent = 'View ' + themName + "'s Profile →";
 
       // Update legend labels
@@ -741,7 +781,7 @@ function shareComparison(){
   if(u){
     var viewBtn = document.querySelector('.btn-share-comp.btn-outline');
     if(viewBtn){
-      viewBtn.href = 'profile.html?u=' + encodeURIComponent(u);
+      viewBtn.href = '/profile?u=' + encodeURIComponent(u);
       viewBtn.textContent = 'View ' + escapeHTML(u.charAt(0).toUpperCase() + u.slice(1)) + '\'s Profile →';
     }
     // Also update the "them" name in the profiles strip
@@ -783,3 +823,4 @@ document.addEventListener('click',function(e){
 </script>
 </body>
 </html>
+
