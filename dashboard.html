@@ -461,7 +461,7 @@ function loadPendingRequests(uid) {
 function loadFriends(uid){
   db.collection('users').doc(uid).get().then(function(doc){
     if(!doc.exists) return;
-    var friends = doc.data().friends || [];
+    var friends = (doc.data().friends||[]).filter(function(v,i,a){return a.indexOf(v)===i;});
     if(!friends.length) return;
     var grid = document.getElementById('friendsGrid');
     var nav = document.getElementById('friendsNav');
@@ -482,7 +482,7 @@ function loadFriends(uid){
         var mbti = escapeHTML((p&&p.mbti)||'—');
         var enn = p&&p.ennType ? p.ennType+'w'+p.ennWing : '—';
         var card = document.createElement('a');
-        card.href = 'profile.html?u='+encodeURIComponent(u.username||fuid);
+        card.href = '/profile?u='+encodeURIComponent(u.username||fuid);
         card.className = 'friend-card';
         card.innerHTML = '<div class="friend-avatar">'+init+'</div>'
           +'<div class="friend-name">'+dname+'</div>'
@@ -491,7 +491,7 @@ function loadFriends(uid){
           +'<div class="friend-enn">'+escapeHTML(enn)+'</div>';
         grid.appendChild(card);
         var si = document.createElement('a');
-        si.href = 'profile.html?u='+encodeURIComponent(u.username||fuid);
+        si.href = '/profile?u='+encodeURIComponent(u.username||fuid);
         si.className = 'sidebar-nav-item';
         si.innerHTML = '<div class="suggest-avatar" style="width:24px;height:24px;font-size:11px;border-radius:50%">'+init+'</div>'
           +'<div style="flex:1"><div style="font-size:12px;color:var(--text)">'+dname+'</div>'
@@ -530,10 +530,20 @@ function loadActivity(uid){
         } else {
           iconSVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
         }
+        var isFriendReq = a.type==='friend_request' || (!a.type && a.fromUid && a.text && a.text.indexOf('sent you a friend request')>-1);
+        var actionHtml = '';
+        if(isFriendReq && a.fromUid){
+          actionHtml = '<div style="display:flex;gap:8px;margin-top:8px">'
+            +'<button class="btn-add-small" style="border-color:var(--green,#4caf50);color:var(--green,#4caf50)" data-uid="'+escapeHTML(a.fromUid)+'" data-name="'+escapeHTML(a.fromName||'')+'" onclick="acceptFriendRequest(this.dataset.uid,this.dataset.name);this.closest(\'.feed-item\').remove()">Accept</button>'
+            +'<button class="btn-add-small" data-uid="'+escapeHTML(a.fromUid)+'" onclick="declineFriendRequest(this.dataset.uid);this.closest(\'.feed-item\').remove()">Decline</button>'
+            +'</div>';
+        } else if(a.link){
+          actionHtml = '<a href="'+escapeHTML(a.link)+'" class="feed-action">View →</a>';
+        }
         item.innerHTML = '<div class="feed-icon">' + iconSVG + '</div>'
           +'<div class="feed-content"><div class="feed-text">' + escapeHTML(a.text||'') + '</div>'
           +'<div class="feed-time">' + timeAgo + '</div>'
-          +(a.link?'<a href="'+escapeHTML(a.link)+'" class="feed-action">View →</a>':'')
+          +actionHtml
           +'</div>';
         feed.appendChild(item);
       });
@@ -634,9 +644,9 @@ function sendFriendRequest(toUid, toName, btn){
     });
     var actRef = db.collection('activity').doc(toUid).collection('feed').doc();
     batch.set(actRef,{
+      type: 'friend_request',
       text: (user.displayName||'Someone')+' sent you a friend request',
       fromUid: user.uid, fromName: user.displayName||'',
-      link: '/profile',
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     return batch.commit().then(function(){
@@ -664,7 +674,6 @@ function acceptFriendRequest(fromUid, fromName){
   batch.set(actRef,{
     text: (user.displayName||'Someone')+' accepted your friend request',
     fromUid: user.uid, fromName: user.displayName||'',
-    link: '/profile',
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   });
   batch.commit().then(function(){
@@ -802,3 +811,4 @@ try {
 </script>
 </body>
 </html>
+
