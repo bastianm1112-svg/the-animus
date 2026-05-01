@@ -1680,7 +1680,7 @@ function renderQ(){
         fetch('/api/simplify',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({question:qText2})
+          body:JSON.stringify({question:qText2, lang:lang})
         }).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
         .then(function(d){
           var txt=(d.simplified||'').trim().replace(/^["']|["']$/g,'');
@@ -3075,3 +3075,4 @@ try{firebase.auth().onAuthStateChanged(function(u){document.querySelectorAll('a.
 </script>
 </body>
 </html>
+
