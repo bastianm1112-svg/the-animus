@@ -293,9 +293,9 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
     <div class="compat-bar-wrap">
       <div class="compat-label">Overall Compatibility</div>
       <div class="compat-score-row">
-        <div class="compat-pct">68<span>%</span></div>
-        <div class="compat-track"><div class="compat-fill" data-w="68"></div></div>
-        <div class="compat-verdict"><span id="compatVerdict">Select two profiles to compare</span></div>
+        <div class="compat-pct">—<span>%</span></div>
+        <div class="compat-track"><div class="compat-fill" data-w="0"></div></div>
+        <div class="compat-verdict"><span id="compatVerdict">Choose a friend above to compare</span></div>
       </div>
     </div>
 
@@ -536,7 +536,20 @@ auth.onAuthStateChanged(function(currentUser){
 
   var params = new URLSearchParams(window.location.search);
   var u = params.get('u');
-  if(!u){ return; } // no target user — show blank state
+  if(!u){
+    // No comparison target — clear the hardcoded placeholder values
+    document.querySelector('.compat-pct').innerHTML = '—<span>%</span>';
+    var fill = document.querySelector('.compat-fill');
+    if(fill){ fill.setAttribute('data-w','0'); fill.style.width='0%'; }
+    document.getElementById('compatVerdict').textContent = 'Choose a friend above to compare';
+    document.querySelectorAll('.ring-svg').forEach(function(svg){
+      var circles = svg.querySelectorAll('circle');
+      if(circles[1]) circles[1].setAttribute('stroke-dashoffset','138.16');
+      var txt = svg.querySelector('text');
+      if(txt) txt.textContent = '—';
+    });
+    return;
+  }
 
   u = u.replace(/[^a-zA-Z0-9_\-]/g,'').substring(0,32);
 
