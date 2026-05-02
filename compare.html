@@ -733,15 +733,15 @@ function generateAIAnalysis(mySnap, themSnap, myName, themName){
     + ' Person 2 ('+themName+'): MBTI='+themSnap.mbti+', Enneagram='+(themSnap.ennType||'?')+'w'+(themSnap.ennWing||'?')+', Attachment='+(themSnap.att||'?')+', Philosophy='+(themSnap.phi||'?')+', Political X='+(themSnap.polX||0)+' Y='+(themSnap.polY||0)+'.'
     + ' Return JSON with keys: {"whereAlign":"2 paragraphs on natural connection","whereClash":"2 paragraphs on friction","dynamic":"1 paragraph on social interaction","mutualEffect":"1 paragraph on what each brings out in the other"}. Raw JSON only.';
 
-  fetch('https://api.anthropic.com/v1/messages',{
+  fetch('/api/compare',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,messages:[{role:'user',content:prompt}]})
-  }).then(function(r){return r.json();})
+    body:JSON.stringify({prompt:prompt})
+  }).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
   .then(function(d){
     var text=(d.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('').replace(/```json|```/g,'').trim();
     var ai=JSON.parse(text);
-        aiContent.innerHTML =
+    aiContent.innerHTML =
       '<div class="ai-section"><div class="ai-section-title">Where You Align</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.whereAlign,3000)+'</div></div></div>'
       +'<div class="ai-section"><div class="ai-section-title">Where You\'ll Clash</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.whereClash,3000)+'</div></div></div>'
       +'<div class="ai-section"><div class="ai-section-title">How You\'d Interact</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.dynamic,1500)+'</div></div></div>'
@@ -836,4 +836,5 @@ document.addEventListener('click',function(e){
 </script>
 </body>
 </html>
+
 
