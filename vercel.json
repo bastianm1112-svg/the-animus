@@ -3,57 +3,22 @@
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=63072000; includeSubDomains; preload"
-        }
+        {"key": "X-Frame-Options", "value": "DENY"},
+        {"key": "X-Content-Type-Options", "value": "nosniff"},
+        {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"},
+        {"key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload"}
       ]
     }
   ],
   "rewrites": [
-    {
-      "source": "/dashboard",
-      "destination": "/dashboard.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/login.html"
-    },
-    {
-      "source": "/settings",
-      "destination": "/settings.html"
-    },
-    {
-      "source": "/test",
-      "destination": "/psyche-complete.html"
-    },
-    {
-      "source": "/compare",
-      "destination": "/compare.html"
-    },
-    {
-      "source": "/types",
-      "destination": "/types.html"
-    },
-    {
-      "source": "/profile",
-      "destination": "/profile.html"
-    },
-    {
-      "source": "/:username((?!dashboard|login|settings|test|compare|types|profile|api|_vercel|favicon|index).*)",
-      "destination": "/profile.html?u=:username"
-    }
+    {"source": "/dashboard", "destination": "/dashboard.html"},
+    {"source": "/login", "destination": "/login.html"},
+    {"source": "/settings", "destination": "/settings.html"},
+    {"source": "/test", "destination": "/psyche-complete.html"},
+    {"source": "/compare", "destination": "/compare.html"},
+    {"source": "/types", "destination": "/types.html"},
+    {"source": "/profile", "destination": "/profile.html"},
+    {"source": "/group", "destination": "/group.html"},
+    {"source": "/:username((?!dashboard|login|settings|test|compare|types|profile|group|api|_vercel|favicon|index).*)", "destination": "/profile.html?u=:username"}
   ]
 }
