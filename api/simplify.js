@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { question, lang } = req.body || {};
@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   const isEs = lang === 'es';
   const prompt = isEs
-    ? `Reescribí esta pregunta de test de personalidad en español paraguayo simple y cotidiano. Usá "vos" en vez de "tú". Sé conciso (1-2 oraciones). Devolvé solo la pregunta simplificada, sin explicación: ${question}`
+    ? `Reescribí esta pregunta de test de personalidad en español paraguayo simple y cotidiano. Usá "vos". Sé conciso (1-2 oraciones). Devolvé solo la pregunta simplificada, sin explicación: ${question}`
     : `Rewrite this personality test question in simple, everyday language. Keep it concise (1-2 sentences). Return only the simplified question, no explanation: ${question}`;
 
   try {
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 120,
+        max_tokens: 150,
         messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -39,11 +39,11 @@ export default async function handler(req, res) {
       .map(b => b.text)
       .join('')
       .trim()
-      .replace(/^["'""'']|["'""'']$/g, '');
+      .replace(/^["'“‘]|["'”’]$/g, '');
 
     res.json({ simplified: text });
   } catch (e) {
-    console.error('Simplify handler error:', e);
+    console.error('Simplify error:', e);
     res.status(500).json({ error: 'Internal error' });
   }
-}
+};
