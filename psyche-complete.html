@@ -332,9 +332,25 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
   <div style="display:flex;gap:12px;align-items:center;">
     <a href="/dashboard" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">Dashboard</a>
     <a href="/profile" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">My Profile</a>
-    <a href="/login" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e;text-decoration:none;border:1px solid #8a6f3e;padding:5px 14px;" onmouseover="this.style.background='#c8a96e';this.style.color='#000'" onmouseout="this.style.background='none';this.style.color='#c8a96e'">Sign In</a>
+    <a href="/login" id="navSignInBtn" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e;text-decoration:none;border:1px solid #8a6f3e;padding:5px 14px;" onmouseover="this.style.background='#c8a96e';this.style.color='#000'" onmouseout="this.style.background='none';this.style.color='#c8a96e'">Sign In</a>
   </div>
 </nav>
+<script>
+(function(){
+  try {
+    firebase.auth().onAuthStateChanged(function(user){
+      var btn = document.getElementById('navSignInBtn');
+      if(!btn) return;
+      if(user){
+        btn.href = '/dashboard';
+        btn.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Dashboard';
+        btn.onmouseover = function(){ this.style.background='#c8a96e'; this.style.color='#000'; };
+        btn.onmouseout  = function(){ this.style.background='none';    this.style.color='#c8a96e'; };
+      }
+    });
+  } catch(e){}
+})();
+</script>
 
 <!-- INTRO -->
 <div id="intro">
@@ -3075,4 +3091,5 @@ try{firebase.auth().onAuthStateChanged(function(u){document.querySelectorAll('a.
 </script>
 </body>
 </html>
+
 
