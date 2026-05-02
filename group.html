@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANIMUS — Group Compare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080808;--surface:#0f0f0f;--surface2:#141414;--border:#1e1e1e;--border2:#2a2a2a;--text:#e2e2e2;--muted:#555;--muted2:#888;--gold:#c8a96e;--gold2:#8a6f3e;--gold3:#f0d090;--white:#f0ece4;--green:#4a9e6a;--green2:#2d6b47;}
+body.light-mode{--bg:#f4f1ec;--surface:#fff;--surface2:#f8f5f0;--border:#e0dbd4;--border2:#cdc7bf;--text:#1a1714;--muted:#9a9189;--muted2:#6b6259;--white:#1a1714;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;}
+/* Nav */
+.navbar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;z-index:200;}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;color:var(--white);text-decoration:none;margin-right:40px;}
+.nav-logo span{color:var(--gold);}
+.nav-items{display:flex;align-items:center;gap:4px;flex:1;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:7px 14px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;transition:all 0.15s;}
+.nav-item:hover{color:var(--text);background:var(--surface);}
+.nav-item.active{color:var(--gold);background:rgba(200,169,110,0.06);}
+.nav-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
+.nav-avatar{width:32px;height:32px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);text-decoration:none;}
+.nav-hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--text);align-items:center;justify-content:center;}
+.nav-mobile-menu{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:199;padding:8px 0;}
+.nav-mobile-menu.open{display:block;}
+.nav-mobile-item{display:flex;align-items:center;gap:10px;padding:13px 24px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;transition:color 0.15s;}
+.nav-mobile-item:hover,.nav-mobile-item.active{color:var(--gold);}
+@media(max-width:768px){.nav-items{display:none!important;}.nav-hamburger{display:flex!important;}}
+
+/* Page */
+.page{padding-top:56px;max-width:1100px;margin:0 auto;padding-bottom:80px;}
+.page-header{padding:40px 28px 0;border-bottom:1px solid var(--border);background:var(--surface);margin-bottom:0;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:0.06em;color:var(--white);line-height:1;}
+.page-sub{font-size:13px;color:var(--muted2);margin-top:4px;padding-bottom:24px;}
+
+/* Selector */
+.selector-section{padding:24px 28px;border-bottom:1px solid var(--border);}
+.selector-label{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold2);margin-bottom:14px;}
+.selector-grid{display:flex;flex-wrap:wrap;gap:10px;}
+.person-chip{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 10px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all 0.18s;user-select:none;}
+.person-chip:hover{border-color:var(--gold2);}
+.person-chip.selected{border-color:var(--gold);background:rgba(200,169,110,0.08);}
+.person-chip.you{border-color:var(--green2);background:rgba(74,158,106,0.06);}
+.person-chip.you.selected{border-color:var(--green);background:rgba(74,158,106,0.12);}
+.chip-avatar{width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);flex-shrink:0;}
+.chip-info{line-height:1.3;}
+.chip-name{font-size:13px;color:var(--text);}
+.chip-type{font-size:10px;color:var(--muted);}
+.chip-check{width:16px;height:16px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-left:4px;transition:all 0.15s;}
+.person-chip.selected .chip-check{background:var(--gold);border-color:var(--gold);color:#000;}
+.person-chip.you.selected .chip-check{background:var(--green);border-color:var(--green);color:#000;}
+.selector-hint{font-size:11px;color:var(--muted);margin-top:12px;}
+
+/* Main content */
+.group-content{padding:28px;}
+.group-placeholder{text-align:center;padding:60px 20px;color:var(--muted);font-size:13px;}
+.group-placeholder-title{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--border2);margin-bottom:8px;letter-spacing:0.1em;}
+
+/* Profile cards grid */
+.profiles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:32px;}
+.profile-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;}
+.profile-card.is-you{border-color:var(--green2);}
+.pc-you-badge{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);border:1px solid var(--green2);padding:2px 6px;}
+.pc-avatar{width:48px;height:48px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);margin-bottom:12px;}
+.pc-name{font-size:14px;font-weight:500;color:var(--white);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pc-username{font-size:11px;color:var(--muted);margin-bottom:12px;}
+.pc-mbti{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--gold);letter-spacing:0.04em;line-height:1;}
+.pc-enn{font-size:11px;color:var(--muted2);margin-top:2px;}
+.pc-no-data{font-size:11px;color:var(--muted);font-style:italic;margin-top:8px;}
+
+/* Compatibility matrix */
+.matrix-section{margin-bottom:32px;}
+.section-title{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold2);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.matrix-wrap{overflow-x:auto;}
+.matrix-table{border-collapse:collapse;min-width:100%;}
+.matrix-table th,.matrix-table td{padding:10px 14px;border:1px solid var(--border);text-align:center;font-size:12px;white-space:nowrap;}
+.matrix-table th{background:var(--surface2);color:var(--muted2);font-weight:400;font-size:11px;letter-spacing:0.06em;}
+.matrix-table td.matrix-name{text-align:left;color:var(--text);background:var(--surface2);font-weight:500;}
+.matrix-table td.self{background:var(--surface);color:var(--muted);}
+.matrix-pct{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;}
+.compat-high{color:var(--green);}
+.compat-mid{color:var(--gold);}
+.compat-low{color:var(--muted2);}
+
+/* Group insights */
+.insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
+.insight-card{background:var(--surface);border:1px solid var(--border);padding:16px;}
+.insight-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.insight-value{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);letter-spacing:0.04em;line-height:1.1;}
+.insight-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--gold2);color:var(--text);padding:10px 24px;font-size:12px;z-index:600;opacity:0;transition:all 0.3s;pointer-events:none;letter-spacing:0.05em;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",authDomain:"animus-b3d83.firebaseapp.com",projectId:"animus-b3d83",storageBucket:"animus-b3d83.appspot.com",messagingSenderId:"681221615050",appId:"1:681221615050:web:1d037cd07a8381c91b3333"});
+</script>
+<script>(function(){var t=localStorage.getItem('animus_theme');if(t==='light')document.body.classList.add('light-mode');})();</script>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/" class="nav-logo a-nav-logo">ANI<span>MUS</span></a>
+  <div class="nav-items">
+    <a href="/dashboard" class="nav-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="/profile" class="nav-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+    <a href="/compare" class="nav-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Compare</a>
+    <a href="/group" class="nav-item active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Group</a>
+  </div>
+  <div class="nav-right">
+    <a href="/profile" class="nav-avatar" id="navAvatar">?</a>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <a href="/dashboard" class="nav-mobile-item">Dashboard</a>
+  <a href="/profile" class="nav-mobile-item">Profile</a>
+  <a href="/compare" class="nav-mobile-item">Compare</a>
+  <a href="/group" class="nav-mobile-item active">Group</a>
+  <a href="/settings" class="nav-mobile-item">Settings</a>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">GROUP COMPARE</div>
+    <div class="page-sub">Select people from your friends list to compare profiles and see compatibility.</div>
+  </div>
+
+  <div class="selector-section">
+    <div class="selector-label">Select People to Compare</div>
+    <div class="selector-grid" id="selectorGrid">
+      <div style="color:var(--muted);font-size:12px">Loading friends...</div>
+    </div>
+    <div class="selector-hint" id="selectorHint">Select 2–6 people to see group comparison</div>
+  </div>
+
+  <div class="group-content" id="groupContent">
+    <div class="group-placeholder">
+      <div class="group-placeholder-title">SELECT PEOPLE ABOVE</div>
+      <div>Choose 2 or more people to compare their personalities</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var db = firebase.firestore();
+var auth = firebase.auth();
+
+function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function showToast(m){ var t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},2400); }
+
+// Store loaded profiles: uid → { user, snap }
+var _people = {}; // uid → {uid, displayName, username, mbti, ennType, ennWing, instStack, phi, att, cog, polX, polY, isYou}
+var _selected = []; // ordered array of selected uids
+var _meUid = null;
+
+auth.onAuthStateChanged(function(user){
+  if(!user){ window.location.href='/login'; return; }
+  _meUid = user.uid;
+  document.getElementById('navAvatar').textContent = (user.displayName||'?').charAt(0).toUpperCase();
+
+  // Load me + friends
+  Promise.all([
+    db.collection('users').doc(user.uid).get(),
+    db.collection('profiles').doc(user.uid).get()
+  ]).then(function(res){
+    var uDoc=res[0], pDoc=res[1];
+    var uData = uDoc.exists ? uDoc.data() : {};
+    var snap  = pDoc.exists ? (pDoc.data().latest||{}) : {};
+    _people[user.uid] = buildPerson(user.uid, uData, snap, true);
+
+    var friends = (uData.friends||[]).filter(function(v,i,a){return a.indexOf(v)===i;});
+
+    if(!friends.length){
+      renderSelector();
+      return;
+    }
+
+    Promise.all(friends.map(function(fuid){
+      return Promise.all([
+        db.collection('users').doc(fuid).get(),
+        db.collection('profiles').doc(fuid).get()
+      ]).then(function(r2){
+        var fu=r2[0].exists?r2[0].data():{};
+        var fs=r2[1].exists?(r2[1].data().latest||{}):{};
+        _people[fuid] = buildPerson(fuid, fu, fs, false);
+      });
+    })).then(renderSelector);
+  });
+});
+
+function buildPerson(uid, u, snap, isYou){
+  return {
+    uid: uid,
+    displayName: u.displayName||'Unknown',
+    username: u.username||'',
+    mbti: snap.mbti||'',
+    mbtiName: snap.mbtiName||'',
+    ennType: snap.ennType||'',
+    ennWing: snap.ennWing||'',
+    instStack: snap.instStack||'',
+    phi: snap.phi||'',
+    att: snap.att||'',
+    cog: snap.cog||{},
+    polX: snap.polX||0,
+    polY: snap.polY||0,
+    isYou: isYou
+  };
+}
+
+function renderSelector(){
+  var grid = document.getElementById('selectorGrid');
+  var allPeople = Object.values(_people).sort(function(a,b){ return a.isYou?-1:b.isYou?1:0; });
+  if(!allPeople.length){ grid.innerHTML='<div style="color:var(--muted);font-size:12px">Add friends to compare with them</div>'; return; }
+  grid.innerHTML = allPeople.map(function(p){
+    var init = (p.displayName||'?').charAt(0).toUpperCase();
+    var isSel = _selected.indexOf(p.uid)>-1;
+    var cls = 'person-chip'+(p.isYou?' you':'')+(isSel?' selected':'');
+    return '<div class="'+cls+'" data-uid="'+escapeHTML(p.uid)+'" onclick="togglePerson(\''+escapeHTML(p.uid)+'\')">'
+      +'<div class="chip-avatar">'+init+'</div>'
+      +'<div class="chip-info">'
+      +'<div class="chip-name">'+escapeHTML(p.isYou?'You ('+p.displayName+')':p.displayName)+'</div>'
+      +'<div class="chip-type">'+(p.mbti||'No profile')+'</div>'
+      +'</div>'
+      +'<div class="chip-check">'+(isSel?'✓':'')+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function togglePerson(uid){
+  var idx = _selected.indexOf(uid);
+  if(idx>-1){ _selected.splice(idx,1); }
+  else {
+    if(_selected.length>=6){ showToast('Max 6 people at once'); return; }
+    _selected.push(uid);
+  }
+  renderSelector();
+  renderGroup();
+}
+
+// ── Compatibility math (same as compare.html) ──
+function calcCogCompat(a,b){
+  var fns=['Ti','Te','Fi','Fe','Ni','Ne','Si','Se'];
+  var aV=fns.map(function(f){return a[f]||0;}), bV=fns.map(function(f){return b[f]||0;});
+  var dot=0,mA=0,mB=0;
+  for(var i=0;i<fns.length;i++){dot+=aV[i]*bV[i];mA+=aV[i]*aV[i];mB+=bV[i]*bV[i];}
+  var sim=mA&&mB?dot/(Math.sqrt(mA)*Math.sqrt(mB)):0;
+  var aSorted=fns.slice().sort(function(x,y){return (a[y]||0)-(a[x]||0);});
+  var bSorted=fns.slice().sort(function(x,y){return (b[y]||0)-(b[x]||0);});
+  var golden=[[0,1],[1,0],[2,3],[3,2],[4,5],[5,4]];
+  var complementBonus=golden.reduce(function(s,pair){return s+(aSorted[pair[0]]===bSorted[pair[1]]?8:0);},0);
+  return Math.min(100,Math.round(sim*60+complementBonus));
+}
+function calcPolCompat(x1,y1,x2,y2){
+  var d=Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2));
+  return Math.max(0,Math.round(100-d*0.7));
+}
+function calcAttCompat(a,b){
+  var m={AT_SEC:{AT_SEC:90,AT_ANX:72,AT_AVO:65,AT_DIS:60},AT_ANX:{AT_SEC:72,AT_ANX:45,AT_AVO:30,AT_DIS:35},AT_AVO:{AT_SEC:65,AT_ANX:30,AT_AVO:55,AT_DIS:70},AT_DIS:{AT_SEC:60,AT_ANX:35,AT_AVO:70,AT_DIS:50}};
+  return (m[a]&&m[a][b])||50;
+}
+function calcPhiCompat(a,b){
+  var m={PH_STO:{PH_STO:90,PH_EPI:55,PH_KAN:80,PH_ARI:75,PH_NIE:60,PH_EXI:65,PH_PRA:70,PH_SKE:72},PH_EPI:{PH_STO:55,PH_EPI:90,PH_KAN:50,PH_ARI:70,PH_NIE:65,PH_EXI:75,PH_PRA:80,PH_SKE:60},PH_KAN:{PH_STO:80,PH_EPI:50,PH_KAN:90,PH_ARI:72,PH_NIE:45,PH_EXI:55,PH_PRA:60,PH_SKE:65},PH_ARI:{PH_STO:75,PH_EPI:70,PH_KAN:72,PH_ARI:90,PH_NIE:58,PH_EXI:60,PH_PRA:78,PH_SKE:65},PH_NIE:{PH_STO:60,PH_EPI:65,PH_KAN:45,PH_ARI:58,PH_NIE:90,PH_EXI:82,PH_PRA:55,PH_SKE:70},PH_EXI:{PH_STO:65,PH_EPI:75,PH_KAN:55,PH_ARI:60,PH_NIE:82,PH_EXI:90,PH_PRA:60,PH_SKE:75},PH_PRA:{PH_STO:70,PH_EPI:80,PH_KAN:60,PH_ARI:78,PH_NIE:55,PH_EXI:60,PH_PRA:90,PH_SKE:68},PH_SKE:{PH_STO:72,PH_EPI:60,PH_KAN:65,PH_ARI:65,PH_NIE:70,PH_EXI:75,PH_PRA:68,PH_SKE:90}};
+  return (m[a]&&m[a][b])||55;
+}
+function calcCompat(a, b){
+  if(!a.mbti||!b.mbti) return null;
+  var cog = calcCogCompat(a.cog,b.cog);
+  var pol = calcPolCompat(a.polX,a.polY,b.polX,b.polY);
+  var att = calcAttCompat(a.att,b.att);
+  var phi = calcPhiCompat(a.phi,b.phi);
+  return Math.round(cog*0.35 + pol*0.2 + att*0.2 + phi*0.25);
+}
+function compatClass(n){ return n>=75?'compat-high':n>=55?'compat-mid':'compat-low'; }
+
+function renderGroup(){
+  var content = document.getElementById('groupContent');
+  var hint = document.getElementById('selectorHint');
+  if(_selected.length < 2){
+    hint.textContent = _selected.length===0 ? 'Select 2–6 people to see group comparison' : 'Select at least one more person';
+    content.innerHTML = '<div class="group-placeholder"><div class="group-placeholder-title">SELECT PEOPLE ABOVE</div><div>Choose 2 or more people to compare their personalities</div></div>';
+    return;
+  }
+  hint.textContent = _selected.length+' people selected';
+
+  var people = _selected.map(function(uid){ return _people[uid]; }).filter(Boolean);
+  var phiNames={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'};
+
+  // Profile cards
+  var cardsHtml = '<div class="section-title">Profiles</div><div class="profiles-grid">'
+    + people.map(function(p){
+        var init = (p.displayName||'?').charAt(0).toUpperCase();
+        var ennStr = p.ennType&&p.ennWing ? p.ennType+'w'+p.ennWing : '';
+        var phi = p.phi ? phiNames[p.phi]||p.phi : '';
+        var detail = [ennStr, p.instStack, phi].filter(Boolean).join(' · ');
+        return '<div class="profile-card'+(p.isYou?' is-you':'')+'">'
+          +(p.isYou?'<div class="pc-you-badge">You</div>':'')
+          +'<div class="pc-avatar">'+init+'</div>'
+          +'<div class="pc-name">'+escapeHTML(p.displayName)+'</div>'
+          +'<div class="pc-username">'+(p.username?'@'+escapeHTML(p.username):'')+'</div>'
+          +(p.mbti
+            ?'<div class="pc-mbti">'+escapeHTML(p.mbti)+'</div>'
+            +'<div class="pc-enn">'+escapeHTML(detail)+'</div>'
+            :'<div class="pc-no-data">No profile yet</div>'
+          )+'</div>';
+      }).join('')
+    + '</div>';
+
+  // Compatibility matrix
+  var matrixHtml = '';
+  if(people.filter(function(p){return p.mbti;}).length >= 2){
+    matrixHtml = '<div class="matrix-section"><div class="section-title">Compatibility Matrix</div>'
+      + '<div class="matrix-wrap"><table class="matrix-table">'
+      + '<thead><tr><th></th>'
+      + people.map(function(p){
+          return '<th>'+(p.isYou?'You':escapeHTML(p.displayName.split(' ')[0]))+'<br><span style="color:var(--gold);font-family:\'Bebas Neue\',sans-serif;font-size:14px">'+(p.mbti||'—')+'</span></th>';
+        }).join('')
+      + '</tr></thead><tbody>'
+      + people.map(function(a){
+          return '<tr><td class="matrix-name">'
+            +(a.isYou?'<span style="color:var(--green)">You</span>':escapeHTML(a.displayName.split(' ')[0]))
+            +' <span style="font-size:10px;color:var(--gold)">'+(a.mbti||'')+'</span></td>'
+            + people.map(function(b){
+                if(a.uid===b.uid) return '<td class="self">—</td>';
+                var score = calcCompat(a,b);
+                if(score===null) return '<td style="color:var(--muted);font-size:11px">—</td>';
+                return '<td><span class="matrix-pct '+compatClass(score)+'">'+score+'</span><span style="font-size:10px;color:var(--muted)">%</span></td>';
+              }).join('')
+            + '</tr>';
+        }).join('')
+      + '</tbody></table></div></div>';
+  }
+
+  // Group insights
+  var mbtiCounts = {};
+  var totalCompat = 0, compatPairs = 0;
+  var avgPolX = 0, avgPolY = 0, polCount = 0;
+  people.forEach(function(p){
+    if(p.mbti){ mbtiCounts[p.mbti]=(mbtiCounts[p.mbti]||0)+1; }
+    avgPolX+=p.polX; avgPolY+=p.polY; polCount++;
+  });
+  // Average pairwise compat
+  for(var i=0;i<people.length;i++) for(var j=i+1;j<people.length;j++){
+    var s=calcCompat(people[i],people[j]);
+    if(s!==null){totalCompat+=s;compatPairs++;}
+  }
+  var avgCompat = compatPairs ? Math.round(totalCompat/compatPairs) : null;
+  avgPolX = polCount ? Math.round(avgPolX/polCount) : 0;
+  avgPolY = polCount ? Math.round(avgPolY/polCount) : 0;
+  var mostCommon = Object.keys(mbtiCounts).sort(function(a,b){return mbtiCounts[b]-mbtiCounts[a];})[0]||'—';
+  var eTypes = people.map(function(p){return p.ennType;}).filter(Boolean);
+  var mostEnn = eTypes.length ? eTypes.sort(function(a,b){
+    return eTypes.filter(function(x){return x===b;}).length - eTypes.filter(function(x){return x===a;}).length;
+  })[0] : '—';
+  var polLabel = avgPolX>10?'Right':avgPolX<-10?'Left':'Center';
+  var authLabel = avgPolY>10?'Auth':avgPolY<-10?'Lib':'Moderate';
+
+  var insightsHtml = '<div class="matrix-section"><div class="section-title">Group Insights</div>'
+    +'<div class="insights-grid">'
+    +(avgCompat!==null?'<div class="insight-card"><div class="insight-label">Avg Compatibility</div><div class="insight-value '+compatClass(avgCompat)+'">'+avgCompat+'<span style="font-size:16px">%</span></div><div class="insight-sub">across all pairs</div></div>':'')
+    +'<div class="insight-card"><div class="insight-label">Most Common Type</div><div class="insight-value">'+escapeHTML(mostCommon)+'</div><div class="insight-sub">'+(mbtiCounts[mostCommon]>1?mbtiCounts[mostCommon]+' people':'unique in group')+'</div></div>'
+    +(mostEnn!=='—'?'<div class="insight-card"><div class="insight-label">Common Ennea</div><div class="insight-value">'+escapeHTML(mostEnn)+'</div><div class="insight-sub">most frequent type</div></div>':'')
+    +'<div class="insight-card"><div class="insight-label">Group Politics</div><div class="insight-value" style="font-size:20px">'+polLabel+'<br>'+authLabel+'</div><div class="insight-sub">average position</div></div>'
+    +'<div class="insight-card"><div class="insight-label">Group Size</div><div class="insight-value">'+people.length+'</div><div class="insight-sub">people selected</div></div>'
+    +'</div></div>';
+
+  content.innerHTML = cardsHtml + matrixHtml + insightsHtml;
+}
+</script>
+<script>
+try{firebase.auth().onAuthStateChanged(function(u){document.querySelectorAll('a.a-nav-logo').forEach(function(el){el.href=u?'/dashboard':'/';});});}catch(e){}
+</script>
+<script>
+function toggleMobileMenu(){document.getElementById('navMobileMenu').classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('navMobileMenu');var b=document.getElementById('navHamburger');if(m&&b&&!m.contains(e.target)&&!b.contains(e.target))m.classList.remove('open');});
+</script>
+</body>
+</html>
