@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com https://www.gstatic.com; connect-src 'self' https://api.anthropic.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-ancestors 'none'; base-uri 'self';">
@@ -1795,7 +1795,9 @@ function getEnneagram(eS){
 
 function getAttachment(atS){
   var types = ['AT_SEC','AT_ANX','AT_AVO','AT_DIS'];
-  return types.reduce(function(a,b){ return atS[a]>=atS[b]?a:b; }, types[0]);
+  var best = types.reduce(function(a,b){ return atS[a]>=atS[b]?a:b; }, types[0]);
+  if(best!=='AT_SEC' && ((atS[best]||0)-(atS['AT_SEC']||0))<8) return 'AT_SEC';
+  return best;
 }
 
 // ── HELPER: Philosophy dominant school ──
