@@ -2653,7 +2653,26 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   };
 
   // Save to localStorage
-  document.getElementById('btnSave').addEventListener('click',function(){
+  // Auto-save to Firestore when results render (if signed in)
+(function(){
+  var _unsub = firebase.auth().onAuthStateChanged(function(user){
+    _unsub();
+    if(!user) return;
+    var _snap = Object.assign({},snapshot,{completedAt:new Date().toISOString(),testMode:TOTAL<=100?'short':'full'});
+    var _ref = firebase.firestore().collection('profiles').doc(user.uid);
+    _ref.get().then(function(doc){
+      var h=doc.exists?(doc.data().history||[]):[];
+      h.push({snapshot:_snap,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+      if(h.length>10)h=h.slice(-10);
+      return _ref.set({latest:_snap,history:h,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    }).then(function(){
+      var btn=document.getElementById('btnSave');
+      if(btn){btn.innerHTML='↓ SAVED ✓';btn.style.opacity='0.7';}
+    }).catch(function(e){console.error('Auto-save:',e);});
+  });
+})();
+
+document.getElementById('btnSave').addEventListener('click',function(){
     try { localStorage.setItem('animus_last_result', JSON.stringify(snapshot)); } catch(e){}
     var user = firebase.auth().currentUser;
     if(!user){
