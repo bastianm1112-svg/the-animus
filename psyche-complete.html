@@ -1795,13 +1795,13 @@ function getEnneagram(eS){
 
 function getAttachment(atS){
   var types = ['AT_SEC','AT_ANX','AT_AVO','AT_DIS'];
-  return types.reduce(function(a,b){ return atS[a]>atS[b]?a:b; }, types[0]);
+  return types.reduce(function(a,b){ return atS[a]>=atS[b]?a:b; }, types[0]);
 }
 
 // ── HELPER: Philosophy dominant school ──
 function getPhilosophy(phS){
   var types = ['PH_STO','PH_EPI','PH_KAN','PH_ARI','PH_NIE','PH_EXI','PH_PRA','PH_SKE'];
-  return types.reduce(function(a,b){ return phS[a]>phS[b]?a:b; }, types[0]);
+  return types.reduce(function(a,b){ return phS[a]>=phS[b]?a:b; }, types[0]);
 }
 
 // ── HELPER: Instinctual stack (SP/SOC/SX ordered by score) ──
@@ -1926,7 +1926,8 @@ function buildPrompt(data){
   var fnsSorted = Object.keys(data.cog).sort(function(a,b){return data.cog[b]-data.cog[a];});
   var cogStr = fnsSorted.map(function(f,i){ return f+':'+data.cog[f]+(i<4?'(pos'+(i+1)+')':''); }).join(', ');
 
-  var polQuadrant = data.polX>0&&data.polY<0?'Lib-Right':
+  var polQuadrant = (Math.abs(data.polX)<10&&Math.abs(data.polY)<10)?'True Centrist':
+                    data.polX>0&&data.polY<0?'Lib-Right':
                     data.polX>0&&data.polY>0?'Auth-Right':
                     data.polX<0&&data.polY<0?'Lib-Left':'Auth-Left';
 
