@@ -1757,6 +1757,42 @@ function finishQuiz(){
 
 
 // ── HELPER: Attachment dominant type ──
+
+// ── HELPER: Derive MBTI from cognitive function scores ──
+function getMBTI(cog){
+  var stacks={
+    INTJ:['Ni','Te','Fi','Se'], INTP:['Ti','Ne','Si','Fe'],
+    INFJ:['Ni','Fe','Ti','Se'], INFP:['Fi','Ne','Si','Te'],
+    ENTJ:['Te','Ni','Se','Fi'], ENTP:['Ne','Ti','Fe','Si'],
+    ENFJ:['Fe','Ni','Se','Ti'], ENFP:['Ne','Fi','Te','Si'],
+    ISTJ:['Si','Te','Fi','Ne'], ISFJ:['Si','Fe','Ti','Ne'],
+    ESTJ:['Te','Si','Ne','Fi'], ESFJ:['Fe','Si','Ne','Ti'],
+    ISTP:['Ti','Se','Ni','Fe'], ISFP:['Fi','Se','Ni','Te'],
+    ESTP:['Se','Ti','Fe','Ni'], ESFP:['Se','Fi','Te','Ni']
+  };
+  var w=[4,3,2,1], best=null, bestScore=-Infinity;
+  Object.keys(stacks).forEach(function(type){
+    var s=0; stacks[type].forEach(function(fn,i){ s+=(cog[fn]||0)*w[i]; });
+    if(s>bestScore){ bestScore=s; best=type; }
+  });
+  return best||'INTP';
+}
+
+// ── HELPER: Derive Enneagram type/wing/tritype from scores ──
+function getEnneagram(eS){
+  var nums=['E1','E2','E3','E4','E5','E6','E7','E8','E9'];
+  var type=nums.reduce(function(a,b){ return (eS[a]||0)>(eS[b]||0)?a:b; },nums[0]).replace('E','');
+  var t=parseInt(type);
+  var wL=t===1?9:t-1, wR=t===9?1:t+1;
+  var wing=(eS['E'+wL]||0)>(eS['E'+wR]||0)?String(wL):String(wR);
+  var gut=['E8','E9','E1'].reduce(function(a,b){ return (eS[a]||0)>(eS[b]||0)?a:b; }).replace('E','');
+  var heart=['E2','E3','E4'].reduce(function(a,b){ return (eS[a]||0)>(eS[b]||0)?a:b; }).replace('E','');
+  var head=['E5','E6','E7'].reduce(function(a,b){ return (eS[a]||0)>(eS[b]||0)?a:b; }).replace('E','');
+  var tri=[gut,heart,head];
+  var mi=tri.indexOf(type); if(mi>0){ tri.splice(mi,1); tri.unshift(type); }
+  return {type:type, wing:wing, tritype:tri.join(''), scores:eS};
+}
+
 function getAttachment(atS){
   var types = ['AT_SEC','AT_ANX','AT_AVO','AT_DIS'];
   return types.reduce(function(a,b){ return atS[a]>atS[b]?a:b; }, types[0]);
