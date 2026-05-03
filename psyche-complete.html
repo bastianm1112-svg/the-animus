@@ -301,9 +301,9 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
 .fade-in{animation:fadeUp 0.4s ease forwards;}
 </style>
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
     firebase.initializeApp({
       apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
@@ -1602,8 +1602,7 @@ function finishFill(filteredQ, fillAnswers, baseProfile){
   var si=0;
   var iv2=setInterval(function(){ si++; if(si<steps.length) document.getElementById('loadStatus').textContent=steps[si]; },1200);
 
-  var cogStr = fnsSorted.map(function(f,i){ return f+':'+mergedData.cog[f]+(i<4?'(pos'+(i+1)+')':''); }).join(', ');
-  var prompt = buildPrompt(mbti, enn, baseProfile.att||'AT_AVO', baseProfile.phi||'PH_NIE', baseProfile.instStack||'', mergedData, fnsSorted);
+  var prompt = buildPrompt({mbti:mbti, ennResult:enn, att:baseProfile.att||'AT_AVO', phi:baseProfile.phi||'PH_NIE', instStack:baseProfile.instStack||'', cog:mergedData.cog, polX:mergedData.polX||0, polY:mergedData.polY||0});
 
   callAIWithRetry(prompt, 3, function(aiRes){
     clearInterval(iv2);
