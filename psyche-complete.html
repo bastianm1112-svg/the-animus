@@ -2655,9 +2655,10 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   // Save to localStorage
   // Auto-save to Firestore when results render (if signed in)
 (function(){
+  var _saved=false;
   var _unsub = firebase.auth().onAuthStateChanged(function(user){
-    _unsub();
-    if(!user) return;
+    if(!user||_saved) return;
+    _saved=true; _unsub();
     var _snap = Object.assign({},snapshot,{completedAt:new Date().toISOString(),testMode:TOTAL<=100?'short':'full'});
     var _ref = firebase.firestore().collection('profiles').doc(user.uid);
     _ref.get().then(function(doc){
@@ -2674,28 +2675,30 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
 document.getElementById('btnSave').addEventListener('click',function(){
     try { localStorage.setItem('animus_last_result', JSON.stringify(snapshot)); } catch(e){}
-    var user = firebase.auth().currentUser;
-    if(!user){
-      showToast('Sign in to save your profile permanently');
-      setTimeout(function(){ window.location.href='/login'; },2000);
-      return;
-    }
-    var snapshotWithMeta = Object.assign({},snapshot,{
-      completedAt: new Date().toISOString(),
-      testMode: TOTAL<=100?'short':'full'
-    });
-    var profileRef = firebase.firestore().collection('profiles').doc(user.uid);
-    profileRef.get().then(function(doc){
-      var history = doc.exists?(doc.data().history||[]):[];
-      history.push({snapshot:snapshotWithMeta,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-      if(history.length>10) history=history.slice(-10);
-      return profileRef.set({latest:snapshotWithMeta,history:history,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-    }).then(function(){
-      showToast('Profile saved ✓');
-      setTimeout(function(){ window.location.href='/profile'; },1800);
-    }).catch(function(e){
-      showToast('Saved locally — sign in to sync');
-      setTimeout(function(){ window.location.href='/profile'; },2500);
+    var _btnU=firebase.auth().onAuthStateChanged(function(user){
+      _btnU();
+      if(!user){
+        showToast('Sign in to save your profile permanently');
+        setTimeout(function(){ window.location.href='/login'; },2000);
+        return;
+      }
+      var snapshotWithMeta = Object.assign({},snapshot,{
+        completedAt: new Date().toISOString(),
+        testMode: TOTAL<=100?'short':'full'
+      });
+      var profileRef = firebase.firestore().collection('profiles').doc(user.uid);
+      profileRef.get().then(function(doc){
+        var history = doc.exists?(doc.data().history||[]):[];
+        history.push({snapshot:snapshotWithMeta,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+        if(history.length>10) history=history.slice(-10);
+        return profileRef.set({latest:snapshotWithMeta,history:history,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+      }).then(function(){
+        showToast('Profile saved ✓');
+        setTimeout(function(){ window.location.href='/profile'; },1800);
+      }).catch(function(e){
+        console.error('Save error:',e);
+        showToast('Save failed — check connection and try again');
+      });
     });
   });
 
