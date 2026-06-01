@@ -397,10 +397,17 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 
   <!-- ── AI ANALYSIS ── -->
   <div class="c-panel active" id="c-panel-ai">
-    <div class="ai-section">
+    <div class="dual-legend" style="margin-bottom:20px">
+      <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYouAI">You</span></div>
+      <div class="dual-legend-item"><div class="legend-dot legend-them"></div><span id="legendThemAI">Them</span></div>
+    </div>
+    <div id="aiAnalysisContent">
+      <div style="padding:40px 0;text-align:center;color:var(--muted);font-size:12px;letter-spacing:0.05em">Choose a friend above to generate AI analysis.</div>
+    </div>
+    <div class="ai-section" style="display:none">
       <div class="ai-section-title">Where You Align</div>
       <div class="ai-block">
-        <div class="ai-block-title">Intellectual Chemistry</div><div class="ai-block-text" style="color:var(--muted)">Analysis will appear here after both profiles are loaded.</div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
+        <div class="ai-block-title">Intellectual Chemistry</div>
       <div class="dual-row"><div class="dual-label"><strong>Ne</strong><span style="font-size:10px;color:var(--muted)">Ext. Intuition</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
       <div class="dual-row"><div class="dual-label"><strong>Te</strong><span style="font-size:10px;color:var(--muted)">Ext. Thinking</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
       <div class="dual-row"><div class="dual-label"><strong>Ni</strong><span style="font-size:10px;color:var(--muted)">Int. Intuition</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
@@ -416,6 +423,33 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       <div class="dual-row"><div class="dual-label"><strong>Extraversion</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
       <div class="dual-row"><div class="dual-label"><strong>Agreeableness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
       <div class="dual-row"><div class="dual-label"><strong>Neuroticism</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
+    </div>
+  </div>
+
+  <!-- ── COGNITION ── -->
+  <div class="c-panel" id="c-panel-cognition">
+    <div class="dual-legend">
+      <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYouCog">You</span></div>
+      <div class="dual-legend-item"><div class="legend-dot legend-them"></div><span id="legendThemCog">Them</span></div>
+    </div>
+    <div class="dual-section">
+      <div class="dual-section-title">Cognitive Functions</div>
+      <div class="dual-row"><div class="dual-label"><strong>Ni</strong><span style="font-size:10px;color:var(--muted)">Int. Intuition</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Ni"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Ni"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Ni">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Ni">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Ne</strong><span style="font-size:10px;color:var(--muted)">Ext. Intuition</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Ne"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Ne"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Ne">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Ne">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Ti</strong><span style="font-size:10px;color:var(--muted)">Int. Thinking</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Ti"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Ti"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Ti">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Ti">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Te</strong><span style="font-size:10px;color:var(--muted)">Ext. Thinking</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Te"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Te"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Te">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Te">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Fi</strong><span style="font-size:10px;color:var(--muted)">Int. Feeling</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Fi"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Fi"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Fi">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Fi">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Fe</strong><span style="font-size:10px;color:var(--muted)">Ext. Feeling</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Fe"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Fe"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Fe">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Fe">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Si</strong><span style="font-size:10px;color:var(--muted)">Int. Sensing</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Si"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Si"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Si">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Si">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Se</strong><span style="font-size:10px;color:var(--muted)">Ext. Sensing</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Se"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Se"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Se">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Se">—</div></div></div>
+    </div>
+    <div class="dual-section">
+      <div class="dual-section-title">Big Five</div>
+      <div class="dual-row"><div class="dual-label"><strong>Openness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-O"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-O"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-O">—</div><div class="dual-num" style="color:var(--green)" id="b5n-them-O">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Conscientiousness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-C"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-C"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-C">—</div><div class="dual-num" style="color:var(--green)" id="b5n-them-C">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Extraversion</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-E"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-E"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-E">—</div><div class="dual-num" style="color:var(--green)" id="b5n-them-E">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Agreeableness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-A"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-A"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-A">—</div><div class="dual-num" style="color:var(--green)" id="b5n-them-A">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Neuroticism</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-N"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-N"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-N">—</div><div class="dual-num" style="color:var(--green)" id="b5n-them-N">—</div></div></div>
     </div>
   </div>
 
@@ -448,8 +482,8 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   <!-- ── PHILOSOPHY ── -->
   <div class="c-panel" id="c-panel-philosophy">
     <div class="dual-legend">
-      <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYou2">You</span></div>
-      <div class="dual-legend-item"><div class="legend-dot legend-them"></div><span id="legendThem2">Them</span></div>
+      <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYouPhi">You</span></div>
+      <div class="dual-legend-item"><div class="legend-dot legend-them"></div><span id="legendThemPhi">Them</span></div>
     </div>
     <div class="dual-section">
       <div class="dual-section-title">Philosophical Schools</div>
@@ -603,8 +637,8 @@ auth.onAuthStateChanged(function(currentUser){
       document.getElementById('viewThemBtn').textContent = 'View ' + themName + "'s Profile →";
 
       // Update legend labels
-      document.querySelectorAll('#legendYou').forEach(function(el){ el.textContent = myName; });
-      document.querySelectorAll('#legendThem').forEach(function(el){ el.textContent = themName; });
+      ['legendYouAI','legendYouCog','legendYou'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=myName; });
+      ['legendThemAI','legendThemCog','legendThem'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=themName; });
       document.getElementById('summaryYouHeader').textContent = myName;
       document.getElementById('summaryThemHeader').textContent = themName;
 
@@ -690,21 +724,34 @@ function calcPhiCompat(p1,p2){
 }
 
 function updateDualBars(my, them){
-  // Cog functions
   var fns=['Ni','Ne','Ti','Te','Fi','Fe','Si','Se'];
-  document.querySelectorAll('.dual-row').forEach(function(row){
-    var label=row.querySelector('.dual-label strong');
-    if(!label) return;
-    var fn=label.textContent.trim();
-    if(my.cog&&my.cog[fn]!==undefined){
-      var youBar=row.querySelector('.dual-bar-you');
-      var themBar=row.querySelector('.dual-bar-them');
-      var nums=row.querySelectorAll('.dual-num');
-      if(youBar){ youBar.setAttribute('data-w',my.cog[fn]); }
-      if(themBar&&them.cog){ themBar.setAttribute('data-w',them.cog[fn]||0); }
-      if(nums[0]) nums[0].textContent=my.cog[fn];
-      if(nums[1]&&them.cog) nums[1].textContent=them.cog[fn]||0;
-    }
+  fns.forEach(function(fn){
+    var youBar=document.getElementById('cog-you-'+fn);
+    var themBar=document.getElementById('cog-them-'+fn);
+    var youNum=document.getElementById('cogn-you-'+fn);
+    var themNum=document.getElementById('cogn-them-'+fn);
+    var yv = (my.cog&&my.cog[fn]!==undefined) ? Math.round(my.cog[fn]) : 0;
+    var tv = (them.cog&&them.cog[fn]!==undefined) ? Math.round(them.cog[fn]) : 0;
+    if(youBar){ youBar.setAttribute('data-w',yv); setTimeout(function(){youBar.style.width=yv+'%';},200); }
+    if(themBar){ themBar.setAttribute('data-w',tv); setTimeout(function(){themBar.style.width=tv+'%';},200); }
+    if(youNum) youNum.textContent=yv;
+    if(themNum) themNum.textContent=tv;
+  });
+  // Big Five
+  var b5keys=['Openness','Conscientiousness','Extraversion','Agreeableness','Neuroticism'];
+  var b5ids=['O','C','E','A','N'];
+  b5keys.forEach(function(k,i){
+    var id=b5ids[i];
+    var youBar=document.getElementById('b5-you-'+id);
+    var themBar=document.getElementById('b5-them-'+id);
+    var youNum=document.getElementById('b5n-you-'+id);
+    var themNum=document.getElementById('b5n-them-'+id);
+    var yv=(my.big5&&my.big5[k]!==undefined)?Math.round(my.big5[k]):0;
+    var tv=(them.big5&&them.big5[k]!==undefined)?Math.round(them.big5[k]):0;
+    if(youBar){ youBar.setAttribute('data-w',yv); setTimeout(function(){youBar.style.width=yv+'%';},200); }
+    if(themBar){ themBar.setAttribute('data-w',tv); setTimeout(function(){themBar.style.width=tv+'%';},200); }
+    if(youNum) youNum.textContent=yv;
+    if(themNum) themNum.textContent=tv;
   });
 }
 
@@ -780,6 +827,11 @@ function animateBars(){
 }
 animateBars();
 
+function sanitizeText(str, maxLen) {
+  if (!str) return '';
+  maxLen = maxLen || 500;
+  return String(str).replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, '').trim().substring(0, maxLen);
+}
 function shareComparison(){
   var url = window.location.href;
   if(navigator.clipboard){
