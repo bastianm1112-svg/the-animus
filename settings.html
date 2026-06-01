@@ -1,7 +1,7 @@
-﻿<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANIMUS — Settings</title>
+<title>ANIMUS â€” Settings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -21,7 +21,7 @@ body.light-mode {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6; }
 
-/* ── NAV ── */
+/* â”€â”€ NAV â”€â”€ */
 .navbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; z-index: 200; }
 .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.1em; color: var(--white); text-decoration: none; margin-right: 40px; }
 .nav-logo span { color: var(--gold); }
@@ -32,11 +32,11 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .nav-right { margin-left: auto; }
 .nav-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--gold); text-decoration: none; }
 
-/* ── LAYOUT ── */
+/* â”€â”€ LAYOUT â”€â”€ */
 .page { padding-top: 56px; display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
 @media(max-width: 768px) { .page { grid-template-columns: 1fr; } .settings-nav { display: none; } }
 
-/* ── SETTINGS NAV ── */
+/* â”€â”€ SETTINGS NAV â”€â”€ */
 .settings-nav {
   border-right: 1px solid var(--border);
   padding: 32px 16px;
@@ -61,7 +61,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .settings-nav-item.active svg { opacity: 1; }
 .settings-nav-divider { height: 1px; background: var(--border); margin: 12px 0; }
 
-/* ── MAIN ── */
+/* â”€â”€ MAIN â”€â”€ */
 .settings-main { padding: 40px 48px; max-width: 700px; }
 @media(max-width: 900px) { .settings-main { padding: 28px 20px; } }
 
@@ -314,6 +314,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .nav-mobile-item.active,.nav-mobile-item:hover{color:var(--gold);}
 @media(max-width:768px){.nav-items{display:none!important;}.nav-hamburger{display:flex!important;}}
 </style>
+<link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
@@ -388,7 +389,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   <!-- MAIN -->
   <main class="settings-main">
 
-    <!-- ── PROFILE ── -->
+    <!-- â”€â”€ PROFILE â”€â”€ -->
     <div class="settings-section active" id="section-profile">
       <div class="settings-header">
         <div class="settings-page-title">Profile</div>
@@ -450,7 +451,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
     </div>
 
-    <!-- ── ACCOUNT & SECURITY ── -->
+    <!-- â”€â”€ ACCOUNT & SECURITY â”€â”€ -->
     <div class="settings-section" id="section-account">
       <div class="settings-header">
         <div class="settings-page-title">Account & Security</div>
@@ -477,7 +478,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
             <div class="field-label">Current Password</div>
           </div>
           <div class="field-control">
-            <input class="s-input" id="currentPw" type="password" placeholder="••••••••" autocomplete="current-password" oninput="markDirty()" />
+            <input class="s-input" id="currentPw" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password" oninput="markDirty()" />
           </div>
         </div>
         <div class="field-row">
@@ -486,7 +487,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
             <div class="field-desc">Minimum 8 characters.</div>
           </div>
           <div class="field-control">
-            <input class="s-input" id="newPw" type="password" placeholder="••••••••" autocomplete="new-password" oninput="checkPwStrength(this.value); markDirty()" />
+            <input class="s-input" id="newPw" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="new-password" oninput="checkPwStrength(this.value); markDirty()" />
             <div class="pw-strength">
               <div class="pw-seg" id="ps1"></div>
               <div class="pw-seg" id="ps2"></div>
@@ -500,7 +501,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
             <div class="field-label">Confirm New Password</div>
           </div>
           <div class="field-control">
-            <input class="s-input" id="confirmPw" type="password" placeholder="••••••••" autocomplete="new-password" oninput="markDirty()" />
+            <input class="s-input" id="confirmPw" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="new-password" oninput="markDirty()" />
           </div>
         </div>
       </div>
@@ -513,7 +514,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
           </div>
           <div class="connected-info">
             <div class="connected-name">Google</div>
-            <div class="connected-sub" id="googleEmail">—</div>
+            <div class="connected-sub" id="googleEmail">â€”</div>
           </div>
           <div class="connected-status" id="googleStatus">Not connected</div>
         </div>
@@ -541,7 +542,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
     </div>
 
-    <!-- ── APPEARANCE ── -->
+    <!-- â”€â”€ APPEARANCE â”€â”€ -->
     <div class="settings-section" id="section-appearance">
       <div class="settings-header">
         <div class="settings-page-title">Appearance</div>
@@ -574,7 +575,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
           <div class="field-control">
             <select class="s-select" id="language" onchange="applyLanguage(this.value); markDirty()">
               <option value="en">English</option>
-              <option value="es">Español (Paraguay)</option>
+              <option value="es">EspaÃ±ol (Paraguay)</option>
             </select>
           </div>
         </div>
@@ -589,8 +590,8 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
           </div>
           <div class="field-control">
             <select class="s-select" id="defaultMode" onchange="markDirty()">
-              <option value="full" selected>Full — 280 questions (~30 min)</option>
-              <option value="short">Short — 100 questions (~12 min)</option>
+              <option value="full" selected>Full â€” 280 questions (~30 min)</option>
+              <option value="short">Short â€” 100 questions (~12 min)</option>
             </select>
           </div>
         </div>
@@ -612,7 +613,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
     </div>
 
-    <!-- ── NOTIFICATIONS ── -->
+    <!-- â”€â”€ NOTIFICATIONS â”€â”€ -->
     <div class="settings-section" id="section-notifications">
       <div class="settings-header">
         <div class="settings-page-title">Notifications</div>
@@ -659,7 +660,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
     </div>
 
-    <!-- ── PRIVACY ── -->
+    <!-- â”€â”€ PRIVACY â”€â”€ -->
     <div class="settings-section" id="section-privacy">
       <div class="settings-header">
         <div class="settings-page-title">Privacy</div>
@@ -716,7 +717,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
     </div>
 
-    <!-- ── DATA & EXPORT ── -->
+    <!-- â”€â”€ DATA & EXPORT â”€â”€ -->
     <div class="settings-section" id="section-data">
       <div class="settings-header">
         <div class="settings-page-title">Data & Export</div>
@@ -769,7 +770,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
         <div class="field-row">
           <div class="field-info">
             <div class="field-label">Assessment #2</div>
-            <div class="field-desc" id="assess2Desc">—</div>
+            <div class="field-desc" id="assess2Desc">â€”</div>
           </div>
           <div class="field-control" style="display:flex;gap:6px">
             <button class="btn-secondary" onclick="showToast('Viewing assessment #2...')">View</button>
@@ -938,7 +939,7 @@ function saveChanges() {
     applyLanguage(lang);
     applyTheme(theme);
     document.getElementById('usernamePreview').textContent = escapeHTML(un);
-    showToast('Settings saved ✓');
+    showToast('Settings saved âœ“');
   }).catch(function(e){
     btn.disabled = false;
     btn.textContent = 'Save Changes';
@@ -1006,7 +1007,7 @@ function handlePhotoUpload(input) {
     var preview = document.querySelector('.avatar-preview');
     preview.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="avatar-overlay">Change</div>';
     markDirty();
-    showToast('Photo updated — save to apply');
+    showToast('Photo updated â€” save to apply');
   };
   reader.readAsDataURL(input.files[0]);
 }
@@ -1017,7 +1018,7 @@ function syncGoogle() {
     var preview = document.getElementById('avatarPreview');
     preview.innerHTML = '<img src="'+escapeHTML(user.photoURL)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="avatar-overlay">Change</div>';
     markDirty();
-    showToast('Photo synced from Google ✓');
+    showToast('Photo synced from Google âœ“');
   } else { showToast('No Google photo found on your account'); }
 }
 
@@ -1037,7 +1038,7 @@ function copyShareLink() {
   var username = document.getElementById('username').value;
   if(!username && auth.currentUser) username = auth.currentUser.uid;
   var url = window.location.origin + '/' + encodeURIComponent(username);
-  if(navigator.clipboard) { navigator.clipboard.writeText(url).then(function(){ showToast('Share link copied ✓'); }); }
+  if(navigator.clipboard) { navigator.clipboard.writeText(url).then(function(){ showToast('Share link copied âœ“'); }); }
   else { showToast('Your profile link: ' + url); }
 }
 
@@ -1129,7 +1130,7 @@ auth.onAuthStateChanged(function(user){
     var googleEl=document.getElementById('googleEmail');
     if(googleEl && user.providerData){
       var googleProvider=user.providerData.find(function(p){ return p.providerId==='google.com'; });
-      if(googleProvider && googleEl) googleEl.textContent=googleProvider.email||'—';
+      if(googleProvider && googleEl) googleEl.textContent=googleProvider.email||'â€”';
     }
   });
   // Assessment history
@@ -1141,12 +1142,12 @@ auth.onAuthStateChanged(function(user){
     if(history[0] && el1){
       var r=history[0].snapshot||{};
       var d=history[0].timestamp?new Date(history[0].timestamp.toDate()).toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
-      el1.textContent=(r.instStack==='short'?'Short':'Full')+' Assessment · '+d+' · '+(r.mbti||'—')+' '+(r.ennType?r.ennType+'w'+r.ennWing:'');
+      el1.textContent=(r.instStack==='short'?'Short':'Full')+' Assessment Â· '+d+' Â· '+(r.mbti||'â€”')+' '+(r.ennType?r.ennType+'w'+r.ennWing:'');
     }
     if(history[1] && el2){
       var r2=history[1].snapshot||{};
       var d2=history[1].timestamp?new Date(history[1].timestamp.toDate()).toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
-      el2.textContent=(r2.instStack==='short'?'Short':'Full')+' Assessment · '+d2+' · '+(r2.mbti||'—')+' '+(r2.ennType?r2.ennType+'w'+r2.ennWing:'');
+      el2.textContent=(r2.instStack==='short'?'Short':'Full')+' Assessment Â· '+d2+' Â· '+(r2.mbti||'â€”')+' '+(r2.ennType?r2.ennType+'w'+r2.ennWing:'');
     }
   });
 });
@@ -1163,40 +1164,40 @@ var _i18n_es = {
   'Profile':'Perfil','Compare':'Comparar','Types':'Tipos',
   'Account & Security':'Cuenta y Seguridad','Appearance':'Apariencia',
   'Notifications':'Notificaciones','Privacy':'Privacidad',
-  'Data & Export':'Datos y Exportación','Sign Out':'Cerrar Sesión',
-  'How you appear to others on ANIMUS.':'Cómo aparecés ante los demás en ANIMUS.',
-  'Manage your login credentials and connected accounts.':'Administrá tus credenciales y cuentas conectadas.',
-  'Customize how ANIMUS looks and feels.':'Personalizá el aspecto de ANIMUS.',
-  'Choose what you get notified about inside ANIMUS.':'Elegí sobre qué te notifica ANIMUS.',
-  'Control who can see your profile and data.':'Controlá quién puede ver tu perfil y datos.',
-  'Photo':'Foto','Identity':'Identidad','Email':'Correo','Password':'Contraseña',
+  'Data & Export':'Datos y ExportaciÃ³n','Sign Out':'Cerrar SesiÃ³n',
+  'How you appear to others on ANIMUS.':'CÃ³mo aparecÃ©s ante los demÃ¡s en ANIMUS.',
+  'Manage your login credentials and connected accounts.':'AdministrÃ¡ tus credenciales y cuentas conectadas.',
+  'Customize how ANIMUS looks and feels.':'PersonalizÃ¡ el aspecto de ANIMUS.',
+  'Choose what you get notified about inside ANIMUS.':'ElegÃ­ sobre quÃ© te notifica ANIMUS.',
+  'Control who can see your profile and data.':'ControlÃ¡ quiÃ©n puede ver tu perfil y datos.',
+  'Photo':'Foto','Identity':'Identidad','Email':'Correo','Password':'ContraseÃ±a',
   'Connected Accounts':'Cuentas Conectadas','Danger Zone':'Zona de Peligro',
   'Theme':'Tema','Language':'Idioma','Assessment Preferences':'Preferencias del Test',
   'Activity':'Actividad','Profile Visibility':'Visibilidad del Perfil',
-  'Display Name':'Nombre de Pantalla','Username':'Usuario','Bio':'Biografía',
-  'Email Address':'Dirección de Correo','Current Password':'Contraseña Actual',
-  'New Password':'Nueva Contraseña','Confirm New Password':'Confirmar Contraseña',
-  'Color Theme':'Tema de Color','Show Simplify Button':'Mostrar Botón de Simplificación',
+  'Display Name':'Nombre de Pantalla','Username':'Usuario','Bio':'BiografÃ­a',
+  'Email Address':'DirecciÃ³n de Correo','Current Password':'ContraseÃ±a Actual',
+  'New Password':'Nueva ContraseÃ±a','Confirm New Password':'Confirmar ContraseÃ±a',
+  'Color Theme':'Tema de Color','Show Simplify Button':'Mostrar BotÃ³n de SimplificaciÃ³n',
   'Default Test Mode':'Modo de Test Predeterminado',
   'Your name shown on your profile and to friends.':'Tu nombre visible en tu perfil y para amigos.',
-  'Used to sign in and receive notifications.':'Usado para iniciar sesión y recibir notificaciones.',
-  'Minimum 8 characters.':'Mínimo 8 caracteres.',
-  'Choose between dark and light mode across all pages.':'Elegí entre modo oscuro y claro.',
+  'Used to sign in and receive notifications.':'Usado para iniciar sesiÃ³n y recibir notificaciones.',
+  'Minimum 8 characters.':'MÃ­nimo 8 caracteres.',
+  'Choose between dark and light mode across all pages.':'ElegÃ­ entre modo oscuro y claro.',
   'Used throughout the site and during the assessment.':'Usado en todo el sitio y durante el test.',
-  'Which version opens by default when you start the test.':'Qué versión abre por defecto al iniciar el test.',
-  'Show the plain-English simplification button on each question.':'Mostrar el botón de simplificación en cada pregunta.',
-  'You have unsaved changes':'Tenés cambios sin guardar',
-  'Friend requests':'Solicitudes de amistad','Friend joined':'Amigo se unió',
-  'Friend retook assessment':'Amigo realizó el test','Profile comparison':'Comparación de perfil',
-  'When someone sends you a friend request':'Cuando alguien te envía una solicitud de amistad',
-  'When someone you know creates an account':'Cuando alguien que conocés crea una cuenta',
-  'Sign out of all devices':'Cerrar sesión en todos los dispositivos',
+  'Which version opens by default when you start the test.':'QuÃ© versiÃ³n abre por defecto al iniciar el test.',
+  'Show the plain-English simplification button on each question.':'Mostrar el botÃ³n de simplificaciÃ³n en cada pregunta.',
+  'You have unsaved changes':'TenÃ©s cambios sin guardar',
+  'Friend requests':'Solicitudes de amistad','Friend joined':'Amigo se uniÃ³',
+  'Friend retook assessment':'Amigo realizÃ³ el test','Profile comparison':'ComparaciÃ³n de perfil',
+  'When someone sends you a friend request':'Cuando alguien te envÃ­a una solicitud de amistad',
+  'When someone you know creates an account':'Cuando alguien que conocÃ©s crea una cuenta',
+  'Sign out of all devices':'Cerrar sesiÃ³n en todos los dispositivos',
   'Delete account':'Eliminar cuenta',
   'Revokes all active sessions everywhere.':'Revoca todas las sesiones activas en todos lados.',
   'Permanently deletes your profile, results, and all data. This cannot be undone.':'Elimina permanentemente tu perfil, resultados y todos los datos. No se puede deshacer.',
-  'Public Profile':'Perfil Público','Show Retake History':'Mostrar Historial de Retoma',
+  'Public Profile':'Perfil PÃºblico','Show Retake History':'Mostrar Historial de Retoma',
   "Show in Friends' Suggestions":'Aparecer en Sugerencias de Amigos',
-  'Public':'Público','Hidden':'Oculto','Visible':'Visible','Enabled':'Activado'
+  'Public':'PÃºblico','Hidden':'Oculto','Visible':'Visible','Enabled':'Activado'
 };
 
 function applyLanguage(lang) {
@@ -1220,7 +1221,7 @@ function applyLanguage(lang) {
     });
   });
 
-  // field-desc (may have child elements — only translate plain ones)
+  // field-desc (may have child elements â€” only translate plain ones)
   document.querySelectorAll('.field-desc').forEach(function(el){
     if(!el.children.length){
       if(!el.getAttribute('data-en')) el.setAttribute('data-en', el.textContent.trim());
@@ -1259,7 +1260,7 @@ function applyLanguage(lang) {
   document.getElementById('language').value = savedLang;
 })();
 
-// ── SECURITY UTILITIES ──
+// â”€â”€ SECURITY UTILITIES â”€â”€
 function escapeHTML(str){
   if(str===null||str===undefined) return '';
   return String(str)
