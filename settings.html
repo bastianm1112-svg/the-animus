@@ -21,7 +21,7 @@ body.light-mode {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6; }
 
-/* â”€â”€ NAV â”€â”€ */
+/* ── NAV ── */
 .navbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; z-index: 200; }
 .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.1em; color: var(--white); text-decoration: none; margin-right: 40px; }
 .nav-logo span { color: var(--gold); }
@@ -32,11 +32,11 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .nav-right { margin-left: auto; }
 .nav-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--gold); text-decoration: none; }
 
-/* â”€â”€ LAYOUT â”€â”€ */
+/* ── LAYOUT ── */
 .page { padding-top: 56px; display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
 @media(max-width: 768px) { .page { grid-template-columns: 1fr; } .settings-nav { display: none; } }
 
-/* â”€â”€ SETTINGS NAV â”€â”€ */
+/* ── SETTINGS NAV ── */
 .settings-nav {
   border-right: 1px solid var(--border);
   padding: 32px 16px;
@@ -61,7 +61,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .settings-nav-item.active svg { opacity: 1; }
 .settings-nav-divider { height: 1px; background: var(--border); margin: 12px 0; }
 
-/* â”€â”€ MAIN â”€â”€ */
+/* ── MAIN ── */
 .settings-main { padding: 40px 48px; max-width: 700px; }
 @media(max-width: 900px) { .settings-main { padding: 28px 20px; } }
 
@@ -402,7 +402,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   <!-- MAIN -->
   <main class="settings-main">
 
-    <!-- â”€â”€ PROFILE â”€â”€ -->
+    <!-- ── PROFILE ── -->
     <div class="settings-section active" id="section-profile">
       <div class="settings-header">
         <div class="settings-page-title">Profile</div>
@@ -464,7 +464,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
     </div>
 
-    <!-- â”€â”€ ACCOUNT & SECURITY â”€â”€ -->
+    <!-- ── ACCOUNT & SECURITY ── -->
     <div class="settings-section" id="section-account">
       <div class="settings-header">
         <div class="settings-page-title">Account & Security</div>
@@ -555,7 +555,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
     </div>
 
-    <!-- â”€â”€ APPEARANCE â”€â”€ -->
+    <!-- ── APPEARANCE ── -->
     <div class="settings-section" id="section-appearance">
       <div class="settings-header">
         <div class="settings-page-title">Appearance</div>
@@ -626,7 +626,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
     </div>
 
-    <!-- â”€â”€ NOTIFICATIONS â”€â”€ -->
+    <!-- ── NOTIFICATIONS ── -->
     <div class="settings-section" id="section-notifications">
       <div class="settings-header">
         <div class="settings-page-title">Notifications</div>
@@ -673,7 +673,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
     </div>
 
-    <!-- â”€â”€ PRIVACY â”€â”€ -->
+    <!-- ── PRIVACY ── -->
     <div class="settings-section" id="section-privacy">
       <div class="settings-header">
         <div class="settings-page-title">Privacy</div>
@@ -730,7 +730,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
     </div>
 
-    <!-- â”€â”€ DATA & EXPORT â”€â”€ -->
+    <!-- ── DATA & EXPORT ── -->
     <div class="settings-section" id="section-data">
       <div class="settings-header">
         <div class="settings-page-title">Data & Export</div>
@@ -1273,7 +1273,7 @@ function applyLanguage(lang) {
   document.getElementById('language').value = savedLang;
 })();
 
-// â”€â”€ SECURITY UTILITIES â”€â”€
+// ── SECURITY UTILITIES ──
 function escapeHTML(str){
   if(str===null||str===undefined) return '';
   return String(str)
