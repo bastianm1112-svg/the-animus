@@ -621,7 +621,7 @@ function searchUsers(val){
     var currentUser=firebase.auth().currentUser;
     firebase.firestore().collection('usernames')
       .where(firebase.firestore.FieldPath.documentId(),'>=',q)
-      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'ï£¿')
+      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'\uf8ff')
       .limit(8).get()
       .then(function(snap){
         if(snap.empty){ res.innerHTML='<div class="search-empty">No users found for @'+escapeHTML(q)+'</div>'; return; }
