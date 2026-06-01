@@ -31,7 +31,16 @@
       p.classList.remove('active');
     });
     var panel = document.getElementById('c-panel-' + panelId);
-    if (panel) panel.classList.add('active');
+    if (panel) {
+      panel.classList.add('active', 'panel-enter');
+      panel.addEventListener(
+        'animationend',
+        function () {
+          panel.classList.remove('panel-enter');
+        },
+        { once: true }
+      );
+    }
     if (g.AnimusComparePair && g.AnimusComparePair.refreshCharts) {
       g.AnimusComparePair.refreshCharts();
     }

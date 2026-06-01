@@ -111,11 +111,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .ring-label { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; text-align: center; }
 .ring-score { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: var(--gold); }
 
-/* Compare tabs */
-.compare-tabs { display: flex; gap: 0; border-top: 1px solid var(--border); overflow-x: auto; }
-.compare-tab { padding: 13px 20px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; white-space: nowrap; background: none; border-left: none; border-right: none; border-top: none; font-family: 'DM Sans', sans-serif; }
-.compare-tab:hover { color: var(--text); }
-.compare-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+/* Compare tabs — see animus-compare.css */
 
 /* ── CONTENT ── */
 .compare-content { max-width: 1000px; margin: 0 auto; padding: 32px 28px; }
@@ -435,12 +431,27 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
 </div>
 
 <div class="compare-tabs-wrap">
-  <div class="compare-tabs" id="compareTabs" role="tablist">
-    <button type="button" class="compare-tab active" data-panel="ai" role="tab" aria-selected="true">AI Analysis</button>
-    <button type="button" class="compare-tab" data-panel="cognition" role="tab">Cognition</button>
-    <button type="button" class="compare-tab" data-panel="personality" role="tab">Personality</button>
-    <button type="button" class="compare-tab" data-panel="philosophy" role="tab">Philosophy</button>
-    <button type="button" class="compare-tab" data-panel="summary" role="tab">Summary</button>
+  <div class="compare-tabs" id="compareTabs" role="tablist" aria-label="Comparison views">
+    <button type="button" class="compare-tab active" data-panel="ai" role="tab" aria-selected="true" aria-controls="c-panel-ai">
+      <span class="compare-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l1.8 5.5H19l-4.5 3.3 1.7 5.2L12 13.8 7.8 17l1.7-5.2L5 8.5h5.2L12 3z"/><circle cx="12" cy="12" r="9" stroke-opacity="0.35"/></svg></span>
+      <span class="compare-tab-text"><span class="compare-tab-label">AI</span><span class="compare-tab-desc">Insight</span></span>
+    </button>
+    <button type="button" class="compare-tab" data-panel="cognition" role="tab" aria-controls="c-panel-cognition">
+      <span class="compare-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 18V6l8 4 8-4v12l-8 4-8-4z"/><path d="M12 10v8"/></svg></span>
+      <span class="compare-tab-text"><span class="compare-tab-label">Mind</span><span class="compare-tab-desc">Functions</span></span>
+    </button>
+    <button type="button" class="compare-tab" data-panel="personality" role="tab" aria-controls="c-panel-personality">
+      <span class="compare-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="11" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M13 20c0-2.5 1.8-4.5 4-4.5"/></svg></span>
+      <span class="compare-tab-text"><span class="compare-tab-label">Person</span><span class="compare-tab-desc">Enneagram</span></span>
+    </button>
+    <button type="button" class="compare-tab" data-panel="philosophy" role="tab" aria-controls="c-panel-philosophy">
+      <span class="compare-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg></span>
+      <span class="compare-tab-text"><span class="compare-tab-label">Values</span><span class="compare-tab-desc">Ethics</span></span>
+    </button>
+    <button type="button" class="compare-tab" data-panel="summary" role="tab" aria-controls="c-panel-summary">
+      <span class="compare-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="5" width="16" height="14" rx="1"/><path d="M8 9h8M8 13h5M8 17h3"/></svg></span>
+      <span class="compare-tab-text"><span class="compare-tab-label">Summary</span><span class="compare-tab-desc">At a glance</span></span>
+    </button>
   </div>
 </div>
 
@@ -454,8 +465,12 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
   </div>
 
   <!-- ── AI ANALYSIS ── -->
-  <div class="c-panel active" id="c-panel-ai">
-    <div class="dual-legend" style="margin-bottom:20px">
+  <div class="c-panel compare-panel-card active" id="c-panel-ai">
+    <div class="compare-panel-head">
+      <h2 class="compare-panel-title">AI Analysis</h2>
+      <p class="compare-panel-sub">How your types interact in practice</p>
+    </div>
+    <div class="dual-legend compare-legend-pills">
       <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYouAI">You</span></div>
       <div class="dual-legend-item"><div class="legend-dot legend-them"></div><span id="legendThemAI">Them</span></div>
     </div>
@@ -465,8 +480,12 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
   </div>
 
   <!-- ── COGNITION ── -->
-  <div class="c-panel" id="c-panel-cognition">
-    <div class="dual-legend">
+  <div class="c-panel compare-panel-card" id="c-panel-cognition">
+    <div class="compare-panel-head">
+      <h2 class="compare-panel-title">Cognition</h2>
+      <p class="compare-panel-sub">Functions &amp; Big Five side by side</p>
+    </div>
+    <div class="dual-legend compare-legend-pills">
       <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYouCog">You</span></div>
       <div class="dual-legend-item"><div class="legend-dot legend-them"></div><span id="legendThemCog">Them</span></div>
     </div>
@@ -492,8 +511,12 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
   </div>
 
   <!-- ── PERSONALITY ── -->
-  <div class="c-panel" id="c-panel-personality">
-    <div class="dual-legend">
+  <div class="c-panel compare-panel-card" id="c-panel-personality">
+    <div class="compare-panel-head">
+      <h2 class="compare-panel-title">Personality</h2>
+      <p class="compare-panel-sub">Enneagram, instincts &amp; attachment</p>
+    </div>
+    <div class="dual-legend compare-legend-pills">
       <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYou2">You</span></div>
       <div class="dual-legend-item"><div class="legend-dot legend-them"></div><span id="legendThem2">Them</span></div>
     </div>
@@ -525,8 +548,12 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
   </div>
 
   <!-- ── PHILOSOPHY ── -->
-  <div class="c-panel" id="c-panel-philosophy">
-    <div class="dual-legend">
+  <div class="c-panel compare-panel-card" id="c-panel-philosophy">
+    <div class="compare-panel-head">
+      <h2 class="compare-panel-title">Philosophy</h2>
+      <p class="compare-panel-sub">Worldview, ethics &amp; politics</p>
+    </div>
+    <div class="dual-legend compare-legend-pills">
       <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYouPhi">You</span></div>
       <div class="dual-legend-item"><div class="legend-dot legend-them"></div><span id="legendThemPhi">Them</span></div>
     </div>
@@ -552,7 +579,12 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
   </div>
 
   <!-- ── SUMMARY ── -->
-  <div class="c-panel" id="c-panel-summary">
+  <div class="c-panel compare-panel-card" id="c-panel-summary">
+    <div class="compare-panel-head">
+      <h2 class="compare-panel-title">Summary</h2>
+      <p class="compare-panel-sub">Dimension gaps at a glance</p>
+    </div>
+    <div class="summary-table-wrap">
     <table class="summary-table">
       <thead>
         <tr>
@@ -564,6 +596,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
       </thead>
       <tbody></tbody>
     </table>
+    </div>
   </div>
 
 </div>
