@@ -8,7 +8,7 @@
 <meta property="og:type" content="profile">
 <meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #080808;
@@ -601,7 +601,7 @@ function loadProfileData(uid, isOwner, currentUser){
       var cogColors=['','','','dim','dim','low','low','low'];
       var fnColorMap={Ni:'fn-ni',Ne:'fn-ne',Ti:'fn-ti',Te:'fn-te',Fi:'fn-fi',Fe:'fn-fe',Si:'fn-si',Se:'fn-se'};
 var fnTooltips={Ni:'Introverted Intuition — pattern recognition, long-range vision',Ne:'Extraverted Intuition — possibility mapping, lateral thinking',Ti:'Introverted Thinking — internal logical frameworks',Te:'Extraverted Thinking — external systematization, efficiency',Fi:'Introverted Feeling — deep personal values, authenticity',Fe:'Extraverted Feeling — interpersonal harmony, emotional attunement',Si:'Introverted Sensing — experiential memory, established procedure',Se:'Extraverted Sensing — present-moment awareness, physical mastery'};
-document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Math.round(snap.cog[fn]||0);var cls=fnColorMap[fn]||'';return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><div class="fn-tooltip-wrap"><strong>'+escapeHTML(fn)+'</strong><div class="fn-tooltip">'+escapeHTML(fnTooltips[fn]||fn)+'</div></div></div><div class="bar-wrap"><div class="bar-fill '+cls+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><strong>'+escapeHTML(fn)+'</strong></div><div class="bar-wrap"><div class="bar-fill '+(cogColors[i]||'low')+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');
+document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Math.round(snap.cog[fn]||0);var cls=fnColorMap[fn]||'';return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><div class="fn-tooltip-wrap"><strong>'+escapeHTML(fn)+'</strong><div class="fn-tooltip">'+escapeHTML(fnTooltips[fn]||fn)+'</div></div></div><div class="bar-wrap"><div class="bar-fill '+cls+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');
       var stackLabels=['Dominant','Auxiliary','Tertiary','Inferior']; var stackColors=['var(--gold)','var(--gold)','var(--gold2)','var(--muted)'];
       document.getElementById('stackSummaryList').innerHTML=cogFns.slice(0,4).map(function(fn,i){return '<div>'+stackLabels[i]+' &rarr; <strong style="color:'+stackColors[i]+'">'+escapeHTML(fn)+'</strong></div>';}).join('');
     }
