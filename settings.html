@@ -588,7 +588,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
           <div class="field-control">
             <select class="s-select" id="language" onchange="applyLanguage(this.value); markDirty()">
               <option value="en">English</option>
-              <option value="es">EspaÃ±ol (Paraguay)</option>
+              <option value="es">Español (Paraguay)</option>
             </select>
           </div>
         </div>
@@ -952,7 +952,7 @@ function saveChanges() {
     applyLanguage(lang);
     applyTheme(theme);
     document.getElementById('usernamePreview').textContent = escapeHTML(un);
-    showToast('Settings saved âœ“');
+    showToast('Settings saved ✓');
   }).catch(function(e){
     btn.disabled = false;
     btn.textContent = 'Save Changes';
@@ -1031,7 +1031,7 @@ function syncGoogle() {
     var preview = document.getElementById('avatarPreview');
     preview.innerHTML = '<img src="'+escapeHTML(user.photoURL)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="avatar-overlay">Change</div>';
     markDirty();
-    showToast('Photo synced from Google âœ“');
+    showToast('Photo synced from Google ✓');
   } else { showToast('No Google photo found on your account'); }
 }
 
@@ -1051,7 +1051,7 @@ function copyShareLink() {
   var username = document.getElementById('username').value;
   if(!username && auth.currentUser) username = auth.currentUser.uid;
   var url = window.location.origin + '/' + encodeURIComponent(username);
-  if(navigator.clipboard) { navigator.clipboard.writeText(url).then(function(){ showToast('Share link copied âœ“'); }); }
+  if(navigator.clipboard) { navigator.clipboard.writeText(url).then(function(){ showToast('Share link copied ✓'); }); }
   else { showToast('Your profile link: ' + url); }
 }
 
@@ -1155,12 +1155,12 @@ auth.onAuthStateChanged(function(user){
     if(history[0] && el1){
       var r=history[0].snapshot||{};
       var d=history[0].timestamp?new Date(history[0].timestamp.toDate()).toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
-      el1.textContent=(r.instStack==='short'?'Short':'Full')+' Assessment Â· '+d+' Â· '+(r.mbti||'—')+' '+(r.ennType?r.ennType+'w'+r.ennWing:'');
+      el1.textContent=(r.instStack==='short'?'Short':'Full')+' Assessment · '+d+' · '+(r.mbti||'—')+' '+(r.ennType?r.ennType+'w'+r.ennWing:'');
     }
     if(history[1] && el2){
       var r2=history[1].snapshot||{};
       var d2=history[1].timestamp?new Date(history[1].timestamp.toDate()).toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
-      el2.textContent=(r2.instStack==='short'?'Short':'Full')+' Assessment Â· '+d2+' Â· '+(r2.mbti||'—')+' '+(r2.ennType?r2.ennType+'w'+r2.ennWing:'');
+      el2.textContent=(r2.instStack==='short'?'Short':'Full')+' Assessment · '+d2+' · '+(r2.mbti||'—')+' '+(r2.ennType?r2.ennType+'w'+r2.ennWing:'');
     }
   });
 });
@@ -1177,40 +1177,40 @@ var _i18n_es = {
   'Profile':'Perfil','Compare':'Comparar','Types':'Tipos',
   'Account & Security':'Cuenta y Seguridad','Appearance':'Apariencia',
   'Notifications':'Notificaciones','Privacy':'Privacidad',
-  'Data & Export':'Datos y ExportaciÃ³n','Sign Out':'Cerrar SesiÃ³n',
-  'How you appear to others on ANIMUS.':'CÃ³mo aparecÃ©s ante los demÃ¡s en ANIMUS.',
-  'Manage your login credentials and connected accounts.':'AdministrÃ¡ tus credenciales y cuentas conectadas.',
-  'Customize how ANIMUS looks and feels.':'PersonalizÃ¡ el aspecto de ANIMUS.',
-  'Choose what you get notified about inside ANIMUS.':'ElegÃ­ sobre quÃ© te notifica ANIMUS.',
-  'Control who can see your profile and data.':'ControlÃ¡ quiÃ©n puede ver tu perfil y datos.',
-  'Photo':'Foto','Identity':'Identidad','Email':'Correo','Password':'ContraseÃ±a',
+  'Data & Export':'Datos y Exportación','Sign Out':'Cerrar Sesión',
+  'How you appear to others on ANIMUS.':'Cómo aparecés ante los demás en ANIMUS.',
+  'Manage your login credentials and connected accounts.':'Administrá tus credenciales y cuentas conectadas.',
+  'Customize how ANIMUS looks and feels.':'Personalizá el aspecto de ANIMUS.',
+  'Choose what you get notified about inside ANIMUS.':'Elegí sobre qué te notifica ANIMUS.',
+  'Control who can see your profile and data.':'Controlá quién puede ver tu perfil y datos.',
+  'Photo':'Foto','Identity':'Identidad','Email':'Correo','Password':'Contraseña',
   'Connected Accounts':'Cuentas Conectadas','Danger Zone':'Zona de Peligro',
   'Theme':'Tema','Language':'Idioma','Assessment Preferences':'Preferencias del Test',
   'Activity':'Actividad','Profile Visibility':'Visibilidad del Perfil',
-  'Display Name':'Nombre de Pantalla','Username':'Usuario','Bio':'BiografÃ­a',
-  'Email Address':'DirecciÃ³n de Correo','Current Password':'ContraseÃ±a Actual',
-  'New Password':'Nueva ContraseÃ±a','Confirm New Password':'Confirmar ContraseÃ±a',
-  'Color Theme':'Tema de Color','Show Simplify Button':'Mostrar BotÃ³n de SimplificaciÃ³n',
+  'Display Name':'Nombre de Pantalla','Username':'Usuario','Bio':'Biografía',
+  'Email Address':'Dirección de Correo','Current Password':'Contraseña Actual',
+  'New Password':'Nueva Contraseña','Confirm New Password':'Confirmar Contraseña',
+  'Color Theme':'Tema de Color','Show Simplify Button':'Mostrar Botón de Simplificación',
   'Default Test Mode':'Modo de Test Predeterminado',
   'Your name shown on your profile and to friends.':'Tu nombre visible en tu perfil y para amigos.',
-  'Used to sign in and receive notifications.':'Usado para iniciar sesiÃ³n y recibir notificaciones.',
-  'Minimum 8 characters.':'MÃ­nimo 8 caracteres.',
-  'Choose between dark and light mode across all pages.':'ElegÃ­ entre modo oscuro y claro.',
+  'Used to sign in and receive notifications.':'Usado para iniciar sesión y recibir notificaciones.',
+  'Minimum 8 characters.':'Mínimo 8 caracteres.',
+  'Choose between dark and light mode across all pages.':'Elegí entre modo oscuro y claro.',
   'Used throughout the site and during the assessment.':'Usado en todo el sitio y durante el test.',
-  'Which version opens by default when you start the test.':'QuÃ© versiÃ³n abre por defecto al iniciar el test.',
-  'Show the plain-English simplification button on each question.':'Mostrar el botÃ³n de simplificaciÃ³n en cada pregunta.',
-  'You have unsaved changes':'TenÃ©s cambios sin guardar',
-  'Friend requests':'Solicitudes de amistad','Friend joined':'Amigo se uniÃ³',
-  'Friend retook assessment':'Amigo realizÃ³ el test','Profile comparison':'ComparaciÃ³n de perfil',
-  'When someone sends you a friend request':'Cuando alguien te envÃ­a una solicitud de amistad',
-  'When someone you know creates an account':'Cuando alguien que conocÃ©s crea una cuenta',
-  'Sign out of all devices':'Cerrar sesiÃ³n en todos los dispositivos',
+  'Which version opens by default when you start the test.':'Qué versión abre por defecto al iniciar el test.',
+  'Show the plain-English simplification button on each question.':'Mostrar el botón de simplificación en cada pregunta.',
+  'You have unsaved changes':'Tenés cambios sin guardar',
+  'Friend requests':'Solicitudes de amistad','Friend joined':'Amigo se unió',
+  'Friend retook assessment':'Amigo realizó el test','Profile comparison':'Comparación de perfil',
+  'When someone sends you a friend request':'Cuando alguien te envía una solicitud de amistad',
+  'When someone you know creates an account':'Cuando alguien que conocés crea una cuenta',
+  'Sign out of all devices':'Cerrar sesión en todos los dispositivos',
   'Delete account':'Eliminar cuenta',
   'Revokes all active sessions everywhere.':'Revoca todas las sesiones activas en todos lados.',
   'Permanently deletes your profile, results, and all data. This cannot be undone.':'Elimina permanentemente tu perfil, resultados y todos los datos. No se puede deshacer.',
-  'Public Profile':'Perfil PÃºblico','Show Retake History':'Mostrar Historial de Retoma',
+  'Public Profile':'Perfil Público','Show Retake History':'Mostrar Historial de Retoma',
   "Show in Friends' Suggestions":'Aparecer en Sugerencias de Amigos',
-  'Public':'PÃºblico','Hidden':'Oculto','Visible':'Visible','Enabled':'Activado'
+  'Public':'Público','Hidden':'Oculto','Visible':'Visible','Enabled':'Activado'
 };
 
 function applyLanguage(lang) {
