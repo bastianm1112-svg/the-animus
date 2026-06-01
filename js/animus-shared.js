@@ -108,7 +108,7 @@
    * Vercel rewrites /name → profile.html?u=name but the browser often keeps /name with no search string.
    */
   function resolveProfileRoute(loc) {
-    loc = loc || (typeof g !== 'undefined' && g.location ? g.location : null);
+    loc = loc || (global && global.location ? global.location : null);
     if (!loc) return { kind: 'self' };
 
     var params = new URLSearchParams(loc.search || '');
@@ -167,8 +167,8 @@
   function toggleThemeGlobal() {
     var isLight = document.body.classList.toggle('light-mode');
     localStorage.setItem(KEYS.theme, isLight ? 'light' : 'dark');
-    if (typeof g.AnimusApp !== 'undefined' && g.AnimusApp.syncThemeButton) {
-      g.AnimusApp.syncThemeButton();
+    if (typeof global.AnimusApp !== 'undefined' && global.AnimusApp.syncThemeButton) {
+      global.AnimusApp.syncThemeButton();
       return;
     }
     var btn = document.getElementById('themeToggleBtn');

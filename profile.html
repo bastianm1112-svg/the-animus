@@ -219,7 +219,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
         <div class="profile-meta">
           <div class="profile-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="joinedDate">Joined recently</span></div>
           <div class="profile-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><strong id="friendCount">0</strong>&nbsp;friends</div>
-          <div class="profile-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><strong id="assessCount">0</strong>&nbsp;assessments taken</div>
+          <div class="profile-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><strong id="assessCount">0</strong>&nbsp;<span id="assessMetaText">assessments taken</span></div>
         </div>
       </div>
       <div class="hero-actions">
@@ -229,7 +229,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
       </div>
     </div>
     <div id="profileViewBanner" style="display:none;margin:12px 0 0;padding:10px 14px;background:rgba(200,169,110,0.08);border:1px solid var(--border2);font-size:12px;color:var(--muted2);line-height:1.5"></div>
-    <div class="type-strip" id="typeStrip"><div class="type-badge" style="color:var(--muted)" id="typeStripPlaceholder">Take the assessment to see your types</div></div>
+    <div class="type-strip" id="typeStrip"><div class="type-badge" style="color:var(--muted)" id="typeStripPlaceholder" data-voice-you="Take the assessment to see your types" data-voice-they="%name% has not completed the assessment yet">Take the assessment to see your types</div></div>
     <div class="profile-tabs" id="profileTabs">
       <button class="profile-tab active" data-panel="overview">Overview</button>
       <button class="profile-tab" data-panel="cognition">Cognition</button>
@@ -246,7 +246,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
 
   <div class="panel active" id="panel-overview">
     <div class="panel-main" id="overviewPanelRoot">
-      <div class="viz-empty"><div class="viz-empty-title">Overview</div><p>Complete the assessment to unlock your full profile.</p></div>
+      <div class="viz-empty"><div class="viz-empty-title">Overview</div><p data-voice-you="Complete the assessment to unlock your full profile." data-voice-they="%name% has not shared assessment results yet.">Complete the assessment to unlock your full profile.</p></div>
     </div>
     <div class="panel-side">
       <div class="profile-actions-card">
@@ -266,19 +266,19 @@ var auth=firebase.auth(); var db=firebase.firestore();
 
   <div class="panel" id="panel-cognition">
     <div class="panel-main" id="cognitionPanelRoot">
-      <div class="viz-empty"><div class="viz-empty-title">Cognition</div><p>Complete the assessment to see your cognitive profile.</p></div>
+      <div class="viz-empty"><div class="viz-empty-title">Cognition</div><p data-voice-you="Complete the assessment to see your cognitive profile." data-voice-they="This section will appear after they complete the assessment.">Complete the assessment to see your cognitive profile.</p></div>
     </div>
   </div>
 
   <div class="panel" id="panel-personality">
     <div class="panel-main" id="personalityPanelRoot">
-      <div class="viz-empty"><div class="viz-empty-title">Personality</div><p>Complete the assessment to see your enneagram and temperament profile.</p></div>
+      <div class="viz-empty"><div class="viz-empty-title">Personality</div><p data-voice-you="Complete the assessment to see your enneagram and temperament profile." data-voice-they="This section will appear after they complete the assessment.">Complete the assessment to see your enneagram and temperament profile.</p></div>
     </div>
   </div>
 
   <div class="panel" id="panel-philosophy">
     <div class="panel-main" id="philosophyPanelRoot">
-      <div class="viz-empty"><div class="viz-empty-title">Philosophy</div><p>Complete the assessment to see your philosophical orientation.</p></div>
+      <div class="viz-empty"><div class="viz-empty-title">Philosophy</div><p data-voice-you="Complete the assessment to see your philosophical orientation." data-voice-they="This section will appear after they complete the assessment.">Complete the assessment to see your philosophical orientation.</p></div>
     </div>
   </div>
 
@@ -321,7 +321,7 @@ function animateBars(){
 window.animateBars = animateBars;
 setTimeout(animateBars, 200);
 
-var _snap={}, _pName='', _pUser='';
+var _snap={}, _pName='', _pUser='', _viewUid='', _isProfileOwner=true;
 
 function shareProfile(){
   if(!_snap.mbti){ var u=window.location.href; if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){showToast('Link copied');}); return; }
@@ -338,8 +338,14 @@ function shareProfile(){
   document.getElementById('scModal').classList.add('open');
 }
 function closeShareCard(){ document.getElementById('scModal').classList.remove('open'); }
+function profilePublicUrl(){
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.profileHrefForUser) {
+    return window.location.origin + AnimusShared.profileHrefForUser(_pUser, _viewUid);
+  }
+  return window.location.origin + (_pUser ? '/' + encodeURIComponent(_pUser) : '/profile');
+}
 function copyShareLink(){
-  var u = window.location.origin+(_pUser?'/'+_pUser:'/profile');
+  var u = profilePublicUrl();
   if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){showToast('Link copied ✓');});
   else { var ta=document.createElement('textarea');ta.value=u;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Link copied ✓'); }
 }
@@ -452,6 +458,11 @@ auth.onAuthStateChanged(function (currentUser) {
 });
 
 function loadProfileData(uid, isOwner, currentUser){
+  _viewUid = uid;
+  _isProfileOwner = !!isOwner;
+  document.body.classList.toggle('is-owner', isOwner);
+  document.body.classList.toggle('viewing-other', !isOwner);
+
   Promise.all([
     db.collection('users').doc(uid).get(),
     db.collection('profiles').doc(uid).get()
@@ -475,13 +486,17 @@ function loadProfileData(uid, isOwner, currentUser){
 
     if (!isOwner) {
       document.querySelectorAll('.owner-only').forEach(function (el) { el.style.display = 'none'; });
-      var retake = document.querySelector('a[href="/test"].btn-primary-profile');
-      if (retake) retake.style.display = 'none';
     }
 
     if(currentUser){
       AnimusShared.applyNavAvatarForSession(document.getElementById('navAvatar'), currentUser);
-      if(isOwner) AnimusShared.applyProfilePhoto(document.getElementById('profilePhoto'), currentUser, u);
+    }
+    if (typeof AnimusShared !== 'undefined') {
+      AnimusShared.applyProfilePhoto(document.getElementById('profilePhoto'), { uid: uid }, u);
+    }
+
+    if (!isOwner && typeof AnimusShared !== 'undefined') {
+      document.title = (u.displayName || u.username || 'Profile') + ' — ANIMUS';
     }
 
     document.getElementById('profileName').textContent=u.displayName||'&#8212;';
@@ -491,12 +506,6 @@ function loadProfileData(uid, isOwner, currentUser){
     document.getElementById('friendCount').textContent=(u.friends||[]).length;
     if(p.history) document.getElementById('assessCount').textContent=(p.history||[]).length;
 
-    var typePlaceholder=document.getElementById('typeStripPlaceholder');
-    if(typePlaceholder){
-      typePlaceholder.textContent=isOwner
-        ? 'Take the assessment to see YOUR types'
-        : (u.displayName||'They')+' has not completed the assessment yet';
-    }
     if(snap.mbti){
       var strip=document.getElementById('typeStrip');
       var badges=[[snap.mbti,snap.mbtiName||''],[snap.ennType+'w'+snap.ennWing,'Enneagram'],[snap.ennTritype||'','Tritype'],[snap.instStack||'','Instinct'],[snap.phi||'','Philosophy'],[snap.att||'','Attachment'],[snap.socionics||'','Socionics']];
@@ -523,14 +532,24 @@ function loadProfileData(uid, isOwner, currentUser){
       }).join('');
     }
 
-    if(!isOwner && currentUser){
+    if(!isOwner){
       var heroActions=document.querySelector('.hero-actions');
-      if(heroActions && !heroActions.querySelector('a[href*="compare"]')){
-        var cmpUrl = u.username
-          ? '/compare?u=' + encodeURIComponent(u.username)
-          : '/compare?uid=' + encodeURIComponent(uid);
+      if(heroActions){
+        var cmpUrl = (typeof AnimusShared !== 'undefined' && AnimusShared.profileHrefForUser)
+          ? (function () {
+              var comparePath = u.username
+                ? '/compare?u=' + encodeURIComponent(u.username)
+                : '/compare?uid=' + encodeURIComponent(uid);
+              return comparePath;
+            })()
+          : (u.username ? '/compare?u=' + encodeURIComponent(u.username) : '/compare?uid=' + encodeURIComponent(uid));
         heroActions.innerHTML='<a href="'+cmpUrl+'" class="btn-action-profile btn-primary-profile">&#8652; Compare with them</a><button class="btn-action-profile btn-secondary-profile" onclick="shareProfile()">Share</button>';
       }
+      document.querySelectorAll('.profile-actions-card a[href="/compare"]').forEach(function (a) {
+        a.href = u.username
+          ? '/compare?u=' + encodeURIComponent(u.username)
+          : '/compare?uid=' + encodeURIComponent(uid);
+      });
     }
     if (typeof AnimusProfileSections !== 'undefined') {
       AnimusProfileSections.renderAll(snap, isOwner, voice, u.displayName || '');
@@ -566,9 +585,19 @@ function loadProfileData(uid, isOwner, currentUser){
       encodeURIComponent(u) +
       '" class="btn-action-profile btn-primary-profile">⇔ Compare</a><button class="btn-action-profile btn-secondary-profile" onclick="shareProfile()">Share</button>';
   }
+  document.body.classList.add('viewing-other');
+  document.body.classList.remove('is-owner');
   document.querySelectorAll('.owner-only').forEach(function (el) {
     el.style.display = 'none';
   });
+  var banner = document.getElementById('profileViewBanner');
+  if (banner) {
+    banner.style.display = 'block';
+    banner.textContent = 'Viewing @' + u + "'s profile — results describe them, not you.";
+  }
+  if (typeof AnimusProfileVoice !== 'undefined') {
+    AnimusProfileVoice.applyProfileVoice(false, name);
+  }
   document.querySelectorAll('.nav-item').forEach(function (el) {
     el.classList.remove('active');
   });

@@ -167,13 +167,15 @@
     }
   }
 
-  function renderCognition(snap, isOwner, voice) {
+  function renderCognition(snap, isOwner, voice, displayName) {
     var root = document.getElementById('cognitionPanelRoot');
     if (!root) return;
     var p = pron(isOwner);
+    var name = (displayName || '').trim() || 'This person';
 
     if (!snap || !snap.mbti) {
-      root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Cognition</div><p>Complete the assessment first.</p></div>';
+      root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Cognition</div><p>'
+        + (isOwner ? 'Complete the assessment to see your cognitive profile.' : name + ' has not completed an assessment for this section.') + '</p></div>';
       return;
     }
 
@@ -208,13 +210,15 @@
       }).join('') + '</div></div>';
   }
 
-  function renderPersonality(snap, isOwner, voice) {
+  function renderPersonality(snap, isOwner, voice, displayName) {
     var root = document.getElementById('personalityPanelRoot');
     if (!root) return;
     var p = pron(isOwner);
+    var name = (displayName || '').trim() || 'This person';
 
     if (!snap || !snap.mbti) {
-      root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Personality</div><p>Complete the assessment first.</p></div>';
+      root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Personality</div><p>'
+        + (isOwner ? 'Complete the assessment to see your enneagram and temperament profile.' : name + ' has not completed an assessment for this section.') + '</p></div>';
       return;
     }
 
@@ -242,12 +246,15 @@
         + escapeHTML(narr(voice, snap.attNarrative, isOwner)) + '</p></div>' : '');
   }
 
-  function renderPhilosophy(snap, isOwner, voice) {
+  function renderPhilosophy(snap, isOwner, voice, displayName) {
     var root = document.getElementById('philosophyPanelRoot');
     if (!root) return;
+    var p = pron(isOwner);
+    var name = (displayName || '').trim() || 'This person';
 
     if (!snap || !snap.mbti) {
-      root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Philosophy</div><p>Complete the assessment first.</p></div>';
+      root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Philosophy</div><p>'
+        + (isOwner ? 'Complete the assessment to see your philosophical orientation.' : name + ' has not completed an assessment for this section.') + '</p></div>';
       return;
     }
 
@@ -255,7 +262,11 @@
     var phiName = PHI_LABELS[phiTop] || (phiTop || '').replace('PH_', '') || '—';
 
     root.innerHTML = ''
-      + '<p class="section-lead">Philosophical schools scored in parallel — the shape shows where moral reasoning anchors.</p>'
+      + '<p class="section-lead">' + escapeHTML(
+        isOwner
+          ? 'Philosophical schools scored in parallel — the shape shows where your moral reasoning anchors.'
+          : 'Philosophical schools scored in parallel — the shape shows where ' + name + "'s moral reasoning anchors."
+      ) + '</p>'
       + (snap.phiNarrative ? '<div class="narrative"><div class="narrative-title">' + escapeHTML(phiName) + ' orientation</div><div class="narrative-text">'
         + escapeHTML(narr(voice, snap.phiNarrative, isOwner)) + '</div></div>' : '')
       + '<div class="phi-layout">'
@@ -284,9 +295,9 @@
 
   function renderAll(snap, isOwner, voice, displayName) {
     renderOverview(snap, isOwner, voice, displayName);
-    renderCognition(snap, isOwner, voice);
-    renderPersonality(snap, isOwner, voice);
-    renderPhilosophy(snap, isOwner, voice);
+    renderCognition(snap, isOwner, voice, displayName);
+    renderPersonality(snap, isOwner, voice, displayName);
+    renderPhilosophy(snap, isOwner, voice, displayName);
     setTimeout(function () {
       if (typeof g.animateBars === 'function') g.animateBars();
       document.querySelectorAll('[data-w]').forEach(function (el) {

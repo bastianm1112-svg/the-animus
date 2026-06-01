@@ -306,7 +306,7 @@
     fixPoliticalStat(snap);
 
     if (typeof g.AnimusProfileVisuals !== 'undefined') {
-      g.AnimusProfileVisuals.renderAll(snap, isOwner, voice);
+      g.AnimusProfileVisuals.renderAll(snap, isOwner, voice, displayName);
     }
 
     if (typeof g.animateBars === 'function') {

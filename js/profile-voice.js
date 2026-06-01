@@ -49,10 +49,10 @@
       'aloneNarrative': isOwner ? 'Complete the assessment to see this section.' : 'They have not completed an assessment for this section.',
       'socialNarrative': isOwner ? 'Complete the assessment to see this section.' : 'They have not completed an assessment for this section.',
       'shadowNarrative': isOwner ? 'Complete the assessment to see this section.' : 'They have not completed an assessment for this section.',
-      'cogNarrativePlaceholder': isOwner ? 'Complete the assessment to see your cognitive analysis.' : 'Complete the assessment to see their cognitive analysis.',
-      'phiNarrativePlaceholder': isOwner ? 'Complete the assessment to see your philosophical analysis.' : 'Complete the assessment to see their philosophical analysis.',
-      'polNarrativePlaceholder': isOwner ? 'Complete the assessment to see your political analysis.' : 'Complete the assessment to see their political analysis.',
-      'socialPlaceholder': isOwner ? 'Complete the assessment to see your social analysis.' : 'Complete the assessment to see their social analysis.'
+      'cogNarrativePlaceholder': isOwner ? 'Complete the assessment to see your cognitive analysis.' : 'Cognitive analysis will appear after they complete the assessment.',
+      'phiNarrativePlaceholder': isOwner ? 'Complete the assessment to see your philosophical analysis.' : 'Philosophical analysis will appear after they complete the assessment.',
+      'polNarrativePlaceholder': isOwner ? 'Complete the assessment to see your political analysis.' : 'Political analysis will appear after they complete the assessment.',
+      'socialPlaceholder': isOwner ? 'Complete the assessment to see your social analysis.' : 'Social analysis will appear after they complete the assessment.'
     };
     Object.keys(map).forEach(function (id) {
       var el = document.getElementById(id);
@@ -65,14 +65,50 @@
       if (youT && theyT) el.textContent = isOwner ? youT : theyT;
     });
 
-    var compareBtn = document.querySelector('a[href="/compare"]');
-    if (compareBtn && !isOwner) {
-      compareBtn.textContent = '⇄ Compare with them';
+    document.querySelectorAll('[data-voice-you]').forEach(function (el) {
+      if (el.dataset.dynamicFilled) return;
+      var theyText = el.getAttribute('data-voice-they');
+      var youText = el.getAttribute('data-voice-you');
+      if (!youText && !theyText) return;
+      el.textContent = (isOwner ? youText : theyText || youText).replace(/%name%/g, name);
+    });
+
+    document.querySelectorAll('[data-voice-html-you]').forEach(function (el) {
+      if (el.dataset.dynamicFilled) return;
+      var theyHtml = el.getAttribute('data-voice-html-they');
+      var youHtml = el.getAttribute('data-voice-html-you');
+      if (!youHtml && !theyHtml) return;
+      el.innerHTML = (isOwner ? youHtml : theyHtml || youHtml).replace(/%name%/g, escapeHTML(name));
+    });
+
+    var assessMeta = document.getElementById('assessMetaText');
+    if (assessMeta) {
+      assessMeta.textContent = isOwner ? 'assessments taken' : 'assessments completed';
     }
+
+    var retakeBtn = document.querySelector('a[href="/test"].btn-primary-profile');
+    if (retakeBtn) retakeBtn.style.display = isOwner ? '' : 'none';
+    var editBtn = document.querySelector('.hero-actions button[onclick="editBio()"]');
+    if (editBtn) editBtn.style.display = isOwner ? '' : 'none';
+
+    document.querySelectorAll('.profile-actions-card a[href="/compare"]').forEach(function (a) {
+      if (!isOwner) a.textContent = '⇄ Compare with them';
+      else a.textContent = '⇄ Compare with someone';
+    });
 
     function narr(t) { return narrativeForViewer(t, isOwner, name); }
 
-    return { narrativeForViewer: narr, subj: subj, they: they, their: their, Your: Your, You: You, name: name };
+    return { narrativeForViewer: narr, subj: subj, they: they, their: their, Your: Your, You: You, name: name, isOwner: isOwner };
+  }
+
+  function escapeHTML(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   g.AnimusProfileVoice = {

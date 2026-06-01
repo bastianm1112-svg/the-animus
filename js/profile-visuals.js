@@ -246,8 +246,11 @@
     var p = pron(isOwner);
 
     if (!snap || !snap.mbti || typeof snap.polX !== 'number') {
+      var polEmpty = isOwner
+        ? 'Complete the assessment to map your economic and social position.'
+        : 'Political compass data will appear after they complete the assessment.';
       root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Political compass</div>'
-        + '<p>Complete the assessment to map ' + p.possL + ' economic and social position.</p></div>';
+        + '<p>' + polEmpty + '</p></div>';
       return;
     }
 
@@ -352,8 +355,11 @@
     var p = pron(isOwner);
 
     if (!snap || !snap.mbti) {
+      var socEmpty = isOwner
+        ? 'Complete the assessment to see how you show up alone vs with others.'
+        : 'Social profile data will appear after they complete the assessment.';
       root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Social profile</div>'
-        + '<p>Complete the assessment to see how ' + p.subjL + ' show up alone vs with others.</p></div>';
+        + '<p>' + socEmpty + '</p></div>';
       return;
     }
 
@@ -405,17 +411,20 @@
       + dimBars('Social presence', snap.soc, SOC_LABELS) + '</div>';
   }
 
-  function renderFigures(snap, isOwner, voice) {
+  function renderFigures(snap, isOwner, voice, displayName) {
     var root = document.getElementById('figuresPanelRoot');
     if (!root) return;
     var p = pron(isOwner);
+    var name = (displayName || '').trim() || 'This person';
     var figures = (snap && snap.figures) ? snap.figures.slice() : [];
 
     if (!figures.length) {
       root.innerHTML = '<div class="viz-empty figures-empty">'
         + '<div class="figures-empty-orbit" aria-hidden="true"></div>'
         + '<div class="viz-empty-title">Similar figures</div>'
-        + '<p>Complete the assessment to see historical, cultural, and fictional mirrors of ' + p.possL + ' profile.</p></div>';
+        + '<p>' + (isOwner
+          ? 'Complete the assessment to see historical, cultural, and fictional mirrors of your profile.'
+          : 'Figures will appear here after ' + escapeHTML(name) + ' completes the assessment.') + '</p></div>';
       return;
     }
 
@@ -482,10 +491,10 @@
     });
   }
 
-  function renderAll(snap, isOwner, voice) {
+  function renderAll(snap, isOwner, voice, displayName) {
     renderPolitical(snap, isOwner, voice);
     renderSocial(snap, isOwner, voice);
-    renderFigures(snap, isOwner, voice);
+    renderFigures(snap, isOwner, voice, displayName);
     setTimeout(animateVisualBars, 120);
     if (typeof g.animateBars === 'function') setTimeout(g.animateBars, 180);
   }
