@@ -354,7 +354,7 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
       if(!btn) return;
       if(user){
         btn.href = '/dashboard';
-        btn.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Dashboard';
+        var n=(user.displayName||'?').trim(); btn.textContent=(n.split(/\s+/).length>1?(n.split(/\s+/)[0].charAt(0)+n.split(/\s+/).pop().charAt(0)):n.charAt(0)).toUpperCase();
         btn.onmouseover = function(){ this.style.background='#c8a96e'; this.style.color='#000'; };
         btn.onmouseout  = function(){ this.style.background='none';    this.style.color='#c8a96e'; };
       } else {
