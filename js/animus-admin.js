@@ -245,7 +245,10 @@
 
     auth.onAuthStateChanged(function (user) {
       if (!user) {
-        g.location.href = '/login?next=' + encodeURIComponent('/admin');
+        g.location.href =
+          typeof g.AnimusShared !== 'undefined' && g.AnimusShared.buildLoginUrl
+            ? g.AnimusShared.buildLoginUrl('/admin')
+            : '/login?next=' + encodeURIComponent('/admin');
         return;
       }
 

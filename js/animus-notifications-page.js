@@ -10,7 +10,10 @@
     }
     auth.onAuthStateChanged(function (user) {
       if (!user) {
-        g.location.href = '/login?next=' + encodeURIComponent('/notifications');
+        g.location.href =
+          typeof g.AnimusShared !== 'undefined' && g.AnimusShared.buildLoginUrl
+            ? g.AnimusShared.buildLoginUrl('/notifications')
+            : '/login?next=' + encodeURIComponent('/notifications');
         return;
       }
       if (typeof g.AnimusShared !== 'undefined') {

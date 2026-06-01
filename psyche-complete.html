@@ -329,9 +329,26 @@ body.page-test{background:var(--bg);color:var(--text);min-height:100vh;}
   <script src="/js/animus-shared.js"></script>
   <script>
     AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
+    AnimusShared.guardTestPageAuth(firebase.auth());
   </script>
+  <style>
+    body.page-test.test-auth-pending #appNavMount,
+    body.page-test.test-auth-pending #intro,
+    body.page-test.test-auth-pending #quiz,
+    body.page-test.test-auth-pending #loading,
+    body.page-test.test-auth-pending #results,
+    body.page-test.test-auth-pending #compareView,
+    body.page-test.test-auth-pending #appBottomMount,
+    body.page-test.test-auth-pending .skip-link { visibility: hidden; pointer-events: none; }
+    body.page-test.test-auth-pending::after {
+      content: 'Checking sign-in?';
+      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted2);
+      background: var(--bg); z-index: 9999;
+    }
+  </style>
 </head>
-<body class="page-test phase-intro">
+<body class="page-test phase-intro test-auth-pending">
 <script>
 (function(){try{var _t=localStorage.getItem('animus_theme');if(_t==='light')document.body.classList.add('light-mode');}catch(e){}})();
 if(window.top!==window.self){window.top.location=window.self.location;}

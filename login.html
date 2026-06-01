@@ -169,9 +169,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="auth-switch" id="switchTxt">
       Don't have an account? <a onclick="setMode('signup')">Create one ?</a>
     </div>
-    <div class="auth-guest">
-      <a href="/test">Take the test without an account ?</a>
-    </div>
   </div>
 
   <div id="screenSetup" class="screen">
@@ -432,6 +429,15 @@ function doForgot(){
 }
 
 function goToDashboard(){
+  var nextRaw = '';
+  try { nextRaw = new URLSearchParams(window.location.search).get('next') || ''; } catch (e) {}
+  var dest = typeof AnimusShared !== 'undefined' && AnimusShared.safeLoginRedirectPath
+    ? AnimusShared.safeLoginRedirectPath(nextRaw)
+    : '/';
+  if (dest && dest !== '/') {
+    window.location.replace(dest);
+    return;
+  }
   showScreen('screenSuccess');
   setTimeout(function(){ window.location.href = '/'; }, 1000);
 }

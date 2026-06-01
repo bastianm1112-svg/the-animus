@@ -145,6 +145,105 @@
       .substring(0, 32);
   }
 
+  var LOGIN_REDIRECT_PREFIXES = [
+    '/profile',
+    '/compare',
+    '/friends',
+    '/notifications',
+    '/settings',
+    '/admin'
+  ];
+
+  /**
+   * Safe post-login redirect — blocks open redirects and strips dangerous query params.
+   */
+  function safeLoginRedirectPath(next) {
+    if (!next || typeof next !== 'string') return '/';
+    var raw = next.trim();
+    if (!raw.startsWith('/') || raw.startsWith('//')) return '/';
+    if (/^https?:/i.test(raw) || /^javascript:/i.test(raw) || /^data:/i.test(raw)) return '/';
+    if (/[\u0000-\u001f\s\\]/.test(raw)) return '/';
+
+    var pathQuery = raw.split('#')[0];
+    var qIdx = pathQuery.indexOf('?');
+    var pathOnly = qIdx >= 0 ? pathQuery.slice(0, qIdx) : pathQuery;
+    var query = qIdx >= 0 ? pathQuery.slice(qIdx + 1) : '';
+
+    if (pathOnly === '/test') {
+      var safeQ = '';
+      if (query) {
+        try {
+          if (new URLSearchParams(query).get('mode') === 'short') safeQ = '?mode=short';
+        } catch (e) {}
+      }
+      return '/test' + safeQ;
+    }
+
+    if (pathOnly === '/profile') {
+      if (!query) return '/profile';
+      try {
+        var pp = new URLSearchParams(query);
+        var uid = pp.get('uid');
+        if (uid) {
+          uid = String(uid).replace(/[^a-zA-Z0-9]/g, '').substring(0, 128);
+          if (uid) return '/profile?uid=' + encodeURIComponent(uid);
+        }
+        var un = normalizeUsername(pp.get('u'));
+        if (un) return '/profile?u=' + encodeURIComponent(un);
+      } catch (e) {}
+      return '/profile';
+    }
+
+    var i;
+    for (i = 0; i < LOGIN_REDIRECT_PREFIXES.length; i++) {
+      var prefix = LOGIN_REDIRECT_PREFIXES[i];
+      if (pathOnly === prefix) return pathOnly;
+    }
+
+    if (/^\/[a-z0-9_]{3,32}$/.test(pathOnly)) return pathOnly;
+    return '/';
+  }
+
+  function buildLoginUrl(returnPath) {
+    var safe = safeLoginRedirectPath(returnPath);
+    if (safe === '/') return '/login';
+    return '/login?next=' + encodeURIComponent(safe);
+  }
+
+  function readNextParam(loc) {
+    loc = loc || (global && global.location ? global.location : null);
+    if (!loc) return '';
+    try {
+      return new URLSearchParams(loc.search || '').get('next') || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function testPageReturnPath(loc) {
+    loc = loc || (global && global.location ? global.location : null);
+    if (!loc) return '/test';
+    try {
+      if (new URLSearchParams(loc.search || '').get('mode') === 'short') return '/test?mode=short';
+    } catch (e) {}
+    return '/test';
+  }
+
+  /** Redirect anonymous users away from the assessment (call once after Firebase auth is ready). */
+  function guardTestPageAuth(auth) {
+    if (!auth || !global || !global.document || !global.document.body) return;
+    var returnPath = testPageReturnPath();
+    global.document.body.classList.add('test-auth-pending');
+    auth.onAuthStateChanged(function (user) {
+      if (!user) {
+        global.location.replace(buildLoginUrl(returnPath));
+        return;
+      }
+      global.document.body.classList.remove('test-auth-pending');
+      global.document.body.classList.add('test-auth-ok');
+    });
+  }
+
   /**
    * Resolve whose profile to load from URL (query or clean /username path).
    * Vercel rewrites /name → profile.html?u=name but the browser often keeps /name with no search string.
@@ -576,6 +675,11 @@
     sanitizeProfileSnapshot: sanitizeProfileSnapshot,
     sanitizeUserProfileFields: sanitizeUserProfileFields,
     normalizeUsername: normalizeUsername,
+    safeLoginRedirectPath: safeLoginRedirectPath,
+    buildLoginUrl: buildLoginUrl,
+    readNextParam: readNextParam,
+    testPageReturnPath: testPageReturnPath,
+    guardTestPageAuth: guardTestPageAuth,
     resolveProfileRoute: resolveProfileRoute,
     profilePathForUsername: profilePathForUsername,
     profileHrefForUser: profileHrefForUser,
