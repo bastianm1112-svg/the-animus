@@ -52,7 +52,7 @@ function rejectForeignOrigin(req, res) {
   } catch (e) {
     return true;
   }
-  if (!host || ALLOWED_HOSTS.has(host)) return false;
+  if (!host || ALLOWED_HOSTS.has(host) || /\.vercel\.app$/i.test(host)) return false;
   res.status(403).json({ error: 'Forbidden origin' });
   return true;
 }

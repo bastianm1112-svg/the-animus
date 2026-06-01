@@ -3,6 +3,7 @@
   'use strict';
 
   var Compat = g.AnimusCompareCompat;
+  var Normalize = g.AnimusCompareNormalize;
 
   function escapeHTML(s) {
     if (!s) return '';
@@ -70,12 +71,41 @@
     });
 
     var panelPers = document.getElementById('c-panel-personality');
-    if (panelPers && my.enn && them.enn) {
-      var ennOrder = ['E1', 'E5', 'E6', 'E7'];
-      var ennLabels = ['1', '5', '6', '7'];
-      ennOrder.forEach(function (k, i) {
-        setDualRow(panelPers, i, Math.round(my.enn[k] || 0), Math.round(them.enn[k] || 0));
-      });
+    if (panelPers) {
+      var ennSec = panelPers.querySelectorAll('.dual-section')[0];
+      if (ennSec) {
+        var ennRows = ennSec.querySelectorAll('.dual-row');
+        ['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9'].forEach(function (k, i) {
+          setDualRowEl(
+            ennRows[i],
+            Math.round((my.enn && my.enn[k]) || 0),
+            Math.round((them.enn && them.enn[k]) || 0)
+          );
+        });
+      }
+      var ivSec = panelPers.querySelectorAll('.dual-section')[1];
+      if (ivSec) {
+        var ivRows = ivSec.querySelectorAll('.dual-row');
+        [['IV_SP', 0], ['IV_SOC', 1], ['IV_SX', 2]].forEach(function (pair) {
+          setDualRowEl(
+            ivRows[pair[1]],
+            Math.round((my.iv && my.iv[pair[0]]) || 0),
+            Math.round((them.iv && them.iv[pair[0]]) || 0)
+          );
+        });
+      }
+      var attSec = panelPers.querySelectorAll('.dual-section')[2];
+      if (attSec && (my.att2 || them.att2)) {
+        var attRows = attSec.querySelectorAll('.dual-row');
+        [['AT_AVO', 0], ['AT_SEC', 1], ['AT_ANX', 2], ['AT_DIS', 3]].forEach(function (pair) {
+          if (!attRows[pair[1]]) return;
+          setDualRowEl(
+            attRows[pair[1]],
+            Math.round((my.att2 && my.att2[pair[0]]) || 0),
+            Math.round((them.att2 && them.att2[pair[0]]) || 0)
+          );
+        });
+      }
     }
 
     var panelPhi = document.getElementById('c-panel-philosophy');
@@ -88,15 +118,150 @@
           setDualRowEl(phiRows[i], Math.round(my.phiS[k] || 0), Math.round(them.phiS[k] || 0));
         });
       }
+      var ethSec = panelPhi.querySelectorAll('.dual-section')[1];
+      if (ethSec && (my.eth || them.eth)) {
+        var ethRows = ethSec.querySelectorAll('.dual-row');
+        [['ET_EGO', 0], ['ET_CON', 1], ['ET_DEO', 2], ['ET_VIR', 3]].forEach(function (pair) {
+          if (!ethRows[pair[1]]) return;
+          setDualRowEl(
+            ethRows[pair[1]],
+            Math.round((my.eth && my.eth[pair[0]]) || 0),
+            Math.round((them.eth && them.eth[pair[0]]) || 0)
+          );
+        });
+      }
       if (typeof my.polX === 'number' && typeof them.polX === 'number') {
         var polSec = panelPhi.querySelectorAll('.dual-section')[2];
         if (polSec) {
           var polRows = polSec.querySelectorAll('.dual-row');
-          setDualRowEl(polRows[0], Math.min(100, Math.round(Math.abs(my.polX))), Math.min(100, Math.round(Math.abs(them.polX))));
-          setDualRowEl(polRows[1], Math.min(100, Math.round(Math.abs(my.polY || 0))), Math.min(100, Math.round(Math.abs(them.polY || 0))));
+          setDualRowEl(
+            polRows[0],
+            Math.min(100, Math.round(Math.abs(my.polX))),
+            Math.min(100, Math.round(Math.abs(them.polX)))
+          );
+          setDualRowEl(
+            polRows[1],
+            Math.min(100, Math.round(Math.abs(my.polY || 0))),
+            Math.min(100, Math.round(Math.abs(them.polY || 0)))
+          );
+          var polNums = polRows[0] && polRows[0].querySelectorAll('.dual-num');
+          if (polNums && polNums[0]) polNums[0].textContent = (my.polX > 0 ? '+' : '') + Math.round(my.polX);
+          if (polNums && polNums[1]) polNums[1].textContent = (them.polX > 0 ? '+' : '') + Math.round(them.polX);
+          polNums = polRows[1] && polRows[1].querySelectorAll('.dual-num');
+          if (polNums && polNums[0]) polNums[0].textContent = (my.polY > 0 ? '+' : '') + Math.round(my.polY || 0);
+          if (polNums && polNums[1]) polNums[1].textContent = (them.polY > 0 ? '+' : '') + Math.round(them.polY || 0);
         }
       }
     }
+  }
+
+  function renderAnalysisHtml(ai, note) {
+    var html =
+      '<div class="ai-section"><div class="ai-section-title">Where You Align</div><div class="ai-block"><div class="ai-block-text">' +
+      escapeHTML(ai.whereAlign) +
+      '</div></div></div>' +
+      '<div class="ai-section"><div class="ai-section-title">Where You\'ll Clash</div><div class="ai-block"><div class="ai-block-text">' +
+      escapeHTML(ai.whereClash) +
+      '</div></div></div>' +
+      '<div class="ai-section"><div class="ai-section-title">How You\'d Interact</div><div class="ai-block"><div class="ai-block-text">' +
+      escapeHTML(ai.dynamic) +
+      '</div></div></div>' +
+      '<div class="ai-section"><div class="ai-section-title">What Each Brings Out</div><div class="ai-block"><div class="ai-block-text">' +
+      escapeHTML(ai.mutualEffect) +
+      '</div></div></div>';
+    if (note) {
+      html =
+        '<p class="compare-ai-note">' +
+        escapeHTML(note) +
+        '</p>' +
+        html;
+    }
+    return html;
+  }
+
+  function runCompareAnalysis(mySnap, themSnap, myName, themName, scores) {
+    var aiContent = document.getElementById('aiAnalysisContent');
+    if (!aiContent) return;
+
+    function showOffline(note) {
+      var ai =
+        Normalize && Normalize.buildOfflineAnalysis
+          ? Normalize.buildOfflineAnalysis(mySnap, themSnap, myName, themName, scores)
+          : {
+              whereAlign: 'Your types suggest overlapping values with distinct blind spots.',
+              whereClash: 'Stress may highlight different priorities in planning vs. emotional tone.',
+              dynamic: 'Clear roles and recovery time after hard talks keep the dynamic constructive.',
+              mutualEffect: 'Each person can stretch the other outside their default comfort zone.'
+            };
+      aiContent.innerHTML = renderAnalysisHtml(ai, note);
+    }
+
+    aiContent.innerHTML =
+      '<div class="compare-ai-loading">Generating analysis…</div>';
+
+    var prompt =
+      'You are an expert in MBTI and Enneagram. Analyze compatibility between two people.' +
+      ' Person 1 (' +
+      myName +
+      '): MBTI=' +
+      mySnap.mbti +
+      ', Enneagram=' +
+      (mySnap.ennType || '?') +
+      'w' +
+      (mySnap.ennWing || '?') +
+      ', Attachment=' +
+      (mySnap.att || '?') +
+      ', Philosophy=' +
+      (mySnap.phi || '?') +
+      ', Political X=' +
+      (mySnap.polX || 0) +
+      ' Y=' +
+      (mySnap.polY || 0) +
+      '.' +
+      ' Person 2 (' +
+      themName +
+      '): MBTI=' +
+      themSnap.mbti +
+      ', Enneagram=' +
+      (themSnap.ennType || '?') +
+      'w' +
+      (themSnap.ennWing || '?') +
+      ', Attachment=' +
+      (themSnap.att || '?') +
+      ', Philosophy=' +
+      (themSnap.phi || '?') +
+      ', Political X=' +
+      (themSnap.polX || 0) +
+      ' Y=' +
+      (themSnap.polY || 0) +
+      '.' +
+      ' Return JSON with keys: {"whereAlign":"2 paragraphs on natural connection","whereClash":"2 paragraphs on friction","dynamic":"1 paragraph on social interaction","mutualEffect":"1 paragraph on what each brings out in the other"}. Raw JSON only.';
+
+    fetch('/api/compare', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt })
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error(String(r.status));
+        return r.json();
+      })
+      .then(function (d) {
+        var text = (d.content || [])
+          .map(function (b) {
+            return b.type === 'text' ? b.text : '';
+          })
+          .join('')
+          .replace(/```json|```/g, '')
+          .trim();
+        var ai = JSON.parse(text);
+        aiContent.innerHTML = renderAnalysisHtml(ai, null);
+      })
+      .catch(function () {
+        showOffline(
+          'Live AI is unavailable — showing an on-device summary from your stored assessment data.'
+        );
+      });
   }
 
   function gapClass(a, b) {
@@ -169,8 +334,33 @@
 
   function generateComparison(mySnap, themSnap, myName, themName) {
     if (!Compat) return;
+    mySnap =
+      Normalize && Normalize.normalizeProfileForCompare
+        ? Normalize.normalizeProfileForCompare(mySnap)
+        : mySnap;
+    themSnap =
+      Normalize && Normalize.normalizeProfileForCompare
+        ? Normalize.normalizeProfileForCompare(themSnap)
+        : themSnap;
+    if (
+      Normalize &&
+      Normalize.hasRichCompareData &&
+      (!Normalize.hasRichCompareData(mySnap) || !Normalize.hasRichCompareData(themSnap))
+    ) {
+      clearDemoCompat();
+      var verdictEl = document.getElementById('compatVerdict');
+      if (verdictEl) {
+        verdictEl.textContent =
+          'One or both profiles need a full assessment (not just type labels) to score charts.';
+      }
+      return;
+    }
+
     var scores = Compat.calcOverall(mySnap, themSnap);
-    if (!scores) return;
+    if (!scores) {
+      clearDemoCompat();
+      return;
+    }
 
     var pct = document.querySelector('.compat-pct');
     if (pct) pct.innerHTML = scores.overall + '<span>%</span>';
@@ -192,9 +382,7 @@
     updateDualBars(mySnap, themSnap);
     updateSummaryTable(mySnap, themSnap, myName, themName);
 
-    if (typeof g.generateAIAnalysis === 'function') {
-      g.generateAIAnalysis(mySnap, themSnap, myName, themName);
-    }
+    runCompareAnalysis(mySnap, themSnap, myName, themName, scores);
   }
 
   function setCompareResultsState(state) {
@@ -314,10 +502,38 @@
             (themProfile.instStack ? ' · ' + themProfile.instStack : '');
         }
 
+        var myNorm =
+          Normalize && Normalize.normalizeProfileForCompare
+            ? Normalize.normalizeProfileForCompare(myProfile)
+            : myProfile;
+        var themNorm =
+          Normalize && Normalize.normalizeProfileForCompare
+            ? Normalize.normalizeProfileForCompare(themProfile)
+            : themProfile;
+
         if (myProfile && themProfile) {
           setCompareResultsState('is-ready');
-          generateComparison(myProfile, themProfile, myName, themName);
-          if (typeof g.animateCompareBars === 'function') g.animateCompareBars();
+          if (
+            Normalize &&
+            Normalize.hasRichCompareData &&
+            Normalize.hasRichCompareData(myNorm) &&
+            Normalize.hasRichCompareData(themNorm)
+          ) {
+            generateComparison(myProfile, themProfile, myName, themName);
+            if (typeof g.animateCompareBars === 'function') g.animateCompareBars();
+          } else {
+            clearDemoCompat();
+            var aiBox = document.getElementById('aiAnalysisContent');
+            if (aiBox) {
+              aiBox.innerHTML =
+                '<div class="compare-panel-empty">Types are set, but detailed scores are missing. Complete the full test (or save full profile data in admin) to unlock charts and compatibility.</div>';
+            }
+            var vPartial = document.getElementById('compatVerdict');
+            if (vPartial) {
+              vPartial.textContent =
+                'Add full assessment data to compare dimension-by-dimension.';
+            }
+          }
         } else {
           setCompareResultsState('is-pending');
           clearDemoCompat();
@@ -373,6 +589,7 @@
     init: initPairCompare,
     generateComparison: generateComparison,
     clearDemoCompat: clearDemoCompat,
-    updateDualBars: updateDualBars
+    updateDualBars: updateDualBars,
+    runCompareAnalysis: runCompareAnalysis
   };
 })(typeof window !== 'undefined' ? window : globalThis);

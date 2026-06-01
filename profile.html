@@ -46,7 +46,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 .nav-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--gold); text-decoration: none; transition: border-color 0.2s; }
 .nav-avatar:hover { border-color: var(--gold2); }
-.profile-hero { padding-top: 56px; background: var(--surface); border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+.profile-hero { padding-top: 0; background: var(--surface); border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
 .profile-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 60% 0%, rgba(200,169,110,0.05) 0%, transparent 60%); pointer-events: none; }
 .hero-inner { max-width: 1100px; margin: 0 auto; padding: 40px 28px 0; position: relative; z-index: 1; }
 .hero-top { display: flex; align-items: flex-end; gap: 28px; margin-bottom: 0; }
@@ -202,7 +202,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
 <link rel="stylesheet" href="/css/animus-release.css">
 <script src="/js/animus-app.js" defer></script>
 </head>
-<body>
+<body class="has-app-nav page-profile">
 <script>(function(){try{if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');}catch(e){}})();</script>
 <a href="#profile-content" class="skip-link">Skip to profile</a>
 

@@ -21,7 +21,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .nav-item.active{color:var(--gold);}
 .nav-right{margin-left:auto;}
 .nav-avatar{width:32px;height:32px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);text-decoration:none;}
-.page{padding-top:56px;max-width:1100px;margin:0 auto;padding-left:28px;padding-right:28px;}
+.page{padding-top:20px;max-width:1100px;margin:0 auto;padding-left:28px;padding-right:28px;}
 .page-header{padding:48px 0 32px;border-bottom:1px solid var(--border);margin-bottom:40px;}
 .page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,96px);letter-spacing:0.06em;color:var(--white);line-height:0.9;margin-bottom:12px;}
 .page-title span{color:var(--gold);}
@@ -84,7 +84,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <link rel="stylesheet" href="/css/animus-release.css">
 <script src="/js/animus-app.js" defer></script>
 </head>
-<body>
+<body class="has-app-nav">
 <script>(function(){ try{if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');}catch(e){} })();</script>
 <a href="#main-content" class="skip-link">Skip to content</a>
 

@@ -53,8 +53,16 @@
     return (m[a] && m[a][b]) || 55;
   }
 
+  function hasCogData(snap) {
+    if (!snap || !snap.cog) return false;
+    return Object.keys(snap.cog).some(function (k) {
+      return Number(snap.cog[k]) > 0;
+    });
+  }
+
   function calcOverall(my, them) {
     if (!my.mbti || !them.mbti) return null;
+    if (!hasCogData(my) || !hasCogData(them)) return null;
     var cog = calcCogCompat(my.cog || {}, them.cog || {});
     var pol = calcPolCompat(my.polX || 0, my.polY || 0, them.polX || 0, them.polY || 0);
     var att = calcAttCompat(my.att || '', them.att || '');
@@ -75,6 +83,7 @@
     calcPolCompat: calcPolCompat,
     calcAttCompat: calcAttCompat,
     calcPhiCompat: calcPhiCompat,
+    hasCogData: hasCogData,
     calcOverall: calcOverall
   };
 })(typeof window !== 'undefined' ? window : globalThis);

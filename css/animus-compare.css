@@ -156,9 +156,20 @@ body.page-compare {
   transition: opacity 0.25s;
 }
 
-.compare-results.is-empty .compare-hero-inner > *:not(.compare-empty-banner) {
-  opacity: 0.35;
+.compare-results.is-empty .profiles-strip,
+.compare-results.is-empty .compat-bar-wrap,
+.compare-results.is-empty .compat-rings,
+.compare-results.is-empty .compare-tabs {
+  opacity: 0.2;
   pointer-events: none;
+}
+
+.compare-results.is-empty .compare-content {
+  display: none;
+}
+
+.compare-results.is-pending .compare-content .c-panel {
+  opacity: 0.5;
 }
 
 .compare-empty-banner {
@@ -201,7 +212,101 @@ body.page-compare {
   display: block;
 }
 
+.compare-page-wrap {
+  padding-top: 12px;
+}
+
+.compare-picker-card {
+  margin-top: 8px;
+}
+
+.compare-hero {
+  margin-top: 8px;
+  border: 1px solid var(--border);
+}
+
+.compare-tabs {
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 50;
+  background: var(--surface);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.compare-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.compare-content {
+  max-width: 100%;
+}
+
+.compare-panel-empty,
+.compare-ai-loading,
+.compare-ai-note {
+  font-size: 13px;
+  color: var(--muted2);
+  line-height: 1.65;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.compare-ai-note {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  text-align: left;
+  border-left: 2px solid var(--gold2);
+  padding-left: 12px;
+}
+
+.c-panel .dual-row {
+  margin-bottom: 14px;
+}
+
+.c-panel .dual-bar-you,
+.c-panel .dual-bar-them {
+  min-width: 2px;
+}
+
 @media (max-width: 768px) {
+  .compare-page-wrap {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .compare-picker-card {
+    padding: 16px;
+  }
+
+  .compare-friend-chip {
+    flex: 1 1 100%;
+  }
+
+  .chip-name {
+    max-width: none;
+  }
+
+  .compare-content {
+    padding: 20px 0 32px !important;
+  }
+
+  .compare-share-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-share-comp {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dual-label {
+    min-width: 64px;
+    font-size: 10px;
+  }
+
   .profiles-strip {
     grid-template-columns: 1fr;
     gap: 12px;

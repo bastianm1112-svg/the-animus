@@ -163,6 +163,79 @@ select:focus-visible {
   text-transform: uppercase;
 }
 
+/* Site-wide mobile polish — match desktop shell on all app pages */
+@media (max-width: 768px) {
+  .page,
+  .friends-page,
+  .notifications-page,
+  .admin-page,
+  .group-page-header,
+  .compare-page-wrap {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+
+  .friends-page,
+  .notifications-page {
+    padding-top: 16px;
+  }
+
+  .card,
+  .friend-card,
+  .notif-page-card,
+  .compare-picker-card {
+    border-radius: 4px;
+  }
+
+  .summary-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .compare-tab,
+  .profile-tab {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .compare-mode-bar {
+    width: 100%;
+    display: flex;
+  }
+
+  .compare-mode-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+body.page-profile {
+  padding-bottom: calc(var(--mbn-h) + var(--safe-bottom) + 16px);
+}
+
+body.page-profile .profile-hero {
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+  body.page-profile .profile-content {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+
+  body.page-profile .type-strip {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+  }
+
+  body.page-profile .type-badge {
+    flex-shrink: 0;
+  }
+}
+
 /* Print */
 @media print {
   .navbar,
