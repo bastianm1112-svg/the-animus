@@ -39,6 +39,11 @@ service cloud.firestore {
               && request.resource.data.language.size() <= 16));
     }
 
+    function profileFieldsChanged() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['displayName', 'bio', 'username', 'email', 'language']);
+    }
+
     function friendKeysOnly() {
       return request.resource.data.diff(resource.data).affectedKeys()
         .hasOnly(['friendRequests']);
@@ -50,20 +55,30 @@ service cloud.firestore {
     }
 
     function incomingFriendRequest() {
+      let priorReceived = resource.data.get('friendRequests', {}).get('received', []);
+      let nextReceived = request.resource.data.get('friendRequests', {}).get('received', []);
       return signedIn()
         && request.auth.uid != userId
         && friendKeysOnly()
-        && (request.auth.uid in request.resource.data.friendRequests.received)
-        && !(request.auth.uid in resource.data.get('friendRequests', {}).get('received', []));
+        && (request.auth.uid in nextReceived)
+        && !(request.auth.uid in priorReceived);
     }
 
     function peerAcceptFriend() {
+      let priorSent = resource.data.get('friendRequests', {}).get('sent', []);
+      let nextSent = request.resource.data.get('friendRequests', {}).get('sent', []);
       return signedIn()
         && request.auth.uid != userId
         && friendKeysAndFriends()
         && (request.auth.uid in request.resource.data.get('friends', []))
-        && (request.auth.uid in resource.data.get('friendRequests', {}).get('sent', []))
-        && !(request.auth.uid in request.resource.data.get('friendRequests', {}).get('sent', []));
+        && (request.auth.uid in priorSent)
+        && !(request.auth.uid in nextSent);
+    }
+
+    function ownerProfileUpdate() {
+      return isOwner(userId)
+        && isAdminFlagUnchanged()
+        && (!profileFieldsChanged() || userTextFieldsValid());
     }
 
     match /users/{userId} {
@@ -72,9 +87,8 @@ service cloud.firestore {
         && userTextFieldsValid()
         && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false);
       allow update: if signedIn()
-        && userTextFieldsValid()
         && (
-          (isOwner(userId) && isAdminFlagUnchanged())
+          ownerProfileUpdate()
           || incomingFriendRequest()
           || peerAcceptFriend()
         );

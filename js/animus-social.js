@@ -347,7 +347,10 @@
           btn.textContent = 'Add';
           btn.disabled = false;
         }
-        showToast('Error: ' + (e.message || 'failed'));
+        var msg = e && e.code === 'permission-denied'
+          ? 'Could not send request — try signing out and back in, or ask them to finish account setup.'
+          : (e.message || 'failed');
+        showToast('Error: ' + msg);
       });
   }
 
