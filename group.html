@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -107,15 +107,33 @@ firebase.initializeApp({apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",authDom
 <nav class="navbar">
   <a href="/" class="nav-logo a-nav-logo">ANI<span>MUS</span></a>
   <div class="nav-items">
-    <a href="/dashboard" class="nav-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
-    <a href="/profile" class="nav-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
-    <a href="/compare" class="nav-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Compare</a>
-    <a href="/group" class="nav-item active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Group</a>
+    <a href="/dashboard" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="/profile" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profile
+    </a>
+    <a href="/compare" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      Compare
+    </a>
+    <a href="/group" class="nav-item active">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Group
+    </a>
+    <a href="/types" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h8M4 18h8"/></svg>
+      Types
+    </a>
   </div>
   <div class="nav-right">
-    <button onclick="(function(){var l=document.body.classList.toggle('light-mode');localStorage.setItem('animus_theme',l?'light':'dark');})()" title="Toggle theme" style="width:32px;height:32px;background:none;border:1px solid var(--border2);color:var(--muted2);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:2px;transition:all 0.2s;margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleThemeGlobal()" title="Toggle theme">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <a href="/profile" class="nav-avatar" id="navAvatar">?</a>
-    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
   </div>
 </nav>
 <div class="nav-mobile-menu" id="navMobileMenu">
@@ -123,6 +141,8 @@ firebase.initializeApp({apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",authDom
   <a href="/profile" class="nav-mobile-item">Profile</a>
   <a href="/compare" class="nav-mobile-item">Compare</a>
   <a href="/group" class="nav-mobile-item active">Group</a>
+  <a href="/types" class="nav-mobile-item">Types</a>
+  <a href="/test" class="nav-mobile-item">Take Test</a>
   <a href="/settings" class="nav-mobile-item">Settings</a>
 </div>
 
@@ -157,9 +177,8 @@ var auth = firebase.auth();
 function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function showToast(m){ var t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},2400); }
 
-// Store loaded profiles: uid → { user, snap }
-var _people = {}; // uid → {uid, displayName, username, mbti, ennType, ennWing, instStack, phi, att, cog, polX, polY, isYou}
-var _selected = []; // ordered array of selected uids
+var _people = {};
+var _selected = [];
 var _meUid = null;
 
 auth.onAuthStateChanged(function(user){
@@ -167,7 +186,6 @@ auth.onAuthStateChanged(function(user){
   _meUid = user.uid;
   document.getElementById('navAvatar').textContent = (user.displayName||'?').charAt(0).toUpperCase();
 
-  // Load me + friends
   Promise.all([
     db.collection('users').doc(user.uid).get(),
     db.collection('profiles').doc(user.uid).get()
@@ -230,7 +248,7 @@ function renderSelector(){
       +'<div class="chip-name">'+escapeHTML(p.isYou?'You ('+p.displayName+')':p.displayName)+'</div>'
       +'<div class="chip-type">'+(p.mbti||'No profile')+'</div>'
       +'</div>'
-      +'<div class="chip-check">'+(isSel?'✓':'')+'</div>'
+      +'<div class="chip-check">'+(isSel?'&#10003;':'')+'</div>'
       +'</div>';
   }).join('');
 }
@@ -246,7 +264,6 @@ function togglePerson(uid){
   renderGroup();
 }
 
-// ── Compatibility math (same as compare.html) ──
 function calcCogCompat(a,b){
   var fns=['Ti','Te','Fi','Fe','Ni','Ne','Si','Se'];
   var aV=fns.map(function(f){return a[f]||0;}), bV=fns.map(function(f){return b[f]||0;});
@@ -294,7 +311,6 @@ function renderGroup(){
   var people = _selected.map(function(uid){ return _people[uid]; }).filter(Boolean);
   var phiNames={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'};
 
-  // Profile cards
   var cardsHtml = '<div class="section-title">Profiles</div><div class="profiles-grid">'
     + people.map(function(p){
         var init = (p.displayName||'?').charAt(0).toUpperCase();
@@ -314,7 +330,6 @@ function renderGroup(){
       }).join('')
     + '</div>';
 
-  // Compatibility matrix
   var matrixHtml = '';
   if(people.filter(function(p){return p.mbti;}).length >= 2){
     matrixHtml = '<div class="matrix-section"><div class="section-title">Compatibility Matrix</div>'
@@ -339,7 +354,6 @@ function renderGroup(){
       + '</tbody></table></div></div>';
   }
 
-  // Group insights
   var mbtiCounts = {};
   var totalCompat = 0, compatPairs = 0;
   var avgPolX = 0, avgPolY = 0, polCount = 0;
@@ -347,7 +361,6 @@ function renderGroup(){
     if(p.mbti){ mbtiCounts[p.mbti]=(mbtiCounts[p.mbti]||0)+1; }
     avgPolX+=p.polX; avgPolY+=p.polY; polCount++;
   });
-  // Average pairwise compat
   for(var i=0;i<people.length;i++) for(var j=i+1;j<people.length;j++){
     var s=calcCompat(people[i],people[j]);
     if(s!==null){totalCompat+=s;compatPairs++;}
@@ -381,6 +394,21 @@ try{firebase.auth().onAuthStateChanged(function(u){document.querySelectorAll('a.
 <script>
 function toggleMobileMenu(){document.getElementById('navMobileMenu').classList.toggle('open');}
 document.addEventListener('click',function(e){var m=document.getElementById('navMobileMenu');var b=document.getElementById('navHamburger');if(m&&b&&!m.contains(e.target)&&!b.contains(e.target))m.classList.remove('open');});
+function toggleThemeGlobal(){
+  var isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('animus_theme', isLight ? 'light' : 'dark');
+  var btn = document.getElementById('themeToggleBtn');
+  if(btn) btn.innerHTML = isLight
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+}
+(function(){
+  var isLight = document.body.classList.contains('light-mode');
+  var btn = document.getElementById('themeToggleBtn');
+  if(btn) btn.innerHTML = isLight
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+})();
 </script>
 <style>
 .mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(8,8,8,0.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);z-index:300;justify-content:space-around;align-items:center;padding:0 8px;}
