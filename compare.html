@@ -293,9 +293,10 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-unified.css">
 <link rel="stylesheet" href="/css/animus-release.css">
+<link rel="stylesheet" href="/css/animus-compare.css">
 <script src="/js/animus-app.js" defer></script>
 </head>
-<body>
+<body class="page-compare has-app-nav">
 <a href="#compare-main" class="skip-link">Skip to compare</a>
 <script>
 // Apply saved theme immediately to prevent flash
@@ -309,24 +310,25 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
 
 <div id="appNavMount"></div>
 
-<div class="friends-picker-bar" id="friendsPickerBar">
-  <span class="friends-picker-label">Compare with</span>
-  <select class="friends-picker-select" id="friendsPickerSelect">
-    <option value="">— Choose a friend —</option>
-  </select>
-  <a href="/friends" class="friends-picker-link" id="friendsPickerAdd" style="font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap">+ Add friends</a>
-</div>
-<p class="friends-picker-empty" id="friendsPickerEmpty" style="display:none;font-size:12px;color:var(--muted);margin:0 28px 12px;max-width:1000px;margin-left:auto;margin-right:auto"></p>
+<div class="compare-page-wrap">
+  <div class="compare-picker-card" id="friendsPickerBar">
+    <div class="compare-picker-label">Compare with a friend</div>
+    <div class="compare-friend-chips" id="compareFriendChips"></div>
+    <p class="compare-picker-hint" id="friendsPickerEmpty" style="display:none"></p>
+    <p class="compare-picker-hint"><a href="/friends">+ Add friends</a></p>
+  </div>
 
-<div class="compare-mode-bar compare-page-inner" id="compare-main">
+<div class="compare-mode-bar" id="compare-main">
   <button type="button" class="compare-mode-btn active" data-mode="pair">1-on-1</button>
   <button type="button" class="compare-mode-btn" data-mode="group">Group</button>
 </div>
 
 <div id="compareModePair" class="compare-mode-pair">
+<div id="compareResultsWrap" class="compare-results is-empty">
 <!-- COMPARE HERO -->
 <div class="compare-hero">
   <div class="compare-hero-inner">
+    <div class="compare-empty-banner" id="compareEmptyBanner">Pick a friend above to load a real side-by-side comparison. Scores stay blank until both profiles have assessment data.</div>
 
     <!-- Profiles strip -->
     <div class="profiles-strip">
@@ -367,7 +369,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
         <svg class="ring-svg" viewBox="0 0 56 56">
           <circle cx="28" cy="28" r="22" fill="none" stroke="#1e1e1e" stroke-width="4"/>
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
-            stroke-dasharray="138.16" stroke-dashoffset="44.2" stroke-linecap="round"
+            stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
           <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
         </svg>
@@ -377,9 +379,9 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
         <svg class="ring-svg" viewBox="0 0 56 56">
           <circle cx="28" cy="28" r="22" fill="none" stroke="#1e1e1e" stroke-width="4"/>
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
-            stroke-dasharray="138.16" stroke-dashoffset="69.08" stroke-linecap="round"
+            stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">50%</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
         </svg>
         <div class="ring-label">Values</div>
       </div>
@@ -387,9 +389,9 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
         <svg class="ring-svg" viewBox="0 0 56 56">
           <circle cx="28" cy="28" r="22" fill="none" stroke="#1e1e1e" stroke-width="4"/>
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
-            stroke-dasharray="138.16" stroke-dashoffset="27.63" stroke-linecap="round"
+            stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">80%</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
         </svg>
         <div class="ring-label">Philosophy</div>
       </div>
@@ -397,9 +399,9 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
         <svg class="ring-svg" viewBox="0 0 56 56">
           <circle cx="28" cy="28" r="22" fill="none" stroke="#1e1e1e" stroke-width="4"/>
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
-            stroke-dasharray="138.16" stroke-dashoffset="83.0" stroke-linecap="round"
+            stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">40%</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
         </svg>
         <div class="ring-label">Political</div>
       </div>
@@ -407,9 +409,9 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
         <svg class="ring-svg" viewBox="0 0 56 56">
           <circle cx="28" cy="28" r="22" fill="none" stroke="#1e1e1e" stroke-width="4"/>
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
-            stroke-dasharray="138.16" stroke-dashoffset="55.26" stroke-linecap="round"
+            stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">60%</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
         </svg>
         <div class="ring-label">Attachment</div>
       </div>
@@ -417,9 +419,9 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
         <svg class="ring-svg" viewBox="0 0 56 56">
           <circle cx="28" cy="28" r="22" fill="none" stroke="#1e1e1e" stroke-width="4"/>
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
-            stroke-dasharray="138.16" stroke-dashoffset="34.54" stroke-linecap="round"
+            stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">75%</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
         </svg>
         <div class="ring-label">Social</div>
       </div>
@@ -549,8 +551,8 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
     </div>
     <div class="dual-section">
       <div class="dual-section-title">Political Compass</div>
-      <div class="dual-row"><div class="dual-label"><strong>Economic</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">+50</div><div class="dual-num" style="color:var(--green)">âˆ’10</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Social</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">âˆ’34</div><div class="dual-num" style="color:var(--green)">+10</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Economic</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Social</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
     </div>
   </div>
 
@@ -565,27 +567,14 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
           <th style="text-align:center">Gap</th>
         </tr>
       </thead>
-      <tbody>
-        <tr><td class="dim-name">MBTI</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-med">Med</span></td></tr>
-        <tr><td class="dim-name">Enneagram</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-high">High</span></td></tr>
-        <tr><td class="dim-name">Tritype</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-high">High</span></td></tr>
-        <tr><td class="dim-name">Attachment</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-high">High</span></td></tr>
-        <tr><td class="dim-name">Instinct</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-med">Med</span></td></tr>
-        <tr><td class="dim-name">Philosophy</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-low">Low</span></td></tr>
-        <tr><td class="dim-name">Ethics</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-high">High</span></td></tr>
-        <tr><td class="dim-name">Political</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-high">High</span></td></tr>
-        <tr><td class="dim-name">Dominant Fn</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-med">Med</span></td></tr>
-        <tr><td class="dim-name">Openness</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-low">Low</span></td></tr>
-        <tr><td class="dim-name">Extraversion</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-high">High</span></td></tr>
-        <tr><td class="dim-name">Agreeableness</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-med">Med</span></td></tr>
-        <tr><td class="dim-name">Socionics</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-low">Low</span></td></tr>
-        <tr><td class="dim-name">Temperament</td><td class="val-you">—</td><td class="val-them">—</td><td style="text-align:center"><span class="gap-pill gap-high">High</span></td></tr>
-      </tbody>
+      <tbody></tbody>
     </table>
   </div>
 
 </div>
+</div><!-- /compareResultsWrap -->
 </div><!-- /compareModePair -->
+</div><!-- /compare-page-wrap -->
 
 <div id="compareModeGroup" class="compare-mode-group">
   <div class="group-page-header">
@@ -621,14 +610,6 @@ if (typeof AnimusComparePair !== 'undefined') {
   AnimusComparePair.clearDemoCompat();
 }
 
-var friendsPickerSelect = document.getElementById('friendsPickerSelect');
-if (friendsPickerSelect) {
-  friendsPickerSelect.addEventListener('change', function () {
-    if (typeof AnimusCompareFriends !== 'undefined') {
-      AnimusCompareFriends.onFriendSelectChange(this);
-    }
-  });
-}
 
 function setCompareMode(mode) {
   var pair = document.getElementById('compareModePair');
@@ -713,22 +694,21 @@ document.getElementById('compareTabs').querySelectorAll('.compare-tab').forEach(
     document.querySelectorAll('.c-panel').forEach(function(p){ p.classList.remove('active'); });
     this.classList.add('active');
     document.getElementById('c-panel-' + panel).classList.add('active');
-    animateBars();
+    animateCompareBars();
   });
 });
 
-// Animate bars
-function animateBars(){
+function animateCompareBars(){
   setTimeout(function(){
     document.querySelectorAll('[data-w]').forEach(function(el){
-      el.style.width = el.getAttribute('data-w') + '%';
+      var w = el.getAttribute('data-w');
+      if (w !== null && w !== '') el.style.width = w + '%';
     });
-    // Compat ring
     var fill = document.querySelector('.compat-fill');
-    if(fill) fill.style.width = fill.getAttribute('data-w') + '%';
+    if (fill) fill.style.width = fill.getAttribute('data-w') + '%';
   }, 100);
 }
-animateBars();
+window.animateCompareBars = animateCompareBars;
 
 function sanitizeText(str, maxLen) {
   if (!str) return '';
@@ -748,25 +728,6 @@ function shareComparison(){
   }
 }
 
-// Read ?u= param and update "View Profile" link dynamically
-(function(){
-  var params = new URLSearchParams(window.location.search);
-  var u = params.get('u');
-  if(u) u = u.replace(/[^a-zA-Z0-9_\-]/g,'').substring(0,32);
-  if(u){
-    var viewBtn = document.querySelector('.btn-share-comp.btn-outline');
-    if(viewBtn){
-      viewBtn.href = (typeof AnimusShared !== 'undefined' ? AnimusShared.profilePathForUsername(u) : '/profile?u=' + encodeURIComponent(u));
-      viewBtn.textContent = 'View ' + escapeHTML(u.charAt(0).toUpperCase() + u.slice(1)) + '\'s Profile →';
-    }
-    // Also update the "them" name in the profiles strip
-    var themName = document.querySelectorAll('.ph-info .ph-name')[1];
-    var themUser = document.querySelectorAll('.ph-info .ph-username')[1];
-    if(themName) themName.textContent = escapeHTML(u.charAt(0).toUpperCase() + u.slice(1));
-    if(themUser) themUser.textContent = '@' + u;
-  }
-})();
-
 function showToast(msg){
   var t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -785,7 +746,9 @@ document.addEventListener('DOMContentLoaded', function () {
   AnimusNav.mountBottom('appBottomMount', 'compare');
   if (typeof firebase !== 'undefined' && firebase.auth && typeof AnimusSocial !== 'undefined') {
     AnimusSocial.init(firebase.auth(), firebase.firestore());
-    firebase.auth().onAuthStateChanged(function (u) { if (u) AnimusSocial.loadNotifs(u.uid); });
+    firebase.auth().onAuthStateChanged(function (u) {
+      if (u) AnimusSocial.refreshNotifBadge(u.uid);
+    });
   }
 });
 </script>

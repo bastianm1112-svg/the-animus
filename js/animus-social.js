@@ -45,35 +45,12 @@
     g.location.href = '/friends';
   }
 
+  function openNotifs() {
+    g.location.href = '/notifications';
+  }
+
   function toggleNotifs() {
-    var dd = document.getElementById('notifDropdown');
-    if (!dd) {
-      openFriends();
-      return;
-    }
-    var open = dd.classList.toggle('open');
-    dd.setAttribute('aria-hidden', open ? 'false' : 'true');
-    var notifBtn = document.getElementById('navNotifBtn');
-    if (notifBtn) notifBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open && auth && auth.currentUser) {
-      loadNotifs(auth.currentUser.uid);
-    }
-    document.addEventListener(
-      'click',
-      function closeNotifOutside(e) {
-        if (!dd.classList.contains('open')) return;
-        if (
-          dd.contains(e.target) ||
-          (e.target.closest &&
-            (e.target.closest('.notif-btn') || e.target.closest('.nav-item-notif')))
-        )
-          return;
-        dd.classList.remove('open');
-        dd.setAttribute('aria-hidden', 'true');
-        document.removeEventListener('click', closeNotifOutside);
-      },
-      { once: false }
-    );
+    openNotifs();
   }
 
   function openAddFriend() {
@@ -407,10 +384,29 @@
       });
   }
 
-  function loadNotifs(uid) {
-    if (!db) return;
-    var notifList =
-      document.getElementById('notifDropdownList') || document.getElementById('notifList');
+  function notifCardHtml(r) {
+    return (
+      '<div class="notif-page-card">' +
+      '<div class="notif-dot"></div>' +
+      '<div style="flex:1">' +
+      '<div class="notif-text"><strong>' +
+      escapeHTML(r.name) +
+      '</strong> sent you a friend request</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+      '<button type="button" class="btn-add-small" style="border-color:var(--green);color:var(--green)" data-uid="' +
+      escapeHTML(r.uid) +
+      '" data-name="' +
+      escapeHTML(r.name) +
+      '" onclick="AnimusSocial.acceptFriendRequest(this.dataset.uid,this.dataset.name)">Accept</button>' +
+      '<button type="button" class="btn-add-small" data-uid="' +
+      escapeHTML(r.uid) +
+      '" onclick="AnimusSocial.declineFriendRequest(this.dataset.uid)">Decline</button>' +
+      '</div></div></div>'
+    );
+  }
+
+  function refreshNotifBadge(uid) {
+    if (!db || !uid) return;
     var badge = document.getElementById('notifBadge');
     db.collection('users')
       .doc(uid)
@@ -418,17 +414,28 @@
       .then(function (doc) {
         if (!doc.exists) return;
         var received = (doc.data().friendRequests || {}).received || [];
+        var has = received.length > 0;
+        if (badge) badge.style.display = has ? 'block' : 'none';
+        if (typeof g.AnimusApp !== 'undefined') g.AnimusApp.syncMbnNotifBadge(has);
+      });
+  }
+
+  function loadNotifsPage(uid) {
+    if (!db) return;
+    var list = document.getElementById('notifPageList');
+    if (!list) return;
+    db.collection('users')
+      .doc(uid)
+      .get()
+      .then(function (doc) {
+        if (!doc.exists) return;
+        var received = (doc.data().friendRequests || {}).received || [];
+        refreshNotifBadge(uid);
         if (!received.length) {
-          if (notifList) {
-            notifList.innerHTML =
-              '<div class="notif-empty">No new notifications</div>';
-          }
-          if (badge) badge.style.display = 'none';
-          if (typeof g.AnimusApp !== 'undefined') g.AnimusApp.syncMbnNotifBadge(false);
+          list.innerHTML =
+            '<div class="notif-page-empty">You\'re all caught up. Friend requests will show up here.<br><a href="/friends">Find friends</a></div>';
           return;
         }
-        if (badge) badge.style.display = 'block';
-        if (typeof g.AnimusApp !== 'undefined') g.AnimusApp.syncMbnNotifBadge(true);
         var promises = received.map(function (uid2) {
           return db
             .collection('users')
@@ -439,30 +446,21 @@
             });
         });
         Promise.all(promises).then(function (requesters) {
-          if (!notifList) return;
-          notifList.innerHTML = requesters
-            .filter(Boolean)
-            .map(function (r) {
-              return (
-                '<div class="notif-item"><div class="notif-dot"></div><div style="flex:1">' +
-                '<div class="notif-text"><strong>' +
-                escapeHTML(r.name) +
-                '</strong> sent you a friend request</div>' +
-                '<div style="display:flex;gap:8px;margin-top:6px">' +
-                '<button type="button" class="btn-add-small" style="border-color:var(--green);color:var(--green)" data-uid="' +
-                r.uid +
-                '" data-name="' +
-                escapeHTML(r.name) +
-                '" onclick="AnimusSocial.acceptFriendRequest(this.dataset.uid,this.dataset.name)">Accept</button>' +
-                '<button type="button" class="btn-add-small" data-uid="' +
-                r.uid +
-                '" onclick="AnimusSocial.declineFriendRequest(this.dataset.uid)">Decline</button>' +
-                '</div></div></div>'
-              );
-            })
-            .join('');
+          var rows = requesters.filter(Boolean);
+          if (!rows.length) {
+            list.innerHTML =
+              '<div class="notif-page-empty">You\'re all caught up.</div>';
+            return;
+          }
+          list.innerHTML = rows.map(notifCardHtml).join('');
         });
       });
+  }
+
+  function loadNotifs(uid) {
+    refreshNotifBadge(uid);
+    var pageList = document.getElementById('notifPageList');
+    if (pageList) loadNotifsPage(uid);
   }
 
   function bindModals() {
@@ -483,7 +481,10 @@
   g.AnimusSocial = {
     init: init,
     openFriends: openFriends,
+    openNotifs: openNotifs,
     toggleNotifs: toggleNotifs,
+    refreshNotifBadge: refreshNotifBadge,
+    loadNotifsPage: loadNotifsPage,
     openAddFriend: openAddFriend,
     closeAddFriend: closeAddFriend,
     loadFriends: loadFriends,

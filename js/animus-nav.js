@@ -48,11 +48,11 @@
       '">' +
       SVG_FRIENDS +
       ' Friends</a>' +
-      '<button type="button" class="nav-item nav-item-notif' +
+      '<a href="/notifications" class="nav-item nav-item-notif' +
       ac(active, 'notifications') +
-      '" onclick="AnimusSocial.toggleNotifs()" aria-haspopup="true" aria-expanded="false" id="navNotifBtn">' +
+      '" id="navNotifBtn">' +
       SVG_BELL +
-      ' Notifications<div class="notif-badge" id="notifBadge"></div></button>' +
+      ' Notifications<div class="notif-badge" id="notifBadge"></div></a>' +
       '<a href="/test" class="nav-item' +
       ac(active, 'test') +
       '">' +
@@ -88,7 +88,9 @@
       '<a href="/friends" class="nav-mobile-item' +
       ac(active, 'friends') +
       '">Friends</a>' +
-      '<button type="button" class="nav-mobile-item" onclick="toggleMobileMenu();AnimusSocial.toggleNotifs();">Notifications</button>' +
+      '<a href="/notifications" class="nav-mobile-item' +
+      ac(active, 'notifications') +
+      '">Notifications</a>' +
       '<a href="/test" class="nav-mobile-item' +
       ac(active, 'test') +
       '">Take Test</a>' +
@@ -98,10 +100,7 @@
       '<a href="/types" class="nav-mobile-item' +
       ac(active, 'types') +
       '">Types</a>' +
-      '</div>' +
-      '<div class="notif-dropdown" id="notifDropdown" aria-hidden="true">' +
-      '<div class="notif-dropdown-head">Notifications</div>' +
-      '<div id="notifDropdownList"></div></div>'
+      '</div>'
     );
   }
 

@@ -406,6 +406,29 @@
     }
   }
 
+  /** Always prefer Firestore profiles.latest (admin edits, retakes). Local fallback only for own uid when missing. */
+  function fetchLatestProfile(uid, options) {
+    options = options || {};
+    if (!uid || typeof firebase === 'undefined' || !firebase.firestore) {
+      return Promise.resolve(null);
+    }
+    return firebase
+      .firestore()
+      .collection('profiles')
+      .doc(uid)
+      .get()
+      .then(function (doc) {
+        var latest = doc.exists && doc.data().latest ? doc.data().latest : null;
+        if (latest && latest.mbti) return latest;
+        var authUser = firebase.auth && firebase.auth().currentUser;
+        if (options.allowLocalFallback !== false && authUser && authUser.uid === uid) {
+          var local = loadLastResultLocal();
+          if (local && local.mbti) return local;
+        }
+        return latest;
+      });
+  }
+
   function isUserAdmin(uid) {
     if (!uid || typeof firebase === 'undefined' || !firebase.firestore) {
       return Promise.resolve(false);
@@ -526,6 +549,7 @@
     enrichProfileSnapshot: enrichProfileSnapshot,
     saveLastResultLocal: saveLastResultLocal,
     loadLastResultLocal: loadLastResultLocal,
+    fetchLatestProfile: fetchLatestProfile,
     isUserAdmin: isUserAdmin,
     saveProfileToFirestore: saveProfileToFirestore,
     trySyncLocalResultToFirestore: trySyncLocalResultToFirestore

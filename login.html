@@ -325,7 +325,7 @@ function checkSetupUN(val){
   }, 500);
 }
 
-var reservedUsernamesSetup = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare','friends','group','types','landing','index','404','about'];
+var reservedUsernamesSetup = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare','friends','notifications','group','types','landing','index','404','about'];
 function finishSetup(){
   var un = document.getElementById('setupUN').value.trim().toLowerCase();
   var errEl = document.getElementById('setupErr');
@@ -387,7 +387,7 @@ function saveDoc(user, displayName, username){
   });
 }
 
-var reservedUsernames = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare','friends','group','types','landing','index','404','about'];
+var reservedUsernames = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare','friends','notifications','group','types','landing','index','404','about'];
 function checkUN(val){
   val = val.toLowerCase().replace(/[^a-z0-9_]/g,'');
   document.getElementById('iUser').value = val;

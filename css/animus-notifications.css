@@ -1,0 +1,63 @@
+.notifications-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 28px 24px calc(var(--mbn-h) + var(--safe-bottom) + 48px);
+}
+
+.notifications-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 4vw, 34px);
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.notifications-sub {
+  font-size: 13px;
+  color: var(--muted2);
+  margin-bottom: 28px;
+}
+
+.notif-page-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notif-page-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.notif-page-card .notif-dot {
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.notif-page-card .notif-text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.notif-page-card .notif-text strong {
+  color: var(--white);
+}
+
+.notif-page-empty {
+  text-align: center;
+  padding: 48px 24px;
+  background: var(--surface);
+  border: 1px dashed var(--border2);
+  color: var(--muted2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.notif-page-empty a {
+  color: var(--gold);
+}

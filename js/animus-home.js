@@ -109,15 +109,18 @@
           }
         });
 
-      db.collection('profiles')
-        .doc(user.uid)
-        .get()
-        .then(function (pdoc) {
-          var profile = pdoc.exists && pdoc.data().latest ? pdoc.data().latest : null;
-          if (!profile && typeof g.AnimusShared !== 'undefined') {
-            var local = g.AnimusShared.loadLastResultLocal();
-            if (local && local.mbti) profile = local;
-          }
+      var profilePromise =
+        typeof g.AnimusShared !== 'undefined' && g.AnimusShared.fetchLatestProfile
+          ? g.AnimusShared.fetchLatestProfile(user.uid)
+          : db
+              .collection('profiles')
+              .doc(user.uid)
+              .get()
+              .then(function (pdoc) {
+                return pdoc.exists && pdoc.data().latest ? pdoc.data().latest : null;
+              });
+
+      profilePromise.then(function (profile) {
           var factEl = document.getElementById('dailyFactText');
           var factLabel = document.getElementById('dailyFactLabel');
           if (g.AnimusDailyFacts && factEl) {
@@ -138,10 +141,10 @@
               }
             }
           }
-        });
+      });
 
       if (typeof g.AnimusSocial !== 'undefined') {
-        g.AnimusSocial.loadNotifs(user.uid);
+        g.AnimusSocial.refreshNotifBadge(user.uid);
       }
     });
   }

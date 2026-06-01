@@ -101,10 +101,62 @@
     }
   }
 
+  function escapeHTML(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function renderComparePicker(container, friends, selectedValue) {
+    if (!container) return;
+    if (!friends.length) {
+      container.innerHTML = '';
+      return;
+    }
+    container.innerHTML = friends
+      .map(function (f) {
+        var sel =
+          selectedValue &&
+          (selectedValue === f.username ||
+            selectedValue === f.uid ||
+            selectedValue === 'uid:' + f.uid);
+        var cls =
+          'compare-friend-chip' + (sel ? ' active' : '') + (f.hasProfile ? '' : ' no-profile');
+        var init = escapeHTML((f.displayName || '?').charAt(0).toUpperCase());
+        var types = f.mbti
+          ? escapeHTML(f.mbti) +
+            (f.ennType ? ' · ' + escapeHTML(String(f.ennType) + 'w' + (f.ennWing || '')) : '')
+          : 'No assessment yet';
+        return (
+          '<a href="' +
+          escapeHTML(f.href) +
+          '" class="' +
+          cls +
+          '">' +
+          '<span class="chip-avatar">' +
+          init +
+          '</span>' +
+          '<span class="chip-meta">' +
+          '<span class="chip-name">' +
+          escapeHTML(f.displayName || 'Friend') +
+          '</span>' +
+          '<span class="chip-types">' +
+          types +
+          '</span></span></a>'
+        );
+      })
+      .join('');
+  }
+
   g.AnimusCompareFriends = {
     ensureUserDocument: ensureUserDocument,
     fetchFriends: fetchFriends,
     populateFriendSelect: populateFriendSelect,
+    renderComparePicker: renderComparePicker,
     onFriendSelectChange: onFriendSelectChange,
     friendCompareHref: friendCompareHref
   };

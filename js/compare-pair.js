@@ -197,14 +197,23 @@
     }
   }
 
+  function setCompareResultsState(state) {
+    var wrap = document.getElementById('compareResultsWrap');
+    if (!wrap) return;
+    wrap.classList.remove('is-empty', 'is-ready', 'is-pending');
+    if (state) wrap.classList.add(state);
+  }
+
   function loadComparisonTarget(db, auth, currentUser, params) {
     var u = params.get('u');
     var uidParam = params.get('uid');
 
     if (!u && !uidParam) {
       clearDemoCompat();
+      setCompareResultsState('is-empty');
       return;
     }
+    setCompareResultsState('is-pending');
 
     var themUidPromise;
     if (uidParam) {
@@ -224,21 +233,37 @@
         return;
       }
 
+      var myProfileP =
+        g.AnimusShared && g.AnimusShared.fetchLatestProfile
+          ? g.AnimusShared.fetchLatestProfile(currentUser.uid)
+          : db
+              .collection('profiles')
+              .doc(currentUser.uid)
+              .get()
+              .then(function (d) {
+                return d.exists && d.data().latest ? d.data().latest : null;
+              });
+      var themProfileP =
+        g.AnimusShared && g.AnimusShared.fetchLatestProfile
+          ? g.AnimusShared.fetchLatestProfile(themUid, { allowLocalFallback: false })
+          : db
+              .collection('profiles')
+              .doc(themUid)
+              .get()
+              .then(function (d) {
+                return d.exists && d.data().latest ? d.data().latest : null;
+              });
+
       Promise.all([
-        db.collection('profiles').doc(currentUser.uid).get(),
+        myProfileP,
         db.collection('users').doc(currentUser.uid).get(),
-        db.collection('profiles').doc(themUid).get(),
+        themProfileP,
         db.collection('users').doc(themUid).get()
       ]).then(function (results) {
-        var myProfile = results[0].exists ? results[0].data().latest : null;
+        var myProfile = results[0];
         var myUser = results[1].exists ? results[1].data() : {};
-        var themProfile = results[2].exists ? results[2].data().latest : null;
+        var themProfile = results[2];
         var themUser = results[3].exists ? results[3].data() : {};
-
-        if (!myProfile && g.AnimusShared && g.AnimusShared.loadLastResultLocal) {
-          var local = g.AnimusShared.loadLastResultLocal();
-          if (local && local.mbti) myProfile = local;
-        }
 
         var myName = escapeHTML(myUser.displayName || currentUser.displayName || 'You');
         var themName = escapeHTML(themUser.displayName || themUser.username || 'Them');
@@ -290,13 +315,19 @@
         }
 
         if (myProfile && themProfile) {
+          setCompareResultsState('is-ready');
           generateComparison(myProfile, themProfile, myName, themName);
-        } else if (!myProfile) {
-          var v = document.getElementById('compatVerdict');
-          if (v) v.textContent = 'Complete your assessment to compare scores';
-        } else if (!themProfile) {
-          var v2 = document.getElementById('compatVerdict');
-          if (v2) v2.textContent = themName + ' has not completed the assessment yet';
+          if (typeof g.animateCompareBars === 'function') g.animateCompareBars();
+        } else {
+          setCompareResultsState('is-pending');
+          clearDemoCompat();
+          if (!myProfile) {
+            var v = document.getElementById('compatVerdict');
+            if (v) v.textContent = 'Complete your assessment to compare scores';
+          } else if (!themProfile) {
+            var v2 = document.getElementById('compatVerdict');
+            if (v2) v2.textContent = themName + ' has not completed the assessment yet';
+          }
         }
       }).catch(function (e) {
         console.error('Compare load error:', e);
@@ -318,17 +349,19 @@
 
       if (g.AnimusCompareFriends) {
         g.AnimusCompareFriends.fetchFriends(db, currentUser).then(function (friends) {
-          var select = document.getElementById('friendsPickerSelect');
+          var chips = document.getElementById('compareFriendChips');
           var empty = document.getElementById('friendsPickerEmpty');
           if (!friends.length) {
+            if (chips) chips.innerHTML = '';
             if (empty) {
               empty.style.display = 'block';
-              empty.innerHTML = 'No friends yet. <a href="/friends" style="color:var(--gold)">Add friends</a>, then pick someone to compare.';
+              empty.innerHTML =
+                'No friends yet. <a href="/friends">Add friends</a>, then pick someone to compare.';
             }
-          } else if (empty) {
-            empty.style.display = 'none';
+          } else {
+            if (empty) empty.style.display = 'none';
+            g.AnimusCompareFriends.renderComparePicker(chips, friends, selectedPicker);
           }
-          g.AnimusCompareFriends.populateFriendSelect(select, friends, selectedPicker);
         });
       }
 
