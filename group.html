@@ -182,10 +182,11 @@ var _people = {};
 var _selected = [];
 var _meUid = null;
 
+AnimusShared.bindNavAuth('navAvatar');
+
 auth.onAuthStateChanged(function(user){
   if(!user){ window.location.href='/login'; return; }
   _meUid = user.uid;
-  AnimusShared.bindNavAuth('navAvatar');
 
   Promise.all([
     db.collection('users').doc(user.uid).get(),

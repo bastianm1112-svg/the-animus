@@ -553,12 +553,11 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
 <div class="toast" id="toast"></div>
 
 <script>
+AnimusShared.bindNavAuth('navAvatar');
+
 // ── LOAD COMPARISON DATA FROM FIREBASE ──
 auth.onAuthStateChanged(function(currentUser){
   if(!currentUser){ window.location.href='/login'; return; }
-
-  // Set nav avatar
-  AnimusShared.bindNavAuth('navAvatar');
 
   // Populate friends picker
   db.collection('users').doc(currentUser.uid).get().then(function(doc){
