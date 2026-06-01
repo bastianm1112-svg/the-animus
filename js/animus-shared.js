@@ -535,6 +535,110 @@
     };
   }
 
+  var MBTI_BASICS = {
+    INTJ: { mbtiName: 'The Strategic Visionary', socionics: 'LII', keirsey: 'Rational' },
+    INTP: { mbtiName: 'The Analytical Architect', socionics: 'ILI', keirsey: 'Rational' },
+    ENTJ: { mbtiName: 'The Commanding Strategist', socionics: 'LSE', keirsey: 'Rational' },
+    ENTP: { mbtiName: 'The Dialectical Provocateur', socionics: 'ILE', keirsey: 'Rational' },
+    INFJ: { mbtiName: 'The Prophetic Empath', socionics: 'EII', keirsey: 'Idealist' },
+    INFP: { mbtiName: 'The Idealistic Visionary', socionics: 'IEI', keirsey: 'Idealist' },
+    ENFJ: { mbtiName: 'The Transformative Catalyst', socionics: 'ESE', keirsey: 'Idealist' },
+    ENFP: { mbtiName: 'The Radically Human', socionics: 'IEE', keirsey: 'Idealist' },
+    ISTJ: { mbtiName: 'The Reliable Pillar', socionics: 'LSI', keirsey: 'Guardian' },
+    ISFJ: { mbtiName: 'The Devoted Protector', socionics: 'ESI', keirsey: 'Guardian' },
+    ESTJ: { mbtiName: 'The Structural Authority', socionics: 'SLE', keirsey: 'Guardian' },
+    ESFJ: { mbtiName: 'The Social Architect', socionics: 'SEE', keirsey: 'Guardian' },
+    ISTP: { mbtiName: 'The Tactical Craftsman', socionics: 'SLI', keirsey: 'Artisan' },
+    ISFP: { mbtiName: 'The Quiet Composer', socionics: 'SEI', keirsey: 'Artisan' },
+    ESTP: { mbtiName: 'The Electric Operator', socionics: 'LSE', keirsey: 'Artisan' },
+    ESFP: { mbtiName: 'The Radiant Presence', socionics: 'SEE', keirsey: 'Artisan' }
+  };
+
+  function cogScoreSum(obj) {
+    if (!obj || typeof obj !== 'object') return 0;
+    return Object.keys(obj).reduce(function (s, k) {
+      return s + (Number(obj[k]) || 0);
+    }, 0);
+  }
+
+  function profileSnapshotScore(snap) {
+    if (!snap || typeof snap !== 'object') return 0;
+    var mbti = snap.mbti || (snap.categories && snap.categories.meta && snap.categories.meta.mbti);
+    if (!mbti) return 0;
+    var score = 10;
+    if (snap.mbtiName) score += 4;
+    if (snap.cogNarrative) score += 28;
+    if (snap.ennNarrative) score += 12;
+    if (snap.attNarrative) score += 8;
+    if (snap.phiNarrative) score += 8;
+    if (snap.politicalNarrative) score += 8;
+    if (snap.figures && snap.figures.length) score += 14;
+    if (snap.values && snap.values.length) score += 6;
+    if (cogScoreSum(snap.cog) > 0) score += 22;
+    else if (snap.categories && snap.categories.personality && cogScoreSum(snap.categories.personality.cog) > 0) {
+      score += 18;
+    }
+    if (snap.ennType || snap.ennTritype) score += 6;
+    if (snap.att) score += 4;
+    if (snap.phi) score += 4;
+    if (typeof snap.polX === 'number' && typeof snap.polY === 'number') score += 4;
+    return score;
+  }
+
+  function pickBestProfileSnapshot(profileDocData) {
+    if (!profileDocData || typeof profileDocData !== 'object') return null;
+    var candidates = [];
+    if (profileDocData.latest && typeof profileDocData.latest === 'object') {
+      candidates.push(profileDocData.latest);
+    }
+    (profileDocData.history || []).forEach(function (entry) {
+      if (entry && entry.snapshot && typeof entry.snapshot === 'object') {
+        candidates.push(entry.snapshot);
+      }
+    });
+    var best = null;
+    var bestScore = 0;
+    candidates.forEach(function (snap) {
+      var sc = profileSnapshotScore(snap);
+      if (sc > bestScore) {
+        bestScore = sc;
+        best = snap;
+      }
+    });
+    return best;
+  }
+
+  function isSparseProfileSnapshot(snap) {
+    return profileSnapshotScore(snap) < 45;
+  }
+
+  function fillMbtiBasics(snap) {
+    snap = Object.assign({}, snap || {});
+    var mbti = snap.mbti ? String(snap.mbti).toUpperCase().trim() : '';
+    if (!mbti || !MBTI_BASICS[mbti]) return snap;
+    snap.mbti = mbti;
+    var basics = MBTI_BASICS[mbti];
+    if (!snap.mbtiName) snap.mbtiName = basics.mbtiName;
+    if (!snap.socionics) snap.socionics = basics.socionics;
+    if (!snap.keirsey) snap.keirsey = basics.keirsey;
+    return snap;
+  }
+
+  function stripCompareInternals(snap) {
+    if (!snap || typeof snap !== 'object') return snap;
+    delete snap._hasRealCog;
+    delete snap._compareDerivedCog;
+    return snap;
+  }
+
+  function hydrateSparseProfile(snap) {
+    snap = fillMbtiBasics(Object.assign({}, snap || {}));
+    if (global.AnimusCompareNormalize && global.AnimusCompareNormalize.normalizeProfileForDisplay) {
+      snap = global.AnimusCompareNormalize.normalizeProfileForDisplay(snap) || snap;
+    }
+    return stripCompareInternals(snap);
+  }
+
   function enrichProfileSnapshot(snapshot, rawData, meta) {
     var snap = sanitizeProfileSnapshot(Object.assign({}, snapshot));
     var data = rawData || {};
@@ -586,6 +690,54 @@
           if (local && local.mbti) return local;
         }
         return latest;
+      });
+  }
+
+  function defaultUsernameForUser(user, pending) {
+    if (pending && pending.username) return pending.username;
+    var base = (user.displayName || (user.email ? user.email.split('@')[0] : '') || 'user')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '')
+      .substring(0, 20);
+    return base || 'user' + Date.now().toString().slice(-6);
+  }
+
+  /** Create users/{uid} if missing (e.g. after failed signup batch or skipped home). */
+  function ensureUserDocument(db, user) {
+    if (!user || !db) return Promise.resolve(null);
+    return db
+      .collection('users')
+      .doc(user.uid)
+      .get()
+      .then(function (doc) {
+        if (doc.exists) return doc.data();
+        var pending = null;
+        try {
+          pending = JSON.parse(localStorage.getItem(KEYS.pendingDoc) || 'null');
+        } catch (e) {}
+        var userData = {
+          displayName: (pending && pending.displayName) || user.displayName || (user.email ? user.email.split('@')[0] : 'User'),
+          username: defaultUsernameForUser(user, pending),
+          email: user.email || '',
+          photoURL: user.photoURL || '',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          friends: [],
+          friendRequests: { sent: [], received: [] },
+          language: localStorage.getItem(KEYS.lang) || 'en'
+        };
+        return db
+          .collection('users')
+          .doc(user.uid)
+          .set(userData)
+          .then(function () {
+            return db.collection('usernames').doc(userData.username).set({ uid: user.uid });
+          })
+          .then(function () {
+            try {
+              localStorage.removeItem(KEYS.pendingDoc);
+            } catch (e) {}
+            return userData;
+          });
       });
   }
 
@@ -719,6 +871,13 @@
     loadLastResultLocal: loadLastResultLocal,
     fetchLatestProfile: fetchLatestProfile,
     isUserAdmin: isUserAdmin,
+    ensureUserDocument: ensureUserDocument,
+    profileSnapshotScore: profileSnapshotScore,
+    pickBestProfileSnapshot: pickBestProfileSnapshot,
+    isSparseProfileSnapshot: isSparseProfileSnapshot,
+    fillMbtiBasics: fillMbtiBasics,
+    hydrateSparseProfile: hydrateSparseProfile,
+    stripCompareInternals: stripCompareInternals,
     saveProfileToFirestore: saveProfileToFirestore,
     trySyncLocalResultToFirestore: trySyncLocalResultToFirestore
   };

@@ -149,13 +149,42 @@
           throw new Error('User document not found');
         }
         targetUser = uDoc.data();
-        var snap = pDoc.exists && pDoc.data().latest ? pDoc.data().latest : { mbti: 'INTJ' };
+        var pData = pDoc.exists ? pDoc.data() : {};
+        var snap =
+          g.AnimusShared && g.AnimusShared.pickBestProfileSnapshot
+            ? g.AnimusShared.pickBestProfileSnapshot(pData)
+            : pData.latest || null;
+        if (!snap || !snap.mbti) {
+          snap = {};
+          fillQuickFields(snap);
+          var taEmpty = document.getElementById('adminJson');
+          if (taEmpty) taEmpty.value = '{\n  "mbti": ""\n}';
+          updateTargetMeta();
+          document.getElementById('adminEditor').style.display = 'block';
+          setStatus(
+            'No assessment saved for this user yet. They need to finish the test (signed in), or paste a full JSON snapshot below.',
+            'err'
+          );
+          return;
+        }
+        if (g.AnimusShared && g.AnimusShared.hydrateSparseProfile) {
+          snap = g.AnimusShared.hydrateSparseProfile(snap);
+        }
         fillQuickFields(snap);
         var ta = document.getElementById('adminJson');
         if (ta) ta.value = JSON.stringify(snap, null, 2);
         updateTargetMeta();
         document.getElementById('adminEditor').style.display = 'block';
-        setStatus('Profile loaded. Edit fields and save.', 'ok');
+        var sparse =
+          g.AnimusShared && g.AnimusShared.isSparseProfileSnapshot && g.AnimusShared.isSparseProfileSnapshot(snap);
+        if (sparse) {
+          setStatus(
+            'Loaded partial profile (often only MBTI). Chart defaults were filled where possible; narratives/figures may still be empty until they retake the test or you paste a full JSON export.',
+            'err'
+          );
+        } else {
+          setStatus('Profile loaded. Edit fields and save.', 'ok');
+        }
       })
       .catch(function (e) {
         setStatus(e.message || 'Load failed', 'err');
@@ -194,6 +223,12 @@
       return;
     }
     snap.mbti = mbtiUp;
+    if (g.AnimusShared && g.AnimusShared.hydrateSparseProfile) {
+      snap = g.AnimusShared.hydrateSparseProfile(snap);
+    }
+    if (g.AnimusShared && g.AnimusShared.stripCompareInternals) {
+      snap = g.AnimusShared.stripCompareInternals(snap);
+    }
     if (typeof snap.polX === 'number') {
       snap.polX = Math.max(-100, Math.min(100, Math.round(snap.polX)));
     }
@@ -277,10 +312,37 @@
     });
   }
 
+  function hydrateEditorFromMbti() {
+    if (!targetUid) {
+      setStatus('Load a user first', 'err');
+      return;
+    }
+    var ta = document.getElementById('adminJson');
+    if (!ta) return;
+    try {
+      var snap = JSON.parse(ta.value || '{}');
+      if (typeof snap !== 'object' || Array.isArray(snap)) snap = {};
+      snap = applyQuickFieldsToSnapshot(snap);
+      if (!snap.mbti) {
+        setStatus('Set MBTI in quick fields or JSON first', 'err');
+        return;
+      }
+      if (g.AnimusShared && g.AnimusShared.hydrateSparseProfile) {
+        snap = g.AnimusShared.hydrateSparseProfile(snap);
+      }
+      fillQuickFields(snap);
+      ta.value = JSON.stringify(snap, null, 2);
+      setStatus('Chart/score defaults applied from MBTI. Add narratives manually or have them retake the test.', 'ok');
+    } catch (e) {
+      setStatus('Invalid JSON: ' + e.message, 'err');
+    }
+  }
+
   g.AnimusAdmin = {
     boot: boot,
     loadProfile: loadProfile,
     saveProfile: saveProfile,
-    syncJsonFromQuick: syncJsonFromQuick
+    syncJsonFromQuick: syncJsonFromQuick,
+    hydrateEditorFromMbti: hydrateEditorFromMbti
   };
 })(typeof window !== 'undefined' ? window : globalThis);

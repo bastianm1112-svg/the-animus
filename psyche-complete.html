@@ -490,6 +490,8 @@ document.addEventListener('DOMContentLoaded', function () {
     a.onAuthStateChanged(function (u) {
       if (u) {
         if (typeof AnimusShared !== 'undefined') {
+          AnimusShared.ensureUserDocument(d, u).catch(function () {});
+          AnimusShared.trySyncLocalResultToFirestore(u).catch(function () {});
           AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), u, null);
           d.collection('users').doc(u.uid).get().then(function (doc) {
             if (doc.exists) AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), u, doc.data());

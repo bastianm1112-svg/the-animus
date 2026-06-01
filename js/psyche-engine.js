@@ -1899,6 +1899,11 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     }
   }
 
+  // Auto-save for signed-in users (local + cloud) so results aren't lost if Save isn't tapped
+  if (typeof firebase !== 'undefined' && firebase.auth) {
+    persistProfileSnapshot(false);
+  }
+
   document.getElementById('btnSave').addEventListener('click', function () {
     var user = firebase.auth().currentUser;
     if (!user) {

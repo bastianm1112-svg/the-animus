@@ -478,7 +478,10 @@ function loadProfileData(uid, isOwner, currentUser){
       u = { displayName: currentUser.displayName||'Unknown', username: currentUser.email?currentUser.email.split('@')[0]:'', bio: '' };
     } else if(!uDoc.exists){ return; }
     var p=pDoc.exists ? pDoc.data() : {};
-    var snap=p.latest||{};
+    var snap =
+      (typeof AnimusShared !== 'undefined' && AnimusShared.pickBestProfileSnapshot)
+        ? (AnimusShared.pickBestProfileSnapshot(p) || p.latest || {})
+        : (p.latest || {});
     if (isOwner && !snap.mbti && typeof AnimusShared !== 'undefined') {
       var localSnap = AnimusShared.loadLastResultLocal();
       if (localSnap && localSnap.mbti) snap = localSnap;

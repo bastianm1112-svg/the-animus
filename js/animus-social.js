@@ -284,6 +284,30 @@
     }, 400);
   }
 
+  function friendRequestErrorMessage(e) {
+    if (!e) return 'Something went wrong';
+    if (e.code === 'not-found') {
+      return 'They need to sign in once and open the home page to finish setup, then try again.';
+    }
+    if (e.code === 'permission-denied') {
+      return 'Could not send request — ask them to sign out and back in, or try again in a minute.';
+    }
+    return e.message || 'Request failed';
+  }
+
+  function writeFriendRequestActivity(toUid, user, type, text) {
+    var actRef = db.collection('activity').doc(toUid).collection('feed').doc();
+    return actRef.set({
+      type: type,
+      text: text,
+      fromUid: user.uid,
+      fromName: (user.displayName || 'Someone').substring(0, 48),
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function (err) {
+      console.warn('Activity feed write skipped:', err && err.code, err && err.message);
+    });
+  }
+
   function sendFriendRequest(toUid, toName, btn) {
     var user = auth && auth.currentUser;
     if (!user) {
@@ -298,11 +322,24 @@
       btn.textContent = 'Sending...';
       btn.disabled = true;
     }
-    db.collection('users')
-      .doc(user.uid)
-      .get()
-      .then(function (doc) {
-        var d = doc.exists ? doc.data() : {};
+    var ensureDoc =
+      typeof g.AnimusShared !== 'undefined' && g.AnimusShared.ensureUserDocument
+        ? g.AnimusShared.ensureUserDocument(db, user)
+        : Promise.resolve();
+    ensureDoc
+      .then(function () {
+        return db.collection('users').doc(toUid).get();
+      })
+      .then(function (targetDoc) {
+        if (!targetDoc.exists) {
+          throw { code: 'not-found', message: 'Target user has no account record yet' };
+        }
+        return db.collection('users').doc(user.uid).get().then(function (doc) {
+          return { targetDoc: targetDoc, selfDoc: doc };
+        });
+      })
+      .then(function (pair) {
+        var d = pair.selfDoc.exists ? pair.selfDoc.data() : {};
         var friends = d.friends || [];
         var sent = (d.friendRequests || {}).sent || [];
         if (friends.indexOf(toUid) > -1) {
@@ -310,14 +347,14 @@
             btn.textContent = 'Already friends';
             btn.classList.add('added');
           }
-          return Promise.resolve();
+          return { skipped: true };
         }
         if (sent.indexOf(toUid) > -1) {
           if (btn) {
             btn.textContent = 'Request Sent';
             btn.classList.add('added');
           }
-          return Promise.resolve();
+          return { skipped: true };
         }
         var batch = db.batch();
         batch.update(db.collection('users').doc(user.uid), {
@@ -326,31 +363,31 @@
         batch.update(db.collection('users').doc(toUid), {
           'friendRequests.received': firebase.firestore.FieldValue.arrayUnion(user.uid)
         });
-        var actRef = db.collection('activity').doc(toUid).collection('feed').doc();
-        batch.set(actRef, {
-          type: 'friend_request',
-          text: (user.displayName || 'Someone') + ' sent you a friend request',
-          fromUid: user.uid,
-          fromName: (user.displayName || 'Someone').substring(0, 48),
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
         return batch.commit().then(function () {
-          if (btn) {
-            btn.textContent = 'Request Sent ✓';
-            btn.classList.add('added');
-          }
-          showToast('Friend request sent to ' + escapeHTML(toName));
+          return writeFriendRequestActivity(
+            toUid,
+            user,
+            'friend_request',
+            (user.displayName || 'Someone') + ' sent you a friend request'
+          ).then(function () {
+            return { skipped: false };
+          });
         });
+      })
+      .then(function (result) {
+        if (result && result.skipped) return;
+        if (btn) {
+          btn.textContent = 'Request Sent ✓';
+          btn.classList.add('added');
+        }
+        showToast('Friend request sent to ' + escapeHTML(toName));
       })
       .catch(function (e) {
         if (btn) {
           btn.textContent = 'Add';
           btn.disabled = false;
         }
-        var msg = e && e.code === 'permission-denied'
-          ? 'Could not send request — try signing out and back in, or ask them to finish account setup.'
-          : (e.message || 'failed');
-        showToast('Error: ' + msg);
+        showToast('Error: ' + friendRequestErrorMessage(e));
       });
   }
 
@@ -366,19 +403,24 @@
       friends: firebase.firestore.FieldValue.arrayUnion(user.uid),
       'friendRequests.sent': firebase.firestore.FieldValue.arrayRemove(user.uid)
     });
-    var actRef = db.collection('activity').doc(fromUid).collection('feed').doc();
-        batch.set(actRef, {
-          type: 'friend_accept',
-          text: (user.displayName || 'Someone') + ' accepted your friend request',
-          fromUid: user.uid,
-          fromName: (user.displayName || 'Someone').substring(0, 48),
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-    batch.commit().then(function () {
-      showToast('You and ' + escapeHTML(fromName) + ' are now friends!');
-      loadNotifs(user.uid);
-      loadFriends(user.uid);
-    });
+    batch
+      .commit()
+      .then(function () {
+        return writeFriendRequestActivity(
+          fromUid,
+          user,
+          'friend_accept',
+          (user.displayName || 'Someone') + ' accepted your friend request'
+        );
+      })
+      .then(function () {
+        showToast('You and ' + escapeHTML(fromName) + ' are now friends!');
+        loadNotifs(user.uid);
+        loadFriends(user.uid);
+      })
+      .catch(function (e) {
+        showToast('Error: ' + friendRequestErrorMessage(e));
+      });
   }
 
   function declineFriendRequest(fromUid) {

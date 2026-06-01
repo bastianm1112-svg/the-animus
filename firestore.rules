@@ -64,6 +64,25 @@ service cloud.firestore {
         && !(request.auth.uid in priorReceived);
     }
 
+    function activityFeedKeysValid() {
+      return request.resource.data.keys().hasAll([
+        'type', 'text', 'fromUid', 'fromName', 'timestamp'
+      ])
+        && (
+          request.resource.data.keys().hasOnly([
+            'type', 'text', 'fromUid', 'fromName', 'timestamp'
+          ])
+          || (
+            request.resource.data.keys().hasOnly([
+              'type', 'text', 'fromUid', 'fromName', 'timestamp', 'link'
+            ])
+            && request.resource.data.link is string
+            && request.resource.data.link.size() <= 200
+            && request.resource.data.link.matches('^/[a-zA-Z0-9_./?=&%-]{0,199}$')
+          )
+        );
+    }
+
     function peerAcceptFriend() {
       let priorSent = resource.data.get('friendRequests', {}).get('sent', []);
       let nextSent = request.resource.data.get('friendRequests', {}).get('sent', []);
@@ -126,18 +145,12 @@ service cloud.firestore {
         allow read: if signedIn() && request.auth.uid == userId;
         allow create: if signedIn()
           && request.resource.data.fromUid == request.auth.uid
-          && request.resource.data.keys().hasOnly([
-            'type', 'text', 'fromUid', 'fromName', 'timestamp', 'link'
-          ])
+          && activityFeedKeysValid()
           && request.resource.data.text is string
           && request.resource.data.text.size() > 0
           && request.resource.data.text.size() <= 500
           && request.resource.data.fromName is string
-          && request.resource.data.fromName.size() <= 48
-          && (!('link' in request.resource.data)
-            || (request.resource.data.link is string
-                && request.resource.data.link.size() <= 200
-                && request.resource.data.link.matches('^/[a-zA-Z0-9_./?=&%-]{0,199}$')));
+          && request.resource.data.fromName.size() <= 48;
         allow update, delete: if false;
       }
     }

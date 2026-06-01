@@ -74,6 +74,7 @@ var db = firebase.firestore();
           <div class="admin-field"><label for="adminPolY">Pol Y</label><input id="adminPolY" type="number" step="1" /></div>
         </div>
         <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.syncJsonFromQuick()">Merge quick fields into JSON</button>
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.hydrateEditorFromMbti()">Fill chart defaults from MBTI</button>
       </div>
 
       <div class="admin-card">
@@ -91,6 +92,7 @@ var db = firebase.firestore();
 <div class="toast" id="toast"></div>
 <div id="appBottomMount"></div>
 
+<script src="/js/compare-normalize.js"></script>
 <script src="/js/animus-social.js"></script>
 <script src="/js/animus-nav.js"></script>
 <script src="/js/animus-admin.js"></script>
