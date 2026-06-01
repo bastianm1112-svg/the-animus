@@ -42,14 +42,7 @@
   }
 
   function openFriends() {
-    if (location.pathname === '/' || location.pathname === '/index.html') {
-      var el = document.getElementById('member-friends');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        return;
-      }
-    }
-    g.location.href = '/#friends';
+    g.location.href = '/friends';
   }
 
   function toggleNotifs() {
@@ -60,6 +53,8 @@
     }
     var open = dd.classList.toggle('open');
     dd.setAttribute('aria-hidden', open ? 'false' : 'true');
+    var notifBtn = document.getElementById('navNotifBtn');
+    if (notifBtn) notifBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (open && auth && auth.currentUser) {
       loadNotifs(auth.currentUser.uid);
     }
@@ -67,7 +62,12 @@
       'click',
       function closeNotifOutside(e) {
         if (!dd.classList.contains('open')) return;
-        if (dd.contains(e.target) || (e.target.closest && e.target.closest('.notif-btn'))) return;
+        if (
+          dd.contains(e.target) ||
+          (e.target.closest &&
+            (e.target.closest('.notif-btn') || e.target.closest('.nav-item-notif')))
+        )
+          return;
         dd.classList.remove('open');
         dd.setAttribute('aria-hidden', 'true');
         document.removeEventListener('click', closeNotifOutside);
@@ -78,7 +78,10 @@
 
   function openAddFriend() {
     var modal = document.getElementById('addFriendModal');
-    if (!modal) return;
+    if (!modal) {
+      g.location.href = '/friends';
+      return;
+    }
     modal.classList.add('open');
     setTimeout(function () {
       var inp = document.getElementById('friendSearchInput');

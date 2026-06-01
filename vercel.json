@@ -17,10 +17,11 @@
     {"source": "/settings", "destination": "/settings.html"},
     {"source": "/test", "destination": "/psyche-complete.html"},
     {"source": "/compare", "destination": "/compare.html"},
+    {"source": "/friends", "destination": "/friends.html"},
     {"source": "/types", "destination": "/types.html"},
     {"source": "/profile", "destination": "/profile.html"},
     {"source": "/404", "destination": "/404.html"},
-    {"source": "/:username((?!dashboard|login|settings|test|compare|types|profile|group|api|_vercel|favicon|index|404|landing).*)", "destination": "/profile.html?u=:username"}
+    {"source": "/:username((?!dashboard|login|settings|test|compare|friends|types|profile|group|api|_vercel|favicon|index|404|landing).*)", "destination": "/profile.html?u=:username"}
   ],
   "redirects": [
     {"source": "/dashboard", "destination": "/", "permanent": true},

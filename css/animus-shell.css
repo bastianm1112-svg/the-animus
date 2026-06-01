@@ -269,6 +269,30 @@ body.light-mode .nav-mobile-menu {
   background: var(--surface);
 }
 
+.nav-item-notif {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.nav-item-notif:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.nav-item-notif.active {
+  color: var(--gold);
+  background: rgba(200, 169, 110, 0.06);
+}
+
+.nav-item-notif .notif-badge {
+  top: 10px;
+  right: 10px;
+}
+
 .notif-badge {
   position: absolute;
   top: 8px;

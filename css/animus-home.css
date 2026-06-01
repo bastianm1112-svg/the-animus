@@ -21,6 +21,19 @@ body.member-mode #guestApp {
   padding: 32px 24px 48px;
 }
 
+.friends-page {
+  padding-top: 32px;
+  padding-bottom: calc(var(--mbn-h) + var(--safe-bottom) + 48px);
+}
+
+.friends-page-title {
+  margin-bottom: 4px;
+}
+
+.friends-page-sub {
+  margin-bottom: 28px;
+}
+
 .home-greeting {
   font-family: 'Playfair Display', serif;
   font-size: clamp(28px, 5vw, 40px);

@@ -323,7 +323,7 @@
           if (!friends.length) {
             if (empty) {
               empty.style.display = 'block';
-              empty.innerHTML = 'No friends yet. <a href="/#friends" style="color:var(--gold)">Add friends on home</a>, then pick someone to compare.';
+              empty.innerHTML = 'No friends yet. <a href="/friends" style="color:var(--gold)">Add friends</a>, then pick someone to compare.';
             }
           } else if (empty) {
             empty.style.display = 'none';

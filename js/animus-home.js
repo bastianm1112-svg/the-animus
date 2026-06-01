@@ -1,5 +1,5 @@
 /**
- * Logged-in home on index — greeting, daily fact, quick actions, friends.
+ * Logged-in home on index — greeting, daily fact, quick actions.
  */
 (function (g) {
   'use strict';
@@ -29,13 +29,6 @@
     return days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
   }
 
-  function scrollToHash() {
-    if (location.hash === '#friends') {
-      var el = document.getElementById('member-friends');
-      if (el) setTimeout(function () { el.scrollIntoView({ behavior: 'smooth' }); }, 300);
-    }
-  }
-
   function setMemberMode(on) {
     if (on) {
       document.body.classList.add('member-mode');
@@ -61,7 +54,10 @@
         return;
       }
       setMemberMode(true);
-      scrollToHash();
+      if (location.hash === '#friends') {
+        g.location.replace('/friends');
+        return;
+      }
 
       var greetEl = document.getElementById('homeGreeting');
       var displayName = escapeHTML(user.displayName || user.email.split('@')[0]);
@@ -145,8 +141,6 @@
         });
 
       if (typeof g.AnimusSocial !== 'undefined') {
-        g.AnimusSocial.loadFriends(user.uid);
-        g.AnimusSocial.loadActivity(user.uid);
         g.AnimusSocial.loadNotifs(user.uid);
       }
     });

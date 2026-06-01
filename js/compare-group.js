@@ -68,7 +68,7 @@
       return;
     }
     var hint = allPeople.length === 1
-      ? '<div style="color:var(--muted);font-size:12px;margin-bottom:10px">Add friends on <a href="/#friends" style="color:var(--gold)">home</a>, then select 2–6 people (including you).</div>'
+      ? '<div style="color:var(--muted);font-size:12px;margin-bottom:10px">Add friends on the <a href="/friends" style="color:var(--gold)">Friends</a> page, then select 2–6 people (including you).</div>'
       : '';
     grid.innerHTML = hint + allPeople.map(function (p) {
       var init = (p.displayName || '?').charAt(0).toUpperCase();
