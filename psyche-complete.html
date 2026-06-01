@@ -322,7 +322,6 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
       appId: "1:681221615050:web:1d037cd07a8381c91b3333"
     });
   </script>
-<link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <script>
@@ -341,7 +340,7 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
   <div style="display:flex;gap:12px;align-items:center;">
     <a href="/dashboard" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">Dashboard</a>
     <a href="/profile" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">My Profile</a>
-    <a href="/login" id="navSignInBtn" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e;text-decoration:none;border:1px solid #8a6f3e;padding:5px 14px;display:none;" onmouseover="this.style.background='#c8a96e';this.style.color='#000'" onmouseout="this.style.background='none';this.style.color='#c8a96e'">Sign In</a>
+    <a href="/login" id="navSignInBtn" style="width:32px;height:32px;border-radius:50%;border:1px solid #2a2a2a;background:#141414;display:none;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#c8a96e;text-decoration:none;text-align:center;line-height:32px;flex-shrink:0;" onmouseover="this.style.background='#c8a96e';this.style.color='#000'" onmouseout="this.style.background='none';this.style.color='#c8a96e'">Sign In</a>
   </div>
 </nav>
 <script>
@@ -352,14 +351,14 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
       if(!btn) return;
       if(user){
         btn.href = '/dashboard';
-        btn.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Dashboard';
+        var _n=(user.displayName||'').trim().split(/\s+/); btn.textContent=(_n.length>1?_n[0].charAt(0)+_n[_n.length-1].charAt(0):(_n[0]||'?').charAt(0)).toUpperCase();
         btn.onmouseover = function(){ this.style.background='#c8a96e'; this.style.color='#000'; };
         btn.onmouseout  = function(){ this.style.background='none';    this.style.color='#c8a96e'; };
       } else {
         btn.href = '/login';
         btn.textContent = 'Sign In';
       }
-      btn.style.display = '';
+      btn.style.display = 'flex';
     });
   } catch(e){ var b=document.getElementById('navSignInBtn'); if(b) b.style.display=''; }
 })();
@@ -2862,8 +2861,7 @@ function downloadPDF(snap, data, mbti, enn, att, phi, instStack, ai){
 .mc-choice:hover{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.03)!important;}
 .mc-choice.selected{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.07)!important;}
 .pbar-fill{background:linear-gradient(to right,#8a6f3e,#b8955a)!important;transition:width 0.4s ease!important;}
-</style><link rel="stylesheet" href="/style.css">
-</head><body>'
+</style></head><body>'
 
     // HEADER
     +'<div class="header">'
