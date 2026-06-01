@@ -126,12 +126,198 @@
     });
   }
 
+  function polQuadrant(polX, polY) {
+    if (polX >= 0 && polY < 0) return 'lib-right';
+    if (polX >= 0 && polY >= 0) return 'auth-right';
+    if (polX < 0 && polY < 0) return 'lib-left';
+    return 'auth-left';
+  }
+
+  var POL_COMPARISONS = {
+    'lib-right': {
+      thinkers: [
+        'Milton Friedman: market freedom and limited state intervention',
+        'Friedrich Hayek: spontaneous order and skepticism of central planning',
+        'John Stuart Mill: individual liberty as the foundation of progress',
+        'Adam Smith: invisible-hand coordination without heavy coercion',
+        'Robert Nozick: minimal state justified by individual rights',
+        'Ayn Rand: rational self-interest and property rights',
+        'Thomas Sowell: empirical skepticism of redistribution schemes',
+        'David Hume: institutional evolution over utopian design'
+      ],
+      politicians: [
+        'Ron Paul: libertarian constitutionalism and anti-interventionism',
+        'Gary Johnson: fiscally conservative, socially liberal synthesis',
+        'Justin Amash: civil liberties with market-oriented economics',
+        'Barry Goldwater: limited government conservatism',
+        'Margaret Thatcher (economic wing): privatization and market reform',
+        'Calvin Coolidge: restrained federal footprint',
+        'Javier Milei: radical market liberalization agenda',
+        'Angela Merkel (fiscal wing): ordoliberal discipline in macro policy'
+      ],
+      countries: [
+        'Switzerland: federalism, direct democracy, economic openness',
+        'Singapore: market dynamism with light-touch social regulation',
+        'New Zealand: trade openness and regulatory reform history',
+        'Ireland: pro-enterprise tax and EU market integration',
+        'Chile: market-oriented development with institutional stability',
+        'Estonia: digital governance and flat-tax experimentation',
+        'Canada (western provinces): resource economy plus trade integration',
+        'Australia: open economy with competitive federalism'
+      ],
+      parties: [
+        'Libertarian Party (US): maximal individual and economic liberty',
+        'FDP (Germany): market liberalism and civil rights',
+        'People\'s Party (Switzerland): decentralization and fiscal restraint',
+        'ACT New Zealand: classical liberal policy platform',
+        'Progressive Conservatives (Canada, historical): balanced market reform',
+        'VVD (Netherlands): pro-enterprise with social tolerance'
+      ]
+    },
+    'auth-right': {
+      thinkers: [
+        'Edmund Burke: tradition, gradual change, and institutional wisdom',
+        'Thomas Hobbes: strong order to prevent civil conflict',
+        'Leo Strauss: civilization defended through disciplined institutions',
+        'Roger Scruton: beauty, home, and continuity against radical rupture',
+        'Samuel Huntington: civilizational order and institutional stability',
+        'Michael Oakeshott: pragmatic conservatism over abstract revolution',
+        'Russell Kirk: moral order anchored in enduring norms',
+        'Carl Schmitt (critical read): sovereignty and friend-enemy politics'
+      ],
+      politicians: [
+        'Winston Churchill: national resolve and institutional leadership',
+        'Ronald Reagan: strong defense with market economics',
+        'Margaret Thatcher: state retrenchment plus national cohesion',
+        'Charles de Gaulle: republican authority and national grandeur',
+        'Lee Kuan Yew: development through firm governance',
+        'Benjamin Netanyahu: security-first statecraft',
+        'Narendra Modi: nation-building through executive strength',
+        'Giorgia Meloni: sovereigntist conservatism in the EU context'
+      ],
+      countries: [
+        'Japan: social order, long horizons, and institutional continuity',
+        'South Korea: rapid development under strong state capacity',
+        'Poland: sovereigntist conservatism in post-communist transition',
+        'Israel: security state with market innovation',
+        'Hungary: nationalist governance with EU friction',
+        'Turkey: executive centralization and regional power projection',
+        'India: developmental state with civilizational nationalism',
+        'United Arab Emirates: stability-led modernization'
+      ],
+      parties: [
+        'Republican Party (US, conservative wing): markets plus traditional order',
+        'Conservative Party (UK): institutional continuity and national interest',
+        'Lega / Brothers of Italy: national conservatism in Europe',
+        'Law and Justice (Poland): sovereigntist social conservatism',
+        'Likud (Israel): security and nationalist governance',
+        'CDU/CSU (Germany): Christian-democratic moderation'
+      ]
+    },
+    'lib-left': {
+      thinkers: [
+        'Noam Chomsky: civil liberties and critique of concentrated power',
+        'Murray Bookchin: municipal freedom and ecological socialism',
+        'Rosa Luxemburg: democratic socialism against authoritarian capture',
+        'Emma Goldman: anarchist feminism and anti-coercion ethics',
+        'Karl Polanyi: embedding markets in social protection',
+        'Antonio Gramsci (civil-libertarian read): cultural hegemony and participation',
+        'Amartya Sen: capability freedom beyond GDP alone',
+        'Martha Nussbaum: dignity, rights, and human development'
+      ],
+      politicians: [
+        'Bernie Sanders: redistributive economics with civil-libertarian streak',
+        'Alexandria Ocasio-Cortez: climate justice and labor rights',
+        'Jeremy Corbyn: anti-austerity and anti-interventionism',
+        'Pablo Iglesias: participatory left in Spain',
+        'Alexis Tsipras (2015): anti-austerity mandate',
+        'Luiz Inácio Lula da Silva: social programs with democratic legitimacy',
+        'Jacinda Ardern: inclusive governance and welfare expansion',
+        'Ralph Nader: corporate accountability and consumer protection'
+      ],
+      countries: [
+        'Uruguay: progressive social policy with democratic stability',
+        'Costa Rica: welfare state without heavy militarization',
+        'Iceland: egalitarian norms and civic participation',
+        'Portugal: drug-policy reform and social-democratic consensus',
+        'Finland: education equity and labor protections',
+        'Denmark (social wing): Nordic model with civil openness',
+        'Scotland (policy culture): communitarian civic identity',
+        'Bhutan: wellbeing metrics over pure growth'
+      ],
+      parties: [
+        'Green Party (multiple countries): ecology plus civil liberties',
+        'Podemos (Spain): participatory left',
+        'Syriza (Greece, historical): anti-austerity coalition',
+        'Labour left (UK): redistribution and public services',
+        'Democratic Socialists of America: workplace democracy agenda',
+        'Die Linke (Germany): anti-austerity and peace politics'
+      ]
+    },
+    'auth-left': {
+      thinkers: [
+        'Karl Marx: class analysis and critique of capital accumulation',
+        'Antonio Gramsci: hegemony and cultural struggle',
+        'John Rawls (egalitarian read): fairness as institutional design',
+        'John Maynard Keynes: macro stabilization and full employment',
+        'Eduard Bernstein: evolutionary socialism within democracy',
+        'Rosa Luxemburg: revolutionary democracy against bureaucracy',
+        'Thomas Piketty: inequality dynamics and progressive taxation',
+        'Ha-Joon Chang: developmental state and industrial policy'
+      ],
+      politicians: [
+        'Franklin D. Roosevelt: New Deal state capacity',
+        'Lyndon B. Johnson: Great Society expansion',
+        'Olof Palme: Nordic social democracy and peace diplomacy',
+        'Wilhelm Liebknecht / SPD founders: labor rights in parliament',
+        'Nelson Mandela (economic wing): redistribution after apartheid',
+        'Luiz Inácio Lula da Silva: Bolsa Família and labor gains',
+        'Mette Frederiksen: Nordic welfare with immigration controls',
+        'Olaf Scholz: corporatist stability and social insurance'
+      ],
+      countries: [
+        'Sweden: strong unions, welfare, and state coordination',
+        'Norway: sovereign wealth fund and egalitarian norms',
+        'France: republican universalism and labor protections',
+        'Germany: co-determination and vocational training system',
+        'Brazil (Workers\' Party eras): conditional cash transfers',
+        'South Africa (post-1994): constitutional rights plus redistribution debate',
+        'Taiwan: progressive social policy with democratic institutions',
+        'Belgium: negotiated labor-market institutions'
+      ],
+      parties: [
+        'Social Democratic parties (Nordic): welfare capitalism',
+        'Labour Party (UK): public services and workers\' rights',
+        'PSOE / PSOE-left (Spain): social investment',
+        'Workers\' Party (Brazil): poverty reduction programs',
+        'SPD (Germany): social market coordination',
+        'Democratic Party (US, progressive wing): safety-net expansion'
+      ]
+    }
+  };
+
+  function buildPoliticalComparisons(polX, polY) {
+    var q = polQuadrant(polX || 0, polY || 0);
+    var base = POL_COMPARISONS[q] || POL_COMPARISONS['lib-left'];
+    var leanEcon = polX > 15 ? 'market-leaning' : polX < -15 ? 'redistribution-leaning' : 'economically centrist';
+    var leanSoc = polY > 15 ? 'order-leaning' : polY < -15 ? 'liberty-leaning' : 'socially centrist';
+    var prefix = 'Profile axis X=' + Math.round(polX || 0) + ' Y=' + Math.round(polY || 0) + ' (' + leanEcon + ', ' + leanSoc + '): ';
+    return {
+      politicalThinkers: base.thinkers.map(function (t) { return prefix + t; }),
+      similarPoliticians: base.politicians.map(function (t) { return prefix + t; }),
+      similarCountries: base.countries.map(function (t) { return prefix + t; }),
+      similarParties: base.parties.map(function (t) { return prefix + t; })
+    };
+  }
+
   g.AnimusCross = {
     FN_ALSO: FN_ALSO,
     DERIVED_FN: DERIVED_FN,
     SHORT_POOL_TAGS: SHORT_POOL_TAGS,
     questionTags: questionTags,
     qKey: qKey,
-    applyChoicePatches: applyChoicePatches
+    applyChoicePatches: applyChoicePatches,
+    polQuadrant: polQuadrant,
+    buildPoliticalComparisons: buildPoliticalComparisons
   };
 })(typeof window !== 'undefined' ? window : globalThis);

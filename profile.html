@@ -564,6 +564,10 @@ function loadProfileData(uid, isOwner, currentUser){
     } else if(!uDoc.exists){ return; }
     var p=pDoc.exists ? pDoc.data() : {};
     var snap=p.latest||{};
+    if(!snap.mbti && typeof AnimusShared!=='undefined'){
+      var localSnap=AnimusShared.loadLastResultLocal();
+      if(localSnap&&localSnap.mbti) snap=localSnap;
+    }
     _snap=snap; _pName=u.displayName||''; _pUser=u.username||'';
 
     if(currentUser){
@@ -655,7 +659,16 @@ document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Mat
     if(isOwner && p.history && p.history.length){
       var hist=document.getElementById('historyList');
       var histArr=p.history.slice().reverse().slice(0,8);
-      hist.innerHTML=histArr.slice(0,5).map(function(h){ var d=h.timestamp?new Date(h.timestamp.toDate()).toLocaleDateString():'&#8212;'; return '<div class="history-entry"><div class="history-type">'+escapeHTML(h.snapshot&&h.snapshot.mbti||'&#8212;')+'</div><div><div style="color:var(--muted2);font-size:12px">Assessment</div><div class="history-date">'+escapeHTML(d)+'</div></div></div>'; }).join('');
+      hist.innerHTML=histArr.slice(0,5).map(function(h){
+        var ts=h.timestamp;
+        var d='&#8212;';
+        if(typeof AnimusShared!=='undefined'&&AnimusShared.parseHistoryTimestamp){
+          var pd=AnimusShared.parseHistoryTimestamp(ts);
+          if(pd) d=pd.toLocaleDateString();
+        } else if(ts&&ts.toDate) d=new Date(ts.toDate()).toLocaleDateString();
+        var mode=h.snapshot&&h.snapshot.testMode?(' · '+h.snapshot.testMode):'';
+        return '<div class="history-entry"><div class="history-type">'+escapeHTML(h.snapshot&&h.snapshot.mbti||'&#8212;')+escapeHTML(mode)+'</div><div><div style="color:var(--muted2);font-size:12px">Assessment</div><div class="history-date">'+escapeHTML(d)+'</div></div></div>';
+      }).join('');
     }
 
     if(!isOwner){
@@ -664,6 +677,12 @@ document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Mat
       document.querySelectorAll('.owner-only').forEach(function(el){el.style.display='none';});
     }
     setTimeout(animateBars, 300);
+
+    if(isOwner && currentUser && !(p.latest&&p.latest.mbti) && typeof AnimusShared!=='undefined'){
+      AnimusShared.trySyncLocalResultToFirestore(currentUser).then(function(synced){
+        if(synced) loadProfileData(uid, isOwner, currentUser);
+      });
+    }
   });
 }
 

@@ -444,7 +444,17 @@ auth.onAuthStateChanged(function(user){
   });
 
   db.collection('profiles').doc(user.uid).get().then(function(doc){
-    var hasTaken=doc.exists&&doc.data().latest&&doc.data().latest.mbti;if(!hasTaken){var card=document.getElementById('onboardingCard');if(card)card.classList.add('show');var banner=document.getElementById('retakeBanner');if(banner)banner.style.display='none';}
+    var hasTaken=doc.exists&&doc.data().latest&&doc.data().latest.mbti;
+    if(!hasTaken && typeof AnimusShared!=='undefined'){
+      var local=AnimusShared.loadLastResultLocal();
+      if(local&&local.mbti) hasTaken=true;
+    }
+    if(!hasTaken){var card=document.getElementById('onboardingCard');if(card)card.classList.add('show');var banner=document.getElementById('retakeBanner');if(banner)banner.style.display='none';}
+    if(!hasTaken && typeof AnimusShared!=='undefined'){
+      AnimusShared.trySyncLocalResultToFirestore(user).then(function(synced){
+        if(synced) window.location.reload();
+      });
+    }
     if(doc.exists){
       var p = doc.data().latest;
       if(p && p.mbti){
@@ -452,9 +462,18 @@ auth.onAuthStateChanged(function(user){
         var ennD = p.ennType ? p.ennType+'w'+p.ennWing : '—';
         document.getElementById('sidebarEnn').textContent = ennD+(p.instStack?' · '+p.instStack:'');
       var now = Date.now();
-      var hist = p.history && p.history.length ? p.history : [];
-      var lastDate = hist.length ? hist[hist.length-1].timestamp : null;
-      var daysSince = lastDate ? Math.floor((now - lastDate.toDate().getTime()) / 86400000) : null;
+      var hist = (doc.data().history && doc.data().history.length) ? doc.data().history : [];
+      var lastDate = hist.length ? hist[hist.length - 1].timestamp : null;
+      var lastMs = null;
+      if (lastDate && typeof AnimusShared !== 'undefined' && AnimusShared.parseHistoryTimestamp) {
+        var ld = AnimusShared.parseHistoryTimestamp(lastDate);
+        if (ld) lastMs = ld.getTime();
+      } else if (lastDate && lastDate.toDate) {
+        lastMs = lastDate.toDate().getTime();
+      } else if (typeof lastDate === 'string') {
+        lastMs = new Date(lastDate).getTime();
+      }
+      var daysSince = lastMs ? Math.floor((now - lastMs) / 86400000) : null;
       if(daysSince !== null && daysSince > 90){
         document.getElementById('retakeBannerText').innerHTML = '<strong>It’s been ' + daysSince + ' days since your last assessment.</strong> See how you’ve changed.';
       } else {

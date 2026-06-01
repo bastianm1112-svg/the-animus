@@ -1291,7 +1291,12 @@ function buildFallbackNarrative(mbti,enn,att,phi,data){
   };
 
   var polX = data.polX||0, polY = data.polY||0;
-  var polQuad = polX>0&&polY<0?'lib-right':polX>0&&polY>0?'auth-right':polX<0&&polY<0?'lib-left':'auth-left';
+  var polQuad = (typeof AnimusCross !== 'undefined' && AnimusCross.polQuadrant)
+    ? AnimusCross.polQuadrant(polX, polY)
+    : (polX>=0&&polY<0?'lib-right':polX>=0&&polY>=0?'auth-right':polX<0&&polY<0?'lib-left':'auth-left');
+  var polCompare = (typeof AnimusCross !== 'undefined' && AnimusCross.buildPoliticalComparisons)
+    ? AnimusCross.buildPoliticalComparisons(polX, polY)
+    : {};
   var polNarr = {
     'lib-right':'Your economic and social positions combine to place you in the libertarian-right quadrant — favoring market freedom while skeptical of state authority over personal life.',
     'auth-right':'You combine market-oriented economics with a preference for social order, tradition, and strong institutions — a conservative synthesis that values both economic freedom and social cohesion.',
@@ -1321,10 +1326,10 @@ function buildFallbackNarrative(mbti,enn,att,phi,data){
     politicalIdeologyDesc: 'This position reflects a specific tradition with its own intellectual history, strengths, and genuine blind spots. Explore the political tab for a full analysis.',
     politicalStrengths: 'This position has genuine intellectual coherence and real historical achievements. Its strongest moments tend to come when it operates within its core assumptions about human nature and the proper role of institutions.',
     politicalWeaknesses: 'Every political position has blind spots that become visible under pressure. This position is most vulnerable when its foundational assumptions about human nature or institutional behavior prove incorrect in specific contexts.',
-    politicalThinkers: ['Key thinkers in this tradition have shaped its most coherent arguments. See the political tab for personalized recommendations based on your exact profile.'],
-    similarCountries: ['Country analysis requires full AI processing — take the test and save results to see personalized comparisons.'],
-    similarPoliticians: ['Politician comparisons require full AI processing — take the test and save results to see personalized matches.'],
-    similarParties: ['Party comparisons require full AI processing — take the test and save results.'],
+    politicalThinkers: polCompare.politicalThinkers || ['Key thinkers in this tradition have shaped its most coherent arguments.'],
+    similarCountries: polCompare.similarCountries || ['Country comparisons are derived from your economic and social axes.'],
+    similarPoliticians: polCompare.similarPoliticians || ['Politician comparisons are derived from your economic and social axes.'],
+    similarParties: polCompare.similarParties || ['Party comparisons are derived from your economic and social axes.'],
     socionics: socionicsByMBTI[mbti] || '—',
     keirsey: keirseyByMBTI[mbti] || 'Rational'
   };
@@ -1693,26 +1698,26 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
     +'<div class="card"><div class="card-title">Social Dimensions</div>'
     +'<div class="bar-row"><div class="bar-label"><strong>Dominance</strong><span>Social assertiveness</span></div>'
-    +'<div class="bar-wrap"><div class="bar-fill" style="width:0%" data-w="'+Math.max(5,data.soc.dom)+'"></div></div>'
-    +'<div class="bar-num">'+Math.max(5,data.soc.dom)+'</div></div>'
+    +'<div class="bar-wrap"><div class="bar-fill" style="width:0%" data-w="'+Math.max(5,data.soc.SOC_DOM||data.soc.dom||0)+'"></div></div>'
+    +'<div class="bar-num">'+Math.max(5,data.soc.SOC_DOM||data.soc.dom||0)+'</div></div>'
     +'<div class="bar-row"><div class="bar-label"><strong>Introversion</strong><span>Inward orientation</span></div>'
-    +'<div class="bar-wrap"><div class="bar-fill dim" style="width:0%" data-w="'+Math.max(5,data.soc.introvert)+'"></div></div>'
-    +'<div class="bar-num">'+Math.max(5,data.soc.introvert)+'</div></div>'
+    +'<div class="bar-wrap"><div class="bar-fill dim" style="width:0%" data-w="'+Math.max(5,data.soc.SOC_INT||data.soc.introvert||0)+'"></div></div>'
+    +'<div class="bar-num">'+Math.max(5,data.soc.SOC_INT||data.soc.introvert||0)+'</div></div>'
     +'<div class="bar-row"><div class="bar-label"><strong>Warmth</strong><span>Openness to others</span></div>'
-    +'<div class="bar-wrap"><div class="bar-fill dim" style="width:0%" data-w="'+Math.max(5,data.soc.warmth)+'"></div></div>'
-    +'<div class="bar-num">'+Math.max(5,data.soc.warmth)+'</div></div>'
+    +'<div class="bar-wrap"><div class="bar-fill dim" style="width:0%" data-w="'+Math.max(5,data.soc.SOC_WAR||data.soc.warmth||0)+'"></div></div>'
+    +'<div class="bar-num">'+Math.max(5,data.soc.SOC_WAR||data.soc.warmth||0)+'</div></div>'
     +'<div class="bar-row"><div class="bar-label"><strong>Directness</strong><span>Communication style</span></div>'
-    +'<div class="bar-wrap"><div class="bar-fill" style="width:0%" data-w="'+Math.max(5,data.soc.direct)+'"></div></div>'
-    +'<div class="bar-num">'+Math.max(5,data.soc.direct)+'</div></div>'
+    +'<div class="bar-wrap"><div class="bar-fill" style="width:0%" data-w="'+Math.max(5,data.soc.SOC_DIR||data.soc.direct||0)+'"></div></div>'
+    +'<div class="bar-num">'+Math.max(5,data.soc.SOC_DIR||data.soc.direct||0)+'</div></div>'
     +'</div>'
 
     +'<div class="card" style="margin-top:12px"><div class="card-title">Alone Self</div>'
     +'<div class="bar-row"><div class="bar-label"><strong>Intellectual</strong><span>Inner analytical drive</span></div>'
-    +'<div class="bar-wrap"><div class="bar-fill" style="width:0%" data-w="'+Math.max(5,data.alone.intellectual)+'"></div></div>'
-    +'<div class="bar-num">'+Math.max(5,data.alone.intellectual)+'</div></div>'
+    +'<div class="bar-wrap"><div class="bar-fill" style="width:0%" data-w="'+Math.max(5,data.alone.AL_INT||data.alone.intellectual||0)+'"></div></div>'
+    +'<div class="bar-num">'+Math.max(5,data.alone.AL_INT||data.alone.intellectual||0)+'</div></div>'
     +'<div class="bar-row"><div class="bar-label"><strong>Sensitive</strong><span>Private emotional depth</span></div>'
-    +'<div class="bar-wrap"><div class="bar-fill dim" style="width:0%" data-w="'+Math.max(5,data.alone.sensitive)+'"></div></div>'
-    +'<div class="bar-num">'+Math.max(5,data.alone.sensitive)+'</div></div>'
+    +'<div class="bar-wrap"><div class="bar-fill dim" style="width:0%" data-w="'+Math.max(5,data.alone.AL_SEN||data.alone.sensitive||0)+'"></div></div>'
+    +'<div class="bar-num">'+Math.max(5,data.alone.AL_SEN||data.alone.sensitive||0)+'</div></div>'
     +'</div>'
     +'</div>';
 
@@ -1802,15 +1807,12 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
   // Build shareable snapshot — full data so imports are complete
   var snapshot={
-    // Type labels
     mbti:mbti, ennType:enn.type, ennWing:enn.wing, ennTritype:enn.tritype,
     att:att, phi:phi, instStack:instStack,
     polX:data.polX, polY:data.polY,
-    // All score dimensions
     cog:data.cog, enn:data.ennScores, att2:data.attScores, tmp:data.tmp, iv:data.iv,
     mf:data.mf, eth:data.eth, ep:data.ep, phiS:data.phiScores,
     soc:data.soc, alone:data.alone,
-    // AI output
     big5:ai.big5||{}, values:ai.values||[],
     mbtiName:sanitizeText(ai.mbtiName,2000)||'', tagline:sanitizeText(ai.tagline,2000)||'',
     socionics:sanitizeText(ai.socionics,2000)||'', keirsey:sanitizeText(ai.keirsey,2000)||'',
@@ -1818,58 +1820,66 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     cogNarrative:sanitizeText(ai.cogNarrative,2000)||'', ennNarrative:sanitizeText(ai.ennNarrative,2000)||'',
     attNarrative:sanitizeText(ai.attNarrative,2000)||'', phiNarrative:sanitizeText(ai.phiNarrative,2000)||'',
     politicalNarrative:sanitizeText(ai.politicalNarrative,2000)||'',
+    politicalIdeology:sanitizeText(ai.politicalIdeology,2000)||'',
+    politicalIdeologyDesc:sanitizeText(ai.politicalIdeologyDesc,2000)||'',
+    politicalStrengths:sanitizeText(ai.politicalStrengths,2000)||'',
+    politicalWeaknesses:sanitizeText(ai.politicalWeaknesses,2000)||'',
+    politicalThinkers:Array.isArray(ai.politicalThinkers)?ai.politicalThinkers:[],
+    similarPoliticians:Array.isArray(ai.similarPoliticians)?ai.similarPoliticians:[],
+    similarParties:Array.isArray(ai.similarParties)?ai.similarParties:[],
+    similarCountries:Array.isArray(ai.similarCountries)?ai.similarCountries:[],
     aloneDesc:sanitizeText(ai.aloneDesc,2000)||'', socialDesc:sanitizeText(ai.socialDesc,2000)||'',
     shadowDesc:sanitizeText(ai.shadowDesc,2000)||''
   };
 
-  // Save to localStorage
-  // Auto-save to Firestore when results render (if signed in)
-(function(){
-  var _saved=false;
-  var _unsub = firebase.auth().onAuthStateChanged(function(user){
-    if(!user||_saved) return;
-    _saved=true; _unsub();
-    var _snap = Object.assign({},snapshot,{completedAt:new Date().toISOString(),testMode:TOTAL<=100?'short':'full'});
-    var _ref = firebase.firestore().collection('profiles').doc(user.uid);
-    _ref.get().then(function(doc){
-      var h=doc.exists?(doc.data().history||[]):[];
-      h.push({snapshot:_snap,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-      if(h.length>10)h=h.slice(-10);
-      return _ref.set({latest:_snap,history:h,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-    }).then(function(){
-      var btn=document.getElementById('btnSave');
-      if(btn){btn.innerHTML='↓ SAVED ✓';btn.style.opacity='0.7';}
-    }).catch(function(e){console.error('Auto-save:',e);});
-  });
-})();
+  function persistProfileSnapshot(redirectAfter) {
+    var meta = {
+      testMode: TOTAL <= 100 ? 'short' : 'full',
+      answerCount: Object.keys(answers || {}).length
+    };
+    if (typeof AnimusShared !== 'undefined') {
+      AnimusShared.saveLastResultLocal(
+        AnimusShared.enrichProfileSnapshot(snapshot, data, meta)
+      );
+    }
+    function doSave(user) {
+      if (!user || typeof AnimusShared === 'undefined') return;
+      AnimusShared.saveProfileToFirestore(user.uid, snapshot, {
+        rawData: data,
+        testMode: meta.testMode,
+        answerCount: meta.answerCount
+      }).then(function () {
+        var btn = document.getElementById('btnSave');
+        if (btn) { btn.innerHTML = '↓ SAVED ✓'; btn.style.opacity = '0.7'; }
+        showToast('Profile saved to your account ✓');
+        if (redirectAfter) {
+          setTimeout(function () { window.location.href = '/profile'; }, 1200);
+        }
+      }).catch(function (e) {
+        console.error('Profile save:', e);
+        showToast('Could not save to cloud — results kept on this device. Tap Save again.');
+      });
+    }
+    var cur = firebase.auth().currentUser;
+    if (cur) doSave(cur);
+    else {
+      var unsub = firebase.auth().onAuthStateChanged(function (user) {
+        if (user) { unsub(); doSave(user); }
+      });
+      setTimeout(function () { try { unsub(); } catch (e) {} }, 45000);
+    }
+  }
 
-document.getElementById('btnSave').addEventListener('click',function(){
-    try { localStorage.setItem('animus_last_result', JSON.stringify(snapshot)); } catch(e){}
-    var _btnU=firebase.auth().onAuthStateChanged(function(user){
-      _btnU();
-      if(!user){
-        showToast('Sign in to save your profile permanently');
-        setTimeout(function(){ window.location.href='/login'; },2000);
-        return;
-      }
-      var snapshotWithMeta = Object.assign({},snapshot,{
-        completedAt: new Date().toISOString(),
-        testMode: TOTAL<=100?'short':'full'
-      });
-      var profileRef = firebase.firestore().collection('profiles').doc(user.uid);
-      profileRef.get().then(function(doc){
-        var history = doc.exists?(doc.data().history||[]):[];
-        history.push({snapshot:snapshotWithMeta,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-        if(history.length>10) history=history.slice(-10);
-        return profileRef.set({latest:snapshotWithMeta,history:history,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-      }).then(function(){
-        showToast('Profile saved ✓');
-        setTimeout(function(){ window.location.href='/profile'; },1800);
-      }).catch(function(e){
-        console.error('Save error:',e);
-        showToast('Save failed — check connection and try again');
-      });
-    });
+  persistProfileSnapshot(false);
+
+  document.getElementById('btnSave').addEventListener('click', function () {
+    var user = firebase.auth().currentUser;
+    if (!user) {
+      showToast('Sign in to save your profile permanently');
+      setTimeout(function () { window.location.href = '/login'; }, 2000);
+      return;
+    }
+    persistProfileSnapshot(true);
   });
 
   // Share: encode snapshot into URL hash
