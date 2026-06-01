@@ -134,6 +134,98 @@
       + '</svg>';
   }
 
+  var COUNTRY_FLAGS = {
+    'USA': '🇺🇸', 'United States': '🇺🇸', 'US': '🇺🇸',
+    'UK': '🇬🇧', 'United Kingdom': '🇬🇧', 'Britain': '🇬🇧',
+    'France': '🇫🇷', 'Germany': '🇩🇪', 'Spain': '🇪🇸', 'Italy': '🇮🇹',
+    'Sweden': '🇸🇪', 'Norway': '🇳🇴', 'Denmark': '🇩🇰', 'Finland': '🇫🇮',
+    'Netherlands': '🇳🇱', 'Belgium': '🇧🇪', 'Switzerland': '🇨🇭', 'Austria': '🇦🇹',
+    'Poland': '🇵🇱', 'Hungary': '🇭🇺', 'Czech Republic': '🇨🇿', 'Czechia': '🇨🇿',
+    'Russia': '🇷🇺', 'Ukraine': '🇺🇦', 'China': '🇨🇳', 'Japan': '🇯🇵',
+    'India': '🇮🇳', 'South Korea': '🇰🇷', 'Taiwan': '🇹🇼', 'Singapore': '🇸🇬',
+    'Australia': '🇦🇺', 'New Zealand': '🇳🇿', 'Canada': '🇨🇦', 'Mexico': '🇲🇽',
+    'Brazil': '🇧🇷', 'Argentina': '🇦🇷', 'Chile': '🇨🇱', 'Colombia': '🇨🇴',
+    'South Africa': '🇿🇦', 'Nigeria': '🇳🇬', 'Kenya': '🇰🇪', 'Egypt': '🇪🇬',
+    'Israel': '🇮🇱', 'Turkey': '🇹🇷', 'Iran': '🇮🇷', 'Saudi Arabia': '🇸🇦',
+    'Greece': '🇬🇷', 'Portugal': '🇵🇹', 'Ireland': '🇮🇪', 'Iceland': '🇮🇸'
+  };
+
+  function stripPolPrefix(item) {
+    var s = String(item || '');
+    var m = s.match(/^Profile axis[^:]*:\s*/i);
+    return m ? s.slice(m[0].length).trim() : s.trim();
+  }
+
+  function parsePolEntry(item) {
+    var s = stripPolPrefix(item);
+    var colon = s.indexOf(':');
+    var label = colon >= 0 ? s.slice(0, colon).trim() : s;
+    var reason = colon >= 0 ? s.slice(colon + 1).trim() : '';
+    var name = label;
+    var country = '';
+    var paren = label.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+    if (paren) {
+      name = paren[1].trim();
+      country = paren[2].trim();
+    }
+    return { name: name, country: country, reason: reason };
+  }
+
+  function countryFlag(name, country) {
+    var key = country || name;
+    return COUNTRY_FLAGS[key] || COUNTRY_FLAGS[name] || '🌐';
+  }
+
+  function ensurePoliticalAlignments(snap) {
+    var out = {
+      countries: Array.isArray(snap.similarCountries) ? snap.similarCountries.slice() : [],
+      parties: Array.isArray(snap.similarParties) ? snap.similarParties.slice() : [],
+      politicians: Array.isArray(snap.similarPoliticians) ? snap.similarPoliticians.slice() : [],
+      thinkers: Array.isArray(snap.politicalThinkers) ? snap.politicalThinkers.slice() : []
+    };
+    var need = !out.countries.length || !out.parties.length || !out.politicians.length;
+    if (need && typeof g.AnimusCross !== 'undefined' && g.AnimusCross.buildPoliticalComparisons) {
+      var cmp = g.AnimusCross.buildPoliticalComparisons(snap.polX, snap.polY);
+      if (!out.countries.length) out.countries = cmp.similarCountries || [];
+      if (!out.parties.length) out.parties = cmp.similarParties || [];
+      if (!out.politicians.length) out.politicians = cmp.similarPoliticians || [];
+      if (!out.thinkers.length) out.thinkers = cmp.politicalThinkers || [];
+    }
+    return out;
+  }
+
+  function buildPolAlignSection(title, subtitle, items, kind) {
+    if (!items || !items.length) return '';
+    var cards = items.slice(0, 8).map(function (item, i) {
+      var p = parsePolEntry(item);
+      var icon = '';
+      if (kind === 'country') {
+        icon = '<span class="pol-align-flag" aria-hidden="true">' + countryFlag(p.name, p.country) + '</span>';
+      } else if (kind === 'party') {
+        icon = '<span class="pol-align-icon pol-align-icon-party" aria-hidden="true">'
+          + escapeHTML((p.country || p.name).charAt(0)) + '</span>';
+      } else if (kind === 'thinker') {
+        icon = '<span class="pol-align-icon pol-align-icon-thinker" aria-hidden="true">'
+          + escapeHTML(p.name.charAt(0)) + '</span>';
+      } else {
+        icon = '<span class="pol-align-icon pol-align-icon-person" aria-hidden="true">'
+          + escapeHTML(p.name.charAt(0)) + '</span>';
+      }
+      return '<article class="pol-align-card" style="--pol-card-delay:' + (i * 50) + 'ms">'
+        + icon
+        + '<div class="pol-align-body">'
+        + '<div class="pol-align-name">' + escapeHTML(p.name)
+        + (p.country ? '<span class="pol-align-meta">' + escapeHTML(p.country) + '</span>' : '')
+        + '</div>'
+        + (p.reason ? '<p class="pol-align-reason">' + escapeHTML(p.reason) + '</p>' : '')
+        + '</div></article>';
+    }).join('');
+    return '<div class="card pol-align-section pol-align-' + kind + '">'
+      + '<div class="card-title">' + escapeHTML(title) + '</div>'
+      + (subtitle ? '<p class="pol-align-sub">' + escapeHTML(subtitle) + '</p>' : '')
+      + '<div class="pol-align-grid">' + cards + '</div></div>';
+  }
+
   function axisTrack(label, value, negativeLabel, positiveLabel) {
     var v = Math.max(-100, Math.min(100, value || 0));
     var markerLeft = 50 + (v / 2);
@@ -192,6 +284,40 @@
             + '<div class="mf-mini-track"><div class="mf-mini-fill" data-w="' + v + '"></div></div>'
             + '<strong>' + v + '</strong></div>';
         }).join('') + '</div></div></div>' : '');
+
+    var align = ensurePoliticalAlignments(snap);
+    var alignLead = narr(voice,
+      'Beyond the compass, these parallels show where ' + p.possL + ' position rhymes globally — regimes, parties, and public figures, not endorsements.',
+      isOwner);
+
+    root.innerHTML += ''
+      + '<div class="pol-align-wrap">'
+      + '<p class="section-lead pol-align-lead">' + alignLead + '</p>'
+      + buildPolAlignSection(
+        'Similar countries',
+        'Governance and policy cultures that echo ' + p.possL + ' economic and social axes.',
+        align.countries,
+        'country'
+      )
+      + buildPolAlignSection(
+        'Political parties worldwide',
+        'Parties from multiple regions whose platforms align with this profile.',
+        align.parties,
+        'party'
+      )
+      + buildPolAlignSection(
+        'Political figures',
+        'Historical and contemporary leaders with comparable positions.',
+        align.politicians,
+        'person'
+      )
+      + buildPolAlignSection(
+        'Political thinkers',
+        'Theorists whose arguments resonate with this orientation.',
+        align.thinkers,
+        'thinker'
+      )
+      + '</div>';
   }
 
   function buildAttachmentMap(att) {

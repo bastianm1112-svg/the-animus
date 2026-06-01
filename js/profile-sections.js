@@ -281,20 +281,23 @@
   }
 
   function renderAll(snap, isOwner, voice, displayName) {
-    renderInsightsGrid(snap, isOwner, displayName, voice);
-    populatePhilosophyBars(snap);
-    fixPersonalityBars(snap);
-    fillSectionLeads(snap, isOwner, voice);
+    if (typeof g.AnimusProfilePanels !== 'undefined') {
+      g.AnimusProfilePanels.renderAll(snap, isOwner, voice, displayName);
+    } else {
+      renderInsightsGrid(snap, isOwner, displayName, voice);
+      populatePhilosophyBars(snap);
+      fixPersonalityBars(snap);
+      fillSectionLeads(snap, isOwner, voice);
+      hideEmptyEnnNarrative(snap);
+    }
+
     fixPoliticalStat(snap);
-    hideEmptyEnnNarrative(snap);
 
     if (typeof g.AnimusProfileVisuals !== 'undefined') {
       g.AnimusProfileVisuals.renderAll(snap, isOwner, voice);
     }
 
-    if (snap.mbti && typeof g.animateBars === 'function') {
-      setTimeout(g.animateBars, 200);
-    } else if (typeof g.animateBars === 'function') {
+    if (typeof g.animateBars === 'function') {
       setTimeout(g.animateBars, 200);
     }
   }

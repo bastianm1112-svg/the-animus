@@ -180,12 +180,15 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 
 </style>
 <link rel="stylesheet" href="/css/animus-unified.css">
+<link rel="stylesheet" href="/css/animus-profile-panels.css">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/animus-shared.js"></script>
 <script src="/js/profile-voice.js"></script>
+<script src="/js/psyche-cross.js"></script>
 <script src="/js/profile-sections.js"></script>
+<script src="/js/profile-panels-visual.js"></script>
 <script src="/js/profile-visuals.js"></script>
 <script>
 if(!firebase.apps.length){
@@ -272,18 +275,8 @@ var auth=firebase.auth(); var db=firebase.firestore();
 <div class="profile-content">
 
   <div class="panel active" id="panel-overview">
-    <div class="panel-main">
-      <div class="stat-grid">
-        <div class="stat-cell"><span class="stat-big" id="statMBTI">&#8212;</span><span class="stat-lbl">MBTI Type</span></div>
-        <div class="stat-cell"><span class="stat-big" id="statEnn">&#8212;</span><span class="stat-lbl">Enneagram</span></div>
-        <div class="stat-cell"><span class="stat-big" id="statDomFn">&#8212;</span><span class="stat-lbl">Dominant Fn</span></div>
-      </div>
-      <div id="profileInsightsGrid" class="insights-grid" style="display:none"></div>
-      <div class="card"><div class="card-title">Tagline</div><p style="font-family:'Playfair Display',serif;font-style:italic;font-size:16px;color:var(--muted2);line-height:1.8"><span id="profileTagline" style="color:var(--muted)">Complete the assessment to generate your profile narrative.</span></p></div>
-      <div class="card"><div class="card-title" data-voice-title-you="Alone — YOUR Inner World" data-voice-title-they="Alone — Their Inner World">Alone — Inner World</div><p id="aloneNarrative" style="font-size:12px;color:var(--muted);line-height:1.9">Complete the assessment to see this section.</p></div>
-      <div class="card"><div class="card-title" data-voice-title-you="With Others — YOUR Social Presence" data-voice-title-they="With Others — Their Social Presence">With Others — Social Presence</div><p id="socialNarrative" style="font-size:12px;color:var(--muted);line-height:1.9">Complete the assessment to see this section.</p></div>
-      <div class="card"><div class="card-title" data-voice-title-you="YOUR Shadow &amp; Blind Spots" data-voice-title-they="Their Shadow &amp; Blind Spots">Shadow &amp; Blind Spots</div><p id="shadowNarrative" style="font-size:12px;color:var(--muted);line-height:1.9">Complete the assessment to see this section.</p></div>
-      <div class="card"><div class="card-title">Core Values</div><div class="values-grid" id="valuesGrid"><div style="color:var(--muted);font-size:12px;grid-column:1/-1">Complete the assessment to see your core values.</div></div></div>
+    <div class="panel-main" id="overviewPanelRoot">
+      <div class="viz-empty"><div class="viz-empty-title">Overview</div><p>Complete the assessment to unlock your full profile.</p></div>
     </div>
     <div class="panel-side">
       <div class="profile-actions-card">
@@ -302,88 +295,21 @@ var auth=firebase.auth(); var db=firebase.firestore();
   </div>
 
   <div class="panel" id="panel-cognition">
-    <div class="panel-main">
-      <p class="section-lead" id="panelCognitionLead" style="display:none"></p>
-      <div class="narrative" id="cogNarrativeBlock" style="display:none"><div class="narrative-title">Cognitive Analysis</div><div class="narrative-text" id="cogNarrativeText"></div></div>
-      <div id="cogNarrativePlaceholder" style="color:var(--muted);font-size:12px;padding:16px 20px;background:var(--surface2);border-left:2px solid var(--border2);margin-bottom:14px">Complete the assessment to see your cognitive analysis.</div>
-      <div class="card"><div class="card-title">All 8 Functions &#8212; Scored</div><div id="cogBars"><div style="color:var(--muted);font-size:12px;padding:8px 0">Complete the assessment to see your function scores.</div></div></div>
-      <div class="card"><div class="card-title">Big Five</div><div id="big5Bars"><div style="color:var(--muted);font-size:12px;padding:8px 0">&#8212;</div></div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="card"><div class="card-title">Socionics</div><p id="socionicsVal" style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--text)">&#8212;</p></div>
-        <div class="card"><div class="card-title">Keirsey</div><p id="keirseyVal" style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--text)">&#8212;</p></div>
-      </div>
-    </div>
-    <div class="panel-side">
-      
-      <div class="side-card"><div class="side-card-title">Stack Summary</div><div style="font-size:12px;color:var(--muted2);line-height:2" id="stackSummaryList"><div style="color:var(--muted)">Complete the assessment to see your cognitive stack.</div></div></div>
+    <div class="panel-main" id="cognitionPanelRoot">
+      <div class="viz-empty"><div class="viz-empty-title">Cognition</div><p>Complete the assessment to see your cognitive profile.</p></div>
     </div>
   </div>
 
   <div class="panel" id="panel-personality">
-    <div class="panel-main">
-      <p class="section-lead" id="panelPersonalityLead" style="display:none"></p>
-      <div class="narrative"><div class="narrative-title">Enneagram Analysis</div><div class="narrative-text"><span id="ennNarrative"></span></div></div>
-      <div class="card">
-        <div class="card-title">Enneagram</div>
-        <div class="enn-display"><span class="enn-big" id="ennBig">&#8212;</span><span class="enn-wing" id="ennWing"></span></div>
-        <p id="ennTritype" style="font-size:11px;color:var(--muted);margin-bottom:16px;letter-spacing:0.1em">TRITYPE: &#8212;</p>
-        <div class="card-title" style="margin-top:0">All 9 Types Scored</div>
-        <div class="enn-bars-wrap">
-        <div class="bar-row"><div class="bar-label" style="min-width:20px"><strong>1</strong></div><div class="bar-wrap"><div class="bar-fill" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label" style="min-width:20px"><strong>6</strong></div><div class="bar-wrap"><div class="bar-fill dim" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label" style="min-width:20px"><strong>5</strong></div><div class="bar-wrap"><div class="bar-fill dim" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label" style="min-width:20px"><strong>8</strong></div><div class="bar-wrap"><div class="bar-fill dim" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label" style="min-width:20px"><strong>2</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label" style="min-width:20px"><strong>3</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label" style="min-width:20px"><strong>4</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label" style="min-width:20px"><strong>7</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label" style="min-width:20px"><strong>9</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="card"><div class="card-title">Instinctual Stack</div><p id="instStack" style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--gold);letter-spacing:0.06em;line-height:1">&#8212;</p></div>
-        <div class="card"><div class="card-title">Attachment Style</div><p id="attStyleLabel" style="font-family:'Playfair Display',serif;font-size:18px;color:var(--white);margin-bottom:8px">&#8212;</p><p style="font-size:11px;color:var(--muted2);line-height:1.8"><span id="attNarrative"></span></p></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Four Temperaments</div>
-        <div class="tmp-bars-wrap">
-        <div class="bar-row"><div class="bar-label"><strong>Melancholic</strong></div><div class="bar-wrap"><div class="bar-fill" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label"><strong>Choleric</strong></div><div class="bar-wrap"><div class="bar-fill dim" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label"><strong>Phlegmatic</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label"><strong>Sanguine</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        </div>
-      </div>
+    <div class="panel-main" id="personalityPanelRoot">
+      <div class="viz-empty"><div class="viz-empty-title">Personality</div><p>Complete the assessment to see your enneagram and temperament profile.</p></div>
     </div>
-    
   </div>
 
   <div class="panel" id="panel-philosophy">
-    <div class="panel-main">
-      <p class="section-lead" id="panelPhilosophyLead" style="display:none"></p>
-      <div class="narrative" id="phiNarrativeBlock" style="display:none"><div class="narrative-title" id="phiNarrativeTitle"></div><div class="narrative-text" id="phiNarrativeText"></div></div>
-      <div id="phiNarrativePlaceholder" style="color:var(--muted);font-size:12px;padding:16px 20px;background:var(--surface2);border-left:2px solid var(--border2);margin-bottom:14px">Complete the assessment to see your philosophical analysis.</div>
-      <div class="card">
-        <div class="card-title">Philosophical School</div>
-        <div class="bar-row"><div class="bar-label"><strong>Nietzschean</strong></div><div class="bar-wrap"><div class="bar-fill" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label"><strong>Existentialist</strong></div><div class="bar-wrap"><div class="bar-fill dim" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label"><strong>Aristotelian</strong></div><div class="bar-wrap"><div class="bar-fill dim" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label"><strong>Skeptic</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label"><strong>Stoic</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label"><strong>Kantian</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label"><strong>Pragmatist</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-        <div class="bar-row"><div class="bar-label"><strong>Epicurean</strong></div><div class="bar-wrap"><div class="bar-fill low" data-w="0"></div></div><div class="bar-num">&#8212;</div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Moral Foundations</div>
-        <div class="moral-row"><span style="color:var(--text)">Liberty / Oppression</span><div class="moral-bar-wrap"><div class="moral-bar-fill" data-w="0" id="mfLib"></div></div><span id="mfLibVal" style="color:var(--muted)">&#8212;</span></div>
-        <div class="moral-row"><span style="color:var(--text)">Fairness / Reciprocity</span><div class="moral-bar-wrap"><div class="moral-bar-fill" data-w="0" id="mfFair"></div></div><span id="mfFairVal" style="color:var(--muted)">&#8212;</span></div>
-        <div class="moral-row"><span style="color:var(--text)">Care / Harm</span><div class="moral-bar-wrap"><div class="moral-bar-fill" data-w="0" id="mfCare"></div></div><span id="mfCareVal" style="color:var(--muted)">&#8212;</span></div>
-        <div class="moral-row"><span style="color:var(--text)">Sanctity / Purity</span><div class="moral-bar-wrap"><div class="moral-bar-fill" data-w="0" id="mfPur"></div></div><span id="mfPurVal" style="color:var(--muted)">&#8212;</span></div>
-        <div class="moral-row"><span style="color:var(--text)">Loyalty / Betrayal</span><div class="moral-bar-wrap"><div class="moral-bar-fill" data-w="0" id="mfLoy"></div></div><span id="mfLoyVal" style="color:var(--muted)">&#8212;</span></div>
-        <div class="moral-row"><span style="color:var(--text)">Authority / Subversion</span><div class="moral-bar-wrap"><div class="moral-bar-fill" data-w="0" id="mfAuth"></div></div><span id="mfAuthVal" style="color:var(--muted)">&#8212;</span></div>
-      </div>
+    <div class="panel-main" id="philosophyPanelRoot">
+      <div class="viz-empty"><div class="viz-empty-title">Philosophy</div><p>Complete the assessment to see your philosophical orientation.</p></div>
     </div>
-    
   </div>
 
   <div class="panel" id="panel-political">
@@ -580,54 +506,12 @@ function loadProfileData(uid, isOwner, currentUser){
       var strip=document.getElementById('typeStrip');
       var badges=[[snap.mbti,snap.mbtiName||''],[snap.ennType+'w'+snap.ennWing,'Enneagram'],[snap.ennTritype||'','Tritype'],[snap.instStack||'','Instinct'],[snap.phi||'','Philosophy'],[snap.att||'','Attachment'],[snap.socionics||'','Socionics']];
       strip.innerHTML=badges.filter(function(b){return b[0];}).map(function(b){ return '<div class="type-badge"><strong>'+escapeHTML(b[0])+'</strong> '+escapeHTML(b[1])+'</div>'; }).join('');
-      document.getElementById('statMBTI').textContent=snap.mbti||'&#8212;';
-      document.getElementById('statEnn').textContent=(snap.ennType||'&#8212;')+'w'+(snap.ennWing||'');
-      var cog=snap.cog||{}; var domFn=Object.keys(cog).sort(function(a,b){return cog[b]-cog[a];})[0]||'&#8212;';
-      document.getElementById('statDomFn').textContent=domFn;
-      document.getElementById('profileTagline').textContent=voice.narrativeForViewer(snap.tagline||'',isOwner);
-      document.getElementById('profileTagline').dataset.filled='1';
     }
 
-    if(snap.aloneDesc){ var el=document.getElementById('aloneNarrative'); if(el){ el.textContent=voice.narrativeForViewer(snap.aloneDesc,isOwner); el.style.color=''; el.dataset.filled='1'; } }
-    if(snap.socialDesc){ var el=document.getElementById('socialNarrative'); if(el){ el.textContent=voice.narrativeForViewer(snap.socialDesc,isOwner); el.style.color=''; el.dataset.filled='1'; } }
-    if(snap.shadowDesc){ var el=document.getElementById('shadowNarrative'); if(el){ el.textContent=voice.narrativeForViewer(snap.shadowDesc,isOwner); el.style.color=''; el.dataset.filled='1'; } }
-    if(snap.values&&snap.values.length){ document.getElementById('valuesGrid').innerHTML=snap.values.map(function(v){return '<div class="value-tag"><div class="value-dot"></div>'+escapeHTML(v)+'</div>';}).join(''); }
-
-    if(snap.phiS){ var phiTop=Object.keys(snap.phiS).sort(function(a,b){return snap.phiS[b]-snap.phiS[a];})[0]; var phiN={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'}; var spEl=document.getElementById('statPolitical'); if(spEl) spEl.textContent=phiN[phiTop]||phiTop||'--'; }
+    if(snap.phiS){ var phiTop=Object.keys(snap.phiS).sort(function(a,b){return snap.phiS[b]-snap.phiS[a];})[0]; var phiN={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'}; var seEl=document.getElementById('statEthics'); if(seEl&&!snap.eth) seEl.textContent=phiN[phiTop]||phiTop||'--'; }
     if(snap.eth){ var ethTop=Object.keys(snap.eth).sort(function(a,b){return snap.eth[b]-snap.eth[a];})[0]; var ethN={ET_VIR:'Virtue',ET_CON:'Consequentialist',ET_DEO:'Deontological',ET_EGO:'Egoist'}; var seEl=document.getElementById('statEthics'); if(seEl) seEl.textContent=ethN[ethTop]||ethTop||'--'; }
     if(snap.tmp){ var tmpTop=Object.keys(snap.tmp).sort(function(a,b){return snap.tmp[b]-snap.tmp[a];})[0]; var tmpN={TMP_CHO:'Choleric',TMP_MEL:'Melancholic',TMP_SAN:'Sanguine',TMP_PHL:'Phlegmatic'}; var stEl=document.getElementById('statTemp'); if(stEl) stEl.textContent=tmpN[tmpTop]||tmpTop||'--'; }
     if(snap.keirsey){ var skEl=document.getElementById('statKeirsey'); if(skEl) skEl.textContent=snap.keirsey; }
-
-    if(snap.cogNarrative){ document.getElementById('cogNarrativeText').textContent=voice.narrativeForViewer(snap.cogNarrative,isOwner); document.getElementById('cogNarrativeBlock').style.display=''; var ph=document.getElementById('cogNarrativePlaceholder'); if(ph) ph.style.display='none'; }
-    if(snap.cog){
-      var cogFns=Object.keys(snap.cog).sort(function(a,b){return snap.cog[b]-snap.cog[a];});
-      var cogColors=['','','','dim','dim','low','low','low'];
-      var fnColorMap={Ni:'fn-ni',Ne:'fn-ne',Ti:'fn-ti',Te:'fn-te',Fi:'fn-fi',Fe:'fn-fe',Si:'fn-si',Se:'fn-se'};
-var fnTooltips={Ni:'Introverted Intuition — pattern recognition, long-range vision',Ne:'Extraverted Intuition — possibility mapping, lateral thinking',Ti:'Introverted Thinking — internal logical frameworks',Te:'Extraverted Thinking — external systematization, efficiency',Fi:'Introverted Feeling — deep personal values, authenticity',Fe:'Extraverted Feeling — interpersonal harmony, emotional attunement',Si:'Introverted Sensing — experiential memory, established procedure',Se:'Extraverted Sensing — present-moment awareness, physical mastery'};
-document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Math.round(snap.cog[fn]||0);var cls=fnColorMap[fn]||'';return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><div class="fn-tooltip-wrap"><strong>'+escapeHTML(fn)+'</strong><div class="fn-tooltip">'+escapeHTML(fnTooltips[fn]||fn)+'</div></div></div><div class="bar-wrap"><div class="bar-fill '+cls+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');
-      var stackLabels=['Dominant','Auxiliary','Tertiary','Inferior']; var stackColors=['var(--gold)','var(--gold)','var(--gold2)','var(--muted)'];
-      document.getElementById('stackSummaryList').innerHTML=cogFns.slice(0,4).map(function(fn,i){return '<div>'+stackLabels[i]+' &rarr; <strong style="color:'+stackColors[i]+'">'+escapeHTML(fn)+'</strong></div>';}).join('');
-    }
-    if(snap.big5){ var b5k=['Openness','Conscientiousness','Extraversion','Agreeableness','Neuroticism']; document.getElementById('big5Bars').innerHTML=b5k.map(function(k,i){var v=Math.round(snap.big5[k]||0);return '<div class="bar-row"><div class="bar-label"><strong>'+escapeHTML(k)+'</strong></div><div class="bar-wrap"><div class="bar-fill '+(i<2?'':'dim')+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join(''); }
-    if(snap.socionics){ var se=document.getElementById('socionicsVal'); if(se) se.textContent=snap.socionics; }
-    if(snap.keirsey){ var ke=document.getElementById('keirseyVal'); if(ke) ke.textContent=snap.keirsey; }
-
-    if(snap.ennType){ document.getElementById('ennBig').textContent=snap.ennType; }
-    if(snap.ennWing){ document.getElementById('ennWing').textContent='w'+snap.ennWing; }
-    if(snap.ennTritype){ document.getElementById('ennTritype').textContent='TRITYPE: '+snap.ennTritype; }
-    if(snap.ennNarrative){ var en=document.getElementById('ennNarrative'); if(en) en.textContent=voice.narrativeForViewer(snap.ennNarrative,isOwner); }
-    if(snap.instStack){ var ie=document.getElementById('instStack'); if(ie) ie.textContent=snap.instStack; }
-    if(snap.att){ var attLabels={AT_SEC:'Secure',AT_ANX:'Anxious-Preoccupied',AT_AVO:'Fearful-Avoidant',AT_DIS:'Dismissive-Avoidant'}; var al=document.getElementById('attStyleLabel'); if(al) al.textContent=attLabels[snap.att]||snap.att; }
-    if(snap.attNarrative){ var an=document.getElementById('attNarrative'); if(an) an.textContent=snap.attNarrative; }
-
-    if(snap.phiNarrative){
-      var phiNameMap={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'};
-      document.getElementById('phiNarrativeTitle').textContent=phiNameMap[snap.phi]||snap.phi||'Philosophy';
-      document.getElementById('phiNarrativeText').textContent=voice.narrativeForViewer(snap.phiNarrative,isOwner);
-      document.getElementById('phiNarrativeBlock').style.display='';
-      var ph=document.getElementById('phiNarrativePlaceholder'); if(ph) ph.style.display='none';
-    }
-
 
     if(isOwner && p.history && p.history.length){
       var hist=document.getElementById('historyList');
