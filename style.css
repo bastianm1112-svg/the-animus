@@ -1,0 +1,305 @@
+/* ════════════════════════════════════════════
+   ANIMUS — Global Visual Enhancement Layer
+   Loaded on all pages after page-level styles
+════════════════════════════════════════════ */
+
+/* ── RENDERING ── */
+*, *::before, *::after { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+/* ── SELECTION ── */
+::selection { background: rgba(200,169,110,0.25); color: #f0ece4; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #8a6f3e; }
+
+/* ── FOCUS RING ── */
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid rgba(200,169,110,0.45);
+  outline-offset: 2px;
+}
+
+/* ── BODY BACKGROUND ── */
+body {
+  background-image: radial-gradient(ellipse at 20% 0%, rgba(200,169,110,0.03) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 100%, rgba(200,169,110,0.02) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* ── NAVBAR ENHANCEMENTS ── */
+.navbar {
+  box-shadow: 0 1px 0 var(--border), 0 4px 24px rgba(0,0,0,0.3);
+}
+.nav-avatar {
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+.nav-avatar:hover {
+  border-color: var(--gold2) !important;
+  box-shadow: 0 0 0 3px rgba(200,169,110,0.12) !important;
+}
+.nav-item { border-radius: 3px; }
+.nav-item.active {
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+
+/* ── CARDS — HOVER LIFT ── */
+.friend-card, .type-card, .dim-full-card, .test-card, .profile-card, .quadrant-card, .insight-card {
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s !important;
+  will-change: transform;
+}
+.friend-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,169,110,0.15) !important;
+}
+.type-card:hover, .dim-full-card:hover, .quadrant-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(200,169,110,0.12);
+}
+.test-card.featured {
+  box-shadow: 0 0 0 1px rgba(200,169,110,0.25), 0 4px 32px rgba(200,169,110,0.06), inset 0 0 60px rgba(200,169,110,0.02);
+}
+.test-card.featured:hover {
+  box-shadow: 0 0 0 1px rgba(200,169,110,0.35), 0 8px 40px rgba(200,169,110,0.1), inset 0 0 60px rgba(200,169,110,0.03);
+}
+
+/* ── GOLD TEXT GLOW ── */
+.hero-title .gold,
+.page-title span,
+.cta-title span,
+.mock-type,
+.enn-big,
+.pc-mbti { text-shadow: 0 0 40px rgba(200,169,110,0.25); }
+
+/* ── BAR FILLS — GRADIENT ── */
+.bar-fill,
+.dual-bar-you,
+.moral-bar-fill {
+  background: linear-gradient(to right, #8a6f3e, #c8a96e) !important;
+}
+.bar-fill.dim, .bar-fill.fn-ni.dim, .bar-fill.fn-ne.dim,
+.bar-fill.fn-ti.dim, .bar-fill.fn-te.dim,
+.bar-fill.fn-fi.dim, .bar-fill.fn-fe.dim,
+.bar-fill.fn-si.dim, .bar-fill.fn-se.dim {
+  background: linear-gradient(to right, #3a2a1a, #8a6f3e) !important;
+}
+.bar-fill.low, .bar-fill.fn-si, .bar-fill.fn-se { opacity: 0.6; }
+.dual-bar-them { background: linear-gradient(to right, #2d6b47, #4a9e6a) !important; }
+.compat-fill { background: linear-gradient(to right, #8a6f3e, #c8a96e, #f0d090) !important; }
+.mock-bar-fill { background: linear-gradient(to right, #8a6f3e, #c8a96e) !important; }
+
+/* ── BUTTONS — PRESS STATE ── */
+.btn-hero-primary, .btn-save, .btn-submit, .btn-retake,
+.btn-full-gold, .btn-primary-profile, .btn-test.featured-btn,
+.sc-btn-gold, .btn-gold { transition: all 0.18s !important; }
+
+.btn-hero-primary:active, .btn-save:active, .btn-submit:active,
+.btn-retake:active, .btn-full-gold:active, .btn-primary-profile:active {
+  transform: scale(0.98) !important;
+}
+.btn-hero-primary:hover, .btn-test.featured-btn:hover {
+  box-shadow: 0 4px 20px rgba(200,169,110,0.25) !important;
+}
+
+/* ── INPUT FOCUS GLOW ── */
+.form-input:focus, .s-input:focus, .s-textarea:focus,
+.s-select:focus, .modal-search-wrap input:focus,
+.sidebar-search input:focus {
+  box-shadow: 0 0 0 3px rgba(200,169,110,0.08) !important;
+}
+
+/* ── SECTION LABEL LINE ── */
+.section-label::after, .sec-label::after, .card-title::after,
+.ai-section-title::after, .dual-section-title::before {
+  background: linear-gradient(to right, rgba(200,169,110,0.25), transparent) !important;
+}
+
+/* ── TYPE BADGES ── */
+.type-badge {
+  transition: all 0.15s;
+  cursor: default;
+}
+.type-badge:hover {
+  border-color: var(--gold2) !important;
+  background: rgba(200,169,110,0.06) !important;
+}
+
+/* ── DIM CARDS ── */
+.dim-card:hover {
+  box-shadow: inset 3px 0 0 var(--gold2) !important;
+}
+
+/* ── SIDEBAR NAV ACTIVE ── */
+.sidebar-nav-item.active {
+  border-left: 2px solid var(--gold) !important;
+}
+
+/* ── TOAST ENHANCEMENT ── */
+.toast {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,169,110,0.2) !important;
+  border-color: rgba(200,169,110,0.35) !important;
+}
+
+/* ── MOBILE BOTTOM NAV — ACTIVE INDICATOR ── */
+.mbn-item { position: relative; transition: color 0.15s; }
+.mbn-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px; height: 2px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  border-radius: 0 0 2px 2px;
+}
+
+/* ── STEP HOVER ── */
+.step { transition: background 0.2s; }
+
+/* ── PROFILE HERO GRADIENT ── */
+.profile-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(200,169,110,0.2), transparent);
+  pointer-events: none;
+}
+
+/* ── NARRATIVE BLOCK ── */
+.narrative {
+  border-left: 2px solid;
+  border-image: linear-gradient(to bottom, var(--gold), var(--gold2)) 1 !important;
+}
+
+/* ── COMPARE HERO ── */
+.compare-hero { background: var(--surface) !important; }
+.vs-circle {
+  background: linear-gradient(135deg, var(--surface), var(--bg)) !important;
+  box-shadow: 0 0 0 1px var(--border2), inset 0 1px 0 rgba(200,169,110,0.05) !important;
+}
+
+/* ── HISTORY ENTRY ── */
+.history-entry { transition: background 0.15s; }
+.history-entry:hover { background: rgba(200,169,110,0.03); }
+
+/* ── SETTINGS NAV ── */
+.settings-nav-item.active {
+  border-left: 2px solid var(--gold) !important;
+}
+
+/* ── ONBOARDING CARD ── */
+.onboarding-card {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(200,169,110,0.03) 100%) !important;
+}
+
+/* ── COMPAT RINGS ── */
+.ring-item { transition: transform 0.2s; }
+.ring-item:hover { transform: scale(1.05); }
+
+/* ── MATRIX TABLE ── */
+.matrix-table tr { transition: background 0.15s; }
+.matrix-table tbody tr:hover td { background: rgba(200,169,110,0.03) !important; }
+
+/* ── MODAL BOX SHADOW ── */
+.modal-box {
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(200,169,110,0.1) !important;
+}
+
+/* ── RETAKE BANNER ── */
+.retake-banner {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(200,169,110,0.02) 100%) !important;
+}
+
+/* ── LIGHT MODE ADJUSTMENTS ── */
+body.light-mode .navbar {
+  box-shadow: 0 1px 0 var(--border), 0 2px 12px rgba(0,0,0,0.08);
+}
+body.light-mode .friend-card:hover,
+body.light-mode .type-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(200,169,110,0.2) !important;
+}
+body.light-mode .modal-box {
+  box-shadow: 0 16px 48px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08) !important;
+}
+body.light-mode .toast {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+}
+
+/* ── PROFILE STAT GRID ── */
+.stat-big {
+  letter-spacing: 0.02em;
+  line-height: 1 !important;
+}
+.stat-cell {
+  transition: background 0.15s;
+  cursor: default;
+}
+.stat-cell:hover { background: rgba(200,169,110,0.04) !important; }
+
+/* ── TEST ANSWER OPTIONS (psyche-complete) ── */
+.choice-btn, .answer-btn, [class*="choice"], [class*="option-btn"] {
+  transition: all 0.15s !important;
+}
+
+/* ── PAGE TRANSITIONS ── */
+@media (prefers-reduced-motion: no-preference) {
+  .panel { animation: none; }
+  .c-panel.active { animation: panelIn 0.2s ease; }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .type-panel.active { animation: panelIn 0.18s ease; }
+}
+
+/* ── SCROLLED NAV ── */
+nav.scrolled {
+  box-shadow: 0 2px 20px rgba(0,0,0,0.4) !important;
+}
+
+/* ── FRIEND CARD ADD BUTTON ── */
+.friend-card-add {
+  background: linear-gradient(135deg, transparent 0%, rgba(200,169,110,0.02) 100%) !important;
+  transition: all 0.2s !important;
+}
+.friend-card-add:hover {
+  border-color: var(--gold2) !important;
+  background: linear-gradient(135deg, rgba(200,169,110,0.04) 0%, rgba(200,169,110,0.06) 100%) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ── PAGE HEADER DECORATION ── */
+.page-header {
+  position: relative;
+}
+.page-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 48px; height: 2px;
+  background: linear-gradient(to right, var(--gold), transparent);
+}
+
+/* ── PROFILE TABS ACTIVE ── */
+.profile-tab.active,
+.compare-tab.active,
+.type-tab.active {
+  text-shadow: 0 0 12px rgba(200,169,110,0.3);
+}
+
+/* ── GOLD CHIP/BADGE ── */
+.type-badge strong, .mock-chip strong, .fn-badge.dom {
+  text-shadow: 0 0 8px rgba(200,169,110,0.2);
+}
+
+/* ── SIDEBAR PROFILE CARD ── */
+.my-profile-card {
+  background: linear-gradient(180deg, var(--surface) 0%, rgba(200,169,110,0.02) 100%) !important;
+}
+.my-type {
+  text-shadow: 0 0 20px rgba(200,169,110,0.2);
+}
+
+/* ── HERO STAT ── */
+.hero-stat strong {
+  text-shadow: 0 0 16px rgba(200,169,110,0.15);
+}
