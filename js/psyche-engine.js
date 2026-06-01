@@ -29,6 +29,19 @@ function sanitizeText(str,maxLen){
   return cleaned.substring(0,maxLen);
 }
 
+function setTestPhase(phase) {
+  if (typeof g.setPagePhase === 'function') g.setPagePhase(phase);
+  else if (g.AnimusApp && g.AnimusApp.setPagePhase) g.AnimusApp.setPagePhase(phase);
+}
+
+function profileLinkField() {
+  return document.getElementById('profileLinkInput') || document.getElementById('importInput');
+}
+
+function profileLinkErrorEl() {
+  return document.getElementById('profileLinkError') || document.getElementById('importError');
+}
+
 function sanitizeSnapshot(obj){
   // Whitelist only known safe keys and types from decoded profile data
   if(!obj||typeof obj!=='object') return null;
@@ -209,8 +222,9 @@ function resumeTestFromStorage() {
     cur = Math.min(data.cur, TOTAL - 1);
     document.getElementById('intro').style.display = 'none';
     document.getElementById('quiz').style.display = 'block';
+    setTestPhase('quiz');
     if(observerMode && observerSubjectName){
-      document.querySelector('.qhdr-logo').innerHTML = 'ANIMUS <span style="font-size:12px;color:var(--accent2);letter-spacing:0.1em">ESTIMATOR</span>';
+      document.querySelector('.qhdr-logo').innerHTML = 'ANI<span>MUS</span> <span class="qhdr-est">ESTIMATOR</span>';
       document.getElementById('qSection').textContent = 'Estimating: ' + observerSubjectName;
     }
     renderQ();
@@ -311,6 +325,7 @@ function startTest() {
   clearTestProgress();
   document.getElementById('intro').style.display='none';
   document.getElementById('quiz').style.display='block';
+  setTestPhase('quiz');
   renderQ();
   saveTestProgress();
 }
@@ -337,17 +352,39 @@ function parseProfileLink(raw){
   catch(e){ return null; }
 }
 
-document.getElementById('importBtn').addEventListener('click', function(){ doImport(); });
-document.getElementById('importInput').addEventListener('keydown', function(e){ if(e.key==='Enter') doImport(); });
+var _profileLinkBtn = document.getElementById('profileLinkBtn') || document.getElementById('importBtn');
+if (_profileLinkBtn) _profileLinkBtn.addEventListener('click', function () { openProfileLink(); });
+var _profileLinkInput = profileLinkField();
+if (_profileLinkInput) {
+  _profileLinkInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') openProfileLink(); });
+}
 
-function doImport(){
-  var raw = document.getElementById('importInput').value;
-  var errEl = document.getElementById('importError');
-  errEl.textContent = '';
-  if(!raw.trim()){ errEl.textContent = 'Paste a profile link first.'; return; }
+function openProfileLink() {
+  var raw = (_profileLinkInput && _profileLinkInput.value) || '';
+  var errEl = profileLinkErrorEl();
+  if (errEl) errEl.textContent = '';
+  if (!raw.trim()) {
+    if (errEl) errEl.textContent = 'Paste a profile link first.';
+    return;
+  }
   var profile = parseProfileLink(raw);
-  if(!profile || !profile.mbti){ errEl.textContent = 'Invalid link — could not read profile data.'; return; }
+  if (!profile || !profile.mbti) {
+    if (errEl) errEl.textContent = 'Invalid link — could not read profile data.';
+    return;
+  }
+  var missingDims = Object.keys(DIM_FNS).filter(function (d) { return isDimMissing(profile, d); });
+  if (missingDims.length > 0) {
+    doFillGapsFromProfile(profile, missingDims);
+  } else {
+    doImportFromProfile(profile);
+  }
+}
 
+function doImport() {
+  openProfileLink();
+}
+
+function doImportFromProfile(profile) {
   var syntheticData = {
     cog:  profile.cog  || {},
     enn:  profile.enn  || {},
@@ -389,6 +426,7 @@ function doImport(){
   var fnsSorted = Object.keys(syntheticData.cog).sort(function(a,b){ return syntheticData.cog[b]-syntheticData.cog[a]; });
 
   document.getElementById('intro').style.display='none';
+  setTestPhase('results');
   showResults(syntheticData, profile.mbti, syntheticEnn, profile.att||'AT_AVO',
     profile.phi||'PH_NIE', profile.instStack||'', fnsSorted, syntheticAI, true);
 
@@ -405,8 +443,11 @@ function doImport(){
         document.getElementById('results').style.display='none';
         bar.style.display='none';
         document.getElementById('intro').style.display='flex';
-        document.getElementById('importInput').value='';
-        document.getElementById('importError').textContent='';
+        setTestPhase('intro');
+        var inp = profileLinkField();
+        if (inp) inp.value = '';
+        var err = profileLinkErrorEl();
+        if (err) err.textContent = '';
       });
       document.getElementById('btnPDFImport').addEventListener('click', function(){
         downloadPDF(profile, syntheticData, profile.mbti, syntheticEnn,
@@ -417,8 +458,20 @@ function doImport(){
 }
 
 // ── FILL GAPS ──
-document.getElementById('fillBtn').addEventListener('click', function(){ doFillGaps(); });
-document.getElementById('fillInput').addEventListener('keydown', function(e){ if(e.key==='Enter') doFillGaps(); });
+function doFillGapsFromProfile(profile, missingDims) {
+  if (!missingDims || !missingDims.length) {
+    doImportFromProfile(profile);
+    return;
+  }
+  var missingFns = [];
+  missingDims.forEach(function (d) { missingFns = missingFns.concat(DIM_FNS[d]); });
+  var filteredQ = Q.filter(function (q) { return missingFns.indexOf(q.fn) > -1; });
+  shuffle(filteredQ);
+  window._baseProfile = profile;
+  window._fillQ = filteredQ;
+  window._fullQ = Q;
+  runFillQuiz(filteredQ, profile, missingDims);
+}
 
 // ── OBSERVER / ESTIMATOR MODE ──
 var observerMode = false;
@@ -448,8 +501,8 @@ document.getElementById('startObserverBtn').addEventListener('click', function()
   _explainCache = {};
   document.getElementById('intro').style.display='none';
   document.getElementById('quiz').style.display='block';
-  // Update header to show observer mode
-  document.querySelector('.qhdr-logo').innerHTML = 'ANIMUS <span style="font-size:12px;color:var(--accent2);letter-spacing:0.1em">ESTIMATOR</span>';
+  setTestPhase('quiz');
+  document.querySelector('.qhdr-logo').innerHTML = 'ANI<span>MUS</span> <span class="qhdr-est">ESTIMATOR</span>';
   document.getElementById('qSection').textContent = 'Estimating: ' + name;
   renderQ();
 });
@@ -486,50 +539,14 @@ function isDimMissing(profile, dim){
   return vals.every(function(v){ return v === 50 || v === undefined; });
 }
 
-function doFillGaps(){
-  var raw = document.getElementById('fillInput').value;
-  var errEl = document.getElementById('fillError');
-  errEl.textContent = '';
-  if(!raw.trim()){ errEl.textContent = 'Paste a profile link first.'; return; }
-  var profile = parseProfileLink(raw);
-  if(!profile || !profile.mbti){ errEl.textContent = 'Invalid link — could not read profile data.'; return; }
-
-  // Detect which dimensions need filling
-  var dims = Object.keys(DIM_FNS);
-  var missingDims = dims.filter(function(d){ return isDimMissing(profile, d); });
-
-  if(missingDims.length === 0){
-    errEl.textContent = 'Profile looks complete — use VIEW instead.';
-    return;
-  }
-
-  // Build filtered question set — only questions for missing dimensions
-  var missingFns = [];
-  missingDims.forEach(function(d){ missingFns = missingFns.concat(DIM_FNS[d]); });
-
-  var filteredQ = Q.filter(function(q){ return missingFns.indexOf(q.fn) > -1; });
-
-  // Shuffle filtered questions
-  shuffle(filteredQ);
-
-  // Store the base profile so we can merge after
-  window._baseProfile = profile;
-  window._fillQ = filteredQ;
-
-  // Replace Q temporarily with filtered set
-  window._fullQ = Q;
-  // We'll run a mini quiz using the filtered set
-  runFillQuiz(filteredQ, profile, missingDims);
-}
-
 function runFillQuiz(filteredQ, baseProfile, missingDims){
   var fillAnswers = new Array(filteredQ.length).fill(null);
   var fillCur = 0;
 
   document.getElementById('intro').style.display = 'none';
   document.getElementById('quiz').style.display = 'block';
+  setTestPhase('quiz');
 
-  // Update header
   var missingLabel = missingDims.length + ' missing dimension' + (missingDims.length > 1 ? 's' : '');
   document.getElementById('qSection').textContent = '';
 
@@ -816,6 +833,7 @@ function finishQuiz(){
   clearTestProgress();
   document.getElementById('quiz').style.display='none';
   document.getElementById('loading').style.display='flex';
+  setTestPhase('loading');
   document.getElementById('loadStatus').textContent='Scoring your responses...';
 
   var data = score();
@@ -1348,6 +1366,7 @@ var TABS=[
 function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   var res=document.getElementById('results');
   res.style.display='block';
+  setTestPhase('results');
   window.scrollTo(0,0);
 
   // Hero
@@ -1788,6 +1807,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     TOTAL = Q.length;
     res.style.display='none';
     document.getElementById('intro').style.display='flex';
+    setTestPhase('intro');
     window.scrollTo(0,0);
   });
 
@@ -1905,23 +1925,6 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
   document.getElementById('closeShareModal').addEventListener('click',function(){
     document.getElementById('shareModal').classList.remove('open');
-  });
-
-  document.getElementById('btnCompare').addEventListener('click',function(){
-    document.getElementById('shareModal').classList.add('open');
-    document.getElementById('compareUrlInput').focus();
-  });
-
-  document.getElementById('btnLoadCompare').addEventListener('click',function(){
-    var input=document.getElementById('compareUrlInput').value.trim();
-    var hash=input.indexOf('#profile=')>-1?input.split('#profile=')[1]:input;
-    if(!hash){showToast('Please paste a valid profile link');return;}
-    try{
-      var them=safeAtob(hash);
-      if(!them) throw new Error('invalid');
-      document.getElementById('shareModal').classList.remove('open');
-      showComparison(snapshot, them);
-    } catch(e){ showToast('Invalid profile link — could not decode'); }
   });
 
   // PDF download

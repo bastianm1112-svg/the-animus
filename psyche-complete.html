@@ -12,8 +12,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ANIMUS — Complete Personality Atlas</title>
 <meta name="theme-color" content="#060606">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/animus-shell.css">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/css/animus-unified.css">
 <link rel="stylesheet" href="/css/animus-release.css">
+<link rel="stylesheet" href="/css/animus-test.css">
+<script src="/js/animus-app.js" defer></script>
 <style>
 :root {
   --bg:#060606;--surface:#0d0d0d;--surface2:#131313;--border:#1c1c1c;--border2:#282828;
@@ -28,7 +34,7 @@ body.light-mode {
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.6;min-height:100vh;}
+body.page-test{background:var(--bg);color:var(--text);min-height:100vh;}
 
 /* INTRO */
 #intro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:88px 20px 40px;text-align:center;position:relative;overflow-x:hidden;overflow-y:auto;pointer-events:auto;}
@@ -325,27 +331,52 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
     AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
   </script>
 </head>
-<body>
+<body class="page-test phase-intro">
 <script>
-// Apply saved theme immediately to prevent flash
-(function(){
-  var _t=localStorage.getItem('animus_theme'); if(_t==='light') document.body.classList.add('light-mode');
-})();
-
-// Frame busting - prevent clickjacking
-if(window.top !== window.self) { window.top.location = window.self.location; }
-
+(function(){try{var _t=localStorage.getItem('animus_theme');if(_t==='light')document.body.classList.add('light-mode');}catch(e){}})();
+if(window.top!==window.self){window.top.location=window.self.location;}
 </script>
-
-<nav style="position:fixed;top:0;left:0;right:0;height:48px;background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);border-bottom:1px solid #1e1e1e;display:flex;align-items:center;padding:0 20px;justify-content:space-between;z-index:300;">
-  <a href="/" class="nav-logo" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.1em;color:#f0ece4;text-decoration:none;">ANI<span style="color:#c8a96e">MUS</span></a>
-  <div style="display:flex;gap:12px;align-items:center;">
-    <a href="/dashboard" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;">Dashboard</a>
-    <a href="/profile" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;">Profile</a>
-    <a href="/login" id="navAvatar" class="test-nav-signin" style="display:none">Sign In</a>
+<a href="#intro" class="skip-link">Skip to test</a>
+<div id="appShell">
+<nav class="navbar" id="appNavbar">
+  <a href="/" class="nav-logo">ANI<span>MUS</span></a>
+  <div class="nav-items">
+    <a href="/dashboard" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="/profile" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profile
+    </a>
+    <a href="/compare" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      Compare
+    </a>
+    <a href="/types" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h8M4 18h8"/></svg>
+      Types
+    </a>
+  </div>
+  <div class="nav-right">
+    <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleThemeGlobal()" title="Toggle theme">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button type="button" class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="/login" class="nav-avatar" id="navAvatar">?</a>
   </div>
 </nav>
-<script>AnimusShared.bindNavAuth('navAvatar');</script>
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <a href="/dashboard" class="nav-mobile-item">Dashboard</a>
+  <a href="/profile" class="nav-mobile-item">Profile</a>
+  <a href="/compare" class="nav-mobile-item">Compare</a>
+  <a href="/types" class="nav-mobile-item">Types</a>
+  <a href="/test" class="nav-mobile-item active">Take Test</a>
+  <a href="/settings" class="nav-mobile-item">Settings</a>
+</div>
+</div>
 
 <!-- INTRO -->
 <div id="intro">
@@ -394,25 +425,20 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
   </div>
 
   <div class="intro-import">
-    <div class="intro-import-divider"><span data-en="or view an existing profile" data-es="o ver un perfil existente">or view an existing profile</span></div>
+    <div class="intro-import-divider"><span data-en="or open an existing profile" data-es="o abrir un perfil existente">or open an existing profile</span></div>
     <div class="intro-import-row">
-      <input class="intro-import-input" id="importInput" maxlength="4096" placeholder="Paste a profile link here..." />
-      <button type="button" class="intro-import-btn" id="importBtn">VIEW →</button>
+      <input class="intro-import-input" id="profileLinkInput" maxlength="4096" placeholder="Paste profile link here..." aria-label="Profile link" />
+      <button type="button" class="intro-import-btn" id="profileLinkBtn">OPEN →</button>
     </div>
-    <div class="intro-import-error" id="importError"></div>
-    <div class="intro-import-divider" style="margin-top:20px"><span data-en="or fill in missing data from an old link" data-es="o completar datos faltantes de un link viejo">or fill in missing data from an old link</span></div>
-    <div class="intro-import-row">
-      <input class="intro-import-input" id="fillInput" maxlength="4096" placeholder="Paste incomplete profile link here..." />
-      <button type="button" class="intro-import-btn" id="fillBtn">FILL GAPS →</button>
-    </div>
-    <div class="intro-import-error" id="fillError"></div>
+    <div class="intro-import-error" id="profileLinkError"></div>
+    <p class="intro-import-hint">Opens a complete profile or continues an incomplete link with only the missing sections.</p>
   </div>
 </div>
 
 <!-- QUIZ -->
-<div id="quiz">
+<div id="quiz" class="test-quiz-ui">
   <div class="qhdr">
-    <a href="/" class="qhdr-logo" style="text-decoration:none;color:inherit;">ANIMUS</a>
+    <a href="/dashboard" class="qhdr-logo">ANI<span>MUS</span></a>
     <div class="qhdr-right">
       <span class="qhdr-section" id="qSection"></span>
       <span class="qhdr-num" id="qNum">1 / —</span>
@@ -433,11 +459,11 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
 <!-- RESULTS -->
 <div id="results">
   <div class="res-hero" id="resHero"></div>
-  <div class="action-bar" id="actionBar" style="display:none">
-    <button class="btn-action" id="btnSave"><span class="btn-action-icon">↓</span> SAVE RESULTS</button>
-    <button class="btn-action accent" id="btnShare"><span class="btn-action-icon">⬡</span> SHARE PROFILE</button>
-    <button class="btn-action" id="btnCompare"><span class="btn-action-icon">⇌</span> COMPARE WITH SOMEONE</button>
-    <button class="btn-action" id="btnPDF"><span class="btn-action-icon">⎙</span> DOWNLOAD PDF</button>
+  <div class="test-action-bar" id="actionBar" style="display:none">
+    <button type="button" class="btn-action-profile btn-secondary-profile" id="btnSave">Save results</button>
+    <button type="button" class="btn-action-profile btn-secondary-profile" id="btnShare">Share profile</button>
+    <a href="/compare" class="btn-action-profile btn-primary-profile" id="btnCompare">Compare</a>
+    <button type="button" class="btn-action-profile btn-secondary-profile" id="btnPDF">Download PDF</button>
   </div>
   <div class="tabs-wrap"><div class="tabs" id="tabsBar"></div></div>
   <div class="tab-panels" id="tabPanels"></div>
@@ -456,13 +482,7 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
       <div class="share-url" id="shareUrlDisplay">Generating link...</div>
       <button class="btn-copy" id="btnCopyUrl">COPY</button>
     </div>
-    <div class="modal-divider"></div>
-    <div class="modal-title" style="font-size:18px;margin-bottom:6px">Compare With Someone</div>
-    <p class="modal-sub" style="margin-bottom:12px">Paste their profile link to see a side-by-side comparison.</p>
-    <div class="compare-input-wrap">
-      <input class="compare-url-input" id="compareUrlInput" placeholder="Paste their profile link here..." />
-      <button class="btn-action accent" id="btnLoadCompare" style="justify-content:center">LOAD COMPARISON →</button>
-    </div>
+    <p class="modal-sub" style="margin-top:12px">Use <a href="/compare" style="color:var(--gold)">Compare</a> to match profiles side by side.</p>
   </div>
 </div>
 
@@ -474,26 +494,24 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
 <script src="/js/psyche-engine.js"></script>
 <script src="/js/psyche-intro.js"></script>
 
-<script>
-// Smart logo nav - goes to dashboard if logged in, landing if not
-(function(){
-  function setupSmartLogo(){
-    var logos = document.querySelectorAll('.nav-logo, .panel-logo, .footer-logo');
-    if(typeof firebase === 'undefined' || !firebase.auth) return;
-    firebase.auth().onAuthStateChanged(function(user){
-      logos.forEach(function(el){
-        if(el.tagName === 'A') el.href = user ? '/dashboard' : '/';
-      });
-    });
-  }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupSmartLogo);
-  else setupSmartLogo();
-})();
-</script>
-<script>
-// Smart logo
-try{firebase.auth().onAuthStateChanged(function(u){document.querySelectorAll('a.nav-logo').forEach(function(el){el.href=u?'/dashboard':'/';});});}catch(e){}
-</script>
+<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+  <a href="/dashboard" class="mbn-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Home
+  </a>
+  <a href="/profile" class="mbn-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+  <a href="/compare" class="mbn-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+    Compare
+  </a>
+  <a href="/settings" class="mbn-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    More
+  </a>
+</nav>
 </body>
 </html>
 

@@ -70,6 +70,14 @@
     else mbn.classList.remove('visible');
   }
 
+  function setPagePhase(phase) {
+    var phases = ['intro', 'quiz', 'loading', 'results', 'compare'];
+    phases.forEach(function (p) {
+      document.body.classList.remove('phase-' + p);
+    });
+    if (phase) document.body.classList.add('phase-' + phase);
+  }
+
   function boot() {
     initTheme();
     initMobileNav();
@@ -77,6 +85,9 @@
       g.AnimusShared.bindNavAuth('navAvatar');
     }
     initSmartLogo();
+    if (document.body.classList.contains('page-test') && !document.body.classList.contains('phase-quiz')) {
+      setPagePhase('intro');
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -89,6 +100,9 @@
     boot: boot,
     initTheme: initTheme,
     syncThemeButton: syncThemeButton,
-    syncMbnNotifBadge: syncMbnNotifBadge
+    syncMbnNotifBadge: syncMbnNotifBadge,
+    setPagePhase: setPagePhase
   };
+
+  g.setPagePhase = setPagePhase;
 })(typeof window !== 'undefined' ? window : globalThis);

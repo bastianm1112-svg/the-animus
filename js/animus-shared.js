@@ -123,21 +123,16 @@
     return (parts[0] || '?').charAt(0).toUpperCase();
   }
 
-  function isTestPage() {
-    var p = (global.location && global.location.pathname) || '';
-    return p.indexOf('/test') !== -1 || p.indexOf('psyche-complete') !== -1;
-  }
-
   function applyNavAvatar(el, user, userDoc) {
     if (!el) return;
-    var onTest = isTestPage();
     if (!user) {
       el.href = '/login';
-      el.textContent = 'Sign In';
+      el.textContent = '';
       el.removeAttribute('title');
-      el.className = onTest ? 'test-nav-signin' : 'nav-avatar';
-      el.style.display = onTest ? '' : '';
+      el.className = 'nav-avatar';
+      el.style.display = 'flex';
       el.innerHTML = 'Sign In';
+      el.setAttribute('aria-label', 'Sign in');
       return;
     }
 
@@ -147,8 +142,9 @@
 
     el.href = '/profile';
     el.title = name;
-    el.className = onTest ? 'test-nav-avatar' : 'nav-avatar';
+    el.className = 'nav-avatar';
     el.style.display = 'flex';
+    el.removeAttribute('aria-label');
 
     if (photo) {
       el.innerHTML =
