@@ -404,7 +404,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
   <!-- Share bar -->
   <div class="compare-share-bar">
     <button class="btn-share-comp btn-gold" onclick="shareComparison()">â¬¡ Share This Comparison</button>
-    <a href="/profile" class="btn-share-comp btn-outline" id="viewThemBtn">View Their Profile â†’</a>
+    <a href="/profile" class="btn-share-comp btn-outline" id="viewThemBtn">View Their Profile →</a>
   </div>
 
   <!-- â”€â”€ AI ANALYSIS â”€â”€ -->
@@ -646,7 +646,7 @@ auth.onAuthStateChanged(function(currentUser){
       document.getElementById('themUsername').textContent = '@' + themUname2;
       document.getElementById('themAvatar').textContent = themName.charAt(0).toUpperCase();
       document.getElementById('viewThemBtn').href = '/profile?u=' + encodeURIComponent(u);
-      document.getElementById('viewThemBtn').textContent = 'View ' + themName + "'s Profile â†’";
+      document.getElementById('viewThemBtn').textContent = 'View ' + themName + "'s Profile →";
 
       // Update legend labels
       ['legendYouAI','legendYouCog','legendYou','legendYou2','legendYouPhi'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=myName; });
@@ -863,7 +863,7 @@ function shareComparison(){
     var viewBtn = document.querySelector('.btn-share-comp.btn-outline');
     if(viewBtn){
       viewBtn.href = '/profile?u=' + encodeURIComponent(u);
-      viewBtn.textContent = 'View ' + escapeHTML(u.charAt(0).toUpperCase() + u.slice(1)) + '\'s Profile â†’';
+      viewBtn.textContent = 'View ' + escapeHTML(u.charAt(0).toUpperCase() + u.slice(1)) + '\'s Profile →';
     }
     // Also update the "them" name in the profiles strip
     var themName = document.querySelectorAll('.ph-info .ph-name')[1];
