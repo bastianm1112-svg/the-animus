@@ -306,11 +306,11 @@ nav.scrolled {
 
 /* ── TEST PAGE ISOLATION — prevent global styles from bleeding into test ── */
 /* The test uses its own design tokens (--accent, --accent2) — don't override them */
-#intro *, #quiz-wrap *, .q-wrap *, .mc-choices *, .scale-wrap *,
-.agree-grid *, .result-wrap *, #result * {
+#intro *, #quiz *, .q-wrap *, .mc-choices *, .scale-wrap *,
+.agree-grid *, .result-wrap *, #results * {
   background-image: none;
 }
-#intro .bar-fill, #quiz-wrap .bar-fill, #result .bar-fill,
+#intro .bar-fill, #quiz .bar-fill, #result .bar-fill,
 .pbar-fill { background: linear-gradient(to right, #6b4d1e, #b8955a) !important; }
 
 /* Test answer letters — make them look intentional as styled badges */
@@ -328,7 +328,7 @@ nav.scrolled {
 .agree-btn.sel .agree-letter { color: #b8955a !important; }
 
 /* Fix body background on test page — test has its own bg */
-body:has(#intro), body:has(#quiz-wrap), body:has(#result) {
+body:has(#intro), body:has(#quiz), body:has(#results) {
   background-image: none !important;
 }
 
