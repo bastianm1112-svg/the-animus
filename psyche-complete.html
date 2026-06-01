@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com https://www.gstatic.com; connect-src 'self' https://api.anthropic.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-ancestors 'none'; base-uri 'self';">
@@ -52,8 +52,8 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
 .qhdr-right{display:flex;align-items:center;gap:20px;}
 .qhdr-section{font-size:9px;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;}
 .qhdr-num{font-size:11px;color:var(--muted2);}
-.pbar-wrap{position:fixed;top:52px;left:0;right:0;height:1px;background:var(--border);z-index:200;}
-.pbar-fill{height:100%;background:var(--accent);transition:width 0.5s cubic-bezier(0.4,0,0.2,1);width:0%;}
+.pbar-wrap{position:fixed;top:52px;left:0;right:0;height:3px;background:var(--border);z-index:200;}
+.pbar-fill{height:100%;background:linear-gradient(to right,var(--gold2,#8a6f3e),var(--accent,#c8a96e));transition:width 0.5s cubic-bezier(0.4,0,0.2,1);width:0%;}
 .qbody{padding:110px 24px 100px;max-width:660px;margin:0 auto;}
 .q-section-badge{display:inline-flex;align-items:center;gap:8px;font-size:9px;letter-spacing:0.3em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;padding:4px 12px;border:1px solid var(--border2);}
 .q-dot{width:4px;height:4px;background:var(--accent);border-radius:50%;}

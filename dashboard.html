@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -175,6 +175,25 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 /* FEED ICONS */
 .feed-icon{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--gold);}
 </style>
+
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: rgba(8,8,8,0.97); backdrop-filter: blur(16px); border-top: 1px solid var(--border); z-index: 300; justify-content: space-around; align-items: center; padding: 0 8px; }
+@media(max-width:768px){ .mobile-bottom-nav { display: flex; } body { padding-bottom: 60px; } }
+.mbn-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 14px; color: var(--muted); text-decoration: none; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; position: relative; }
+.mbn-item.active { color: var(--gold); }
+.mbn-item svg { opacity: 0.6; }
+.mbn-item.active svg { opacity: 1; }
+.mbn-badge { position: absolute; top: 4px; right: 8px; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; border: 1px solid var(--bg); display: none; }
+.mbn-badge.visible { display: block; }
+.theme-toggle-btn { width: 32px; height: 32px; background: none; border: 1px solid var(--border2); color: var(--muted2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border-radius: 2px; }
+.theme-toggle-btn:hover { border-color: var(--gold2); color: var(--gold); }
+.onboarding-card { background: var(--surface); border: 1px solid var(--border2); border-left: 3px solid var(--gold); padding: 28px 32px; margin-bottom: 32px; display: none; }
+.onboarding-card.show { display: block; }
+.onboarding-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+.onboarding-sub { font-size: 13px; color: var(--muted2); line-height: 1.7; margin-bottom: 20px; }
+.onboarding-steps { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+.onboarding-step { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted2); }
+.onboarding-step-num { width: 24px; height: 24px; background: var(--gold2); color: #000; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; flex-shrink: 0; }
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -223,6 +242,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </a>  </div>
   <div class="nav-right">
     <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme" id="themeToggleBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
     <button class="notif-btn" onclick="toggleNotifPanel()" title="Notifications">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <div class="notif-badge" id="notifBadge"></div>
@@ -302,6 +322,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="main-date" id="currentDate"></div>
     </div>
 
+    <div class="onboarding-card" id="onboardingCard"><div class="onboarding-title">Welcome to ANIMUS</div><div class="onboarding-sub">Three steps to your complete personality profile.</div><div class="onboarding-steps"><div class="onboarding-step"><div class="onboarding-step-num">1</div><span>Take the assessment</span></div><div class="onboarding-step"><div class="onboarding-step-num">2</div><span>View your profile</span></div><div class="onboarding-step"><div class="onboarding-step-num">3</div><span>Add friends &amp; compare</span></div></div><a href="/test" class="btn-retake">Begin Assessment →</a></div>
     <div class="retake-banner">
       <div class="retake-text" id="retakeBannerText">Take the assessment to build your profile.</div>
       <a href="/test" class="btn-retake">Take Test →</a>
@@ -379,6 +400,7 @@ var greeting=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
 // ── FIREBASE AUTH + DATA LOAD ──
 auth.onAuthStateChanged(function(user){
   if(!user){ window.location.href='/login'; return; }
+  updateThemeToggleIcon();
 
   // Set greeting
   var name = escapeHTML(user.displayName || user.email.split('@')[0]);
@@ -432,6 +454,11 @@ auth.onAuthStateChanged(function(user){
   });
 
   db.collection('profiles').doc(user.uid).get().then(function(doc){
+    var hasTaken = doc.exists && doc.data().latest && doc.data().latest.mbti;
+    if(!hasTaken){
+      var card = document.getElementById('onboardingCard');
+      if(card) card.classList.add('show');
+    }
     if(doc.exists){
       var p = doc.data().latest;
       if(p && p.mbti){
@@ -710,6 +737,8 @@ function loadNotifs(uid){
     if(!received.length){
       notifList.innerHTML='<div style="padding:16px 0;font-size:12px;color:var(--muted);text-align:center">No new notifications</div>';
       document.getElementById('notifBadge').style.display='none';
+      var mbnBadge2 = document.getElementById('mbnNotifBadge');
+      if(mbnBadge2) mbnBadge2.classList.remove('visible');
       return;
     }
     document.getElementById('notifBadge').style.display='block';
@@ -795,6 +824,21 @@ function signOut(){
   auth.signOut().then(function(){ window.location.href='/login'; });
 }
 
+function toggleTheme(){
+  var isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('animus_theme', isLight ? 'light' : 'dark');
+  var btn = document.getElementById('themeToggleBtn');
+  if(btn) btn.innerHTML = isLight
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+}
+function updateThemeToggleIcon(){
+  var isLight = document.body.classList.contains('light-mode');
+  var btn = document.getElementById('themeToggleBtn');
+  if(btn) btn.innerHTML = isLight
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+}
 function showToast(msg){
   var t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
@@ -813,6 +857,14 @@ try {
   });
 } catch(e){}
 </script>
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
+  <a href="/dashboard" class="mbn-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a>
+  <a href="/profile" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+  <a href="/test" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Test</a>
+  <a href="/compare" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Compare<div class="mbn-badge" id="mbnNotifBadge"></div></a>
+  <a href="/settings" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>More</a>
+</nav>
 </body>
 </html>
 

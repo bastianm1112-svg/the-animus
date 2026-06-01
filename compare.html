@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANIMUS — Compare</title>
@@ -253,6 +253,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       Group
     </a>  </div>
   <div class="nav-right">
+    <button onclick="(function(){var l=document.body.classList.toggle('light-mode');localStorage.setItem('animus_theme',l?'light':'dark');})()" title="Toggle theme" style="width:32px;height:32px;background:none;border:1px solid var(--border2);color:var(--muted2);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:2px;transition:all 0.2s;margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
     <a href="/profile" class="nav-avatar" id="navAvatar">?</a>
     <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
   </div>
@@ -890,7 +891,21 @@ document.addEventListener('click',function(e){
   if(menu&&btn&&!menu.contains(e.target)&&!btn.contains(e.target)){menu.classList.remove('open');}
 });
 </script>
-</body>
+<style>
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(8,8,8,0.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);z-index:300;justify-content:space-around;align-items:center;padding:0 8px;}
+@media(max-width:768px){.mobile-bottom-nav{display:flex;}}
+.mbn-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;color:var(--muted);text-decoration:none;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s;}
+.mbn-item.active{color:var(--gold);}
+.mbn-item svg{opacity:0.6;}
+.mbn-item.active svg{opacity:1;}
+</style>
+<nav class="mobile-bottom-nav">
+  <a href="/dashboard" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a>
+  <a href="/profile" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+  <a href="/test" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Test</a>
+  <a href="/compare" class="mbn-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Compare</a>
+  <a href="/settings" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>More</a>
+</nav></body>
 </html>
 
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -318,6 +318,7 @@ function checkSetupUN(val){
   var st = document.getElementById('setupSt');
   clearTimeout(setupTimer);
   if(val.length<3){ st.className='un-status'; st.textContent=''; return; }
+  if(reservedUsernames.indexOf(val)>-1){ st.className='un-status bad'; st.textContent='@'+val+' is reserved'; return; }
   st.className='un-status'; st.textContent='Checking...';
   setupTimer = setTimeout(function(){
     db.collection('usernames').doc(val).get()
@@ -328,11 +329,13 @@ function checkSetupUN(val){
   }, 500);
 }
 
+var reservedUsernamesSetup = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare','group','types','landing','index','404','about'];
 function finishSetup(){
   var un = document.getElementById('setupUN').value.trim().toLowerCase();
   var errEl = document.getElementById('setupErr');
   errEl.classList.remove('show');
   if(un.length<3){ errEl.textContent='Username must be at least 3 characters.'; errEl.classList.add('show'); return; }
+  if(reservedUsernamesSetup.indexOf(un)>-1){ errEl.textContent='@'+un+' is a reserved name. Please choose another.'; errEl.classList.add('show'); return; }
   if(!googleUser){ goToDashboard(); return; }
 
   var btn = document.querySelector('#screenSetup .btn-submit');
@@ -388,12 +391,14 @@ function saveDoc(user, displayName, username){
   });
 }
 
+var reservedUsernames = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare','group','types','landing','index','404','about'];
 function checkUN(val){
   val = val.toLowerCase().replace(/[^a-z0-9_]/g,'');
   document.getElementById('iUser').value = val;
   var st = document.getElementById('unSt');
   clearTimeout(unTimer);
   if(val.length<3){ st.className='un-status'; st.textContent=''; return; }
+  if(reservedUsernames.indexOf(val)>-1){ st.className='un-status bad'; st.textContent='@'+val+' is reserved'; return; }
   st.className='un-status'; st.textContent='Checking...';
   unTimer = setTimeout(function(){
     db.collection('usernames').doc(val).get()

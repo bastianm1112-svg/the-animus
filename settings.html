@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANIMUS — Settings</title>
@@ -942,7 +942,11 @@ function saveChanges() {
   }).catch(function(e){
     btn.disabled = false;
     btn.textContent = 'Save Changes';
-    showToast(e.message || 'Error saving settings');
+    if(e.code === 'auth/requires-recent-login'){
+      showToast('Sign out and sign back in, then try changing your password again.');
+    } else {
+      showToast(e.message || 'Error saving settings');
+    }
   });
 }
 
@@ -1057,8 +1061,11 @@ function executeConfirmed() {
       showToast('Account deleted');
       setTimeout(function(){ window.location.href='/'; },1200);
     }).catch(function(e){
-      // May need re-auth
-      showToast('Please sign out and sign in again before deleting');
+      if(e.code === 'auth/requires-recent-login'){
+        showToast('For security, please sign out and sign back in before deleting your account.');
+      } else {
+        showToast(e.message || 'Error deleting account');
+      }
     });
   } else if(pendingAction === 'signout' || pendingAction === 'signout-all') {
     firebase.auth().signOut().then(function(){

@@ -1,7 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANIMUS — Know Yourself Completely</title>
+<meta name="description" content="The most comprehensive personality assessment available. 280 questions across 14 dimensions — MBTI, Enneagram, philosophy, political compass, attachment style and more.">
+<meta property="og:title" content="ANIMUS — Know Yourself Completely">
+<meta property="og:description" content="280 questions. 14 dimensions. AI-generated narrative. The most rigorous personality instrument available.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -679,6 +684,7 @@ const auth=firebase.auth();
     <a href="#about">About</a>
     <a href="#dimensions">Dimensions</a>
     <a href="#tests">The Test</a>
+    <button onclick="(function(){var l=document.body.classList.toggle('light-mode');localStorage.setItem('animus_theme',l?'light':'dark');})()" style="background:none;border:none;color:var(--muted2);cursor:pointer;padding:4px;display:flex;align-items:center" title="Toggle theme"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
     <a href="/login" class="nav-cta">Sign In</a>
   </div>
 </nav>

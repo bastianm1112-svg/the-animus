@@ -1,7 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANIMUS Profile</title>
+<meta name="description" content="My complete personality profile on ANIMUS — MBTI, Enneagram, philosophy, political compass and more.">
+<meta property="og:title" content="ANIMUS — My Personality Profile">
+<meta property="og:description" content="Complete personality mapping: cognitive functions, Enneagram, philosophy, political compass, attachment style and more.">
+<meta property="og:type" content="profile">
+<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -154,6 +159,25 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .sc-btn-gold:hover{background:var(--gold3);}
 .sc-btn-outline{background:none;border:1px solid var(--border2);color:var(--muted2);}
 .sc-btn-outline:hover{border-color:var(--gold2);color:var(--gold);}
+/* ── COLOR-CODED FUNCTION BARS ── */
+.bar-fill.fn-ni, .bar-fill.fn-ne { background: #7c5cbf; }
+.bar-fill.fn-ti, .bar-fill.fn-te { background: #4a7abf; }
+.bar-fill.fn-fi, .bar-fill.fn-fe { background: #c8a96e; }
+.bar-fill.fn-si, .bar-fill.fn-se { background: #4a9e6a; }
+.fn-tooltip-wrap { position: relative; display: inline-flex; align-items: center; gap: 4px; }
+.fn-tooltip { position: absolute; bottom: calc(100% + 6px); left: 0; background: var(--surface2); border: 1px solid var(--border2); padding: 6px 10px; font-size: 11px; color: var(--muted2); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; min-width: 160px; }
+.fn-tooltip-wrap:hover .fn-tooltip { opacity: 1; }
+.profile-tabs { position: sticky; top: 56px; z-index: 100; background: var(--surface); border-bottom: 1px solid var(--border); }
+.theme-toggle-btn { width: 32px; height: 32px; background: none; border: 1px solid var(--border2); color: var(--muted2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border-radius: 2px; }
+.theme-toggle-btn:hover { border-color: var(--gold2); color: var(--gold); }
+.mobile-bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: rgba(8,8,8,0.97); backdrop-filter: blur(16px); border-top: 1px solid var(--border); z-index: 300; justify-content: space-around; align-items: center; padding: 0 8px; }
+@media(max-width:768px){ .mobile-bottom-nav { display: flex; } }
+.mbn-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 12px; color: var(--muted); text-decoration: none; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+.mbn-item.active { color: var(--gold); }
+.mbn-item svg { opacity: 0.6; }
+.mbn-item.active svg { opacity: 1; }
+@media print { .navbar, .profile-tabs, .hero-actions, .profile-actions-card, .mobile-bottom-nav { display: none !important; } body { background: #fff !important; color: #000 !important; } .card { background: #fff !important; border: 1px solid #ccc !important; break-inside: avoid; } .bar-fill { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -176,6 +200,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
     <a href="/types" class="nav-item">Types</a>
     <a href="/test" class="nav-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Take Test</a>
   </div>
+  <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme" id="themeToggleBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
   <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
   <div class="nav-right"><a href="/profile" class="nav-avatar" id="navAvatar">?</a></div>
 </nav>
@@ -551,7 +576,9 @@ function loadProfileData(uid, isOwner, currentUser){
     if(snap.cog){
       var cogFns=Object.keys(snap.cog).sort(function(a,b){return snap.cog[b]-snap.cog[a];});
       var cogColors=['','','','dim','dim','low','low','low'];
-      document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Math.round(snap.cog[fn]||0);return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><strong>'+escapeHTML(fn)+'</strong></div><div class="bar-wrap"><div class="bar-fill '+(cogColors[i]||'low')+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');
+      var fnColorMap={Ni:'fn-ni',Ne:'fn-ne',Ti:'fn-ti',Te:'fn-te',Fi:'fn-fi',Fe:'fn-fe',Si:'fn-si',Se:'fn-se'};
+var fnTooltips={Ni:'Introverted Intuition — pattern recognition, long-range vision',Ne:'Extraverted Intuition — possibility mapping, lateral thinking',Ti:'Introverted Thinking — internal logical frameworks',Te:'Extraverted Thinking — external systematization, efficiency',Fi:'Introverted Feeling — deep personal values, authenticity',Fe:'Extraverted Feeling — interpersonal harmony, emotional attunement',Si:'Introverted Sensing — experiential memory, established procedure',Se:'Extraverted Sensing — present-moment awareness, physical mastery'};
+document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Math.round(snap.cog[fn]||0);var cls=fnColorMap[fn]||'';return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><div class="fn-tooltip-wrap"><strong>'+escapeHTML(fn)+'</strong><div class="fn-tooltip">'+escapeHTML(fnTooltips[fn]||fn)+'</div></div></div><div class="bar-wrap"><div class="bar-fill '+cls+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><strong>'+escapeHTML(fn)+'</strong></div><div class="bar-wrap"><div class="bar-fill '+(cogColors[i]||'low')+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');
       var stackLabels=['Dominant','Auxiliary','Tertiary','Inferior']; var stackColors=['var(--gold)','var(--gold)','var(--gold2)','var(--muted)'];
       document.getElementById('stackSummaryList').innerHTML=cogFns.slice(0,4).map(function(fn,i){return '<div>'+stackLabels[i]+' &rarr; <strong style="color:'+stackColors[i]+'">'+escapeHTML(fn)+'</strong></div>';}).join('');
     }
@@ -661,9 +688,25 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
 try { firebase.auth().onAuthStateChanged(function(user){ document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){ el.href=user?'/dashboard':'/'; }); }); } catch(e){}
 </script>
 <script>
+function toggleTheme(){
+  var isLight=document.body.classList.toggle('light-mode');
+  localStorage.setItem('animus_theme',isLight?'light':'dark');
+  var btn=document.getElementById('themeToggleBtn');
+  if(btn)btn.innerHTML=isLight
+    ?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    :'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+}
+(function(){
+  var isLight=document.body.classList.contains('light-mode');
+  var btn=document.getElementById('themeToggleBtn');
+  if(btn)btn.innerHTML=isLight
+    ?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    :'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+})();
+
 function toggleMobileMenu(){ document.getElementById('navMobileMenu').classList.toggle('open'); }
 document.addEventListener('click',function(e){ var menu=document.getElementById('navMobileMenu'); var btn=document.getElementById('navHamburger'); if(menu&&btn&&!menu.contains(e.target)&&!btn.contains(e.target)){menu.classList.remove('open');} });
 </script>
-</body>
+<nav class="mobile-bottom-nav"><a href="/dashboard" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a><a href="/profile" class="mbn-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a><a href="/test" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Test</a><a href="/compare" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Compare</a><a href="/settings" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>More</a></nav></body>
 </html>
 

@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANIMUS — Page Not Found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080808;--surface:#0f0f0f;--border:#1e1e1e;--text:#e2e2e2;--muted:#555;--muted2:#888;--gold:#c8a96e;--gold2:#8a6f3e;--gold3:#f0d090;--white:#f0ece4;}
+body.light-mode{--bg:#f4f1ec;--surface:#fff;--border:#e0dbd4;--text:#1a1714;--muted:#9a9189;--muted2:#6b6259;--white:#1a1714;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;color:var(--muted);text-decoration:none;margin-bottom:60px;}
+.logo span{color:var(--gold);}
+.num{font-family:'Bebas Neue',sans-serif;font-size:clamp(120px,20vw,200px);color:var(--border);letter-spacing:0.06em;line-height:1;margin-bottom:8px;}
+.title{font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:700;color:var(--white);margin-bottom:16px;}
+.sub{font-size:14px;color:var(--muted2);line-height:1.8;max-width:400px;margin-bottom:40px;}
+.links{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+.btn-home{background:var(--gold);color:#000;padding:12px 32px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;transition:background 0.2s;}
+.btn-home:hover{background:var(--gold3);}
+.btn-back{background:none;border:1px solid var(--border);color:var(--muted2);padding:12px 24px;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:all 0.2s;cursor:pointer;}
+.btn-back:hover{border-color:var(--gold2);color:var(--gold);}
+</style>
+</head>
+<body>
+<script>(function(){if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');})();</script>
+<a href="/" class="logo">ANI<span>MUS</span></a>
+<div class="num">404</div>
+<div class="title">Nothing here.</div>
+<p class="sub">The page you're looking for doesn't exist, or the profile hasn't been created yet.</p>
+<div class="links">
+  <a href="/" class="btn-home">Go Home →</a>
+  <button onclick="history.back()" class="btn-back">← Go Back</button>
+</div>
+</body>
+</html>
