@@ -287,7 +287,10 @@
     fillSectionLeads(snap, isOwner, voice);
     fixPoliticalStat(snap);
     hideEmptyEnnNarrative(snap);
-    setPolNarrativeTitle(snap);
+
+    if (typeof g.AnimusProfileVisuals !== 'undefined') {
+      g.AnimusProfileVisuals.renderAll(snap, isOwner, voice);
+    }
 
     if (snap.mbti && typeof g.animateBars === 'function') {
       setTimeout(g.animateBars, 200);
