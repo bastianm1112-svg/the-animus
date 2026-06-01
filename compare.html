@@ -21,7 +21,7 @@ body.light-mode {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6; }
 
-/* â”€â”€ NAV â”€â”€ */
+/* ── NAV ── */
 .navbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; z-index: 200; }
 .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.1em; color: var(--white); text-decoration: none; margin-right: 40px; }
 .nav-logo span { color: var(--gold); }
@@ -32,7 +32,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 .nav-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--gold); text-decoration: none; }
 
-/* â”€â”€ COMPARE HEADER â”€â”€ */
+/* ── COMPARE HEADER ── */
 .compare-hero {
   padding-top: 56px;
   background: var(--surface);
@@ -113,7 +113,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .compare-tab:hover { color: var(--text); }
 .compare-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
 
-/* â”€â”€ CONTENT â”€â”€ */
+/* ── CONTENT ── */
 .compare-content { max-width: 1000px; margin: 0 auto; padding: 32px 28px; }
 @media(max-width:600px) { .compare-content { padding: 20px 16px; } }
 
@@ -407,7 +407,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
     <a href="/profile" class="btn-share-comp btn-outline" id="viewThemBtn">View Their Profile →</a>
   </div>
 
-  <!-- â”€â”€ AI ANALYSIS â”€â”€ -->
+  <!-- ── AI ANALYSIS ── -->
   <div class="c-panel active" id="c-panel-ai">
     <div class="dual-legend" style="margin-bottom:20px">
       <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYouAI">You</span></div>
@@ -438,7 +438,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
     </div>
   </div>
 
-  <!-- â”€â”€ COGNITION â”€â”€ -->
+  <!-- ── COGNITION ── -->
   <div class="c-panel" id="c-panel-cognition">
     <div class="dual-legend">
       <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYouCog">You</span></div>
@@ -465,7 +465,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
     </div>
   </div>
 
-  <!-- â”€â”€ PERSONALITY â”€â”€ -->
+  <!-- ── PERSONALITY ── -->
   <div class="c-panel" id="c-panel-personality">
     <div class="dual-legend">
       <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYou2">You</span></div>
@@ -491,7 +491,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
     </div>
   </div>
 
-  <!-- â”€â”€ PHILOSOPHY â”€â”€ -->
+  <!-- ── PHILOSOPHY ── -->
   <div class="c-panel" id="c-panel-philosophy">
     <div class="dual-legend">
       <div class="dual-legend-item"><div class="legend-dot legend-you"></div><span id="legendYouPhi">You</span></div>
@@ -516,7 +516,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
     </div>
   </div>
 
-  <!-- â”€â”€ SUMMARY â”€â”€ -->
+  <!-- ── SUMMARY ── -->
   <div class="c-panel" id="c-panel-summary">
     <table class="summary-table">
       <thead>
@@ -552,7 +552,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
 <div class="toast" id="toast"></div>
 
 <script>
-// â”€â”€ LOAD COMPARISON DATA FROM FIREBASE â”€â”€
+// ── LOAD COMPARISON DATA FROM FIREBASE ──
 auth.onAuthStateChanged(function(currentUser){
   if(!currentUser){ window.location.href='/login'; return; }
 
