@@ -343,13 +343,7 @@ function parseProfileLink(raw){
   else { encoded = raw; }
   encoded = encoded.trim().replace(/[^A-Za-z0-9+/=]/g,''); // strict base64 chars only
   if(encoded.length < 20) return null; // too short to be a valid profile
-  try { 
-    var decoded = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-    // Validate it has at least the minimum expected shape
-    if(typeof decoded !== 'object' || !decoded.mbti) return null;
-    return decoded;
-  }
-  catch(e){ return null; }
+  return safeAtob(encoded);
 }
 
 var _profileLinkBtn = document.getElementById('profileLinkBtn') || document.getElementById('importBtn');
@@ -873,7 +867,9 @@ function answerFingerprint(){
   return Math.abs(h);
 }
 
-function mbtiFromDichotomies(cog){
+var MBTI_TIE_EPS = 0.5;
+
+function mbtiFromDichotomies(cog, fp){
   var I = ((cog.Si || 50) + (cog.Ni || 50)) / 2;
   var E = ((cog.Se || 50) + (cog.Ne || 50)) / 2;
   var N = ((cog.Ni || 50) + (cog.Ne || 50)) / 2;
@@ -882,10 +878,17 @@ function mbtiFromDichotomies(cog){
   var F = ((cog.Fi || 50) + (cog.Fe || 50)) / 2;
   var J = ((cog.Te || 50) + (cog.Fe || 50) + (cog.Si || 50)) / 3;
   var P = ((cog.Ti || 50) + (cog.Fi || 50) + (cog.Ne || 50) + (cog.Se || 50)) / 4;
-  return (E >= I ? 'E' : 'I')
-    + (N >= S ? 'N' : 'S')
-    + (T >= F ? 'T' : 'F')
-    + (J >= P ? 'J' : 'P');
+  fp = fp || 0;
+  function letter(high, low, pos, neg, bit){
+    if (Math.abs(high - low) < MBTI_TIE_EPS) {
+      return ((fp >> bit) & 1) ? pos : neg;
+    }
+    return high > low ? pos : neg;
+  }
+  return letter(E, I, 'E', 'I', 0)
+    + letter(N, S, 'N', 'S', 1)
+    + letter(T, F, 'T', 'F', 2)
+    + letter(J, P, 'J', 'P', 3);
 }
 
 function getMBTI(cog){
@@ -909,17 +912,22 @@ function getMBTI(cog){
   var top = ranked[0].score;
   var tied = ranked.filter(function(r){ return r.score >= top - 0.5; });
   if (tied.length === 1) return tied[0].type;
-  var dich = mbtiFromDichotomies(cog);
+  var fp = answerFingerprint();
+  var dich = mbtiFromDichotomies(cog, fp);
   for (var j = 0; j < tied.length; j++) {
     if (tied[j].type === dich) return dich;
   }
-  return tied[answerFingerprint() % tied.length].type;
+  return tied[fp % tied.length].type;
 }
 
 // ── HELPER: Derive Enneagram type/wing/tritype from scores ──
 function getEnneagram(eS){
   var nums=['E1','E2','E3','E4','E5','E6','E7','E8','E9'];
-  var type=nums.reduce(function(a,b){ return (eS[a]||0)>(eS[b]||0)?a:b; },nums[0]).replace('E','');
+  var maxVal = -1;
+  nums.forEach(function(k){ maxVal = Math.max(maxVal, eS[k] || 0); });
+  var leaders = nums.filter(function(k){ return (eS[k] || 0) >= maxVal - 0.01; });
+  var typeKey = leaders.length === 1 ? leaders[0] : nums[answerFingerprint() % nums.length];
+  var type = typeKey.replace('E','');
   var t=parseInt(type);
   var wL=t===1?9:t-1, wR=t===9?1:t+1;
   var wing=(eS['E'+wL]||0)>(eS['E'+wR]||0)?String(wL):String(wR);

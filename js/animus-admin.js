@@ -8,6 +8,11 @@
   var db = null;
   var targetUid = null;
   var targetUser = null;
+  var VALID_MBTI = {
+    INTJ: 1, INTP: 1, ENTJ: 1, ENTP: 1, INFJ: 1, INFP: 1, ENFJ: 1, ENFP: 1,
+    ISTJ: 1, ISFJ: 1, ESTJ: 1, ESFJ: 1, ISTP: 1, ISFP: 1, ESTP: 1, ESFP: 1
+  };
+  var MAX_ADMIN_JSON_CHARS = 120000;
 
   function setStatus(msg, kind) {
     var el = document.getElementById('adminStatus');
@@ -165,7 +170,11 @@
     var snap;
     try {
       var ta = document.getElementById('adminJson');
-      snap = JSON.parse(ta.value);
+      var rawJson = ta.value || '';
+      if (rawJson.length > MAX_ADMIN_JSON_CHARS) {
+        throw new Error('JSON too large (max ' + MAX_ADMIN_JSON_CHARS + ' chars)');
+      }
+      snap = JSON.parse(rawJson);
       if (!snap || typeof snap !== 'object' || Array.isArray(snap)) {
         throw new Error('JSON must be an object');
       }
@@ -178,6 +187,18 @@
     if (!snap.mbti) {
       setStatus('Profile must include mbti (e.g. INTJ)', 'err');
       return;
+    }
+    var mbtiUp = String(snap.mbti).toUpperCase().trim();
+    if (!VALID_MBTI[mbtiUp]) {
+      setStatus('Invalid MBTI — use one of the 16 standard types (e.g. ESFP)', 'err');
+      return;
+    }
+    snap.mbti = mbtiUp;
+    if (typeof snap.polX === 'number') {
+      snap.polX = Math.max(-100, Math.min(100, Math.round(snap.polX)));
+    }
+    if (typeof snap.polY === 'number') {
+      snap.polY = Math.max(-100, Math.min(100, Math.round(snap.polY)));
     }
 
     setStatus('Saving…');

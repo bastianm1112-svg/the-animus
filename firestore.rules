@@ -27,9 +27,19 @@ service cloud.firestore {
       allow delete: if isOwner(userId);
     }
 
+    function ownsUsernameDoc() {
+      return signedIn() && resource.data.uid == request.auth.uid;
+    }
+
     match /usernames/{username} {
       allow read: if true;
-      allow create, update, delete: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid']);
+      allow update: if ownsUsernameDoc()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid']);
+      allow delete: if ownsUsernameDoc();
     }
 
     match /profiles/{userId} {
