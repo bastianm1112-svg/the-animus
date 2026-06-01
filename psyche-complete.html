@@ -300,14 +300,12 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .fade-in{animation:fadeUp 0.4s ease forwards;}
 
-/* ── TEST PROGRESS BAR ── */
 .test-progress-wrap{position:fixed;top:56px;left:0;right:0;height:3px;background:var(--border);z-index:150;display:none;}
 .test-progress-fill{height:100%;background:linear-gradient(to right,#8a6f3e,#c8a96e);transition:width 0.4s ease;width:0%;}
 .test-progress-label{position:fixed;top:62px;right:16px;font-size:10px;color:var(--muted);letter-spacing:0.15em;z-index:150;display:none;}
-/* Answer option enhancements */
-.mc-choice{transition:all 0.15s!important;}
-.mc-choice:hover{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.04)!important;transform:translateX(3px)!important;}
-.mc-choice.selected{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.08)!important;}
+.mc-choice{transition:border-color 0.12s,background 0.12s,color 0.12s!important;}
+.mc-choice:hover{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.03)!important;}
+.mc-choice.selected{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.07)!important;}
 .pbar-fill{background:linear-gradient(to right,#8a6f3e,#b8955a)!important;transition:width 0.4s ease!important;}
 </style>
   <!-- Firebase SDK -->
@@ -343,7 +341,7 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
   <div style="display:flex;gap:12px;align-items:center;">
     <a href="/dashboard" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">Dashboard</a>
     <a href="/profile" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">My Profile</a>
-    <a href="/login" id="navSignInBtn" style="width:32px;height:32px;border-radius:50%;border:1px solid #2a2a2a;background:#141414;display:none;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#c8a96e;text-decoration:none;text-align:center;line-height:32px;transition:border-color 0.2s,box-shadow 0.2s;" onmouseover="this.style.borderColor='#8a6f3e';this.style.boxShadow='0 0 0 3px rgba(200,169,110,0.12)'" onmouseout="this.style.borderColor='#2a2a2a';this.style.boxShadow='none'">Sign In</a>
+    <a href="/login" id="navSignInBtn" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e;text-decoration:none;border:1px solid #8a6f3e;padding:5px 14px;display:none;" onmouseover="this.style.background='#c8a96e';this.style.color='#000'" onmouseout="this.style.background='none';this.style.color='#c8a96e'">Sign In</a>
   </div>
 </nav>
 <script>
@@ -354,14 +352,14 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
       if(!btn) return;
       if(user){
         btn.href = '/dashboard';
-        var n=(user.displayName||'?').trim(); btn.textContent=(n.split(/\s+/).length>1?(n.split(/\s+/)[0].charAt(0)+n.split(/\s+/).pop().charAt(0)):n.charAt(0)).toUpperCase();
+        btn.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Dashboard';
         btn.onmouseover = function(){ this.style.background='#c8a96e'; this.style.color='#000'; };
         btn.onmouseout  = function(){ this.style.background='none';    this.style.color='#c8a96e'; };
       } else {
         btn.href = '/login';
-        btn.textContent = '?'; btn.style.display = '';
+        btn.textContent = 'Sign In';
       }
-      btn.style.display = 'flex';
+      btn.style.display = '';
     });
   } catch(e){ var b=document.getElementById('navSignInBtn'); if(b) b.style.display=''; }
 })();
@@ -2857,14 +2855,12 @@ function downloadPDF(snap, data, mbti, enn, att, phi, instStack, ai){
     +'h2{page-break-after:avoid}.card{page-break-inside:avoid}'
     +'}'
     +'
-/* ── TEST PROGRESS BAR ── */
 .test-progress-wrap{position:fixed;top:56px;left:0;right:0;height:3px;background:var(--border);z-index:150;display:none;}
 .test-progress-fill{height:100%;background:linear-gradient(to right,#8a6f3e,#c8a96e);transition:width 0.4s ease;width:0%;}
 .test-progress-label{position:fixed;top:62px;right:16px;font-size:10px;color:var(--muted);letter-spacing:0.15em;z-index:150;display:none;}
-/* Answer option enhancements */
-.mc-choice{transition:all 0.15s!important;}
-.mc-choice:hover{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.04)!important;transform:translateX(3px)!important;}
-.mc-choice.selected{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.08)!important;}
+.mc-choice{transition:border-color 0.12s,background 0.12s,color 0.12s!important;}
+.mc-choice:hover{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.03)!important;}
+.mc-choice.selected{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.07)!important;}
 .pbar-fill{background:linear-gradient(to right,#8a6f3e,#b8955a)!important;transition:width 0.4s ease!important;}
 </style><link rel="stylesheet" href="/style.css">
 </head><body>'
