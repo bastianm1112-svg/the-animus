@@ -1406,7 +1406,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
     +'<div class="section-label">Core Values</div>'
     +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px;">'
-    +(Array.isArray(ai.values)?ai.values.map(function(v){return '<div class="value-tag"><div class="value-dot"></div>'+v+'</div>';}).join(''):'')
+    +(Array.isArray(ai.values)?ai.values.map(function(v){return '<div class="value-tag"><div class="value-dot"></div>'+escapeHTML(v)+'</div>';}).join(''):'')
     +'</div>'
     +'</div>';
 
@@ -1579,8 +1579,8 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
       var desc  = parts.slice(1).join(':').trim();
       return '<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">'
         +'<div style="min-width:6px;margin-top:6px"><div style="width:4px;height:4px;background:'+(labelColor||'var(--accent)')+'"></div></div>'
-        +'<div><div style="font-size:12px;color:var(--text);font-weight:500;margin-bottom:1px">'+label+'</div>'
-        +(desc?'<div style="font-size:11px;color:var(--muted2);line-height:1.7">'+desc+'</div>':'')
+        +'<div><div style="font-size:12px;color:var(--text);font-weight:500;margin-bottom:1px">'+escapeHTML(label)+'</div>'
+        +(desc?'<div style="font-size:11px;color:var(--muted2);line-height:1.7">'+escapeHTML(desc)+'</div>':'')
         +'</div></div>';
     }).join('');
   }
@@ -1813,10 +1813,11 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     cog:data.cog, enn:data.ennScores, att2:data.attScores, tmp:data.tmp, iv:data.iv,
     mf:data.mf, eth:data.eth, ep:data.ep, phiS:data.phiScores,
     soc:data.soc, alone:data.alone,
-    big5:ai.big5||{}, values:ai.values||[],
+    big5:ai.big5||{},
+    values:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.values,80,24):(ai.values||[])),
     mbtiName:sanitizeText(ai.mbtiName,2000)||'', tagline:sanitizeText(ai.tagline,2000)||'',
     socionics:sanitizeText(ai.socionics,2000)||'', keirsey:sanitizeText(ai.keirsey,2000)||'',
-    figures:ai.figures||[],
+    figures:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeFigures(ai.figures):(ai.figures||[])),
     cogNarrative:sanitizeText(ai.cogNarrative,2000)||'', ennNarrative:sanitizeText(ai.ennNarrative,2000)||'',
     attNarrative:sanitizeText(ai.attNarrative,2000)||'', phiNarrative:sanitizeText(ai.phiNarrative,2000)||'',
     politicalNarrative:sanitizeText(ai.politicalNarrative,2000)||'',
@@ -1824,10 +1825,10 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     politicalIdeologyDesc:sanitizeText(ai.politicalIdeologyDesc,2000)||'',
     politicalStrengths:sanitizeText(ai.politicalStrengths,2000)||'',
     politicalWeaknesses:sanitizeText(ai.politicalWeaknesses,2000)||'',
-    politicalThinkers:Array.isArray(ai.politicalThinkers)?ai.politicalThinkers:[],
-    similarPoliticians:Array.isArray(ai.similarPoliticians)?ai.similarPoliticians:[],
-    similarParties:Array.isArray(ai.similarParties)?ai.similarParties:[],
-    similarCountries:Array.isArray(ai.similarCountries)?ai.similarCountries:[],
+    politicalThinkers:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.politicalThinkers,500,8):(Array.isArray(ai.politicalThinkers)?ai.politicalThinkers:[])),
+    similarPoliticians:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.similarPoliticians,500,8):(Array.isArray(ai.similarPoliticians)?ai.similarPoliticians:[])),
+    similarParties:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.similarParties,500,8):(Array.isArray(ai.similarParties)?ai.similarParties:[])),
+    similarCountries:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.similarCountries,500,8):(Array.isArray(ai.similarCountries)?ai.similarCountries:[])),
     aloneDesc:sanitizeText(ai.aloneDesc,2000)||'', socialDesc:sanitizeText(ai.socialDesc,2000)||'',
     shadowDesc:sanitizeText(ai.shadowDesc,2000)||''
   };
@@ -1869,8 +1870,6 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
       setTimeout(function () { try { unsub(); } catch (e) {} }, 45000);
     }
   }
-
-  persistProfileSnapshot(false);
 
   document.getElementById('btnSave').addEventListener('click', function () {
     var user = firebase.auth().currentUser;
@@ -2101,7 +2100,7 @@ function downloadPDF(snap, data, mbti, enn, att, phi, instStack, ai){
 
     // VALUES
     +'<h2>Core Values</h2>'
-    +'<div style="margin-bottom:16px">'+values.map(function(v){return '<div class="value-tag"><div class="vdot"></div>'+v+'</div>';}).join('')+'</div>'
+    +'<div style="margin-bottom:16px">'+values.map(function(v){return '<div class="value-tag"><div class="vdot"></div>'+escapeHTML(v)+'</div>';}).join('')+'</div>'
 
     // FIGURES
     +(figures.length?'<h2>Similar Figures</h2><div class="grid3">'+figRows+'</div>':'')
@@ -2234,7 +2233,7 @@ function showComparison(you, them){
     var heroEl = document.getElementById('resHero');
     var banner = document.createElement('div');
     banner.style.cssText = 'background:rgba(200,169,110,0.08);border:1px solid var(--accent2);padding:12px 20px;margin-bottom:16px;font-size:12px;color:var(--muted2);letter-spacing:0.05em;';
-    banner.innerHTML = '◎ ESTIMATED PROFILE — <strong style="color:var(--text)">'+(window._observerName||'Unknown')+'</strong> — Based on observed behaviors, not self-report. Results may differ from a self-administered test.';
+    banner.innerHTML = '◎ ESTIMATED PROFILE — <strong style="color:var(--text)">'+escapeHTML(window._observerName||'Unknown')+'</strong> — Based on observed behaviors, not self-report. Results may differ from a self-administered test.';
     heroEl.insertBefore(banner, heroEl.firstChild);
   }
     window.scrollTo(0,0);
@@ -2294,13 +2293,20 @@ showResults=function(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
       var snap={
         mbti:mbti,ennType:enn.type,ennWing:enn.wing,ennTritype:enn.tritype,
         att:att,phi:phi,instStack:instStack,polX:data.polX,polY:data.polY,
-        cog:data.cog,enn:data.enn,att2:data.att,tmp:data.tmp,iv:data.iv,
-        mf:data.mf,eth:data.eth,ep:data.ep,phiS:data.phi,soc:data.soc,alone:data.alone,
-        big5:ai.big5||{},values:ai.values||[],figures:ai.figures||[],
+        cog:data.cog,enn:data.ennScores,att2:data.attScores,tmp:data.tmp,iv:data.iv,
+        mf:data.mf,eth:data.eth,ep:data.ep,phiS:data.phiScores,
+        soc:data.soc,alone:data.alone,
+        big5:ai.big5||{},
+        values:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.values,80,24):(ai.values||[])),
+        figures:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeFigures(ai.figures):(ai.figures||[])),
         mbtiName:sanitizeText(ai.mbtiName,2000)||'',socionics:sanitizeText(ai.socionics,2000)||'',keirsey:sanitizeText(ai.keirsey,2000)||'',
         cogNarrative:sanitizeText(ai.cogNarrative,2000)||'',ennNarrative:sanitizeText(ai.ennNarrative,2000)||'',
         attNarrative:sanitizeText(ai.attNarrative,2000)||'',phiNarrative:sanitizeText(ai.phiNarrative,2000)||'',
         politicalNarrative:sanitizeText(ai.politicalNarrative,2000)||'',
+        politicalThinkers:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.politicalThinkers,500,8):[]),
+        similarPoliticians:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.similarPoliticians,500,8):[]),
+        similarParties:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.similarParties,500,8):[]),
+        similarCountries:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.similarCountries,500,8):[]),
         aloneDesc:sanitizeText(ai.aloneDesc,2000)||'',socialDesc:sanitizeText(ai.socialDesc,2000)||'',shadowDesc:sanitizeText(ai.shadowDesc,2000)||''
       };
       showToast('Shared profile found — loading comparison...');

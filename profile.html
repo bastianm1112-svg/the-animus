@@ -185,17 +185,15 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/animus-shared.js"></script>
+<script>
+AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
+var auth=firebase.auth(); var db=firebase.firestore();
+</script>
 <script src="/js/profile-voice.js"></script>
 <script src="/js/psyche-cross.js"></script>
 <script src="/js/profile-sections.js"></script>
 <script src="/js/profile-panels-visual.js"></script>
 <script src="/js/profile-visuals.js"></script>
-<script>
-if(!firebase.apps.length){
-  firebase.initializeApp({apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",authDomain:"animus-b3d83.firebaseapp.com",projectId:"animus-b3d83",storageBucket:"animus-b3d83.firebasestorage.app",messagingSenderId:"681221615050",appId:"1:681221615050:web:1d037cd07a8381c91b3333"});
-}
-var auth=firebase.auth(); var db=firebase.firestore();
-</script>
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -523,8 +521,8 @@ function loadProfileData(uid, isOwner, currentUser){
           var pd=AnimusShared.parseHistoryTimestamp(ts);
           if(pd) d=pd.toLocaleDateString();
         } else if(ts&&ts.toDate) d=new Date(ts.toDate()).toLocaleDateString();
-        var mode=h.snapshot&&h.snapshot.testMode?(' · '+h.snapshot.testMode):'';
-        return '<div class="history-entry"><div class="history-type">'+escapeHTML(h.snapshot&&h.snapshot.mbti||'&#8212;')+escapeHTML(mode)+'</div><div><div style="color:var(--muted2);font-size:12px">Assessment</div><div class="history-date">'+escapeHTML(d)+'</div></div></div>';
+        var mode=h.snapshot&&h.snapshot.testMode?(' · '+escapeHTML(h.snapshot.testMode)):'';
+        return '<div class="history-entry"><div class="history-type">'+escapeHTML(h.snapshot&&h.snapshot.mbti||'&#8212;')+mode+'</div><div><div style="color:var(--muted2);font-size:12px">Assessment</div><div class="history-date">'+escapeHTML(d)+'</div></div></div>';
       }).join('');
     }
 
@@ -596,17 +594,10 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
 </div>
 
 <script>
-try { firebase.auth().onAuthStateChanged(function(user){ document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){ el.href=user?'/dashboard':'/'; }); }); } catch(e){}
+try { firebase.auth().onAuthStateChanged(function(user){ document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){ el.href=user?'/dashboard':'/'; }); if(user&&typeof AnimusShared!=='undefined')AnimusShared.bindNavAuth('navAvatar'); }); } catch(e){}
 </script>
 <script>
-function toggleThemeGlobal(){
-  var isLight=document.body.classList.toggle('light-mode');
-  localStorage.setItem('animus_theme',isLight?'light':'dark');
-  var btn=document.getElementById('themeToggleBtn');
-  if(btn)btn.innerHTML=isLight
-    ?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-    :'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-}
+try { if (typeof AnimusShared !== 'undefined') AnimusShared.bindNavAuth('navAvatar'); } catch (e) {}
 (function(){
   var isLight=document.body.classList.contains('light-mode');
   var btn=document.getElementById('themeToggleBtn');

@@ -1,8 +1,13 @@
+const { assertQuestion, setApiHeaders } = require('./_lib');
+
 module.exports = async function handler(req, res) {
+  setApiHeaders(res);
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { question, lang } = req.body || {};
-  if (!question) return res.status(400).json({ error: 'Missing question' });
+  const checked = assertQuestion(req.body || {});
+  if (checked.error) return res.status(checked.status).json({ error: checked.error });
+  const question = checked.value;
+  const { lang } = req.body || {};
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });

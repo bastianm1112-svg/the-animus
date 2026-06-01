@@ -273,14 +273,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="/js/animus-shared.js"></script>
   <script>
-    if (!firebase.apps.length) { firebase.initializeApp({
-      apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
-      authDomain: "animus-b3d83.firebaseapp.com",
-      projectId: "animus-b3d83",
-      storageBucket: "animus-b3d83.firebasestorage.app",
-      messagingSenderId: "681221615050",
-      appId: "1:681221615050:web:1d037cd07a8381c91b3333"
-    }); }
+    AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
     var auth = firebase.auth();
     var db = firebase.firestore();
   </script>
@@ -731,10 +724,10 @@ window.generateAIAnalysis = function generateAIAnalysis(mySnap, themSnap, myName
     var text=(d.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('').replace(/```json|```/g,'').trim();
     var ai=JSON.parse(text);
     aiContent.innerHTML =
-      '<div class="ai-section"><div class="ai-section-title">Where You Align</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.whereAlign,3000)+'</div></div></div>'
-      +'<div class="ai-section"><div class="ai-section-title">Where You\'ll Clash</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.whereClash,3000)+'</div></div></div>'
-      +'<div class="ai-section"><div class="ai-section-title">How You\'d Interact</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.dynamic,1500)+'</div></div></div>'
-      +'<div class="ai-section"><div class="ai-section-title">What Each Brings Out</div><div class="ai-block"><div class="ai-block-text">'+sanitizeText(ai.mutualEffect,1500)+'</div></div></div>';
+      '<div class="ai-section"><div class="ai-section-title">Where You Align</div><div class="ai-block"><div class="ai-block-text">'+aiSafe(ai.whereAlign,3000)+'</div></div></div>'
+      +'<div class="ai-section"><div class="ai-section-title">Where You\'ll Clash</div><div class="ai-block"><div class="ai-block-text">'+aiSafe(ai.whereClash,3000)+'</div></div></div>'
+      +'<div class="ai-section"><div class="ai-section-title">How You\'d Interact</div><div class="ai-block"><div class="ai-block-text">'+aiSafe(ai.dynamic,1500)+'</div></div></div>'
+      +'<div class="ai-section"><div class="ai-section-title">What Each Brings Out</div><div class="ai-block"><div class="ai-block-text">'+aiSafe(ai.mutualEffect,1500)+'</div></div></div>';
   }).catch(function(){
     aiContent.innerHTML='<div style="padding:20px;color:var(--muted);font-size:12px;text-align:center">AI analysis unavailable — showing score comparison only.</div>';
   });
@@ -768,7 +761,11 @@ animateBars();
 function sanitizeText(str, maxLen) {
   if (!str) return '';
   maxLen = maxLen || 500;
-  return String(str).replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, '').trim().substring(0, maxLen);
+  return String(str).replace(/<[^>]*>/g, '').trim().substring(0, maxLen);
+}
+function aiSafe(str, maxLen) {
+  var t = sanitizeText(str, maxLen);
+  return (typeof AnimusShared !== 'undefined' ? AnimusShared.escapeHTML(t) : t);
 }
 function shareComparison(){
   var url = window.location.href;
@@ -788,7 +785,7 @@ function shareComparison(){
   if(u){
     var viewBtn = document.querySelector('.btn-share-comp.btn-outline');
     if(viewBtn){
-      viewBtn.href = '/profile?u=' + encodeURIComponent(u);
+      viewBtn.href = (typeof AnimusShared !== 'undefined' ? AnimusShared.profilePathForUsername(u) : '/profile?u=' + encodeURIComponent(u));
       viewBtn.textContent = 'View ' + escapeHTML(u.charAt(0).toUpperCase() + u.slice(1)) + '\'s Profile →';
     }
     // Also update the "them" name in the profiles strip

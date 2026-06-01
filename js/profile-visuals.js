@@ -49,8 +49,8 @@
   }
 
   function quadrantInfo(polX, polY) {
-    var econ = polX > 12 ? 'Right' : polX < -12 ? 'Left' : 'Center';
-    var auth = polY > 12 ? 'Authoritarian' : polY < -12 ? 'Libertarian' : 'Moderate';
+    var econ = polX > 10 ? 'Right' : polX < -10 ? 'Left' : 'Center';
+    var auth = polY > 10 ? 'Authoritarian' : polY < -10 ? 'Libertarian' : 'Moderate';
     var slug = (auth + ' ' + econ).trim();
     var colors = {
       'Libertarian Left': '#3d6b8a',

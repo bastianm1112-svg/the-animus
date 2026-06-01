@@ -479,3 +479,10 @@ body.light-mode .card, body.light-mode .side-card {
 
 /* Normalize --green across all pages */
 :root { --green: #27ae60; }
+
+/* Mobile bottom nav clearance (profile, compare, settings, types, dashboard) */
+@media (max-width: 768px) {
+  body:has(.mobile-bottom-nav) {
+    padding-bottom: 60px;
+  }
+}

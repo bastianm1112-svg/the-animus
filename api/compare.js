@@ -1,8 +1,12 @@
+const { assertPrompt, setApiHeaders, LIMITS } = require('./_lib');
+
 module.exports = async function handler(req, res) {
+  setApiHeaders(res);
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { prompt } = req.body || {};
-  if (!prompt) return res.status(400).json({ error: 'Missing prompt' });
+  const checked = assertPrompt(req.body || {}, LIMITS.compare);
+  if (checked.error) return res.status(checked.status).json({ error: checked.error });
+  const prompt = checked.value;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });

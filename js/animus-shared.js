@@ -13,6 +13,15 @@
     testProgress: 'animus_test_progress'
   };
 
+  var FIREBASE_CONFIG = {
+    apiKey: 'AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg',
+    authDomain: 'animus-b3d83.firebaseapp.com',
+    projectId: 'animus-b3d83',
+    storageBucket: 'animus-b3d83.firebasestorage.app',
+    messagingSenderId: '681221615050',
+    appId: '1:681221615050:web:1d037cd07a8381c91b3333'
+  };
+
   function escapeHTML(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -21,6 +30,84 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  function sanitizePlainText(str, maxLen) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/<[^>]*>/g, '').trim().substring(0, maxLen || 500);
+  }
+
+  function sanitizeStringArray(arr, maxLen, maxItems) {
+    if (!Array.isArray(arr)) return [];
+    return arr.slice(0, maxItems || 12).map(function (item) {
+      return sanitizePlainText(item, maxLen || 500);
+    }).filter(Boolean);
+  }
+
+  function sanitizeFigures(figures) {
+    if (!Array.isArray(figures)) return [];
+    return figures.slice(0, 24).map(function (f) {
+      if (!f || typeof f !== 'object') return null;
+      return {
+        name: sanitizePlainText(f.name, 120),
+        type: sanitizePlainText(f.type, 32),
+        note: sanitizePlainText(f.note, 400),
+        initials: sanitizePlainText(f.initials, 4),
+        cat: sanitizePlainText(f.cat, 40)
+      };
+    }).filter(function (f) { return f && f.name; });
+  }
+
+  function safePhotoUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    try {
+      var u = new URL(url.trim());
+      if (u.protocol !== 'https:') return '';
+      var host = u.hostname.toLowerCase();
+      if (host.indexOf('googleusercontent.com') !== -1 ||
+          host === 'firebasestorage.googleapis.com' ||
+          host.indexOf('firebasestorage.app') !== -1) {
+        return u.href;
+      }
+      return '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function profilePathForUsername(username) {
+    var u = String(username || '').trim().replace(/[^a-zA-Z0-9_\-]/g, '').substring(0, 32);
+    return u ? '/' + encodeURIComponent(u) : '/profile';
+  }
+
+  function profileHrefForUser(userOrUsername, uid) {
+    if (userOrUsername && typeof userOrUsername === 'object') {
+      uid = userOrUsername.uid;
+      userOrUsername = userOrUsername.username;
+    }
+    var path = profilePathForUsername(userOrUsername);
+    if (path !== '/profile') return path;
+    if (uid) return '/profile?uid=' + encodeURIComponent(String(uid).replace(/[^a-zA-Z0-9]/g, '').substring(0, 128));
+    return '/profile';
+  }
+
+  /** Economic/social labels aligned with compare-pair (±10 center band). */
+  function polShortLabel(polX, polY) {
+    var px = typeof polX === 'number' ? polX : 0;
+    var py = typeof polY === 'number' ? polY : 0;
+    var econ = px > 10 ? 'Right' : px < -10 ? 'Left' : 'Center';
+    var auth = py > 10 ? 'Auth' : py < -10 ? 'Lib' : 'Mod';
+    return { econ: econ, auth: auth, short: econ + ' · ' + auth };
+  }
+
+  function toggleThemeGlobal() {
+    var isLight = document.body.classList.toggle('light-mode');
+    localStorage.setItem(KEYS.theme, isLight ? 'light' : 'dark');
+    var btn = document.getElementById('themeToggleBtn');
+    if (!btn) return;
+    btn.innerHTML = isLight
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
   }
 
   function initialsFromName(name) {
@@ -50,7 +137,7 @@
     }
 
     var doc = userDoc || {};
-    var photo = doc.photoURL || user.photoURL || '';
+    var photo = safePhotoUrl(doc.photoURL || user.photoURL || '');
     var name = doc.displayName || user.displayName || 'User';
 
     el.href = '/profile';
@@ -70,7 +157,7 @@
   function applyProfilePhoto(el, user, userDoc) {
     if (!el || !user) return;
     var doc = userDoc || {};
-    var photo = doc.photoURL || user.photoURL || '';
+    var photo = safePhotoUrl(doc.photoURL || user.photoURL || '');
     var name = doc.displayName || user.displayName || '';
     if (photo) {
       el.innerHTML =
@@ -266,15 +353,17 @@
     });
     var nowIso = new Date().toISOString();
     var ref = firebase.firestore().collection('profiles').doc(userId);
-    return ref.get().then(function (doc) {
-      var history = doc.exists ? (doc.data().history || []) : [];
-      history.push({ snapshot: snap, timestamp: nowIso });
-      if (history.length > 10) history = history.slice(-10);
-      return ref.set({
-        latest: snap,
-        history: history,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+    return firebase.firestore().runTransaction(function (tx) {
+      return tx.get(ref).then(function (doc) {
+        var history = doc.exists ? (doc.data().history || []) : [];
+        history.push({ snapshot: snap, timestamp: nowIso });
+        if (history.length > 10) history = history.slice(-10);
+        tx.set(ref, {
+          latest: snap,
+          history: history,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      });
     }).then(function () {
       saveLastResultLocal(snap);
       return snap;
@@ -294,9 +383,20 @@
     });
   }
 
+  global.toggleThemeGlobal = toggleThemeGlobal;
+
   global.AnimusShared = {
     KEYS: KEYS,
+    FIREBASE_CONFIG: FIREBASE_CONFIG,
     escapeHTML: escapeHTML,
+    sanitizePlainText: sanitizePlainText,
+    sanitizeStringArray: sanitizeStringArray,
+    sanitizeFigures: sanitizeFigures,
+    safePhotoUrl: safePhotoUrl,
+    profilePathForUsername: profilePathForUsername,
+    profileHrefForUser: profileHrefForUser,
+    polShortLabel: polShortLabel,
+    toggleThemeGlobal: toggleThemeGlobal,
     initialsFromName: initialsFromName,
     applyNavAvatar: applyNavAvatar,
     applyNavAvatarForSession: applyNavAvatarForSession,

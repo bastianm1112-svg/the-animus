@@ -84,6 +84,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 @media(max-width:768px){.nav-items{display:none!important;}.nav-hamburger{display:flex!important;}}
 </style>
 <link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/css/animus-unified.css">
 </head>
 <body>
 <script>(function(){ if(localStorage.getItem('animus_theme')==='light') document.body.classList.add('light-mode'); })();</script>
@@ -543,16 +544,7 @@ document.querySelectorAll('.type-tab').forEach(function(tab){
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="/js/animus-shared.js"></script>
 <script>
-if (!firebase.apps.length) {
-  firebase.initializeApp({
-    apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
-    authDomain: "animus-b3d83.firebaseapp.com",
-    projectId: "animus-b3d83",
-    storageBucket: "animus-b3d83.firebasestorage.app",
-    messagingSenderId: "681221615050",
-    appId: "1:681221615050:web:1d037cd07a8381c91b3333"
-  });
-}
+AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 // Smart logo: dashboard if logged in, landing if not
 try {
   firebase.auth().onAuthStateChanged(function(user){

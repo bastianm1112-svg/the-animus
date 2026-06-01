@@ -64,8 +64,14 @@
   }
 
   function polLabel(x, y) {
-    var econ = x > 12 ? 'economically right' : x < -12 ? 'economically left' : 'economically centrist';
-    var soc = y > 12 ? 'socially authoritarian' : y < -12 ? 'socially libertarian' : 'socially moderate';
+    if (typeof g.AnimusShared !== 'undefined' && g.AnimusShared.polShortLabel) {
+      var pl = g.AnimusShared.polShortLabel(x, y);
+      var econ = pl.econ === 'Right' ? 'economically right' : pl.econ === 'Left' ? 'economically left' : 'economically centrist';
+      var soc = pl.auth === 'Auth' ? 'socially authoritarian' : pl.auth === 'Lib' ? 'socially libertarian' : 'socially moderate';
+      return econ + ', ' + soc;
+    }
+    var econ = x > 10 ? 'economically right' : x < -10 ? 'economically left' : 'economically centrist';
+    var soc = y > 10 ? 'socially authoritarian' : y < -10 ? 'socially libertarian' : 'socially moderate';
     return econ + ', ' + soc;
   }
 
@@ -144,11 +150,17 @@
                 'This is less a party label than a tension between freedom, authority, and economic preference.'
               : p.poss + ' political profile will appear after the assessment maps economic and social axes.'))
         ),
-        metrics: [
-          ['Economic', typeof snap.polX === 'number' ? (snap.polX > 0 ? 'Right' : 'Left') : '—'],
-          ['Social', typeof snap.polY === 'number' ? (snap.polY > 0 ? 'Auth' : 'Lib') : '—'],
-          ['Keirsey', snap.keirsey || '—']
-        ]
+        metrics: (function () {
+          var pl = (typeof g.AnimusShared !== 'undefined' && g.AnimusShared.polShortLabel &&
+            typeof snap.polX === 'number' && typeof snap.polY === 'number')
+            ? g.AnimusShared.polShortLabel(snap.polX, snap.polY)
+            : null;
+          return [
+            ['Economic', pl ? pl.econ : '—'],
+            ['Social', pl ? pl.auth : '—'],
+            ['Keirsey', snap.keirsey || '—']
+          ];
+        })()
       },
       {
         kicker: 'Social',

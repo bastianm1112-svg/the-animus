@@ -262,9 +262,11 @@
           g.AnimusShared.applyProfilePhoto(document.getElementById('themAvatar'), { uid: themUid }, themUser);
         }
 
-        var themProfileUrl = themUser.username
-          ? '/profile?u=' + encodeURIComponent(themUser.username)
-          : '/profile?uid=' + encodeURIComponent(themUid);
+        var themProfileUrl = g.AnimusShared
+          ? g.AnimusShared.profileHrefForUser(themUser.username, themUid)
+          : (themUser.username
+            ? '/profile?u=' + encodeURIComponent(themUser.username)
+            : '/profile?uid=' + encodeURIComponent(themUid));
         var viewBtn = document.getElementById('viewThemBtn');
         if (viewBtn) {
           viewBtn.href = themProfileUrl;

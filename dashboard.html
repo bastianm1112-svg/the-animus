@@ -199,16 +199,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="/js/animus-shared.js"></script>
   <script>
-  if(!firebase.apps.length){
-    firebase.initializeApp({
-      apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
-      authDomain: "animus-b3d83.firebaseapp.com",
-      projectId: "animus-b3d83",
-      storageBucket: "animus-b3d83.firebasestorage.app",
-      messagingSenderId: "681221615050",
-      appId: "1:681221615050:web:1d037cd07a8381c91b3333"
-    });
-  }
+  AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
   var auth = firebase.auth();
   var db = firebase.firestore();
   </script>
@@ -516,7 +507,7 @@ function loadFriends(uid){
         var mbti = escapeHTML((p&&p.mbti)||'—');
         var enn = p&&p.ennType ? p.ennType+'w'+p.ennWing : '—';
         var card = document.createElement('a');
-        card.href = '/profile?u='+encodeURIComponent(u.username||fuid);
+        card.href = (typeof AnimusShared !== 'undefined' ? AnimusShared.profileHrefForUser(u.username, fuid) : '/profile?u='+encodeURIComponent(u.username||fuid));
         card.className = 'friend-card';
         card.innerHTML = '<div class="friend-avatar">'+init+'</div>'
           +'<div class="friend-name">'+dname+'</div>'
@@ -525,7 +516,7 @@ function loadFriends(uid){
           +'<div class="friend-enn">'+escapeHTML(enn)+'</div>';
         grid.appendChild(card);
         var si = document.createElement('a');
-        si.href = '/profile?u='+encodeURIComponent(u.username||fuid);
+        si.href = (typeof AnimusShared !== 'undefined' ? AnimusShared.profileHrefForUser(u.username, fuid) : '/profile?u='+encodeURIComponent(u.username||fuid));
         si.className = 'sidebar-nav-item';
         si.innerHTML = '<div class="suggest-avatar" style="width:24px;height:24px;font-size:11px;border-radius:50%">'+init+'</div>'
           +'<div style="flex:1"><div style="font-size:12px;color:var(--text)">'+dname+'</div>'
