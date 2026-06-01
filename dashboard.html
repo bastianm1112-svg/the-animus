@@ -1,8 +1,8 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANIMUS ââ‚¬” Dashboard</title>
+<title>ANIMUS — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -174,26 +174,24 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .skeleton-line{height:12px;margin-bottom:6px;}
 /* FEED ICONS */
 .feed-icon{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--gold);}
-
-
-/* ════ MOBILE BOTTOM NAV â”â‚¬â”â‚¬ */
-.mobile-bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: rgba(8,8,8,0.97); backdrop-filter: blur(16px); border-top: 1px solid var(--border); z-index: 300; justify-content: space-around; align-items: center; padding: 0 8px; }
-@media(max-width:768px){ .mobile-bottom-nav { display: flex; } body { padding-bottom: 60px; } }
-.mbn-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 14px; color: var(--muted); text-decoration: none; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; position: relative; }
-.mbn-item.active { color: var(--gold); }
-.mbn-item svg { opacity: 0.6; }
-.mbn-item.active svg { opacity: 1; }
-.mbn-badge { position: absolute; top: 4px; right: 8px; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; border: 1px solid var(--bg); display: none; }
-.mbn-badge.visible { display: block; }
-.theme-toggle-btn { width: 32px; height: 32px; background: none; border: 1px solid var(--border2); color: var(--muted2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border-radius: 2px; }
-.theme-toggle-btn:hover { border-color: var(--gold2); color: var(--gold); }
-.onboarding-card { background: var(--surface); border: 1px solid var(--border2); border-left: 3px solid var(--gold); padding: 28px 32px; margin-bottom: 32px; display: none; }
-.onboarding-card.show { display: block; }
-.onboarding-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
-.onboarding-sub { font-size: 13px; color: var(--muted2); line-height: 1.7; margin-bottom: 20px; }
-.onboarding-steps { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
-.onboarding-step { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted2); }
-.onboarding-step-num { width: 24px; height: 24px; background: var(--gold2); color: #000; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; flex-shrink: 0; }
+/* Mobile bottom nav */
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(8,8,8,0.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);z-index:300;justify-content:space-around;align-items:center;padding:0 8px;}
+@media(max-width:768px){.mobile-bottom-nav{display:flex;} body{padding-bottom:60px;}}
+.mbn-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 14px;color:var(--muted);text-decoration:none;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s;position:relative;}
+.mbn-item.active{color:var(--gold);}.mbn-item svg{opacity:0.6;}.mbn-item.active svg{opacity:1;}
+.mbn-badge{position:absolute;top:4px;right:8px;width:8px;height:8px;background:var(--gold);border-radius:50%;border:1px solid var(--bg);display:none;}
+.mbn-badge.visible{display:block;}
+/* Theme toggle */
+.theme-toggle-btn{width:32px;height:32px;background:none;border:1px solid var(--border2);color:var(--muted2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;border-radius:2px;}
+.theme-toggle-btn:hover{border-color:var(--gold2);color:var(--gold);}
+/* Onboarding card */
+.onboarding-card{background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--gold);padding:28px 32px;margin-bottom:32px;display:none;}
+.onboarding-card.show{display:block;}
+.onboarding-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:8px;}
+.onboarding-sub{font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:20px;}
+.onboarding-steps{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px;}
+.onboarding-step{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted2);}
+.onboarding-step-num{width:24px;height:24px;background:var(--gold2);color:#000;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;flex-shrink:0;}
 </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -233,38 +231,32 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Profile
     </a>
-    <a href="/compare" class="nav-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-      Compare
+    
+    <a href="/test" class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Take Test
     </a>
-    <a href="/group" class="nav-item">
+    <a href="/compare" class="nav-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Compare</a><a href="/group" class="nav-item">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Group
     </a>
-    <a href="/types" class="nav-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h8M4 18h8"/></svg>
-      Types
-    </a>
+    <a href="/types" class="nav-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h8M4 18h8"/></svg>Types</a>
   </div>
-  <div class="nav-right">
-    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleThemeGlobal()" title="Toggle theme">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-    </button>
+  <div class="nav-right"><button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleThemeGlobal()" title="Toggle theme"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <button class="notif-btn" onclick="toggleNotifPanel()" title="Notifications">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <div class="notif-badge" id="notifBadge"></div>
     </button>
-    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <a href="/profile" class="nav-avatar" id="navAvatar">?</a>
   </div>
 </nav>
-<div class="nav-mobile-menu" id="navMobileMenu">
+<div class="nav-mobile-menu" id="navMobileMenu"><a href="/dashboard" class="nav-mobile-item active">Dashboard</a><a href="/profile" class="nav-mobile-item">Profile</a><a href="/compare" class="nav-mobile-item">Compare</a><a href="/group" class="nav-mobile-item">Group</a><a href="/types" class="nav-mobile-item">Types</a><a href="/test" class="nav-mobile-item">Take Test</a><a href="/settings" class="nav-mobile-item">Settings</a></div><!--REMOVE_OLD-->
   <a href="/dashboard" class="nav-mobile-item active">Dashboard</a>
-  <a href="/profile" class="nav-mobile-item">Profile</a>
-  <a href="/compare" class="nav-mobile-item">Compare</a>
-  <a href="/group" class="nav-mobile-item">Group</a>
+  <a href="/profile" class="nav-mobile-item">My Profile</a>
   <a href="/types" class="nav-mobile-item">Types</a>
   <a href="/test" class="nav-mobile-item">Take Test</a>
+  <a href="/group" class="nav-mobile-item">Group</a>
   <a href="/settings" class="nav-mobile-item">Settings</a>
 </div>
 
@@ -276,11 +268,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="my-profile-card">
         <div class="my-avatar" id="sidebarAvatar">?</div>
         <div>
-          <div class="my-name" id="sidebarName">ââ‚¬”</div>
-          <div class="my-username" id="sidebarUsername">@ââ‚¬”</div>
+          <div class="my-name" id="sidebarName">—</div>
+          <div class="my-username" id="sidebarUsername">@—</div>
         </div>
-        <div class="my-type" id="sidebarType">ââ‚¬”</div>
-        <div class="my-enn" id="sidebarEnn">ââ‚¬”</div>
+        <div class="my-type" id="sidebarType">—</div>
+        <div class="my-enn" id="sidebarEnn">—</div>
         <a href="/profile" class="btn-view-profile">View Profile</a>
       </div>
     </div>
@@ -331,8 +323,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="main-date" id="currentDate"></div>
     </div>
 
-    <div class="onboarding-card" id="onboardingCard"><div class="onboarding-title">Welcome to ANIMUS</div><div class="onboarding-sub">Three steps to your complete personality profile.</div><div class="onboarding-steps"><div class="onboarding-step"><div class="onboarding-step-num">1</div><span>Take the assessment</span></div><div class="onboarding-step"><div class="onboarding-step-num">2</div><span>View your profile</span></div><div class="onboarding-step"><div class="onboarding-step-num">3</div><span>Add friends &amp; compare</span></div></div><a href="/test" class="btn-retake">Begin Assessment →</a></div>
-    <div class="retake-banner">
+    <div class="onboarding-card" id="onboardingCard"><div class="onboarding-title">Welcome to ANIMUS</div><div class="onboarding-sub">Three steps to your complete personality profile.</div><div class="onboarding-steps"><div class="onboarding-step" id="step1"><div class="onboarding-step-num">1</div><span>Take the assessment</span></div><div class="onboarding-step" id="step2"><div class="onboarding-step-num">2</div><span>View your profile</span></div><div class="onboarding-step" id="step3"><div class="onboarding-step-num">3</div><span>Add friends &amp; compare</span></div></div><a href="/test" class="btn-retake">Begin Assessment &#8594;</a></div><div class="retake-banner">
       <div class="retake-text" id="retakeBannerText">Take the assessment to build your profile.</div>
       <a href="/test" class="btn-retake">Take Test →</a>
     </div>
@@ -343,7 +334,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </div>
 
     <div class="friends-grid" id="friendsGrid">
-      <div class="empty-state">No friends yet ââ‚¬” add someone to get started</div>
+      <div class="empty-state">No friends yet — add someone to get started</div>
       <button class="friend-card friend-card-add" onclick="openAddFriend()">
         <div class="add-icon">+</div>
         <div class="add-label">Add Friend</div>
@@ -377,7 +368,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <!-- ADD FRIEND MODAL -->
 <div class="modal-overlay" id="addFriendModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeAddFriend()">âÅ“•</button>
+    <button class="modal-close" onclick="closeAddFriend()">✕</button>
     <div class="modal-title">Add a friend</div>
     <p class="modal-sub">Search by username to find and add someone to your friends list.</p>
     <div class="modal-search-wrap">
@@ -406,10 +397,9 @@ document.getElementById('currentDate').textContent=days[now.getDay()]+', '+month
 var hour=now.getHours();
 var greeting=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
 
-// â”â‚¬â”â‚¬ FIREBASE AUTH + DATA LOAD â”â‚¬â”â‚¬
+// ── FIREBASE AUTH + DATA LOAD ──
 auth.onAuthStateChanged(function(user){
   if(!user){ window.location.href='/login'; return; }
-  updateThemeToggleIcon();
 
   // Set greeting
   var name = escapeHTML(user.displayName || user.email.split('@')[0]);
@@ -458,30 +448,26 @@ auth.onAuthStateChanged(function(user){
         document.getElementById('mainGreeting').innerHTML = greeting+', <em>'+escapeHTML(firestoreName)+'</em>';
       }
       var fc = (data.friends||[]).length;
-      if(fc) document.getElementById('friendCount').textContent = 'Ã‚· '+fc;
+      if(fc) document.getElementById('friendCount').textContent = '· '+fc;
     }
   });
 
   db.collection('profiles').doc(user.uid).get().then(function(doc){
-    var hasTaken = doc.exists && doc.data().latest && doc.data().latest.mbti;
-    if(!hasTaken){
-      var card = document.getElementById('onboardingCard');
-      if(card) card.classList.add('show');
-    }
+    var hasTaken=doc.exists&&doc.data().latest&&doc.data().latest.mbti;if(!hasTaken){var card=document.getElementById(''onboardingCard'');if(card)card.classList.add(''show'');}
     if(doc.exists){
       var p = doc.data().latest;
       if(p && p.mbti){
         document.getElementById('sidebarType').textContent = p.mbti;
-        var ennD = p.ennType ? p.ennType+'w'+p.ennWing : 'ââ‚¬”';
-        document.getElementById('sidebarEnn').textContent = ennD+(p.instStack?' Ã‚· '+p.instStack:'');
+        var ennD = p.ennType ? p.ennType+'w'+p.ennWing : '—';
+        document.getElementById('sidebarEnn').textContent = ennD+(p.instStack?' · '+p.instStack:'');
       var now = Date.now();
       var hist = p.history && p.history.length ? p.history : [];
       var lastDate = hist.length ? hist[hist.length-1].timestamp : null;
       var daysSince = lastDate ? Math.floor((now - lastDate.toDate().getTime()) / 86400000) : null;
       if(daysSince !== null && daysSince > 90){
-        document.getElementById('retakeBannerText').innerHTML = '<strong>Itââ‚¬â„¢s been ' + daysSince + ' days since your last assessment.</strong> See how youââ‚¬â„¢ve changed.';
+        document.getElementById('retakeBannerText').innerHTML = '<strong>It’s been ' + daysSince + ' days since your last assessment.</strong> See how you’ve changed.';
       } else {
-        document.getElementById('retakeBannerText').innerHTML = '<strong>Last assessment complete.</strong> Retake any time to see how youââ‚¬â„¢ve changed.';
+        document.getElementById('retakeBannerText').innerHTML = '<strong>Last assessment complete.</strong> Retake any time to see how you’ve changed.';
       }
       }
     }
@@ -519,8 +505,8 @@ function loadFriends(uid){
         var init = escapeHTML((u.displayName||'?').charAt(0).toUpperCase());
         var dname = escapeHTML(u.displayName||'');
         var uname = escapeHTML(u.username||'');
-        var mbti = escapeHTML((p&&p.mbti)||'ââ‚¬”');
-        var enn = p&&p.ennType ? p.ennType+'w'+p.ennWing : 'ââ‚¬”';
+        var mbti = escapeHTML((p&&p.mbti)||'—');
+        var enn = p&&p.ennType ? p.ennType+'w'+p.ennWing : '—';
         var card = document.createElement('a');
         card.href = '/profile?u='+encodeURIComponent(u.username||fuid);
         card.className = 'friend-card';
@@ -621,7 +607,7 @@ function searchUsers(val){
     var currentUser=firebase.auth().currentUser;
     firebase.firestore().collection('usernames')
       .where(firebase.firestore.FieldPath.documentId(),'>=',q)
-      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'\uf8ff')
+      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'')
       .limit(8).get()
       .then(function(snap){
         if(snap.empty){ res.innerHTML='<div class="search-empty">No users found for @'+escapeHTML(q)+'</div>'; return; }
@@ -653,7 +639,7 @@ function searchUsers(val){
   },400);
 }
 function addFriend(btn,name){
-  btn.textContent='Sent âÅ““'; btn.classList.add('added'); btn.disabled=true;
+  btn.textContent='Sent ✓'; btn.classList.add('added'); btn.disabled=true;
   showToast('Friend request sent to '+escapeHTML(name));
 }
 
@@ -690,7 +676,7 @@ function sendFriendRequest(toUid, toName, btn){
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     return batch.commit().then(function(){
-      if(btn){ btn.textContent='Request Sent âÅ““'; btn.classList.add('added'); }
+      if(btn){ btn.textContent='Request Sent ✓'; btn.classList.add('added'); }
       showToast('Friend request sent to '+escapeHTML(toName));
     });
   }).catch(function(e){
@@ -746,8 +732,6 @@ function loadNotifs(uid){
     if(!received.length){
       notifList.innerHTML='<div style="padding:16px 0;font-size:12px;color:var(--muted);text-align:center">No new notifications</div>';
       document.getElementById('notifBadge').style.display='none';
-      var mbnBadge2 = document.getElementById('mbnNotifBadge');
-      if(mbnBadge2) mbnBadge2.classList.remove('visible');
       return;
     }
     document.getElementById('notifBadge').style.display='block';
@@ -833,21 +817,6 @@ function signOut(){
   auth.signOut().then(function(){ window.location.href='/login'; });
 }
 
-function toggleThemeGlobal(){
-  var isLight = document.body.classList.toggle('light-mode');
-  localStorage.setItem('animus_theme', isLight ? 'light' : 'dark');
-  var btn = document.getElementById('themeToggleBtn');
-  if(btn) btn.innerHTML = isLight
-    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-}
-function updateThemeToggleIcon(){
-  var isLight = document.body.classList.contains('light-mode');
-  var btn = document.getElementById('themeToggleBtn');
-  if(btn) btn.innerHTML = isLight
-    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-}
 function showToast(msg){
   var t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
@@ -866,7 +835,11 @@ try {
   });
 } catch(e){}
 </script>
-<!-- MOBILE BOTTOM NAV -->
+<script>
+function toggleThemeGlobal(){var isLight=document.body.classList.toggle('light-mode');localStorage.setItem('animus_theme',isLight?'light':'dark');var btn=document.getElementById('themeToggleBtn');if(btn)btn.innerHTML=isLight?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';}
+(function(){var isLight=document.body.classList.contains('light-mode');var btn=document.getElementById('themeToggleBtn');if(btn)btn.innerHTML=isLight?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';})();
+function updateThemeToggleIcon(){var isLight=document.body.classList.contains('light-mode');var btn=document.getElementById('themeToggleBtn');if(btn)btn.innerHTML=isLight?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';}
+</script>
 <nav class="mobile-bottom-nav">
   <a href="/dashboard" class="mbn-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a>
   <a href="/profile" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
