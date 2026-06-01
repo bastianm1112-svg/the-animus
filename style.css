@@ -303,3 +303,164 @@ nav.scrolled {
 .hero-stat strong {
   text-shadow: 0 0 16px rgba(200,169,110,0.15);
 }
+
+/* ── TEST PAGE ISOLATION — prevent global styles from bleeding into test ── */
+/* The test uses its own design tokens (--accent, --accent2) — don't override them */
+#intro *, #quiz-wrap *, .q-wrap *, .mc-choices *, .scale-wrap *,
+.agree-grid *, .result-wrap *, #result * {
+  background-image: none;
+}
+#intro .bar-fill, #quiz-wrap .bar-fill, #result .bar-fill,
+.pbar-fill { background: linear-gradient(to right, #6b4d1e, #b8955a) !important; }
+
+/* Test answer letters — make them look intentional as styled badges */
+.mc-letter, .agree-letter {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 10px !important;
+  letter-spacing: 0.15em !important;
+  color: #4a4a4a !important;
+  font-weight: 400 !important;
+  text-transform: uppercase;
+}
+.mc-choice:hover .mc-letter,
+.agree-btn:hover .agree-letter { color: #b8955a !important; }
+.mc-choice.selected .mc-letter,
+.agree-btn.sel .agree-letter { color: #b8955a !important; }
+
+/* Fix body background on test page — test has its own bg */
+body:has(#intro), body:has(#quiz-wrap), body:has(#result) {
+  background-image: none !important;
+}
+
+/* ── SHARPNESS & CLARITY ── */
+
+/* Crisper nav text */
+.nav-item, .nav-logo, .sidebar-nav-item {
+  text-rendering: optimizeLegibility;
+}
+
+/* Sharper card borders */
+.card, .side-card, .profile-actions-card {
+  border-color: rgba(255,255,255,0.06) !important;
+}
+body.light-mode .card, body.light-mode .side-card {
+  border-color: rgba(0,0,0,0.1) !important;
+}
+
+/* More prominent active nav */
+.nav-item.active {
+  color: var(--gold) !important;
+  background: rgba(200,169,110,0.07) !important;
+  box-shadow: inset 0 -2px 0 var(--gold) !important;
+}
+
+/* Theme toggle button style */
+.theme-toggle-btn {
+  width: 32px; height: 32px;
+  background: none !important;
+  border: 1px solid var(--border2) !important;
+  color: var(--muted2) !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 2px !important;
+  transition: all 0.2s !important;
+  flex-shrink: 0;
+}
+.theme-toggle-btn:hover {
+  border-color: var(--gold2) !important;
+  color: var(--gold) !important;
+}
+
+/* Better spacing in nav */
+.nav-items { gap: 2px !important; }
+.nav-right { gap: 10px !important; }
+
+/* Cleaner stat cells */
+.stat-cell {
+  background: var(--surface) !important;
+}
+.stat-big {
+  font-size: 32px !important;
+}
+.stat-lbl {
+  font-size: 9px !important;
+  letter-spacing: 0.18em !important;
+}
+
+/* Sharper profile tabs */
+.profile-tabs, .compare-tabs, .type-tabs {
+  scrollbar-width: none !important;
+}
+.profile-tabs::-webkit-scrollbar,
+.compare-tabs::-webkit-scrollbar,
+.type-tabs::-webkit-scrollbar { display: none; }
+
+/* Crisp narrative text */
+.narrative-text {
+  font-size: 13px !important;
+  line-height: 1.85 !important;
+  color: var(--muted2) !important;
+}
+
+/* Better empty states */
+.empty-state {
+  font-size: 11px !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--muted) !important;
+}
+
+/* Sharper modal */
+.modal-title {
+  font-size: 20px !important;
+}
+
+/* Group placeholder */
+.group-placeholder-title {
+  color: var(--border2) !important;
+  letter-spacing: 0.15em !important;
+}
+
+/* Cleaner toast */
+.toast {
+  border-radius: 0 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* Better compat pct display */
+.compat-pct {
+  font-size: 52px !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Sidebar profile type */
+.my-type {
+  font-size: 32px !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* Better looking bars */
+.bar-wrap, .dual-bar-wrap, .moral-bar-wrap {
+  border-radius: 2px !important;
+  overflow: hidden;
+}
+.bar-fill, .dual-bar-you, .dual-bar-them, .moral-bar-fill {
+  border-radius: 2px !important;
+}
+
+/* Cleaner section titles */
+.section-title::before {
+  content: '';
+  width: 12px !important;
+  height: 1px;
+  background: var(--gold2);
+  display: inline-block;
+}
+
+/* Page header gold accent */
+.page-title {
+  line-height: 0.9 !important;
+}
