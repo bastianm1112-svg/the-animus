@@ -634,7 +634,7 @@ auth.onAuthStateChanged(function(currentUser){
       document.getElementById('navAvatar').textContent = myName.charAt(0);
       if(myProfile){
         document.getElementById('youType').textContent = myProfile.mbti || '—';
-        document.getElementById('youEnn').textContent = (myProfile.ennType||'—')+'w'+(myProfile.ennWing||'')+(myProfile.instStack?' Â· '+myProfile.instStack:'');
+        document.getElementById('youEnn').textContent = (myProfile.ennType||'—')+'w'+(myProfile.ennWing||'')+(myProfile.instStack?' · '+myProfile.instStack:'');
       }
 
       // Populate THEM side
@@ -654,7 +654,7 @@ auth.onAuthStateChanged(function(currentUser){
 
       if(themProfile){
         document.getElementById('themType').textContent = themProfile.mbti || '—';
-        document.getElementById('themEnn').textContent = (themProfile.ennType||'—')+'w'+(themProfile.ennWing||'')+(themProfile.instStack?' Â· '+themProfile.instStack:'');
+        document.getElementById('themEnn').textContent = (themProfile.ennType||'—')+'w'+(themProfile.ennWing||'')+(themProfile.instStack?' · '+themProfile.instStack:'');
       }
 
       // If both profiles exist, run AI comparison
@@ -845,7 +845,7 @@ function sanitizeText(str, maxLen) {
 function shareComparison(){
   var url = window.location.href;
   if(navigator.clipboard){
-    navigator.clipboard.writeText(url).then(function(){ showToast('Comparison link copied âœ“'); });
+    navigator.clipboard.writeText(url).then(function(){ showToast('Comparison link copied ✓'); });
   } else {
     showToast('Copy this URL to share: ' + url);
   }
