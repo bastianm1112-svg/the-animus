@@ -15,15 +15,18 @@
         return;
       }
 
-      db.collection('users')
-        .doc(user.uid)
-        .get()
-        .then(function (doc) {
-          var userData = doc.exists ? doc.data() : {};
-          if (typeof g.AnimusShared !== 'undefined') {
-            g.AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), user, userData);
-          }
-        });
+      var sharedReady =
+        typeof g.AnimusShared !== 'undefined' && g.AnimusShared.ensureUserDocument
+          ? g.AnimusShared.ensureUserDocument(db, user)
+          : db.collection('users').doc(user.uid).get().then(function (doc) {
+              return doc.exists ? doc.data() : {};
+            });
+      sharedReady.then(function (userData) {
+        userData = userData || {};
+        if (typeof g.AnimusShared !== 'undefined') {
+          g.AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), user, userData);
+        }
+      });
 
       if (typeof g.AnimusSocial !== 'undefined') {
         g.AnimusSocial.loadFriends(user.uid);

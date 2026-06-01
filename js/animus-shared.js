@@ -702,6 +702,24 @@
     return base || 'user' + Date.now().toString().slice(-6);
   }
 
+  function normalizedFriendRequests(fr) {
+    if (!fr || typeof fr !== 'object' || Array.isArray(fr)) {
+      return { sent: [], received: [] };
+    }
+    return {
+      sent: Array.isArray(fr.sent) ? fr.sent : [],
+      received: Array.isArray(fr.received) ? fr.received : []
+    };
+  }
+
+  function friendRequestsNeedsRepair(fr) {
+    if (fr === undefined || fr === null) return false;
+    if (typeof fr !== 'object' || Array.isArray(fr)) return true;
+    if (fr.sent !== undefined && !Array.isArray(fr.sent)) return true;
+    if (fr.received !== undefined && !Array.isArray(fr.received)) return true;
+    return false;
+  }
+
   /** Create users/{uid} if missing (e.g. after failed signup batch or skipped home). */
   function ensureUserDocument(db, user) {
     if (!user || !db) return Promise.resolve(null);
@@ -710,7 +728,20 @@
       .doc(user.uid)
       .get()
       .then(function (doc) {
-        if (doc.exists) return doc.data();
+        if (doc.exists) {
+          var data = doc.data() || {};
+          if (friendRequestsNeedsRepair(data.friendRequests)) {
+            return db
+              .collection('users')
+              .doc(user.uid)
+              .set({ friendRequests: normalizedFriendRequests(data.friendRequests) }, { merge: true })
+              .then(function () {
+                data.friendRequests = normalizedFriendRequests(data.friendRequests);
+                return data;
+              });
+          }
+          return data;
+        }
         var pending = null;
         try {
           pending = JSON.parse(localStorage.getItem(KEYS.pendingDoc) || 'null');

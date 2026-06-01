@@ -284,13 +284,46 @@
     }, 400);
   }
 
+  function asFriendIdList(val) {
+    return Array.isArray(val) ? val : [];
+  }
+
+  function assertFriendRequestsShape(data, whoLabel) {
+    var fr = data.friendRequests;
+    if (fr === undefined || fr === null) return;
+    if (typeof fr !== 'object' || Array.isArray(fr)) {
+      throw {
+        code: 'failed-precondition',
+        message:
+          whoLabel +
+          ' account has corrupted friend-list data. They should open https://the-animus.vercel.app/friends once while signed in.'
+      };
+    }
+    if (fr.sent !== undefined && !Array.isArray(fr.sent)) {
+      throw { code: 'failed-precondition', message: whoLabel + ' friend list needs repair (invalid sent field).' };
+    }
+    if (fr.received !== undefined && !Array.isArray(fr.received)) {
+      throw { code: 'failed-precondition', message: whoLabel + ' friend list needs repair (invalid received field).' };
+    }
+  }
+
   function friendRequestErrorMessage(e) {
     if (!e) return 'Something went wrong';
+    if (e.userMessage) return e.userMessage;
     if (e.code === 'not-found') {
-      return 'They need to sign in once and open the home page to finish setup, then try again.';
+      return 'That user has no account record yet. They need to sign up and open the app home page once.';
+    }
+    if (e.code === 'failed-precondition') {
+      return e.message || 'Account data needs a quick repair on their side.';
     }
     if (e.code === 'permission-denied') {
-      return 'Could not send request — ask them to sign out and back in, or try again in a minute.';
+      if (e.stage === 'their') {
+        return 'Could not update their friend list. Ask them to open the Friends page once while signed in, then try again.';
+      }
+      if (e.stage === 'yours') {
+        return 'Could not update your friend list. Refresh the page or open the Friends page, then try again.';
+      }
+      return 'Server blocked this request (permissions). If it keeps happening, tell us — a rules update may still be deploying.';
     }
     return e.message || 'Request failed';
   }
@@ -340,42 +373,63 @@
       })
       .then(function (pair) {
         var d = pair.selfDoc.exists ? pair.selfDoc.data() : {};
+        var t = pair.targetDoc.data() || {};
+        assertFriendRequestsShape(d, 'Your');
+        assertFriendRequestsShape(t, 'Their');
         var friends = d.friends || [];
-        var sent = (d.friendRequests || {}).sent || [];
-        if (friends.indexOf(toUid) > -1) {
+        var sent = asFriendIdList((d.friendRequests || {}).sent);
+        var theirReceived = asFriendIdList((t.friendRequests || {}).received);
+        var theirFriends = t.friends || [];
+        if (friends.indexOf(toUid) > -1 || theirFriends.indexOf(user.uid) > -1) {
           if (btn) {
             btn.textContent = 'Already friends';
             btn.classList.add('added');
           }
           return { skipped: true };
         }
-        if (sent.indexOf(toUid) > -1) {
+        if (sent.indexOf(toUid) > -1 || theirReceived.indexOf(user.uid) > -1) {
           if (btn) {
             btn.textContent = 'Request Sent';
             btn.classList.add('added');
           }
-          return { skipped: true };
+          return { skipped: true, userMessage: 'Friend request already pending.' };
         }
-        var batch = db.batch();
-        batch.update(db.collection('users').doc(user.uid), {
-          'friendRequests.sent': firebase.firestore.FieldValue.arrayUnion(toUid)
-        });
-        batch.update(db.collection('users').doc(toUid), {
-          'friendRequests.received': firebase.firestore.FieldValue.arrayUnion(user.uid)
-        });
-        return batch.commit().then(function () {
-          return writeFriendRequestActivity(
-            toUid,
-            user,
-            'friend_request',
-            (user.displayName || 'Someone') + ' sent you a friend request'
-          ).then(function () {
+        return db
+          .collection('users')
+          .doc(user.uid)
+          .update({
+            'friendRequests.sent': firebase.firestore.FieldValue.arrayUnion(toUid)
+          })
+          .catch(function (err) {
+            err.stage = 'yours';
+            throw err;
+          })
+          .then(function () {
+            return db.collection('users').doc(toUid).update({
+              'friendRequests.received': firebase.firestore.FieldValue.arrayUnion(user.uid)
+            });
+          })
+          .catch(function (err) {
+            err.stage = 'their';
+            throw err;
+          })
+          .then(function () {
+            return writeFriendRequestActivity(
+              toUid,
+              user,
+              'friend_request',
+              (user.displayName || 'Someone') + ' sent you a friend request'
+            );
+          })
+          .then(function () {
             return { skipped: false };
           });
-        });
       })
       .then(function (result) {
-        if (result && result.skipped) return;
+        if (result && result.skipped) {
+          if (result.userMessage) showToast(result.userMessage);
+          return;
+        }
         if (btn) {
           btn.textContent = 'Request Sent ✓';
           btn.classList.add('added');
