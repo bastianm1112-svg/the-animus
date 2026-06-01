@@ -96,6 +96,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="/js/animus-shared.js"></script>
 <script>
 if(!firebase.apps.length){firebase.initializeApp({apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",authDomain:"animus-b3d83.firebaseapp.com",projectId:"animus-b3d83",storageBucket:"animus-b3d83.firebasestorage.app",messagingSenderId:"681221615050",appId:"1:681221615050:web:1d037cd07a8381c91b3333"});
 </script>
@@ -184,7 +185,7 @@ var _meUid = null;
 auth.onAuthStateChanged(function(user){
   if(!user){ window.location.href='/login'; return; }
   _meUid = user.uid;
-  document.getElementById('navAvatar').textContent = (user.displayName||'?').charAt(0).toUpperCase();
+  AnimusShared.bindNavAuth('navAvatar');
 
   Promise.all([
     db.collection('users').doc(user.uid).get(),

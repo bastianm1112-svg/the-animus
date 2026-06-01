@@ -546,6 +546,7 @@ document.querySelectorAll('.type-tab').forEach(function(tab){
 <!-- Firebase SDK for Smart Logo -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="/js/animus-shared.js"></script>
 <script>
 if (!firebase.apps.length) {
   firebase.initializeApp({
@@ -564,6 +565,7 @@ try {
       el.href = user ? '/dashboard' : '/';
     });
   });
+  AnimusShared.bindNavAuth('navAvatar');
 } catch(e){}
 </script>
 <script>

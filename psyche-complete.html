@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com https://www.gstatic.com; connect-src 'self' https://api.anthropic.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-ancestors 'none'; base-uri 'self';">
@@ -11,7 +11,7 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANIMUS — Complete Personality Atlas</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:#060606;--surface:#0d0d0d;--surface2:#131313;--border:#1c1c1c;--border2:#282828;
@@ -40,10 +40,16 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
 .intro-meta{display:flex;gap:56px;margin-bottom:64px;}
 .intro-meta-item strong{display:block;font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px;}
 .intro-meta-item span{font-size:9px;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;}
-.btn-primary{background:none;border:1px solid var(--accent2);color:var(--accent);padding:13px 52px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
-.btn-primary::before{content:'';position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;z-index:-1;}
-.btn-primary:hover{color:#000;border-color:var(--accent);}
-.btn-primary:hover::before{transform:scaleX(1);}
+.intro-actions{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:480px;}
+.btn-primary{background:none;border:1px solid var(--accent2);color:var(--accent);padding:13px 52px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;cursor:pointer;transition:color 0.2s,border-color 0.2s,background 0.2s;position:relative;z-index:2;pointer-events:auto;}
+.btn-primary:hover{color:#000;border-color:var(--accent);background:var(--accent);}
+.intro-mode-btn,.intro-import-btn,.observer-btn{position:relative;z-index:2;pointer-events:auto;}
+.intro-mode-toggle{position:relative;z-index:5;}
+.test-nav-avatar{width:32px;height:32px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--accent);text-decoration:none;flex-shrink:0;overflow:hidden;transition:border-color 0.2s;}
+.test-nav-avatar:hover{border-color:var(--accent);}
+.test-nav-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
+.test-nav-signin{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);text-decoration:none;border:1px solid var(--accent2);padding:5px 14px;}
+.test-nav-signin:hover{background:var(--accent);color:#000;border-color:var(--accent);}
 
 /* QUIZ */
 #quiz{display:none;min-height:100vh;padding-top:48px;}
@@ -312,8 +318,9 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="/js/animus-shared.js"></script>
   <script>
-    firebase.initializeApp({
+    AnimusShared.initFirebaseApp({
       apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
       authDomain: "animus-b3d83.firebaseapp.com",
       projectId: "animus-b3d83",
@@ -336,33 +343,14 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
 </script>
 
 <nav style="position:fixed;top:0;left:0;right:0;height:48px;background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);border-bottom:1px solid #1e1e1e;display:flex;align-items:center;padding:0 20px;justify-content:space-between;z-index:300;">
-  <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.1em;color:#f0ece4;text-decoration:none;">ANI<span style="color:#c8a96e">MUS</span></a>
+  <a href="/" class="nav-logo" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.1em;color:#f0ece4;text-decoration:none;">ANI<span style="color:#c8a96e">MUS</span></a>
   <div style="display:flex;gap:12px;align-items:center;">
-    <a href="/dashboard" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">Dashboard</a>
-    <a href="/profile" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;" onmouseover="this.style.color='#e2e2e2'" onmouseout="this.style.color='#888'">My Profile</a>
-    <a href="/login" id="navSignInBtn" style="width:32px;height:32px;border-radius:50%;border:1px solid #2a2a2a;background:#141414;display:none;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#c8a96e;text-decoration:none;text-align:center;line-height:32px;flex-shrink:0;" onmouseover="this.style.background='#c8a96e';this.style.color='#000'" onmouseout="this.style.background='none';this.style.color='#c8a96e'">Sign In</a>
+    <a href="/dashboard" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;">Dashboard</a>
+    <a href="/profile" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#888;text-decoration:none;">Profile</a>
+    <a href="/login" id="navAvatar" class="test-nav-signin" style="display:none">Sign In</a>
   </div>
 </nav>
-<script>
-(function(){
-  try {
-    firebase.auth().onAuthStateChanged(function(user){
-      var btn = document.getElementById('navSignInBtn');
-      if(!btn) return;
-      if(user){
-        btn.href = '/dashboard';
-        var _n=(user.displayName||'').trim().split(/\s+/); btn.textContent=(_n.length>1?_n[0].charAt(0)+_n[_n.length-1].charAt(0):(_n[0]||'?').charAt(0)).toUpperCase();
-        btn.onmouseover = function(){ this.style.background='#c8a96e'; this.style.color='#000'; };
-        btn.onmouseout  = function(){ this.style.background='none';    this.style.color='#c8a96e'; };
-      } else {
-        btn.href = '/login';
-        btn.textContent = 'Sign In';
-      }
-      btn.style.display = 'flex';
-    });
-  } catch(e){ var b=document.getElementById('navSignInBtn'); if(b) b.style.display=''; }
-})();
-</script>
+<script>AnimusShared.bindNavAuth('navAvatar');</script>
 
 <!-- INTRO -->
 <div id="intro">
@@ -371,14 +359,15 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
   <div class="intro-subtitle" data-en="Know thyself completely" data-es="Conócete completamente">Know thyself completely</div>
   <div class="intro-rule"></div>
   <p class="intro-desc" data-en="The most comprehensive personality instrument available. Maps your cognitive architecture, philosophical orientation, political geometry, attachment patterns, moral foundations, and the full depth of who you are — alone and with others." data-es="La herramienta de personalidad más completa que existe. Mapea tu arquitectura cognitiva, orientación filosófica, geometría política, patrones de apego, fundamentos morales y la profundidad total de quién sos — solo y con los demás.">The most comprehensive personality instrument available. Maps your cognitive architecture, philosophical orientation, political geometry, attachment patterns, moral foundations, and the full depth of who you are — alone and with others.</p>
-  <div class="intro-mode-toggle">
-    <button class="intro-mode-btn active" id="modeFull">
+  <div class="intro-actions">
+  <div class="intro-mode-toggle" id="introModeToggle">
+    <button type="button" class="intro-mode-btn active" id="modeFull" data-intro-action="mode-full" aria-pressed="true">
       <span class="mode-label" data-en="Full" data-es="Completo">Full</span>
       <span class="mode-sub" data-en="280 questions · ~30 min" data-es="280 preguntas · ~30 min">280 questions · ~30 min</span>
     </button>
-    <button class="intro-mode-btn" id="modeShort">
+    <button type="button" class="intro-mode-btn" id="modeShort" data-intro-action="mode-short" aria-pressed="false">
       <span class="mode-label" data-en="Short" data-es="Corto">Short</span>
-      <span class="mode-sub" data-en="100 questions · ~15 min" data-es="100 preguntas · ~15 min">100 questions · ~12 min</span>
+      <span class="mode-sub" data-en="100 questions · ~12 min" data-es="100 preguntas · ~12 min">100 questions · ~12 min</span>
     </button>
   </div>
   <div class="intro-meta">
@@ -386,7 +375,11 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
     <div class="intro-meta-item"><strong>14</strong><span data-en="Dimensions" data-es="Dimensiones">Dimensions</span></div>
     <div class="intro-meta-item"><strong id="metaMin">~30</strong><span data-en="Minutes" data-es="Minutos">Minutes</span></div>
   </div>
-  <button class="btn-primary" id="startBtn" data-en="BEGIN" data-es="COMENZAR">BEGIN</button>
+  <button type="button" class="btn-primary" id="startBtn" data-intro-action="start" data-en="BEGIN" data-es="COMENZAR">BEGIN</button>
+  <p id="resumeTestWrap" style="display:none;font-size:10px;color:var(--muted2);letter-spacing:0.08em;">
+    <button type="button" id="resumeTestBtn" class="intro-import-btn" style="margin-top:8px;width:auto;padding:8px 16px;">RESUME WHERE YOU LEFT OFF →</button>
+  </p>
+  </div>
   <!-- OBSERVER / ESTIMATOR MODE -->
   <div class="intro-observer">
     <div class="intro-import-divider"><span>or estimate someone else's profile</span></div>
@@ -1169,22 +1162,114 @@ function shuffle(arr){
 // ── TEST MODE ──
 var testMode = 'full';
 
-// Check URL param on load
-if(window.location.search.indexOf('mode=short') > -1) {
-  testMode = 'short';
-  document.getElementById('modeShort').classList.add('active');
-  document.getElementById('modeFull').classList.remove('active');
-  document.getElementById('metaQ').textContent = '100';
-  document.getElementById('metaMin').textContent = '~12';
+function setTestMode(mode) {
+  testMode = mode === 'short' ? 'short' : 'full';
+  try { localStorage.setItem(AnimusShared.KEYS.testMode, testMode); } catch(e){}
+  var fullBtn = document.getElementById('modeFull');
+  var shortBtn = document.getElementById('modeShort');
+  if(fullBtn){
+    fullBtn.classList.toggle('active', testMode === 'full');
+    fullBtn.setAttribute('aria-pressed', testMode === 'full' ? 'true' : 'false');
+  }
+  if(shortBtn){
+    shortBtn.classList.toggle('active', testMode === 'short');
+    shortBtn.setAttribute('aria-pressed', testMode === 'short' ? 'true' : 'false');
+  }
+  var metaQ = document.getElementById('metaQ');
+  var metaMin = document.getElementById('metaMin');
+  if(metaQ) metaQ.textContent = testMode === 'full' ? '280' : '100';
+  if(metaMin) metaMin.textContent = testMode === 'full' ? '~30' : '~12';
 }
 
-function setTestMode(mode) {
-  testMode = mode;
-  document.getElementById('modeFull').classList.toggle('active', mode === 'full');
-  document.getElementById('modeShort').classList.toggle('active', mode === 'short');
-  document.getElementById('metaQ').textContent = mode === 'full' ? '280' : '100';
-  document.getElementById('metaMin').textContent = mode === 'full' ? '~30' : '~15';
-  document.getElementById('metaMin').textContent = mode === 'full' ? '~30' : '~12';
+function saveTestProgress() {
+  if(!window._activeQ || !answers) return;
+  try {
+    sessionStorage.setItem(AnimusShared.KEYS.testProgress, JSON.stringify({
+      testMode: testMode,
+      cur: cur,
+      total: TOTAL,
+      answers: answers,
+      observerMode: !!observerMode,
+      observerSubjectName: observerSubjectName || '',
+      savedAt: Date.now()
+    }));
+  } catch(e){}
+}
+
+function clearTestProgress() {
+  try { sessionStorage.removeItem(AnimusShared.KEYS.testProgress); } catch(e){}
+}
+
+function loadSavedTestMode() {
+  var saved = null;
+  try { saved = localStorage.getItem(AnimusShared.KEYS.testMode); } catch(e){}
+  if(saved === 'short' || saved === 'full') return saved;
+  if(window.location.search.indexOf('mode=short') > -1) return 'short';
+  return 'full';
+}
+
+function showResumePromptIfNeeded() {
+  var wrap = document.getElementById('resumeTestWrap');
+  if(!wrap) return;
+  try {
+    var raw = sessionStorage.getItem(AnimusShared.KEYS.testProgress);
+    if(!raw) return;
+    var data = JSON.parse(raw);
+    if(!data || !data.answers || data.cur < 1) return;
+    wrap.style.display = 'block';
+  } catch(e){}
+}
+
+function resumeTestFromStorage() {
+  var raw;
+  try { raw = sessionStorage.getItem(AnimusShared.KEYS.testProgress); } catch(e){ return; }
+  if(!raw) return;
+  var data;
+  try { data = JSON.parse(raw); } catch(e){ return; }
+  if(!data || !data.answers) return;
+  setTestMode(data.testMode || 'full');
+  observerMode = !!data.observerMode;
+  observerSubjectName = data.observerSubjectName || '';
+  buildActiveQuestionSet();
+  if(data.answers.length === TOTAL){
+    answers = data.answers.slice();
+    cur = Math.min(data.cur, TOTAL - 1);
+    document.getElementById('intro').style.display = 'none';
+    document.getElementById('quiz').style.display = 'block';
+    if(observerMode && observerSubjectName){
+      document.querySelector('.qhdr-logo').innerHTML = 'ANIMUS <span style="font-size:12px;color:var(--accent2);letter-spacing:0.1em">ESTIMATOR</span>';
+      document.getElementById('qSection').textContent = 'Estimating: ' + observerSubjectName;
+    }
+    renderQ();
+  }
+}
+
+function buildActiveQuestionSet() {
+  var activeQ;
+  if(testMode === 'short') {
+    var byFnMC = {}, byFnS = {};
+    Q.forEach(function(q){
+      if(q.type==='mc'){ if(!byFnMC[q.fn]) byFnMC[q.fn]=[]; byFnMC[q.fn].push(q); }
+      else { if(!byFnS[q.fn]) byFnS[q.fn]=[]; byFnS[q.fn].push(q); }
+    });
+    activeQ = [];
+    Object.keys(SHORT_ALLOC).forEach(function(fn){
+      var alloc = SHORT_ALLOC[fn];
+      var mcPool = (byFnMC[fn]||[]).slice(); shuffle(mcPool);
+      var sPool  = (byFnS[fn]||[]).slice();  shuffle(sPool);
+      var mcCount = Math.floor(alloc/2);
+      var sCount  = alloc - mcCount;
+      activeQ = activeQ.concat(mcPool.slice(0,mcCount));
+      activeQ = activeQ.concat(sPool.slice(0,sCount));
+    });
+    shuffle(activeQ);
+  } else {
+    activeQ = Q.slice();
+    shuffle(activeQ);
+  }
+  window._activeQ = activeQ;
+  TOTAL = activeQ.length;
+  if(!answers || answers.length !== TOTAL) answers = new Array(TOTAL).fill(null);
 }
 
 // Short test allocation — 100 questions spread across all 14 dimensions
@@ -1203,47 +1288,47 @@ var SHORT_ALLOC = {
   AL_INT:1,AL_SEN:1
 };;
 
-// buildShortSet inlined in startBtn handler
-
-// ── MODE TOGGLE ──
-document.getElementById('modeFull').addEventListener('click', function(){ setTestMode('full'); });
-document.getElementById('modeShort').addEventListener('click', function(){ setTestMode('short'); });
-
-// ── START ──
-document.getElementById('startBtn').addEventListener('click', function(){
-  var activeQ;
-  if(testMode === 'short') {
-    // Short test: half MC, half Likert per dimension = 50+50 = 100 total
-    var byFnMC = {}, byFnS = {};
-    Q.forEach(function(q){
-      if(q.type==='mc'){ if(!byFnMC[q.fn]) byFnMC[q.fn]=[]; byFnMC[q.fn].push(q); }
-      else { if(!byFnS[q.fn]) byFnS[q.fn]=[]; byFnS[q.fn].push(q); }
-    });
-    activeQ = [];
-    Object.keys(SHORT_ALLOC).forEach(function(fn){
-      var alloc = SHORT_ALLOC[fn];
-      var mcPool = (byFnMC[fn]||[]).slice(); shuffle(mcPool);
-      var sPool  = (byFnS[fn]||[]).slice();  shuffle(sPool);
-      var mcCount = Math.floor(alloc/2);
-      var sCount  = alloc - mcCount;
-      activeQ = activeQ.concat(mcPool.slice(0,mcCount));
-      activeQ = activeQ.concat(sPool.slice(0,sCount));
-    });
-    shuffle(activeQ);
-  } else {
-    // Full test: all 280 (140 MC + 140 Likert) shuffled
-    activeQ = Q.slice();
-    shuffle(activeQ);
-  }
-  window._activeQ = activeQ;
-  TOTAL = activeQ.length;
+function startTest() {
+  buildActiveQuestionSet();
   answers = new Array(TOTAL).fill(null);
   cur = 0;
   _explainCache = {};
+  clearTestProgress();
   document.getElementById('intro').style.display='none';
   document.getElementById('quiz').style.display='block';
   renderQ();
-});
+  saveTestProgress();
+}
+
+function initTestIntro() {
+  setTestMode(loadSavedTestMode());
+  showResumePromptIfNeeded();
+
+  var introEl = document.getElementById('intro');
+  if(introEl){
+    introEl.addEventListener('click', function(ev){
+      var actionEl = ev.target.closest('[data-intro-action]');
+      if(!actionEl) return;
+      ev.preventDefault();
+      var action = actionEl.getAttribute('data-intro-action');
+      if(action === 'mode-full') setTestMode('full');
+      else if(action === 'mode-short') setTestMode('short');
+      else if(action === 'start') startTest();
+    });
+  }
+
+  var resumeBtn = document.getElementById('resumeTestBtn');
+  if(resumeBtn) resumeBtn.addEventListener('click', function(ev){ ev.preventDefault(); resumeTestFromStorage(); });
+
+  var modeFull = document.getElementById('modeFull');
+  var modeShort = document.getElementById('modeShort');
+  var startBtn = document.getElementById('startBtn');
+  if(modeFull) modeFull.addEventListener('click', function(){ setTestMode('full'); });
+  if(modeShort) modeShort.addEventListener('click', function(){ setTestMode('short'); });
+  if(startBtn) startBtn.addEventListener('click', function(){ startTest(); });
+}
+
+initTestIntro();
 
 // ── IMPORT PROFILE ──
 function parseProfileLink(raw){
@@ -1734,10 +1819,13 @@ function renderQ(){
   if(nb && !nb.disabled) nb.addEventListener('click', function(){
     if(isLast) finishQuiz(); else { cur++; renderQ(); }
   });
+
+  saveTestProgress();
 }
 
 // ── FINISH QUIZ (called when user completes last question) ──
 function finishQuiz(){
+  clearTestProgress();
   document.getElementById('quiz').style.display='none';
   document.getElementById('loading').style.display='flex';
   document.getElementById('loadStatus').textContent='Scoring your responses...';

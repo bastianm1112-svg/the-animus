@@ -306,6 +306,16 @@ nav.scrolled {
 
 /* ── TEST PAGE ISOLATION — prevent global styles from bleeding into test ── */
 /* The test uses its own design tokens (--accent, --accent2) — don't override them */
+#intro button,
+#intro .intro-mode-btn,
+#intro .btn-primary,
+#intro .intro-import-btn,
+#intro .observer-btn {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 5;
+}
+
 #intro *, #quiz *, .q-wrap *, .mc-choices *, .scale-wrap *,
 .agree-grid *, .result-wrap *, #results * {
   background-image: none;

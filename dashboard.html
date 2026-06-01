@@ -197,6 +197,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="/js/animus-shared.js"></script>
   <script>
   if(!firebase.apps.length){
     firebase.initializeApp({
@@ -391,14 +392,13 @@ auth.onAuthStateChanged(function(user){
   // Set greeting
   var name = escapeHTML(user.displayName || user.email.split('@')[0]);
   document.getElementById('mainGreeting').innerHTML = greeting+', <em>'+name+'</em>';
-  var nameParts = name.split(/\s+/).filter(Boolean);
-  var init = nameParts.length > 1 ? (nameParts[0].charAt(0) + nameParts[nameParts.length-1].charAt(0)).toUpperCase() : name.charAt(0).toUpperCase();
-  document.getElementById('navAvatar').textContent = init;
-  document.getElementById('sidebarAvatar').textContent = init;
   document.getElementById('sidebarName').textContent = name;
 
   // Load user doc - create if missing (handles failed signup writes)
   db.collection('users').doc(user.uid).get().then(function(doc){
+    var userData = doc.exists ? doc.data() : {};
+    AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), user, userData);
+    AnimusShared.applyProfilePhoto(document.getElementById('sidebarAvatar'), user, userData);
     if(!doc.exists){
       var pending = null;
       try{ pending = JSON.parse(localStorage.getItem('animus_pending_doc')||'null'); }catch(_){}
@@ -421,6 +421,8 @@ auth.onAuthStateChanged(function(user){
           localStorage.removeItem('animus_pending_doc');
           document.getElementById('sidebarUsername').textContent='@'+escapeHTML(userData.username);
           document.getElementById('sidebarName').textContent=escapeHTML(userData.displayName);
+          AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), user, userData);
+          AnimusShared.applyProfilePhoto(document.getElementById('sidebarAvatar'), user, userData);
         })
         .catch(function(e){ console.error('Auto-create doc failed:',e); });
       return;
@@ -434,13 +436,15 @@ auth.onAuthStateChanged(function(user){
         document.getElementById('sidebarName').textContent = escapeHTML(firestoreName);
         document.getElementById('mainGreeting').innerHTML = greeting+', <em>'+escapeHTML(firestoreName)+'</em>';
       }
+      AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), user, data);
+      AnimusShared.applyProfilePhoto(document.getElementById('sidebarAvatar'), user, data);
       var fc = (data.friends||[]).length;
       if(fc) document.getElementById('friendCount').textContent = '· '+fc;
     }
   });
 
   db.collection('profiles').doc(user.uid).get().then(function(doc){
-    var hasTaken=doc.exists&&doc.data().latest&&doc.data().latest.mbti;if(!hasTaken){var card=document.getElementById(''onboardingCard'');if(card)card.classList.add(''show'');var banner=document.getElementById(''retakeBanner'');if(banner)banner.style.display=''none'';}
+    var hasTaken=doc.exists&&doc.data().latest&&doc.data().latest.mbti;if(!hasTaken){var card=document.getElementById('onboardingCard');if(card)card.classList.add('show');var banner=document.getElementById('retakeBanner');if(banner)banner.style.display='none';}
     if(doc.exists){
       var p = doc.data().latest;
       if(p && p.mbti){

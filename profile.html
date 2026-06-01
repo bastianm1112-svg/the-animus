@@ -182,6 +182,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="/js/animus-shared.js"></script>
 <script>
 if(!firebase.apps.length){
   firebase.initializeApp({apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",authDomain:"animus-b3d83.firebaseapp.com",projectId:"animus-b3d83",storageBucket:"animus-b3d83.firebasestorage.app",messagingSenderId:"681221615050",appId:"1:681221615050:web:1d037cd07a8381c91b3333"});
@@ -565,7 +566,10 @@ function loadProfileData(uid, isOwner, currentUser){
     var snap=p.latest||{};
     _snap=snap; _pName=u.displayName||''; _pUser=u.username||'';
 
-    if(currentUser){ var _dn=currentUser.displayName||''; var _np=_dn.split(/\s+/).filter(Boolean); document.getElementById('navAvatar').textContent=(_np.length>1?(_np[0].charAt(0)+_np[_np.length-1].charAt(0)):(_np[0]||'?').charAt(0)).toUpperCase(); }
+    if(currentUser){
+      AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), currentUser, u);
+      if(isOwner) AnimusShared.applyProfilePhoto(document.getElementById('profilePhoto'), currentUser, u);
+    }
 
     document.getElementById('profileName').textContent=u.displayName||'&#8212;';
     document.getElementById('profileUsername').textContent='@'+(u.username||'&#8212;');

@@ -202,6 +202,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="/js/animus-shared.js"></script>
   <script>
     if (!firebase.apps.length) { firebase.initializeApp({
       apiKey: "AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",
@@ -557,7 +558,7 @@ auth.onAuthStateChanged(function(currentUser){
   if(!currentUser){ window.location.href='/login'; return; }
 
   // Set nav avatar
-  document.getElementById('navAvatar').textContent=(currentUser.displayName||'?').charAt(0).toUpperCase();
+  AnimusShared.bindNavAuth('navAvatar');
 
   // Populate friends picker
   db.collection('users').doc(currentUser.uid).get().then(function(doc){
@@ -633,7 +634,7 @@ auth.onAuthStateChanged(function(currentUser){
       var myUname = escapeHTML(myUser.username || '');
       document.getElementById('youName').textContent = myName;
       document.getElementById('youUsername').textContent = '@' + myUname;
-      document.getElementById('navAvatar').textContent = myName.charAt(0);
+      AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), currentUser, myUser);
       if(myProfile){
         document.getElementById('youType').textContent = myProfile.mbti || '—';
         document.getElementById('youEnn').textContent = (myProfile.ennType||'—')+'w'+(myProfile.ennWing||'')+(myProfile.instStack?' · '+myProfile.instStack:'');
