@@ -1,8 +1,8 @@
-Ã¯Â»Â¿<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANIMUS Ã¢â‚¬” Dashboard</title>
+<title>ANIMUS ââ‚¬” Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -176,7 +176,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .feed-icon{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--gold);}
 </style>
 
-/* Ã¢”â‚¬Ã¢”â‚¬ MOBILE BOTTOM NAV Ã¢”â‚¬Ã¢”â‚¬ */
+/* â”â‚¬â”â‚¬ MOBILE BOTTOM NAV â”â‚¬â”â‚¬ */
 .mobile-bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: rgba(8,8,8,0.97); backdrop-filter: blur(16px); border-top: 1px solid var(--border); z-index: 300; justify-content: space-around; align-items: center; padding: 0 8px; }
 @media(max-width:768px){ .mobile-bottom-nav { display: flex; } body { padding-bottom: 60px; } }
 .mbn-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 14px; color: var(--muted); text-decoration: none; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; position: relative; }
@@ -274,11 +274,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="my-profile-card">
         <div class="my-avatar" id="sidebarAvatar">?</div>
         <div>
-          <div class="my-name" id="sidebarName">Ã¢â‚¬”</div>
-          <div class="my-username" id="sidebarUsername">@Ã¢â‚¬”</div>
+          <div class="my-name" id="sidebarName">ââ‚¬”</div>
+          <div class="my-username" id="sidebarUsername">@ââ‚¬”</div>
         </div>
-        <div class="my-type" id="sidebarType">Ã¢â‚¬”</div>
-        <div class="my-enn" id="sidebarEnn">Ã¢â‚¬”</div>
+        <div class="my-type" id="sidebarType">ââ‚¬”</div>
+        <div class="my-enn" id="sidebarEnn">ââ‚¬”</div>
         <a href="/profile" class="btn-view-profile">View Profile</a>
       </div>
     </div>
@@ -329,10 +329,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="main-date" id="currentDate"></div>
     </div>
 
-    <div class="onboarding-card" id="onboardingCard"><div class="onboarding-title">Welcome to ANIMUS</div><div class="onboarding-sub">Three steps to your complete personality profile.</div><div class="onboarding-steps"><div class="onboarding-step"><div class="onboarding-step-num">1</div><span>Take the assessment</span></div><div class="onboarding-step"><div class="onboarding-step-num">2</div><span>View your profile</span></div><div class="onboarding-step"><div class="onboarding-step-num">3</div><span>Add friends &amp; compare</span></div></div><a href="/test" class="btn-retake">Begin Assessment Ã¢†’</a></div>
+    <div class="onboarding-card" id="onboardingCard"><div class="onboarding-title">Welcome to ANIMUS</div><div class="onboarding-sub">Three steps to your complete personality profile.</div><div class="onboarding-steps"><div class="onboarding-step"><div class="onboarding-step-num">1</div><span>Take the assessment</span></div><div class="onboarding-step"><div class="onboarding-step-num">2</div><span>View your profile</span></div><div class="onboarding-step"><div class="onboarding-step-num">3</div><span>Add friends &amp; compare</span></div></div><a href="/test" class="btn-retake">Begin Assessment â†’</a></div>
     <div class="retake-banner">
       <div class="retake-text" id="retakeBannerText">Take the assessment to build your profile.</div>
-      <a href="/test" class="btn-retake">Take Test Ã¢†’</a>
+      <a href="/test" class="btn-retake">Take Test â†’</a>
     </div>
 
     <div class="section-head">
@@ -341,7 +341,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </div>
 
     <div class="friends-grid" id="friendsGrid">
-      <div class="empty-state">No friends yet Ã¢â‚¬” add someone to get started</div>
+      <div class="empty-state">No friends yet ââ‚¬” add someone to get started</div>
       <button class="friend-card friend-card-add" onclick="openAddFriend()">
         <div class="add-icon">+</div>
         <div class="add-label">Add Friend</div>
@@ -375,7 +375,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <!-- ADD FRIEND MODAL -->
 <div class="modal-overlay" id="addFriendModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeAddFriend()">Ã¢Å“•</button>
+    <button class="modal-close" onclick="closeAddFriend()">âÅ“•</button>
     <div class="modal-title">Add a friend</div>
     <p class="modal-sub">Search by username to find and add someone to your friends list.</p>
     <div class="modal-search-wrap">
@@ -404,7 +404,7 @@ document.getElementById('currentDate').textContent=days[now.getDay()]+', '+month
 var hour=now.getHours();
 var greeting=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
 
-// Ã¢”â‚¬Ã¢”â‚¬ FIREBASE AUTH + DATA LOAD Ã¢”â‚¬Ã¢”â‚¬
+// â”â‚¬â”â‚¬ FIREBASE AUTH + DATA LOAD â”â‚¬â”â‚¬
 auth.onAuthStateChanged(function(user){
   if(!user){ window.location.href='/login'; return; }
   updateThemeToggleIcon();
@@ -456,7 +456,7 @@ auth.onAuthStateChanged(function(user){
         document.getElementById('mainGreeting').innerHTML = greeting+', <em>'+escapeHTML(firestoreName)+'</em>';
       }
       var fc = (data.friends||[]).length;
-      if(fc) document.getElementById('friendCount').textContent = 'Ã‚Â· '+fc;
+      if(fc) document.getElementById('friendCount').textContent = 'Ã‚· '+fc;
     }
   });
 
@@ -470,16 +470,16 @@ auth.onAuthStateChanged(function(user){
       var p = doc.data().latest;
       if(p && p.mbti){
         document.getElementById('sidebarType').textContent = p.mbti;
-        var ennD = p.ennType ? p.ennType+'w'+p.ennWing : 'Ã¢â‚¬”';
-        document.getElementById('sidebarEnn').textContent = ennD+(p.instStack?' Ã‚Â· '+p.instStack:'');
+        var ennD = p.ennType ? p.ennType+'w'+p.ennWing : 'ââ‚¬”';
+        document.getElementById('sidebarEnn').textContent = ennD+(p.instStack?' Ã‚· '+p.instStack:'');
       var now = Date.now();
       var hist = p.history && p.history.length ? p.history : [];
       var lastDate = hist.length ? hist[hist.length-1].timestamp : null;
       var daysSince = lastDate ? Math.floor((now - lastDate.toDate().getTime()) / 86400000) : null;
       if(daysSince !== null && daysSince > 90){
-        document.getElementById('retakeBannerText').innerHTML = '<strong>ItÃ¢â‚¬â„¢s been ' + daysSince + ' days since your last assessment.</strong> See how youÃ¢â‚¬â„¢ve changed.';
+        document.getElementById('retakeBannerText').innerHTML = '<strong>Itââ‚¬â„¢s been ' + daysSince + ' days since your last assessment.</strong> See how youââ‚¬â„¢ve changed.';
       } else {
-        document.getElementById('retakeBannerText').innerHTML = '<strong>Last assessment complete.</strong> Retake any time to see how youÃ¢â‚¬â„¢ve changed.';
+        document.getElementById('retakeBannerText').innerHTML = '<strong>Last assessment complete.</strong> Retake any time to see how youââ‚¬â„¢ve changed.';
       }
       }
     }
@@ -517,8 +517,8 @@ function loadFriends(uid){
         var init = escapeHTML((u.displayName||'?').charAt(0).toUpperCase());
         var dname = escapeHTML(u.displayName||'');
         var uname = escapeHTML(u.username||'');
-        var mbti = escapeHTML((p&&p.mbti)||'Ã¢â‚¬”');
-        var enn = p&&p.ennType ? p.ennType+'w'+p.ennWing : 'Ã¢â‚¬”';
+        var mbti = escapeHTML((p&&p.mbti)||'ââ‚¬”');
+        var enn = p&&p.ennType ? p.ennType+'w'+p.ennWing : 'ââ‚¬”';
         var card = document.createElement('a');
         card.href = '/profile?u='+encodeURIComponent(u.username||fuid);
         card.className = 'friend-card';
@@ -576,7 +576,7 @@ function loadActivity(uid){
             +'<button class="btn-add-small" data-uid="'+escapeHTML(a.fromUid)+'" onclick="declineFriendRequest(this.dataset.uid);this.closest(\'.feed-item\').remove()">Decline</button>'
             +'</div>';
         } else if(a.link){
-          actionHtml = '<a href="'+escapeHTML(a.link)+'" class="feed-action">View Ã¢†’</a>';
+          actionHtml = '<a href="'+escapeHTML(a.link)+'" class="feed-action">View â†’</a>';
         }
         item.innerHTML = '<div class="feed-icon">' + iconSVG + '</div>'
           +'<div class="feed-content"><div class="feed-text">' + escapeHTML(a.text||'') + '</div>'
@@ -619,7 +619,7 @@ function searchUsers(val){
     var currentUser=firebase.auth().currentUser;
     firebase.firestore().collection('usernames')
       .where(firebase.firestore.FieldPath.documentId(),'>=',q)
-      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'Ã¯Â£Â¿')
+      .where(firebase.firestore.FieldPath.documentId(),'<=',q+'ï£¿')
       .limit(8).get()
       .then(function(snap){
         if(snap.empty){ res.innerHTML='<div class="search-empty">No users found for @'+escapeHTML(q)+'</div>'; return; }
@@ -651,7 +651,7 @@ function searchUsers(val){
   },400);
 }
 function addFriend(btn,name){
-  btn.textContent='Sent Ã¢Å““'; btn.classList.add('added'); btn.disabled=true;
+  btn.textContent='Sent âÅ““'; btn.classList.add('added'); btn.disabled=true;
   showToast('Friend request sent to '+escapeHTML(name));
 }
 
@@ -688,7 +688,7 @@ function sendFriendRequest(toUid, toName, btn){
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     return batch.commit().then(function(){
-      if(btn){ btn.textContent='Request Sent Ã¢Å““'; btn.classList.add('added'); }
+      if(btn){ btn.textContent='Request Sent âÅ““'; btn.classList.add('added'); }
       showToast('Friend request sent to '+escapeHTML(toName));
     });
   }).catch(function(e){
