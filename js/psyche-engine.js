@@ -867,7 +867,16 @@ function answerFingerprint(){
   return Math.abs(h);
 }
 
+// Population priors used only when dimension scores are ambiguous — never override a clear lead.
+var POPULAR_MBTI = 'ISFJ';
+var POPULAR_ENN_TYPE = '9';
+var POPULAR_ENN_WING = '1';
 var MBTI_TIE_EPS = 0.5;
+var MBTI_STACK_TIE_GAP = 0.5;
+var MBTI_BLUR_PRIOR_BONUS = 0.35;
+var ENN_TYPE_TIE_GAP = 2;
+var ENN_WING_TIE_GAP = 1.5;
+var ENN_BLUR_PRIOR_BONUS = 0.5;
 
 function mbtiFromDichotomies(cog, fp){
   var I = ((cog.Si || 50) + (cog.Ni || 50)) / 2;
@@ -879,16 +888,20 @@ function mbtiFromDichotomies(cog, fp){
   var J = ((cog.Te || 50) + (cog.Fe || 50) + (cog.Si || 50)) / 3;
   var P = ((cog.Ti || 50) + (cog.Fi || 50) + (cog.Ne || 50) + (cog.Se || 50)) / 4;
   fp = fp || 0;
-  function letter(high, low, pos, neg, bit){
-    if (Math.abs(high - low) < MBTI_TIE_EPS) {
-      return ((fp >> bit) & 1) ? pos : neg;
-    }
-    return high > low ? pos : neg;
+  function letter(high, low, pos, neg, bit, preferOnBlur){
+    var diff = high - low;
+    var ad = Math.abs(diff);
+    if (ad >= MBTI_TIE_EPS) return diff > 0 ? pos : neg;
+    if (ad < 0.12) return preferOnBlur;
+    if (ad >= 0.28) return diff > 0 ? pos : neg;
+    var bucket = (fp >> bit) & 9;
+    if (bucket < 3) return preferOnBlur;
+    return diff >= 0 ? pos : neg;
   }
-  return letter(E, I, 'E', 'I', 0)
-    + letter(N, S, 'N', 'S', 1)
-    + letter(T, F, 'T', 'F', 2)
-    + letter(J, P, 'J', 'P', 3);
+  return letter(E, I, 'E', 'I', 0, 'I')
+    + letter(N, S, 'N', 'S', 1, 'S')
+    + letter(T, F, 'T', 'F', 2, 'F')
+    + letter(J, P, 'J', 'P', 3, 'J');
 }
 
 function getMBTI(cog){
@@ -910,14 +923,27 @@ function getMBTI(cog){
   });
   ranked.sort(function(a,b){ return b.score - a.score; });
   var top = ranked[0].score;
-  var tied = ranked.filter(function(r){ return r.score >= top - 0.5; });
+  var tied = ranked.filter(function(r){ return r.score >= top - MBTI_STACK_TIE_GAP; });
   if (tied.length === 1) return tied[0].type;
   var fp = answerFingerprint();
   var dich = mbtiFromDichotomies(cog, fp);
   for (var j = 0; j < tied.length; j++) {
     if (tied[j].type === dich) return dich;
   }
-  return tied[fp % tied.length].type;
+  var withPrior = tied.map(function (r) {
+    return {
+      type: r.type,
+      raw: r.score,
+      adj: r.score + (r.type === POPULAR_MBTI ? MBTI_BLUR_PRIOR_BONUS : 0)
+    };
+  });
+  withPrior.sort(function (a, b) {
+    return b.adj - a.adj || b.raw - a.raw;
+  });
+  if (withPrior[0].type === POPULAR_MBTI && withPrior[0].raw >= top - MBTI_STACK_TIE_GAP) {
+    return POPULAR_MBTI;
+  }
+  return withPrior[0].type;
 }
 
 // ── HELPER: Derive Enneagram type/wing/tritype from scores ──
@@ -925,12 +951,33 @@ function getEnneagram(eS){
   var nums=['E1','E2','E3','E4','E5','E6','E7','E8','E9'];
   var maxVal = -1;
   nums.forEach(function(k){ maxVal = Math.max(maxVal, eS[k] || 0); });
-  var leaders = nums.filter(function(k){ return (eS[k] || 0) >= maxVal - 0.01; });
-  var typeKey = leaders.length === 1 ? leaders[0] : nums[answerFingerprint() % nums.length];
+  var leaders = nums.filter(function(k){ return (eS[k] || 0) >= maxVal - ENN_TYPE_TIE_GAP; });
+  var typeKey;
+  if (leaders.length === 1) {
+    typeKey = leaders[0];
+  } else {
+    typeKey = leaders[0];
+    var bestAdj = -1;
+    leaders.forEach(function (k) {
+      var adj = (eS[k] || 0) + (k === 'E' + POPULAR_ENN_TYPE ? ENN_BLUR_PRIOR_BONUS : 0);
+      if (adj > bestAdj) {
+        bestAdj = adj;
+        typeKey = k;
+      }
+    });
+  }
   var type = typeKey.replace('E','');
-  var t=parseInt(type);
+  var t=parseInt(type,10);
   var wL=t===1?9:t-1, wR=t===9?1:t+1;
-  var wing=(eS['E'+wL]||0)>(eS['E'+wR]||0)?String(wL):String(wR);
+  var wLScore = eS['E' + wL] || 0;
+  var wRScore = eS['E' + wR] || 0;
+  var wing;
+  if (Math.abs(wLScore - wRScore) < ENN_WING_TIE_GAP) {
+    if (t === parseInt(POPULAR_ENN_TYPE, 10)) wing = POPULAR_ENN_WING;
+    else wing = wLScore >= wRScore ? String(wL) : String(wR);
+  } else {
+    wing = wLScore > wRScore ? String(wL) : String(wR);
+  }
   var gut=['E8','E9','E1'].reduce(function(a,b){ return (eS[a]||0)>(eS[b]||0)?a:b; }).replace('E','');
   var heart=['E2','E3','E4'].reduce(function(a,b){ return (eS[a]||0)>(eS[b]||0)?a:b; }).replace('E','');
   var head=['E5','E6','E7'].reduce(function(a,b){ return (eS[a]||0)>(eS[b]||0)?a:b; }).replace('E','');
@@ -1139,7 +1186,7 @@ function buildPrompt(data){
     +'Quadrant: '+polQuadrant+'\n'
     +'Economic interpretation: '+(data.polX>60?'Hard libertarian-right':data.polX>30?'Classical liberal / libertarian':data.polX>10?'Centre-right':data.polX>-10?'True centrist':data.polX>-30?'Centre-left / social democrat':data.polX>-60?'Democratic socialist':'Hard left')+'\n'
     +'Social interpretation: '+(data.polY<-60?'Strong libertarian / near-anarchist':data.polY<-30?'Libertarian':data.polY<-10?'Centre-libertarian':data.polY<10?'Moderate':data.polY<30?'Centre-authoritarian':data.polY<60?'Authoritarian':'Hard authoritarian')+'\n\n'
-    +'IMPORTANT: Base ALL analysis on the actual scores above. Do NOT default to INTJ assumptions. '
+    +'IMPORTANT: Base ALL analysis on the actual scores above. Do NOT default to stereotype assumptions (INTJ, ENTJ, etc.). '
     +'This person is '+mbti+' type '+enn.type+'w'+enn.wing+'. Their dominant function is '+fnsSorted[0]+'. '
     +'Be specific to THEIR actual profile — every narrative must match their actual scores.\n\n'
     +'Return a JSON object with EXACTLY these keys:\n'
