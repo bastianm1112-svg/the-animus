@@ -2,8 +2,8 @@
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANIMUS Profile</title>
-<meta name="description" content="My complete personality profile on ANIMUS â€” MBTI, Enneagram, philosophy, political compass and more.">
-<meta property="og:title" content="ANIMUS â€” My Personality Profile">
+<meta name="description" content="My complete personality profile on ANIMUS — MBTI, Enneagram, philosophy, political compass and more.">
+<meta property="og:title" content="ANIMUS — My Personality Profile">
 <meta property="og:description" content="Complete personality mapping: cognitive functions, Enneagram, philosophy, political compass, attachment style and more.">
 <meta property="og:type" content="profile">
 <meta name="twitter:card" content="summary">
@@ -494,7 +494,7 @@ function downloadShareCard(){
     // MBTI type
     ctx.fillStyle='#f0ece4';
     ctx.font='400 '+((_snap.mbti||'').length>4?'160':'190')+'px "Bebas Neue",sans-serif';
-    ctx.fillText(_snap.mbti||'â€”',50,340);
+    ctx.fillText(_snap.mbti||'—',50,340);
     // Type name
     if(_snap.mbtiName){
       ctx.font='400 15px "DM Sans",sans-serif'; ctx.fillStyle='#c8a96e';
@@ -600,7 +600,7 @@ function loadProfileData(uid, isOwner, currentUser){
       var cogFns=Object.keys(snap.cog).sort(function(a,b){return snap.cog[b]-snap.cog[a];});
       var cogColors=['','','','dim','dim','low','low','low'];
       var fnColorMap={Ni:'fn-ni',Ne:'fn-ne',Ti:'fn-ti',Te:'fn-te',Fi:'fn-fi',Fe:'fn-fe',Si:'fn-si',Se:'fn-se'};
-var fnTooltips={Ni:'Introverted Intuition â€” pattern recognition, long-range vision',Ne:'Extraverted Intuition â€” possibility mapping, lateral thinking',Ti:'Introverted Thinking â€” internal logical frameworks',Te:'Extraverted Thinking â€” external systematization, efficiency',Fi:'Introverted Feeling â€” deep personal values, authenticity',Fe:'Extraverted Feeling â€” interpersonal harmony, emotional attunement',Si:'Introverted Sensing â€” experiential memory, established procedure',Se:'Extraverted Sensing â€” present-moment awareness, physical mastery'};
+var fnTooltips={Ni:'Introverted Intuition — pattern recognition, long-range vision',Ne:'Extraverted Intuition — possibility mapping, lateral thinking',Ti:'Introverted Thinking — internal logical frameworks',Te:'Extraverted Thinking — external systematization, efficiency',Fi:'Introverted Feeling — deep personal values, authenticity',Fe:'Extraverted Feeling — interpersonal harmony, emotional attunement',Si:'Introverted Sensing — experiential memory, established procedure',Se:'Extraverted Sensing — present-moment awareness, physical mastery'};
 document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Math.round(snap.cog[fn]||0);var cls=fnColorMap[fn]||'';return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><div class="fn-tooltip-wrap"><strong>'+escapeHTML(fn)+'</strong><div class="fn-tooltip">'+escapeHTML(fnTooltips[fn]||fn)+'</div></div></div><div class="bar-wrap"><div class="bar-fill '+cls+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><strong>'+escapeHTML(fn)+'</strong></div><div class="bar-wrap"><div class="bar-fill '+(cogColors[i]||'low')+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');
       var stackLabels=['Dominant','Auxiliary','Tertiary','Inferior']; var stackColors=['var(--gold)','var(--gold)','var(--gold2)','var(--muted)'];
       document.getElementById('stackSummaryList').innerHTML=cogFns.slice(0,4).map(function(fn,i){return '<div>'+stackLabels[i]+' &rarr; <strong style="color:'+stackColors[i]+'">'+escapeHTML(fn)+'</strong></div>';}).join('');
