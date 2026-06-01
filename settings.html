@@ -1,7 +1,7 @@
 ï»¿<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANIMUS â€” Settings</title>
+<title>ANIMUS — Settings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -491,7 +491,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
             <div class="field-label">Current Password</div>
           </div>
           <div class="field-control">
-            <input class="s-input" id="currentPw" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password" oninput="markDirty()" />
+            <input class="s-input" id="currentPw" type="password" placeholder="••••••••" autocomplete="current-password" oninput="markDirty()" />
           </div>
         </div>
         <div class="field-row">
@@ -500,7 +500,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
             <div class="field-desc">Minimum 8 characters.</div>
           </div>
           <div class="field-control">
-            <input class="s-input" id="newPw" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="new-password" oninput="checkPwStrength(this.value); markDirty()" />
+            <input class="s-input" id="newPw" type="password" placeholder="••••••••" autocomplete="new-password" oninput="checkPwStrength(this.value); markDirty()" />
             <div class="pw-strength">
               <div class="pw-seg" id="ps1"></div>
               <div class="pw-seg" id="ps2"></div>
@@ -514,7 +514,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
             <div class="field-label">Confirm New Password</div>
           </div>
           <div class="field-control">
-            <input class="s-input" id="confirmPw" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="new-password" oninput="markDirty()" />
+            <input class="s-input" id="confirmPw" type="password" placeholder="••••••••" autocomplete="new-password" oninput="markDirty()" />
           </div>
         </div>
       </div>
@@ -527,7 +527,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
           </div>
           <div class="connected-info">
             <div class="connected-name">Google</div>
-            <div class="connected-sub" id="googleEmail">â€”</div>
+            <div class="connected-sub" id="googleEmail">—</div>
           </div>
           <div class="connected-status" id="googleStatus">Not connected</div>
         </div>
@@ -603,8 +603,8 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
           </div>
           <div class="field-control">
             <select class="s-select" id="defaultMode" onchange="markDirty()">
-              <option value="full" selected>Full â€” 280 questions (~30 min)</option>
-              <option value="short">Short â€” 100 questions (~12 min)</option>
+              <option value="full" selected>Full — 280 questions (~30 min)</option>
+              <option value="short">Short — 100 questions (~12 min)</option>
             </select>
           </div>
         </div>
@@ -783,7 +783,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
         <div class="field-row">
           <div class="field-info">
             <div class="field-label">Assessment #2</div>
-            <div class="field-desc" id="assess2Desc">â€”</div>
+            <div class="field-desc" id="assess2Desc">—</div>
           </div>
           <div class="field-control" style="display:flex;gap:6px">
             <button class="btn-secondary" onclick="showToast('Viewing assessment #2...')">View</button>
@@ -1020,7 +1020,7 @@ function handlePhotoUpload(input) {
     var preview = document.querySelector('.avatar-preview');
     preview.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="avatar-overlay">Change</div>';
     markDirty();
-    showToast('Photo updated â€” save to apply');
+    showToast('Photo updated — save to apply');
   };
   reader.readAsDataURL(input.files[0]);
 }
@@ -1143,7 +1143,7 @@ auth.onAuthStateChanged(function(user){
     var googleEl=document.getElementById('googleEmail');
     if(googleEl && user.providerData){
       var googleProvider=user.providerData.find(function(p){ return p.providerId==='google.com'; });
-      if(googleProvider && googleEl) googleEl.textContent=googleProvider.email||'â€”';
+      if(googleProvider && googleEl) googleEl.textContent=googleProvider.email||'—';
     }
   });
   // Assessment history
@@ -1155,12 +1155,12 @@ auth.onAuthStateChanged(function(user){
     if(history[0] && el1){
       var r=history[0].snapshot||{};
       var d=history[0].timestamp?new Date(history[0].timestamp.toDate()).toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
-      el1.textContent=(r.instStack==='short'?'Short':'Full')+' Assessment Â· '+d+' Â· '+(r.mbti||'â€”')+' '+(r.ennType?r.ennType+'w'+r.ennWing:'');
+      el1.textContent=(r.instStack==='short'?'Short':'Full')+' Assessment Â· '+d+' Â· '+(r.mbti||'—')+' '+(r.ennType?r.ennType+'w'+r.ennWing:'');
     }
     if(history[1] && el2){
       var r2=history[1].snapshot||{};
       var d2=history[1].timestamp?new Date(history[1].timestamp.toDate()).toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
-      el2.textContent=(r2.instStack==='short'?'Short':'Full')+' Assessment Â· '+d2+' Â· '+(r2.mbti||'â€”')+' '+(r2.ennType?r2.ennType+'w'+r2.ennWing:'');
+      el2.textContent=(r2.instStack==='short'?'Short':'Full')+' Assessment Â· '+d2+' Â· '+(r2.mbti||'—')+' '+(r2.ennType?r2.ennType+'w'+r2.ennWing:'');
     }
   });
 });
@@ -1234,7 +1234,7 @@ function applyLanguage(lang) {
     });
   });
 
-  // field-desc (may have child elements â€” only translate plain ones)
+  // field-desc (may have child elements — only translate plain ones)
   document.querySelectorAll('.field-desc').forEach(function(el){
     if(!el.children.length){
       if(!el.getAttribute('data-en')) el.setAttribute('data-en', el.textContent.trim());
