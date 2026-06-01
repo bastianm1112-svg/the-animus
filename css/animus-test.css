@@ -16,9 +16,11 @@ body.page-test {
 }
 
 /* Phase: hide app chrome during quiz / loading */
-body.page-test.phase-quiz #appShell,
+body.page-test.phase-quiz #appNavMount,
+body.page-test.phase-quiz #appBottomMount,
 body.page-test.phase-quiz .mobile-bottom-nav,
-body.page-test.phase-loading #appShell,
+body.page-test.phase-loading #appNavMount,
+body.page-test.phase-loading #appBottomMount,
 body.page-test.phase-loading .mobile-bottom-nav {
   display: none !important;
 }

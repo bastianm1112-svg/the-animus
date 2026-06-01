@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com https://www.gstatic.com; connect-src 'self' https://api.anthropic.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-ancestors 'none'; base-uri 'self';">
@@ -10,7 +10,7 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ANIMUS — Complete Personality Atlas</title>
+<title>ANIMUS ? Complete Personality Atlas</title>
 <meta name="theme-color" content="#060606">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -337,63 +337,24 @@ body.page-test{background:var(--bg);color:var(--text);min-height:100vh;}
 if(window.top!==window.self){window.top.location=window.self.location;}
 </script>
 <a href="#intro" class="skip-link">Skip to test</a>
-<div id="appShell">
-<nav class="navbar" id="appNavbar">
-  <a href="/" class="nav-logo">ANI<span>MUS</span></a>
-  <div class="nav-items">
-    <a href="/dashboard" class="nav-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-      Dashboard
-    </a>
-    <a href="/profile" class="nav-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Profile
-    </a>
-    <a href="/compare" class="nav-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-      Compare
-    </a>
-    <a href="/types" class="nav-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h8M4 18h8"/></svg>
-      Types
-    </a>
-  </div>
-  <div class="nav-right">
-    <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleThemeGlobal()" title="Toggle theme">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-    </button>
-    <button type="button" class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <a href="/login" class="nav-avatar" id="navAvatar">?</a>
-  </div>
-</nav>
-<div class="nav-mobile-menu" id="navMobileMenu">
-  <a href="/dashboard" class="nav-mobile-item">Dashboard</a>
-  <a href="/profile" class="nav-mobile-item">Profile</a>
-  <a href="/compare" class="nav-mobile-item">Compare</a>
-  <a href="/types" class="nav-mobile-item">Types</a>
-  <a href="/test" class="nav-mobile-item active">Take Test</a>
-  <a href="/settings" class="nav-mobile-item">Settings</a>
-</div>
-</div>
+<div id="appNavMount"></div>
 
 <!-- INTRO -->
 <div id="intro">
   <div class="intro-eyebrow" data-en="Complete Personality Atlas" data-es="Atlas Completo de Personalidad">Complete Personality Atlas</div>
   <div class="intro-title">ANI<em>MUS</em></div>
-  <div class="intro-subtitle" data-en="Know thyself completely" data-es="Conócete completamente">Know thyself completely</div>
+  <div class="intro-subtitle" data-en="Know thyself completely" data-es="Con?cete completamente">Know thyself completely</div>
   <div class="intro-rule"></div>
-  <p class="intro-desc" data-en="The most comprehensive personality instrument available. Maps your cognitive architecture, philosophical orientation, political geometry, attachment patterns, moral foundations, and the full depth of who you are — alone and with others." data-es="La herramienta de personalidad más completa que existe. Mapea tu arquitectura cognitiva, orientación filosófica, geometría política, patrones de apego, fundamentos morales y la profundidad total de quién sos — solo y con los demás.">The most comprehensive personality instrument available. Maps your cognitive architecture, philosophical orientation, political geometry, attachment patterns, moral foundations, and the full depth of who you are — alone and with others.</p>
+  <p class="intro-desc" data-en="The most comprehensive personality instrument available. Maps your cognitive architecture, philosophical orientation, political geometry, attachment patterns, moral foundations, and the full depth of who you are ? alone and with others." data-es="La herramienta de personalidad m?s completa que existe. Mapea tu arquitectura cognitiva, orientaci?n filos?fica, geometr?a pol?tica, patrones de apego, fundamentos morales y la profundidad total de qui?n sos ? solo y con los dem?s.">The most comprehensive personality instrument available. Maps your cognitive architecture, philosophical orientation, political geometry, attachment patterns, moral foundations, and the full depth of who you are ? alone and with others.</p>
   <div class="intro-actions">
   <div class="intro-mode-toggle" id="introModeToggle">
     <button type="button" class="intro-mode-btn active" id="modeFull" data-intro-action="mode-full" aria-pressed="true">
       <span class="mode-label" data-en="Full" data-es="Completo">Full</span>
-      <span class="mode-sub" data-en="280 questions · ~30 min" data-es="280 preguntas · ~30 min">280 questions · ~30 min</span>
+      <span class="mode-sub" data-en="280 questions ? ~30 min" data-es="280 preguntas ? ~30 min">280 questions ? ~30 min</span>
     </button>
     <button type="button" class="intro-mode-btn" id="modeShort" data-intro-action="mode-short" aria-pressed="false">
       <span class="mode-label" data-en="Short" data-es="Corto">Short</span>
-      <span class="mode-sub" data-en="100 questions · ~12 min" data-es="100 preguntas · ~12 min">100 questions · ~12 min</span>
+      <span class="mode-sub" data-en="100 questions ? ~12 min" data-es="100 preguntas ? ~12 min">100 questions ? ~12 min</span>
     </button>
   </div>
   <div class="intro-meta">
@@ -403,24 +364,24 @@ if(window.top!==window.self){window.top.location=window.self.location;}
   </div>
   <button type="button" class="btn-primary" id="startBtn" data-intro-action="start" data-en="BEGIN" data-es="COMENZAR">BEGIN</button>
   <p id="resumeTestWrap" style="display:none;font-size:10px;color:var(--muted2);letter-spacing:0.08em;">
-    <button type="button" id="resumeTestBtn" class="intro-import-btn" style="margin-top:8px;width:auto;padding:8px 16px;">RESUME WHERE YOU LEFT OFF →</button>
+    <button type="button" id="resumeTestBtn" class="intro-import-btn" style="margin-top:8px;width:auto;padding:8px 16px;">RESUME WHERE YOU LEFT OFF ?</button>
   </p>
   </div>
   <!-- OBSERVER / ESTIMATOR MODE -->
   <div class="intro-observer">
     <div class="intro-import-divider"><span>or estimate someone else's profile</span></div>
     <div class="observer-card">
-      <div class="observer-icon">◎</div>
+      <div class="observer-icon">?</div>
       <div class="observer-info">
         <div class="observer-title">Test Estimator</div>
-        <div class="observer-desc">Answer based on someone's observed behaviors and habits — not your own. Attach a name to save the estimated profile.</div>
+        <div class="observer-desc">Answer based on someone's observed behaviors and habits ? not your own. Attach a name to save the estimated profile.</div>
       </div>
-      <button type="button" class="observer-btn" id="observerBtn">ESTIMATE →</button>
+      <button type="button" class="observer-btn" id="observerBtn">ESTIMATE ?</button>
     </div>
     <div class="observer-name-wrap" id="observerNameWrap" style="display:none">
       <input class="intro-import-input" id="observerName" type="text" placeholder="Enter their name (e.g. Marco, Mom, Friend)" maxlength="64" style="border-right:1px solid var(--border);width:100%" />
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:0.04em">Answer each question as you observe this person to behave — not how you think they should.</div>
-      <button type="button" class="intro-import-btn" id="startObserverBtn" style="margin-top:10px;width:100%">BEGIN ESTIMATOR →</button>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:0.04em">Answer each question as you observe this person to behave ? not how you think they should.</div>
+      <button type="button" class="intro-import-btn" id="startObserverBtn" style="margin-top:10px;width:100%">BEGIN ESTIMATOR ?</button>
     </div>
   </div>
 
@@ -428,7 +389,7 @@ if(window.top!==window.self){window.top.location=window.self.location;}
     <div class="intro-import-divider"><span data-en="or open an existing profile" data-es="o abrir un perfil existente">or open an existing profile</span></div>
     <div class="intro-import-row">
       <input class="intro-import-input" id="profileLinkInput" maxlength="4096" placeholder="Paste profile link here..." aria-label="Profile link" />
-      <button type="button" class="intro-import-btn" id="profileLinkBtn">OPEN →</button>
+      <button type="button" class="intro-import-btn" id="profileLinkBtn">OPEN ?</button>
     </div>
     <div class="intro-import-error" id="profileLinkError"></div>
     <p class="intro-import-hint">Opens a complete profile or continues an incomplete link with only the missing sections.</p>
@@ -438,10 +399,10 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <!-- QUIZ -->
 <div id="quiz" class="test-quiz-ui">
   <div class="qhdr">
-    <a href="/dashboard" class="qhdr-logo">ANI<span>MUS</span></a>
+    <a href="/" class="qhdr-logo">ANI<span>MUS</span></a>
     <div class="qhdr-right">
       <span class="qhdr-section" id="qSection"></span>
-      <span class="qhdr-num" id="qNum">1 / —</span>
+      <span class="qhdr-num" id="qNum">1 / ?</span>
     </div>
   </div>
   <div class="pbar-wrap"><div class="pbar-fill" id="pbarFill"></div></div>
@@ -475,7 +436,7 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <!-- SHARE MODAL -->
 <div class="modal-overlay" id="shareModal">
   <div class="modal-box">
-    <button class="modal-close" id="closeShareModal">✕</button>
+    <button class="modal-close" id="closeShareModal">?</button>
     <div class="modal-title">Share Your Profile</div>
     <p class="modal-sub">Copy the link below and send it to anyone. They can paste it into the Compare mode to see how your profiles stack up.</p>
     <div class="share-url-wrap">
@@ -494,24 +455,31 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <script src="/js/psyche-engine.js"></script>
 <script src="/js/psyche-intro.js"></script>
 
-<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
-  <a href="/dashboard" class="mbn-item">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    Home
-  </a>
-  <a href="/profile" class="mbn-item">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    Profile
-  </a>
-  <a href="/compare" class="mbn-item">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-    Compare
-  </a>
-  <a href="/settings" class="mbn-item">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    More
-  </a>
-</nav>
+<div id="appBottomMount"></div>
+<script src="/js/animus-social.js"></script>
+<script src="/js/animus-nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  AnimusNav.mountTop('appNavMount', 'test');
+  AnimusNav.mountBottom('appBottomMount', 'test');
+  if (typeof firebase !== 'undefined' && firebase.auth && typeof AnimusSocial !== 'undefined') {
+    var a = firebase.auth();
+    var d = firebase.firestore();
+    AnimusSocial.init(a, d);
+    a.onAuthStateChanged(function (u) {
+      if (u) {
+        if (typeof AnimusShared !== 'undefined') {
+          AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), u, null);
+          d.collection('users').doc(u.uid).get().then(function (doc) {
+            if (doc.exists) AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), u, doc.data());
+          });
+        }
+        AnimusSocial.loadNotifs(u.uid);
+      }
+    });
+  }
+});
+</script>
 </body>
 </html>
 

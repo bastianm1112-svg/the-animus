@@ -998,7 +998,7 @@ try {
     auth.onAuthStateChanged(function(user){
       if(user){
         var cta = document.querySelector('.nav-cta');
-        if(cta){ cta.textContent='Dashboard'; cta.href='dashboard.html'; }
+        if(cta){ cta.textContent='Home'; cta.href='/'; }
       }
     });
   }
@@ -1037,11 +1037,11 @@ if('IntersectionObserver' in window){
 
 <script>
 
-// Smart logo: dashboard if logged in, landing if not
+// Smart logo: home if logged in
 try {
   firebase.auth().onAuthStateChanged(function(user){
     document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){
-      el.href = user ? '/dashboard' : '/';
+      el.href = user ? '/' : '/';
     });
   });
 } catch(e){}

@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANIMUS — Know Yourself Completely</title>
-<meta name="description" content="The most comprehensive personality assessment available. 280 questions across 14 dimensions — MBTI, Enneagram, philosophy, political compass, attachment style and more.">
-<meta property="og:title" content="ANIMUS — Know Yourself Completely">
+<title>ANIMUS � Know Yourself Completely</title>
+<meta name="description" content="The most comprehensive personality assessment available. 280 questions across 14 dimensions � MBTI, Enneagram, philosophy, political compass, attachment style and more.">
+<meta property="og:title" content="ANIMUS � Know Yourself Completely">
 <meta property="og:description" content="280 questions. 14 dimensions. AI-generated narrative. The most rigorous personality instrument available.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
@@ -46,7 +46,7 @@ body {
 
 
 
-/* ── NAV ── */
+/* -- NAV -- */
 nav {
   position: fixed; top: 0; left: 0; right: 0;
   height: 60px;
@@ -90,7 +90,7 @@ nav.scrolled {
 }
 .nav-cta:hover { background: var(--gold3) !important; }
 
-/* ── HERO ── */
+/* -- HERO -- */
 .hero {
   min-height: 100vh;
   display: flex; flex-direction: column;
@@ -270,7 +270,7 @@ nav.scrolled {
 }
 @keyframes scrollPulse { 0%,100%{opacity:0.3;} 50%{opacity:1;} }
 
-/* ── SECTION SHARED ── */
+/* -- SECTION SHARED -- */
 section { padding: 120px 40px; }
 .section-label {
   font-size: 10px;
@@ -282,7 +282,7 @@ section { padding: 120px 40px; }
 }
 .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); max-width: 80px; }
 
-/* ── WHAT IS ANIMUS ── */
+/* -- WHAT IS ANIMUS -- */
 .about {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -339,7 +339,7 @@ section { padding: 120px 40px; }
 }
 .dim-info span { font-size: 12px; color: var(--muted); }
 
-/* ── HOW IT WORKS ── */
+/* -- HOW IT WORKS -- */
 .how { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .how-inner { max-width: 1200px; margin: 0 auto; }
 .how-title {
@@ -382,7 +382,7 @@ section { padding: 120px 40px; }
 }
 .step-body { font-size: 13px; color: var(--muted); line-height: 1.7; }
 
-/* ── DIMENSIONS GRID ── */
+/* -- DIMENSIONS GRID -- */
 .dims-section { max-width: 1200px; margin: 0 auto; }
 .dims-title {
   font-family: 'Playfair Display', serif;
@@ -441,7 +441,7 @@ section { padding: 120px 40px; }
   letter-spacing: 0.05em;
 }
 
-/* ── EXAMPLE PROFILE ── */
+/* -- EXAMPLE PROFILE -- */
 .profile-preview { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .profile-preview-inner { max-width: 1200px; margin: 0 auto; }
 .preview-top {
@@ -462,7 +462,7 @@ section { padding: 120px 40px; }
   font-size: 13px; color: var(--muted2);
 }
 .preview-feature::before {
-  content: '◆';
+  content: '?';
   color: var(--gold);
   font-size: 8px;
   flex-shrink: 0;
@@ -515,7 +515,7 @@ section { padding: 120px 40px; }
 .mock-bar-fill { height: 100%; background: var(--gold); }
 .mock-bar-val { font-size: 10px; color: var(--muted); min-width: 24px; text-align: right; }
 
-/* ── TESTS ── */
+/* -- TESTS -- */
 .tests-section { max-width: 1200px; margin: 0 auto; }
 .tests-title {
   font-family: 'Playfair Display', serif;
@@ -579,7 +579,7 @@ section { padding: 120px 40px; }
 }
 .test-card.featured .btn-test:hover { background: var(--gold3); }
 
-/* ── CTA SECTION ── */
+/* -- CTA SECTION -- */
 .cta-section {
   background: var(--bg2);
   border-top: 1px solid var(--border);
@@ -607,7 +607,7 @@ section { padding: 120px 40px; }
 }
 .cta-actions { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
 
-/* ── FOOTER ── */
+/* -- FOOTER -- */
 footer {
   padding: 48px 40px;
   border-top: 1px solid var(--border);
@@ -630,7 +630,7 @@ footer {
 .footer-links a { font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
 .footer-links a:hover { color: var(--text); }
 
-/* ── ANIMATIONS ── */
+/* -- ANIMATIONS -- */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -662,22 +662,94 @@ footer {
 <!-- FIREBASE SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="/js/animus-shared.js"></script>
 <script>
-const firebaseConfig={apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",authDomain:"animus-b3d83.firebaseapp.com",projectId:"animus-b3d83",storageBucket:"animus-b3d83.firebasestorage.app",messagingSenderId:"681221615050",appId:"1:681221615050:web:1d037cd07a8381c91b3333"};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
+AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
+var auth = firebase.auth();
+var db = firebase.firestore();
 </script>
+<link rel="stylesheet" href="/css/animus-shell.css">
 <link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/css/animus-release.css">
+<link rel="stylesheet" href="/css/animus-home.css">
+<script src="/js/animus-app.js" defer></script>
 </head>
 <body>
 <script>
-// Apply saved theme immediately to prevent flash
-(function(){
-  var _st=localStorage.getItem('animus_theme'); if(_st==='light') document.body.classList.add('light-mode');
-})();
+(function(){try{var _st=localStorage.getItem('animus_theme');if(_st==='light')document.body.classList.add('light-mode');}catch(e){}})();
 </script>
 
+<div id="memberApp" class="member-app">
+<div id="memberNavMount"></div>
+<main class="member-home" id="member-home">
+  <h1 class="home-greeting" id="homeGreeting">Good morning</h1>
+  <p class="home-date" id="homeDate"></p>
+  <div class="onboarding-banner" id="onboardingBanner">
+    <p>Take the assessment to unlock your full profile and daily insights.</p>
+    <a href="/test">Begin assessment</a>
+  </div>
+  <div class="daily-fact-card" id="dailyFactCard">
+    <div class="daily-fact-label" id="dailyFactLabel">Daily insight</div>
+    <p class="daily-fact-text" id="dailyFactText">Loading�</p>
+  </div>
+  <h2 class="home-prompt">What would you like to do today?</h2>
+  <div class="home-actions">
+    <a href="/test" class="home-action-card primary">
+      <span class="home-action-title">Take test</span>
+      <span class="home-action-desc">Full or short assessment</span>
+    </a>
+    <a href="/profile" class="home-action-card">
+      <span class="home-action-title">Your profile</span>
+      <span class="home-action-desc">View your latest results</span>
+    </a>
+    <a href="/compare" class="home-action-card">
+      <span class="home-action-title">Compare</span>
+      <span class="home-action-desc">See how you match with others</span>
+    </a>
+    <a href="/types" class="home-action-card">
+      <span class="home-action-title">Types</span>
+      <span class="home-action-desc">Reference library</span>
+    </a>
+    <a href="/settings" class="home-action-card">
+      <span class="home-action-title">Settings</span>
+      <span class="home-action-desc">Account and appearance</span>
+    </a>
+  </div>
+  <section id="member-friends">
+    <div class="home-section-head">
+      <span class="home-section-title">Friends</span>
+      <button type="button" class="home-section-link" onclick="AnimusSocial.openAddFriend()">+ Add friend</button>
+    </div>
+    <div class="friends-grid" id="friendsGrid">
+      <div class="empty-state">No friends yet � add someone to compare profiles</div>
+    </div>
+  </section>
+  <section id="member-activity">
+    <div class="home-section-head"><span class="home-section-title">Recent activity</span></div>
+    <div class="feed-items" id="feedItems">
+      <div class="empty-state" style="grid-column:1/-1">Activity from friends will appear here</div>
+    </div>
+  </section>
+</main>
+<div id="memberBottomMount"></div>
+</div>
 
+<div id="addFriendModal" class="modal-overlay">
+  <div class="modal-box">
+    <button type="button" class="modal-close" onclick="AnimusSocial.closeAddFriend()" aria-label="Close">?</button>
+    <div class="modal-title">Add a friend</div>
+    <p class="modal-sub">Search by username to find someone on ANIMUS.</p>
+    <div class="modal-search-wrap">
+      <span class="modal-search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <input type="search" id="friendSearchInput" placeholder="Search @username�" maxlength="64" autocomplete="off" />
+    </div>
+    <div class="search-results" id="searchResults"><div class="search-empty">Start typing to search</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<div id="guestApp">
 <!-- NAV -->
 <nav id="nav">
   <a href="/" class="nav-logo">ANI<span>MUS</span></a>
@@ -696,7 +768,7 @@ const auth=firebase.auth();
   <div class="hero-vert">Complete Personality Atlas</div>
 
   <div class="hero-content">
-    <div class="hero-eyebrow">Personality · Philosophy · Psychology</div>
+    <div class="hero-eyebrow">Personality � Philosophy � Psychology</div>
 
     <h1 class="hero-title">
       ANI<span class="gold">MUS</span><br>
@@ -704,13 +776,13 @@ const auth=firebase.auth();
     </h1>
 
     <p class="hero-subtitle">
-      The most comprehensive personality instrument available — mapping your cognitive architecture, philosophical orientation, moral foundations, and the full depth of who you are.
+      The most comprehensive personality instrument available � mapping your cognitive architecture, philosophical orientation, moral foundations, and the full depth of who you are.
     </p>
 
     <div class="hero-actions">
       <a href="/test" class="btn-hero-primary">
         <span>Take the Assessment</span>
-        <span>→</span>
+        <span>?</span>
       </a>
       <a href="#how" class="btn-hero-secondary">Learn more</a>
     </div>
@@ -720,7 +792,7 @@ const auth=firebase.auth();
     <div class="hero-stat"><strong>280</strong><span>Questions</span></div>
     <div class="hero-stat"><strong>14</strong><span>Dimensions</span></div>
     <div class="hero-stat"><strong>~30</strong><span>Minutes</span></div>
-    <div class="hero-stat"><strong>∞</strong><span>Insight</span></div>
+    <div class="hero-stat"><strong>8</strong><span>Insight</span></div>
   </div>
 
   <div class="scroll-indicator">
@@ -736,10 +808,10 @@ const auth=firebase.auth();
       <div class="section-label">What is ANIMUS</div>
       <h2 class="about-title">Not a quiz.<br><em>A mirror.</em></h2>
       <p class="about-body">
-        Most personality tests tell you what you already know. ANIMUS goes deeper — mapping the <strong>architecture of how you actually think</strong>, what you value at the deepest level, how you attach to others, and where you stand philosophically and politically.
+        Most personality tests tell you what you already know. ANIMUS goes deeper � mapping the <strong>architecture of how you actually think</strong>, what you value at the deepest level, how you attach to others, and where you stand philosophically and politically.
       </p>
       <p class="about-body">
-        280 questions, 14 dimensions, AI-generated narrative analysis. Your profile isn't a label — it's a complete picture of who you are, how you operate, and why you do what you do.
+        280 questions, 14 dimensions, AI-generated narrative analysis. Your profile isn't a label � it's a complete picture of who you are, how you operate, and why you do what you do.
       </p>
       <p class="about-body">
         Built for people who take self-knowledge seriously.
@@ -755,11 +827,11 @@ const auth=firebase.auth();
         <div class="dim-info"><strong>Enneagram</strong><span>Type, wing, tritype, and instinctual variants</span></div>
       </div>
       <div class="dim-card reveal reveal-delay-3">
-        <div class="dim-icon">φ</div>
+        <div class="dim-icon">f</div>
         <div class="dim-info"><strong>Philosophy</strong><span>Stoic, Nietzschean, Kantian, Existentialist and more</span></div>
       </div>
       <div class="dim-card reveal reveal-delay-4">
-        <div class="dim-icon">◈</div>
+        <div class="dim-icon">?</div>
         <div class="dim-info"><strong>Political Compass</strong><span>Full two-axis mapping with psychological roots</span></div>
       </div>
     </div>
@@ -790,7 +862,7 @@ const auth=firebase.auth();
       <div class="step reveal reveal-delay-3">
         <div class="step-num">04</div>
         <div class="step-title">Compare with Friends</div>
-        <div class="step-body">See a compatibility score, full side-by-side comparison, and AI analysis of how two specific profiles interact — where you align, where you clash.</div>
+        <div class="step-body">See a compatibility score, full side-by-side comparison, and AI analysis of how two specific profiles interact � where you align, where you clash.</div>
       </div>
     </div>
   </div>
@@ -801,12 +873,12 @@ const auth=firebase.auth();
   <div class="dims-section">
     <div class="section-label reveal">What gets measured</div>
     <h2 class="dims-title reveal">14 dimensions.<br>Nothing left out.</h2>
-    <p class="dims-sub reveal">Every aspect of personality, cognition, values, and orientation — measured rigorously and explained clearly.</p>
+    <p class="dims-sub reveal">Every aspect of personality, cognition, values, and orientation � measured rigorously and explained clearly.</p>
     <div class="dims-grid">
       <div class="dim-full-card reveal">
         <div class="dim-full-label">Cognition</div>
         <div class="dim-full-name">Cognitive Functions</div>
-        <div class="dim-full-desc">All 8 Jungian cognitive functions scored 0–100. Dominant, auxiliary, tertiary, inferior — your full stack revealed.</div>
+        <div class="dim-full-desc">All 8 Jungian cognitive functions scored 0�100. Dominant, auxiliary, tertiary, inferior � your full stack revealed.</div>
         <div class="dim-full-q">72</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-1">
@@ -818,62 +890,62 @@ const auth=firebase.auth();
       <div class="dim-full-card reveal reveal-delay-2">
         <div class="dim-full-label">Relationships</div>
         <div class="dim-full-name">Attachment Style</div>
-        <div class="dim-full-desc">Secure, anxious, avoidant, or disorganized — how you seek connection and respond to intimacy.</div>
+        <div class="dim-full-desc">Secure, anxious, avoidant, or disorganized � how you seek connection and respond to intimacy.</div>
         <div class="dim-full-q">16</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-3">
         <div class="dim-full-label">Worldview</div>
         <div class="dim-full-name">Philosophical School</div>
-        <div class="dim-full-desc">Stoic, Epicurean, Kantian, Aristotelian, Nietzschean, Existentialist, Pragmatist, or Skeptic — your conceptual home.</div>
+        <div class="dim-full-desc">Stoic, Epicurean, Kantian, Aristotelian, Nietzschean, Existentialist, Pragmatist, or Skeptic � your conceptual home.</div>
         <div class="dim-full-q">24</div>
       </div>
       <div class="dim-full-card reveal">
         <div class="dim-full-label">Knowledge</div>
         <div class="dim-full-name">Epistemology</div>
-        <div class="dim-full-desc">Rationalist, empiricist, intuitionist, or skeptic — how you believe you know what you know.</div>
+        <div class="dim-full-desc">Rationalist, empiricist, intuitionist, or skeptic � how you believe you know what you know.</div>
         <div class="dim-full-q">12</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-1">
         <div class="dim-full-label">Morality</div>
         <div class="dim-full-name">Ethical Framework</div>
-        <div class="dim-full-desc">Virtue ethics, consequentialism, deontology, or rational egoism — the structure of your moral reasoning.</div>
+        <div class="dim-full-desc">Virtue ethics, consequentialism, deontology, or rational egoism � the structure of your moral reasoning.</div>
         <div class="dim-full-q">12</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-2">
         <div class="dim-full-label">Politics</div>
         <div class="dim-full-name">Political Compass</div>
-        <div class="dim-full-desc">Full two-axis mapping — economic freedom vs state control, authoritarian vs libertarian — with AI analysis of your psychological roots.</div>
+        <div class="dim-full-desc">Full two-axis mapping � economic freedom vs state control, authoritarian vs libertarian � with AI analysis of your psychological roots.</div>
         <div class="dim-full-q">40</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-3">
         <div class="dim-full-label">Character</div>
         <div class="dim-full-name">Four Temperaments</div>
-        <div class="dim-full-desc">The ancient precursor to all typology — Choleric, Melancholic, Sanguine, Phlegmatic — scored and explained.</div>
+        <div class="dim-full-desc">The ancient precursor to all typology � Choleric, Melancholic, Sanguine, Phlegmatic � scored and explained.</div>
         <div class="dim-full-q">16</div>
       </div>
       <div class="dim-full-card reveal">
         <div class="dim-full-label">Drive</div>
         <div class="dim-full-name">Instinctual Variants</div>
-        <div class="dim-full-desc">Self-preservation, social, and sexual/intimate instincts — the motivational layer beneath your Enneagram type.</div>
+        <div class="dim-full-desc">Self-preservation, social, and sexual/intimate instincts � the motivational layer beneath your Enneagram type.</div>
         <div class="dim-full-q">12</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-1">
         <div class="dim-full-label">Social</div>
         <div class="dim-full-name">Interpersonal Style</div>
-        <div class="dim-full-desc">How you present to others — dominance, warmth, directness, introversion — and how you actually are when nobody's watching.</div>
+        <div class="dim-full-desc">How you present to others � dominance, warmth, directness, introversion � and how you actually are when nobody's watching.</div>
         <div class="dim-full-q">21</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-2">
         <div class="dim-full-label">Values</div>
         <div class="dim-full-name">Moral Foundations</div>
-        <div class="dim-full-desc">Haidt's six moral foundations scored — Care, Fairness, Loyalty, Authority, Sanctity, Liberty — revealing what you treat as sacred.</div>
+        <div class="dim-full-desc">Haidt's six moral foundations scored � Care, Fairness, Loyalty, Authority, Sanctity, Liberty � revealing what you treat as sacred.</div>
         <div class="dim-full-q">8</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-3">
         <div class="dim-full-label">Traits</div>
         <div class="dim-full-name">Big Five</div>
-        <div class="dim-full-desc">Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism — derived from your cognitive and personality scores.</div>
-        <div class="dim-full-q">—</div>
+        <div class="dim-full-desc">Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism � derived from your cognitive and personality scores.</div>
+        <div class="dim-full-q">�</div>
       </div>
     </div>
   </div>
@@ -886,12 +958,12 @@ const auth=firebase.auth();
       <div class="preview-text">
         <div class="section-label reveal">Your profile</div>
         <h2 class="preview-title reveal">A permanent record<br>of who you are.</h2>
-        <p class="preview-body reveal">Your results live at <strong>animus.app/you</strong> — a full tabbed profile with every score, an AI-written narrative, and a PDF you can download. Share it with anyone. Retake to see how you change over time.</p>
+        <p class="preview-body reveal">Your results live at <strong>animus.app/you</strong> � a full tabbed profile with every score, an AI-written narrative, and a PDF you can download. Share it with anyone. Retake to see how you change over time.</p>
         <div class="preview-features reveal">
-          <div class="preview-feature">Full 7-tab results — every dimension scored and explained</div>
-          <div class="preview-feature">AI narrative — written specifically for your profile</div>
-          <div class="preview-feature">Similar figures — historical, celebrity, and pop culture</div>
-          <div class="preview-feature">Retake history — track how your scores shift over time</div>
+          <div class="preview-feature">Full 7-tab results � every dimension scored and explained</div>
+          <div class="preview-feature">AI narrative � written specifically for your profile</div>
+          <div class="preview-feature">Similar figures � historical, celebrity, and pop culture</div>
+          <div class="preview-feature">Retake history � track how your scores shift over time</div>
           <div class="preview-feature">Download as PDF or share via link</div>
         </div>
       </div>
@@ -903,7 +975,7 @@ const auth=firebase.auth();
             <div class="mock-chip"><strong>Enn</strong>4w5</div>
             <div class="mock-chip"><strong>Tritype</strong>4/1/5</div>
             <div class="mock-chip"><strong>Attach</strong>Secure</div>
-            <div class="mock-chip"><strong>φ</strong>Existentialist</div>
+            <div class="mock-chip"><strong>f</strong>Existentialist</div>
             <div class="mock-chip"><strong>Instinct</strong>SX/SO</div>
           </div>
         </div>
@@ -955,24 +1027,24 @@ const auth=firebase.auth();
         <div class="test-badge">Recommended</div>
         <div class="test-q">280 <span>Q</span></div>
         <div class="test-name">Full Assessment</div>
-        <div class="test-desc">The complete instrument. Maximum depth and accuracy across all 14 dimensions. Every question is unbiased — randomized, unlabeled, with a plain-language simplification available.</div>
+        <div class="test-desc">The complete instrument. Maximum depth and accuracy across all 14 dimensions. Every question is unbiased � randomized, unlabeled, with a plain-language simplification available.</div>
         <div class="test-meta">
           <div class="test-meta-item"><strong>~30</strong>Minutes</div>
           <div class="test-meta-item"><strong>14</strong>Dimensions</div>
           <div class="test-meta-item"><strong>EN / ES</strong>Language</div>
         </div>
-        <a href="/test" class="btn-test">Begin Full Assessment →</a>
+        <a href="/test" class="btn-test">Begin Full Assessment ?</a>
       </div>
       <div class="test-card reveal reveal-delay-1">
         <div class="test-q">100 <span>Q</span></div>
         <div class="test-name">Short Assessment</div>
-        <div class="test-desc">A curated 100-question set that exploits cross-dimensional overlap — questions chosen because each one scores multiple dimensions simultaneously. Still covers everything, less time.</div>
+        <div class="test-desc">A curated 100-question set that exploits cross-dimensional overlap � questions chosen because each one scores multiple dimensions simultaneously. Still covers everything, less time.</div>
         <div class="test-meta">
           <div class="test-meta-item"><strong>~12</strong>Minutes</div>
           <div class="test-meta-item"><strong>14</strong>Dimensions</div>
           <div class="test-meta-item"><strong>EN / ES</strong>Language</div>
         </div>
-        <a href="/test?mode=short" class="btn-test">Begin Short Assessment →</a>
+        <a href="/test?mode=short" class="btn-test">Begin Short Assessment ?</a>
       </div>
     </div>
   </div>
@@ -983,7 +1055,7 @@ const auth=firebase.auth();
   <h2 class="cta-title reveal">KNOW<br><span>YOURSELF</span></h2>
   <p class="cta-sub reveal">Most people never examine the architecture of their own mind. You're already here.</p>
   <div class="cta-actions reveal">
-    <a href="/test" class="btn-hero-primary"><span>Take the Assessment</span><span>→</span></a>
+    <a href="/test" class="btn-hero-primary"><span>Take the Assessment</span><span>?</span></a>
     <a href="/login" class="btn-hero-secondary">Sign in to save your profile</a>
   </div>
 </section>
@@ -991,25 +1063,40 @@ const auth=firebase.auth();
 <!-- FOOTER -->
 <footer>
   <a href="/" class="footer-logo">ANI<span>MUS</span></a>
-  <div class="footer-copy">© 2026 ANIMUS — Know thyself completely</div>
+  <div class="footer-copy">� 2026 ANIMUS � Know thyself completely</div>
   <div class="footer-links">
     <a href="/test">Test</a>
     <a href="/login">Sign In</a>
   </div>
 </footer>
+</div>
+
+<script src="/js/daily-facts.js"></script>
+<script src="/js/animus-social.js"></script>
+<script src="/js/animus-nav.js"></script>
+<script src="/js/animus-home.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  AnimusNav.mountTop('memberNavMount', 'home');
+  AnimusNav.mountBottom('memberBottomMount', 'home');
+  if (typeof AnimusHome !== 'undefined') AnimusHome.boot(auth, db);
+});
+</script>
 
 <script>
-// Auth state — update nav if logged in (non-blocking)
 try {
-  if(typeof auth !== 'undefined'){
-    auth.onAuthStateChanged(function(user){
-      if(user){
-        var cta = document.querySelector('.nav-cta');
-        if(cta){ cta.textContent='Dashboard'; cta.href='/dashboard'; }
+  if (typeof auth !== 'undefined') {
+    auth.onAuthStateChanged(function (user) {
+      var cta = document.querySelector('#guestApp .nav-cta');
+      if (user) {
+        if (cta) { cta.textContent = 'Home'; cta.href = '/'; }
+      } else if (cta) {
+        cta.textContent = 'Sign In';
+        cta.href = '/login';
       }
     });
   }
-} catch(e){ console.warn('Auth check failed:', e); }
+} catch (e) {}
 
 
 
@@ -1042,16 +1129,5 @@ if('IntersectionObserver' in window){
 }
 </script>
 
-<script>
-
-// Smart logo: dashboard if logged in, landing if not
-try {
-  firebase.auth().onAuthStateChanged(function(user){
-    document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){
-      el.href = user ? '/dashboard' : '/';
-    });
-  });
-} catch(e){}
-</script>
 </body>
 </html>

@@ -57,7 +57,7 @@
     try {
       firebase.auth().onAuthStateChanged(function (user) {
         document.querySelectorAll('a.nav-logo, a.panel-logo, a.footer-logo, a.mobile-logo').forEach(function (el) {
-          el.href = user ? '/dashboard' : '/';
+          el.href = user ? '/' : '/';
         });
       });
     } catch (e) { /* ignore */ }

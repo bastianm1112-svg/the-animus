@@ -1,0 +1,129 @@
+/**
+ * Shared app navbar markup (optional inject). Most pages inline the same structure.
+ */
+(function (g) {
+  'use strict';
+
+  var SVG_SETTINGS =
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+  var SVG_COMPARE =
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>';
+  var SVG_TYPES =
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h8M4 18h8"/></svg>';
+  var SVG_TEST =
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+  var SVG_BELL =
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+  var SVG_THEME =
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  var SVG_MENU =
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+
+  function ac(active, key) {
+    return active === key ? ' active' : '';
+  }
+
+  function buildNavbar(active) {
+    active = active || '';
+    return (
+      '<nav class="navbar">' +
+      '<a href="/" class="nav-logo' +
+      ac(active, 'home') +
+      '">ANI<span>MUS</span></a>' +
+      '<div class="nav-items">' +
+      '<a href="/settings" class="nav-item' +
+      ac(active, 'settings') +
+      '">' +
+      SVG_SETTINGS +
+      ' Settings</a>' +
+      '<button type="button" class="nav-item-btn" onclick="AnimusSocial.openFriends()">Friends</button>' +
+      '<button type="button" class="notif-btn" onclick="AnimusSocial.toggleNotifs()" title="Notifications" aria-label="Notifications">' +
+      SVG_BELL +
+      '<div class="notif-badge" id="notifBadge"></div></button>' +
+      '<a href="/test" class="nav-item' +
+      ac(active, 'test') +
+      '">' +
+      SVG_TEST +
+      ' Take Test</a>' +
+      '<a href="/compare" class="nav-item' +
+      ac(active, 'compare') +
+      '">' +
+      SVG_COMPARE +
+      ' Compare</a>' +
+      '<a href="/types" class="nav-item' +
+      ac(active, 'types') +
+      '">' +
+      SVG_TYPES +
+      ' Types</a>' +
+      '</div>' +
+      '<div class="nav-right">' +
+      '<button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleThemeGlobal()" title="Toggle theme">' +
+      SVG_THEME +
+      '</button>' +
+      '<button type="button" class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation">' +
+      SVG_MENU +
+      '</button>' +
+      '<a href="/profile" class="nav-avatar" id="navAvatar">?</a>' +
+      '</div></nav>' +
+      '<div class="nav-mobile-menu" id="navMobileMenu">' +
+      '<a href="/settings" class="nav-mobile-item' +
+      ac(active, 'settings') +
+      '">Settings</a>' +
+      '<button type="button" class="nav-mobile-item" onclick="toggleMobileMenu();AnimusSocial.openFriends();">Friends</button>' +
+      '<a href="/test" class="nav-mobile-item' +
+      ac(active, 'test') +
+      '">Take Test</a>' +
+      '<a href="/compare" class="nav-mobile-item' +
+      ac(active, 'compare') +
+      '">Compare</a>' +
+      '<a href="/types" class="nav-mobile-item' +
+      ac(active, 'types') +
+      '">Types</a>' +
+      '</div>' +
+      '<div class="notif-dropdown" id="notifDropdown" aria-hidden="true">' +
+      '<div class="notif-dropdown-head">Notifications</div>' +
+      '<div id="notifDropdownList"></div></div>'
+    );
+  }
+
+  function buildBottomNav(active) {
+    return (
+      '<nav class="mobile-bottom-nav" aria-label="Mobile navigation">' +
+      '<a href="/" class="mbn-item' +
+      ac(active, 'home') +
+      '"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a>' +
+      '<a href="/compare" class="mbn-item' +
+      ac(active, 'compare') +
+      '"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Compare</a>' +
+      '<a href="/test" class="mbn-item' +
+      ac(active, 'test') +
+      '"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Test</a>' +
+      '<a href="/settings" class="mbn-item' +
+      ac(active, 'settings') +
+      '"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>More</a>' +
+      '</nav>'
+    );
+  }
+
+  function mountTop(rootId, active) {
+    var root = document.getElementById(rootId);
+    if (root) root.innerHTML = buildNavbar(active);
+  }
+
+  function mountBottom(rootId, active) {
+    var root = document.getElementById(rootId);
+    if (root) root.innerHTML = buildBottomNav(active);
+  }
+
+  function mount(rootId, active) {
+    mountTop(rootId, active);
+  }
+
+  g.AnimusNav = {
+    buildNavbar: buildNavbar,
+    buildBottomNav: buildBottomNav,
+    mountTop: mountTop,
+    mountBottom: mountBottom,
+    mount: mount
+  };
+})(typeof window !== 'undefined' ? window : globalThis);

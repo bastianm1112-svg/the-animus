@@ -225,6 +225,146 @@ body.light-mode .nav-mobile-menu {
   color: var(--gold);
 }
 
+.nav-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  min-height: 40px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s, background 0.15s;
+  border-radius: 2px;
+}
+
+.nav-item-btn:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.notif-btn {
+  position: relative;
+  background: none;
+  border: none;
+  color: var(--muted2);
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background 0.2s;
+  border-radius: 2px;
+}
+
+.notif-btn:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.notif-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  background: var(--gold);
+  border-radius: 50%;
+  border: 1px solid var(--bg);
+  display: none;
+}
+
+.notif-dropdown {
+  display: none;
+  position: fixed;
+  top: calc(var(--nav-h) + 6px);
+  right: max(12px, env(safe-area-inset-right));
+  width: min(360px, calc(100vw - 24px));
+  max-height: min(420px, calc(100vh - var(--nav-h) - 24px));
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  z-index: 250;
+  padding: 12px 0;
+}
+
+.notif-dropdown.open {
+  display: block;
+}
+
+.notif-dropdown-head {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  padding: 8px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.notif-empty {
+  padding: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.notif-item {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.notif-text {
+  font-size: 12px;
+  color: var(--muted2);
+  line-height: 1.6;
+}
+
+.notif-text strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.btn-add-small {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border: 1px solid var(--border2);
+  background: none;
+  color: var(--muted2);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.btn-add-small:hover {
+  border-color: var(--gold2);
+  color: var(--gold);
+}
+
 /* Mobile bottom nav */
 .mobile-bottom-nav {
   display: none;

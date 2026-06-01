@@ -13,7 +13,6 @@
     }
   ],
   "rewrites": [
-    {"source": "/dashboard", "destination": "/dashboard.html"},
     {"source": "/login", "destination": "/login.html"},
     {"source": "/settings", "destination": "/settings.html"},
     {"source": "/test", "destination": "/psyche-complete.html"},
@@ -24,6 +23,7 @@
     {"source": "/:username((?!dashboard|login|settings|test|compare|types|profile|group|api|_vercel|favicon|index|404|landing).*)", "destination": "/profile.html?u=:username"}
   ],
   "redirects": [
+    {"source": "/dashboard", "destination": "/", "permanent": true},
     {"source": "/landing", "destination": "/", "permanent": true},
     {"source": "/group", "destination": "/compare?mode=group", "permanent": false}
   ]

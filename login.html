@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANIMUS — Sign In</title>
+<title>ANIMUS ? Sign In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -89,7 +89,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-release.css">
 <meta name="theme-color" content="#080808">
-<meta name="description" content="Sign in to ANIMUS — your personality atlas across MBTI, Enneagram, philosophy, politics, and more.">
+<meta name="description" content="Sign in to ANIMUS ? your personality atlas across MBTI, Enneagram, philosophy, politics, and more.">
 </head>
 <body>
 <script>(function(){if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');})();</script>
@@ -98,7 +98,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <a href="/" class="panel-logo">ANI<span>MUS</span></a>
   <div>
     <div class="panel-big">KNOW<br><span>THY</span><br>SELF</div>
-    <p class="panel-quote">“The unexamined life is not worth living.” Your profile is waiting.</p>
+    <p class="panel-quote">?The unexamined life is not worth living.? Your profile is waiting.</p>
   </div>
   <div class="panel-dims">
     <div class="panel-dim"><strong>MBTI</strong> Cognitive function stack</div>
@@ -154,11 +154,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input class="form-input" id="iPw" type="password" placeholder="••••••••" autocomplete="current-password"/>
+        <input class="form-input" id="iPw" type="password" placeholder="????????" autocomplete="current-password"/>
       </div>
       <div class="form-group signup-only" id="fConfirm">
         <label class="form-label">Confirm Password</label>
-        <input class="form-input" id="iConfirm" type="password" placeholder="••••••••" autocomplete="new-password"/>
+        <input class="form-input" id="iConfirm" type="password" placeholder="????????" autocomplete="new-password"/>
       </div>
       <div id="forgotRow" style="text-align:right">
         <a class="forgot-link" onclick="doForgot()">Forgot password?</a>
@@ -167,10 +167,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </form>
 
     <div class="auth-switch" id="switchTxt">
-      Don't have an account? <a onclick="setMode('signup')">Create one →</a>
+      Don't have an account? <a onclick="setMode('signup')">Create one ?</a>
     </div>
     <div class="auth-guest">
-      <a href="/test">Take the test without an account →</a>
+      <a href="/test">Take the test without an account ?</a>
     </div>
   </div>
 
@@ -185,13 +185,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         maxlength="30" oninput="checkSetupUN(this.value)" autocomplete="off"/>
     </div>
     <div class="un-status" id="setupSt"></div>
-    <button class="btn-submit" style="margin-top:20px" onclick="finishSetup()">Finish →</button>
+    <button class="btn-submit" style="margin-top:20px" onclick="finishSetup()">Finish ?</button>
   </div>
 
   <div id="screenSuccess" class="screen">
-    <div class="success-icon">◆</div>
+    <div class="success-icon">?</div>
     <div class="success-title">You're in.</div>
-    <p class="success-sub">Redirecting to your dashboard...</p>
+    <p class="success-sub">Redirecting to your home...</p>
   </div>
 </div>
 </div>
@@ -320,7 +320,7 @@ function checkSetupUN(val){
     db.collection('usernames').doc(val).get()
       .then(function(d){
         st.className = d.exists ? 'un-status bad' : 'un-status ok';
-        st.textContent = d.exists ? '@'+val+' is taken' : '@'+val+' is available ✓';
+        st.textContent = d.exists ? '@'+val+' is taken' : '@'+val+' is available ?';
       }).catch(function(){ st.className='un-status ok'; st.textContent='@'+val+' looks good'; });
   }, 500);
 }
@@ -347,7 +347,7 @@ function finishSetup(){
       goToDashboard();
     })
     .catch(function(err){
-      btn.disabled=false; btn.textContent='Finish →';
+      btn.disabled=false; btn.textContent='Finish ?';
       errEl.textContent = err.message||'Something went wrong. Try again.';
       errEl.classList.add('show');
     });
@@ -400,7 +400,7 @@ function checkUN(val){
     db.collection('usernames').doc(val).get()
       .then(function(d){
         st.className = d.exists ? 'un-status bad' : 'un-status ok';
-        st.textContent = d.exists ? '@'+val+' is taken' : '@'+val+' is available ✓';
+        st.textContent = d.exists ? '@'+val+' is taken' : '@'+val+' is available ?';
       }).catch(function(){ st.className='un-status ok'; st.textContent='@'+val+' looks good'; });
   }, 500);
 }
@@ -417,8 +417,8 @@ function setMode(m){
   document.getElementById('sub').textContent     = up?'Take the assessment, build your profile, compare with friends.':'Access your profile, compare with friends, track how you change.';
   document.getElementById('btnSubmit').textContent = up?'Create Account':'Sign In';
   document.getElementById('switchTxt').innerHTML   = up
-    ? 'Already have an account? <a onclick="setMode(\'signin\')">Sign in →</a>'
-    : "Don't have an account? <a onclick=\"setMode('signup')\">Create one →</a>";
+    ? 'Already have an account? <a onclick="setMode(\'signin\')">Sign in ?</a>'
+    : "Don't have an account? <a onclick=\"setMode('signup')\">Create one ?</a>";
   document.getElementById('iPw').setAttribute('autocomplete', up?'new-password':'current-password');
   clearMsgs();
 }
@@ -427,13 +427,13 @@ function doForgot(){
   var email = v('iEmail');
   if(!email){ showErr({message:'Enter your email address first.'}); return; }
   auth.sendPasswordResetEmail(email)
-    .then(function(){ showOk('Reset email sent — check your inbox.'); })
+    .then(function(){ showOk('Reset email sent ? check your inbox.'); })
     .catch(showErr);
 }
 
 function goToDashboard(){
   showScreen('screenSuccess');
-  setTimeout(function(){ window.location.href = '/dashboard'; }, 1000);
+  setTimeout(function(){ window.location.href = '/'; }, 1000);
 }
 
 function showScreen(id){
@@ -455,7 +455,7 @@ function showErr(e){
     'auth/weak-password':'Password must be at least 6 characters.',
     'auth/invalid-email':'Please enter a valid email address.',
     'auth/too-many-requests':'Too many failed attempts. Wait a few minutes and try again.',
-    'auth/network-request-failed':'Network error — check your connection and try again.',
+    'auth/network-request-failed':'Network error ? check your connection and try again.',
     'auth/user-disabled':'This account has been disabled.',
     'auth/account-exists-with-different-credential':'An account exists with this email using a different sign-in method.'
   };
