@@ -229,19 +229,37 @@
     return '/test';
   }
 
-  /** Redirect anonymous users away from the assessment (call once after Firebase auth is ready). */
+  /** Redirect anonymous users away from the assessment (safe to call from <head>). */
   function guardTestPageAuth(auth) {
-    if (!auth || !global || !global.document || !global.document.body) return;
+    if (!auth || !global || !global.document) return;
     var returnPath = testPageReturnPath();
-    global.document.body.classList.add('test-auth-pending');
-    auth.onAuthStateChanged(function (user) {
+    var started = false;
+
+    function onAuth(user) {
+      var body = global.document.body;
+      if (!body) return;
       if (!user) {
         global.location.replace(buildLoginUrl(returnPath));
         return;
       }
-      global.document.body.classList.remove('test-auth-pending');
-      global.document.body.classList.add('test-auth-ok');
-    });
+      body.classList.remove('test-auth-pending');
+      body.classList.add('test-auth-ok');
+    }
+
+    function start() {
+      if (started) return;
+      started = true;
+      var body = global.document.body;
+      if (body) body.classList.add('test-auth-pending');
+      auth.onAuthStateChanged(onAuth);
+    }
+
+    if (global.document.body) start();
+    else if (global.document.addEventListener) {
+      global.document.addEventListener('DOMContentLoaded', start);
+    } else {
+      start();
+    }
   }
 
   /**

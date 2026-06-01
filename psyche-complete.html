@@ -329,7 +329,11 @@ body.page-test{background:var(--bg);color:var(--text);min-height:100vh;}
   <script src="/js/animus-shared.js"></script>
   <script>
     AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
-    AnimusShared.guardTestPageAuth(firebase.auth());
+    var auth = firebase.auth();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function (e) {
+      console.warn('Auth persistence:', e);
+    });
+    AnimusShared.guardTestPageAuth(auth);
   </script>
   <style>
     body.page-test.test-auth-pending #appNavMount,
