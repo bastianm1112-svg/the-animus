@@ -9,7 +9,7 @@
     return base || ('user' + Date.now().toString().slice(-6));
   }
 
-  function ensureUserDocument(db, auth, user) {
+  function ensureUserDocument(db, user) {
     if (!user || !db) return Promise.resolve(null);
     return db.collection('users').doc(user.uid).get().then(function (doc) {
       if (doc.exists) return doc.data();

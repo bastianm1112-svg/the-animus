@@ -72,19 +72,21 @@ body {
 .enn-big,
 .pc-mbti { text-shadow: 0 0 40px rgba(200,169,110,0.25); }
 
-/* ── BAR FILLS — GRADIENT ── */
-.bar-fill,
+/* ── BAR FILLS — GRADIENT (preserve cognitive function colors on profile) ── */
+.bar-fill:not([class*="fn-"]),
 .dual-bar-you,
 .moral-bar-fill {
   background: linear-gradient(to right, #8a6f3e, #c8a96e) !important;
 }
-.bar-fill.dim, .bar-fill.fn-ni.dim, .bar-fill.fn-ne.dim,
-.bar-fill.fn-ti.dim, .bar-fill.fn-te.dim,
-.bar-fill.fn-fi.dim, .bar-fill.fn-fe.dim,
-.bar-fill.fn-si.dim, .bar-fill.fn-se.dim {
+.bar-fill.dim:not([class*="fn-"]),
+.bar-fill.low:not([class*="fn-"]) {
   background: linear-gradient(to right, #3a2a1a, #8a6f3e) !important;
 }
-.bar-fill.low, .bar-fill.fn-si, .bar-fill.fn-se { opacity: 0.6; }
+.profile-content .bar-fill.fn-ni, .profile-content .bar-fill.fn-ne { background: #7c5cbf !important; }
+.profile-content .bar-fill.fn-ti, .profile-content .bar-fill.fn-te { background: #4a7abf !important; }
+.profile-content .bar-fill.fn-fi, .profile-content .bar-fill.fn-fe { background: linear-gradient(to right, #8a6f3e, #c8a96e) !important; }
+.profile-content .bar-fill.fn-si, .profile-content .bar-fill.fn-se { background: #4a9e6a !important; }
+.bar-fill.low:not([class*="fn-"]) { opacity: 0.6; }
 .dual-bar-them { background: linear-gradient(to right, #2d6b47, #4a9e6a) !important; }
 .compat-fill { background: linear-gradient(to right, #8a6f3e, #c8a96e, #f0d090) !important; }
 .mock-bar-fill { background: linear-gradient(to right, #8a6f3e, #c8a96e) !important; }
