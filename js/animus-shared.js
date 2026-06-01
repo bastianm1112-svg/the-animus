@@ -75,8 +75,72 @@
     }
   }
 
+  var PROFILE_ROUTE_RESERVED = {
+    dashboard: 1,
+    login: 1,
+    settings: 1,
+    test: 1,
+    compare: 1,
+    friends: 1,
+    admin: 1,
+    types: 1,
+    profile: 1,
+    group: 1,
+    api: 1,
+    _vercel: 1,
+    favicon: 1,
+    index: 1,
+    '404': 1,
+    landing: 1
+  };
+
+  function normalizeUsername(username) {
+    return String(username || '')
+      .trim()
+      .replace(/^@/, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9_\-]/g, '')
+      .substring(0, 32);
+  }
+
+  /**
+   * Resolve whose profile to load from URL (query or clean /username path).
+   * Vercel rewrites /name → profile.html?u=name but the browser often keeps /name with no search string.
+   */
+  function resolveProfileRoute(loc) {
+    loc = loc || (typeof g !== 'undefined' && g.location ? g.location : null);
+    if (!loc) return { kind: 'self' };
+
+    var params = new URLSearchParams(loc.search || '');
+    var uidParam = params.get('uid');
+    if (uidParam) {
+      return {
+        kind: 'uid',
+        uid: String(uidParam).replace(/[^a-zA-Z0-9]/g, '').substring(0, 128)
+      };
+    }
+
+    var uParam = params.get('u');
+    if (uParam) {
+      var fromQuery = normalizeUsername(uParam);
+      if (fromQuery) return { kind: 'username', username: fromQuery };
+    }
+
+    var segment = decodeURIComponent(String(loc.pathname || '').replace(/^\/+/, '')).split('/')[0];
+    if (!segment || segment === 'profile' || /\.html$/i.test(segment)) {
+      return { kind: 'self' };
+    }
+    if (PROFILE_ROUTE_RESERVED[segment.toLowerCase()]) {
+      return { kind: 'self' };
+    }
+
+    var fromPath = normalizeUsername(segment);
+    if (fromPath) return { kind: 'username', username: fromPath };
+    return { kind: 'self' };
+  }
+
   function profilePathForUsername(username) {
-    var u = String(username || '').trim().replace(/[^a-zA-Z0-9_\-]/g, '').substring(0, 32);
+    var u = normalizeUsername(username);
     return u ? '/' + encodeURIComponent(u) : '/profile';
   }
 
@@ -442,6 +506,8 @@
     sanitizeStringArray: sanitizeStringArray,
     sanitizeFigures: sanitizeFigures,
     safePhotoUrl: safePhotoUrl,
+    normalizeUsername: normalizeUsername,
+    resolveProfileRoute: resolveProfileRoute,
     profilePathForUsername: profilePathForUsername,
     profileHrefForUser: profileHrefForUser,
     polShortLabel: polShortLabel,

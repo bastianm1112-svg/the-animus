@@ -406,24 +406,49 @@ function downloadShareCard(){
 function downloadPDF(){ showToast('Opening PDF download...'); window.print(); }
 function editBio(){ window.location.href='/settings'; }
 
-auth.onAuthStateChanged(function(currentUser){
-  var params = new URLSearchParams(window.location.search);
-  var u = params.get('u');
-  var uidParam = params.get('uid');
-  if(uidParam){
-    uidParam = uidParam.replace(/[^a-zA-Z0-9]/g,'').substring(0,128);
-    loadProfileData(uidParam, currentUser && currentUser.uid === uidParam, currentUser);
-  } else if(u){
-    u = u.replace(/[^a-zA-Z0-9_\-]/g,'').substring(0,32);
-    db.collection('usernames').doc(u).get().then(function(doc){
-      if(!doc.exists){ document.getElementById('profileName').textContent='Profile not found'; return; }
-      loadProfileData(doc.data().uid, currentUser && currentUser.uid === doc.data().uid, currentUser);
-    });
-  } else if(currentUser){
-    loadProfileData(currentUser.uid, true, currentUser);
-  } else {
-    window.location.href='/login';
+function bootProfilePage(currentUser) {
+  var route =
+    typeof AnimusShared !== 'undefined' && AnimusShared.resolveProfileRoute
+      ? AnimusShared.resolveProfileRoute()
+      : { kind: 'self' };
+
+  if (route.kind === 'uid') {
+    loadProfileData(
+      route.uid,
+      !!(currentUser && currentUser.uid === route.uid),
+      currentUser
+    );
+    return;
   }
+
+  if (route.kind === 'username') {
+    db.collection('usernames')
+      .doc(route.username)
+      .get()
+      .then(function (doc) {
+        if (!doc.exists) {
+          document.getElementById('profileName').textContent = 'Profile not found';
+          return;
+        }
+        var targetUid = doc.data().uid;
+        loadProfileData(
+          targetUid,
+          !!(currentUser && currentUser.uid === targetUid),
+          currentUser
+        );
+      });
+    return;
+  }
+
+  if (currentUser) {
+    loadProfileData(currentUser.uid, true, currentUser);
+    return;
+  }
+  window.location.href = '/login';
+}
+
+auth.onAuthStateChanged(function (currentUser) {
+  bootProfilePage(currentUser);
 });
 
 function loadProfileData(uid, isOwner, currentUser){
@@ -438,9 +463,9 @@ function loadProfileData(uid, isOwner, currentUser){
     } else if(!uDoc.exists){ return; }
     var p=pDoc.exists ? pDoc.data() : {};
     var snap=p.latest||{};
-    if(!snap.mbti && typeof AnimusShared!=='undefined'){
-      var localSnap=AnimusShared.loadLastResultLocal();
-      if(localSnap&&localSnap.mbti) snap=localSnap;
+    if (isOwner && !snap.mbti && typeof AnimusShared !== 'undefined') {
+      var localSnap = AnimusShared.loadLastResultLocal();
+      if (localSnap && localSnap.mbti) snap = localSnap;
     }
     _snap=snap; _pName=u.displayName||''; _pUser=u.username||'';
 
@@ -521,19 +546,32 @@ function loadProfileData(uid, isOwner, currentUser){
   });
 }
 
-(function(){
-  var params=new URLSearchParams(window.location.search); var u=params.get('u');
-  if(u) u=u.replace(/[^a-zA-Z0-9_\-]/g,'').substring(0,32);
-  if(u){
-    var name=escapeHTML(u.charAt(0).toUpperCase()+u.slice(1));
-    document.title=name+' &#8212; ANIMUS Profile';
-    var nameEl=document.querySelector('.profile-name'); var userEl=document.querySelector('.profile-username');
-    if(nameEl) nameEl.textContent=name; if(userEl) userEl.textContent='@'+u;
-    var heroActions=document.querySelector('.hero-actions');
-    if(heroActions){ heroActions.innerHTML='<a href="/compare?u='+encodeURIComponent(u)+'" class="btn-action-profile btn-primary-profile">&#8652; Compare</a><button class="btn-action-profile btn-secondary-profile" onclick="shareProfile()">Share</button>'; }
-    document.querySelectorAll('.owner-only').forEach(function(el){ el.style.display='none'; });
-    document.querySelectorAll('.nav-item').forEach(function(el){ el.classList.remove('active'); });
+(function () {
+  var route =
+    typeof AnimusShared !== 'undefined' && AnimusShared.resolveProfileRoute
+      ? AnimusShared.resolveProfileRoute()
+      : null;
+  if (!route || route.kind !== 'username') return;
+  var u = route.username;
+  var name = escapeHTML(u.charAt(0).toUpperCase() + u.slice(1));
+  document.title = name + ' — ANIMUS Profile';
+  var nameEl = document.querySelector('.profile-name');
+  var userEl = document.querySelector('.profile-username');
+  if (nameEl) nameEl.textContent = name;
+  if (userEl) userEl.textContent = '@' + u;
+  var heroActions = document.querySelector('.hero-actions');
+  if (heroActions) {
+    heroActions.innerHTML =
+      '<a href="/compare?u=' +
+      encodeURIComponent(u) +
+      '" class="btn-action-profile btn-primary-profile">⇔ Compare</a><button class="btn-action-profile btn-secondary-profile" onclick="shareProfile()">Share</button>';
   }
+  document.querySelectorAll('.owner-only').forEach(function (el) {
+    el.style.display = 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(function (el) {
+    el.classList.remove('active');
+  });
 })();
 
 function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._timer); t._timer=setTimeout(function(){ t.classList.remove('show'); },2400); }
