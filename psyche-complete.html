@@ -1,4 +1,4 @@
-ï»¿ï»¿ï»¿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com https://www.gstatic.com; connect-src 'self' https://api.anthropic.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-ancestors 'none'; base-uri 'self';">
@@ -52,8 +52,8 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
 .qhdr-right{display:flex;align-items:center;gap:20px;}
 .qhdr-section{font-size:9px;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;}
 .qhdr-num{font-size:11px;color:var(--muted2);}
-.pbar-wrap{position:fixed;top:52px;left:0;right:0;height:3px;background:var(--border);z-index:200;}
-.pbar-fill{height:100%;background:linear-gradient(to right,var(--gold2,#8a6f3e),var(--accent,#c8a96e));transition:width 0.5s cubic-bezier(0.4,0,0.2,1);width:0%;}
+.pbar-wrap{position:fixed;top:52px;left:0;right:0;height:1px;background:var(--border);z-index:200;}
+.pbar-fill{height:100%;background:var(--accent);transition:width 0.5s cubic-bezier(0.4,0,0.2,1);width:0%;}
 .qbody{padding:110px 24px 100px;max-width:660px;margin:0 auto;}
 .q-section-badge{display:inline-flex;align-items:center;gap:8px;font-size:9px;letter-spacing:0.3em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;padding:4px 12px;border:1px solid var(--border2);}
 .q-dot{width:4px;height:4px;background:var(--accent);border-radius:50%;}
@@ -300,15 +300,15 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .fade-in{animation:fadeUp 0.4s ease forwards;}
 
-/* ═══ Enhanced answer options ═══ */
-.mc-choice { transition: all 0.15s !important; position: relative; }
-.mc-choice:hover { border-left-color: var(--gold) !important; background: rgba(200,169,110,0.04) !important; transform: translateX(3px) !important; }
-.mc-choice.selected, .mc-choice.active { border-color: var(--gold) !important; background: rgba(200,169,110,0.08) !important; box-shadow: inset 0 0 0 1px rgba(200,169,110,0.2) !important; }
-.scale-btn:hover { border-color: var(--gold2) !important; background: rgba(200,169,110,0.05) !important; color: var(--gold) !important; }
-.scale-btn.active, .scale-btn.selected { border-color: var(--gold) !important; background: rgba(200,169,110,0.1) !important; color: var(--gold) !important; }
-.agree-btn:hover { border-color: var(--gold2) !important; background: rgba(200,169,110,0.04) !important; }
-.agree-btn.active, .agree-btn.selected { border-color: var(--gold) !important; background: rgba(200,169,110,0.08) !important; }
-.pbar-fill { background: linear-gradient(to right, #8a6f3e, #c8a96e) !important; transition: width 0.4s ease !important; }
+/* ── TEST PROGRESS BAR ── */
+.test-progress-wrap{position:fixed;top:56px;left:0;right:0;height:3px;background:var(--border);z-index:150;display:none;}
+.test-progress-fill{height:100%;background:linear-gradient(to right,#8a6f3e,#c8a96e);transition:width 0.4s ease;width:0%;}
+.test-progress-label{position:fixed;top:62px;right:16px;font-size:10px;color:var(--muted);letter-spacing:0.15em;z-index:150;display:none;}
+/* Answer option enhancements */
+.mc-choice{transition:all 0.15s!important;}
+.mc-choice:hover{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.04)!important;transform:translateX(3px)!important;}
+.mc-choice.selected{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.08)!important;}
+.pbar-fill{background:linear-gradient(to right,#8a6f3e,#b8955a)!important;transition:width 0.4s ease!important;}
 </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -394,17 +394,17 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
   <div class="intro-observer">
     <div class="intro-import-divider"><span>or estimate someone else's profile</span></div>
     <div class="observer-card">
-      <div class="observer-icon">â—Ž</div>
+      <div class="observer-icon">◎</div>
       <div class="observer-info">
         <div class="observer-title">Test Estimator</div>
         <div class="observer-desc">Answer based on someone's observed behaviors and habits — not your own. Attach a name to save the estimated profile.</div>
       </div>
-      <button class="observer-btn" id="observerBtn">ESTIMATE â†’</button>
+      <button class="observer-btn" id="observerBtn">ESTIMATE →</button>
     </div>
     <div class="observer-name-wrap" id="observerNameWrap" style="display:none">
       <input class="intro-import-input" id="observerName" type="text" placeholder="Enter their name (e.g. Marco, Mom, Friend)" maxlength="64" style="border-right:1px solid var(--border);width:100%" />
       <div style="font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:0.04em">Answer each question as you observe this person to behave — not how you think they should.</div>
-      <button class="intro-import-btn" id="startObserverBtn" style="margin-top:10px;width:100%">BEGIN ESTIMATOR â†’</button>
+      <button class="intro-import-btn" id="startObserverBtn" style="margin-top:10px;width:100%">BEGIN ESTIMATOR →</button>
     </div>
   </div>
 
@@ -412,13 +412,13 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
     <div class="intro-import-divider"><span data-en="or view an existing profile" data-es="o ver un perfil existente">or view an existing profile</span></div>
     <div class="intro-import-row">
       <input class="intro-import-input" id="importInput" maxlength="4096" placeholder="Paste a profile link here..." />
-      <button class="intro-import-btn" id="importBtn">VIEW â†’</button>
+      <button class="intro-import-btn" id="importBtn">VIEW →</button>
     </div>
     <div class="intro-import-error" id="importError"></div>
     <div class="intro-import-divider" style="margin-top:20px"><span data-en="or fill in missing data from an old link" data-es="o completar datos faltantes de un link viejo">or fill in missing data from an old link</span></div>
     <div class="intro-import-row">
       <input class="intro-import-input" id="fillInput" maxlength="4096" placeholder="Paste incomplete profile link here..." />
-      <button class="intro-import-btn" id="fillBtn">FILL GAPS â†’</button>
+      <button class="intro-import-btn" id="fillBtn">FILL GAPS →</button>
     </div>
     <div class="intro-import-error" id="fillError"></div>
   </div>
@@ -449,10 +449,10 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
 <div id="results">
   <div class="res-hero" id="resHero"></div>
   <div class="action-bar" id="actionBar" style="display:none">
-    <button class="btn-action" id="btnSave"><span class="btn-action-icon">â†“</span> SAVE RESULTS</button>
-    <button class="btn-action accent" id="btnShare"><span class="btn-action-icon">â¬¡</span> SHARE PROFILE</button>
-    <button class="btn-action" id="btnCompare"><span class="btn-action-icon">â‡Œ</span> COMPARE WITH SOMEONE</button>
-    <button class="btn-action" id="btnPDF"><span class="btn-action-icon">âŽ™</span> DOWNLOAD PDF</button>
+    <button class="btn-action" id="btnSave"><span class="btn-action-icon">↓</span> SAVE RESULTS</button>
+    <button class="btn-action accent" id="btnShare"><span class="btn-action-icon">⬡</span> SHARE PROFILE</button>
+    <button class="btn-action" id="btnCompare"><span class="btn-action-icon">⇌</span> COMPARE WITH SOMEONE</button>
+    <button class="btn-action" id="btnPDF"><span class="btn-action-icon">⎙</span> DOWNLOAD PDF</button>
   </div>
   <div class="tabs-wrap"><div class="tabs" id="tabsBar"></div></div>
   <div class="tab-panels" id="tabPanels"></div>
@@ -464,7 +464,7 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
 <!-- SHARE MODAL -->
 <div class="modal-overlay" id="shareModal">
   <div class="modal-box">
-    <button class="modal-close" id="closeShareModal">âœ•</button>
+    <button class="modal-close" id="closeShareModal">✕</button>
     <div class="modal-title">Share Your Profile</div>
     <p class="modal-sub">Copy the link below and send it to anyone. They can paste it into the Compare mode to see how your profiles stack up.</p>
     <div class="share-url-wrap">
@@ -476,7 +476,7 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
     <p class="modal-sub" style="margin-bottom:12px">Paste their profile link to see a side-by-side comparison.</p>
     <div class="compare-input-wrap">
       <input class="compare-url-input" id="compareUrlInput" placeholder="Paste their profile link here..." />
-      <button class="btn-action accent" id="btnLoadCompare" style="justify-content:center">LOAD COMPARISON â†’</button>
+      <button class="btn-action accent" id="btnLoadCompare" style="justify-content:center">LOAD COMPARISON →</button>
     </div>
   </div>
 </div>
@@ -488,7 +488,7 @@ if(window.top !== window.self) { window.top.location = window.self.location; }
 (function(){
 'use strict';
 
-// â”€â”€ SECURITY UTILITIES â”€â”€
+// ── SECURITY UTILITIES ──
 function escapeHTML(str){
   if(str===null||str===undefined) return '';
   return String(str)
@@ -556,9 +556,9 @@ function safeAtob(encoded){
 }
 
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════
 // QUESTION BANK — 280 questions (140 MC + 140 Likert) across 14 dimensions
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════
 var Q = [
   {sec:"Cognitive","fn":"Ni","t":"A major decision is coming up. How do you approach it?","type":"mc","choices":[{l:"A",t:"I get a strong inner sense of the right answer before I can explain it","s":7},{l:"B",t:"I research all available options and compare them systematically","s":2},{l:"C",t:"I ask people I trust for their perspectives","s":3},{l:"D",t:"I go with whatever feels good in the moment","s":1}]},
   {sec:"Cognitive","fn":"Ni","t":"When reading a complex situation, you tend to:","type":"mc","choices":[{l:"A",t:"See the underlying pattern that explains everything at once","s":7},{l:"B",t:"Break it into logical components and analyze each one","s":2},{l:"C",t:"Focus on how it affects the people involved","s":3},{l:"D",t:"Notice the concrete facts and details on the surface","s":1}]},
@@ -1131,7 +1131,7 @@ var TOTAL = Q.length;
 var answers = new Array(TOTAL).fill(null);
 var cur = 0;
 
-// â”€â”€ LANGUAGE â”€â”€
+// ── LANGUAGE ──
 var _rawLang = localStorage.getItem('animus_lang'); var lang = (_rawLang==='es') ? 'es' : 'en';
 
 // Language now set via settings page (localStorage)
@@ -1160,7 +1160,7 @@ var scaleLabels = {
        opts:['Muy en desacuerdo','En desacuerdo','Algo en desacuerdo','Neutral','Algo de acuerdo','De acuerdo','Muy de acuerdo']}
 };
 
-// â”€â”€ SHUFFLE (Fisher-Yates) â”€â”€
+// ── SHUFFLE (Fisher-Yates) ──
 function shuffle(arr){
   for(var i=arr.length-1;i>0;i--){
     var j=Math.floor(Math.random()*(i+1));
@@ -1169,7 +1169,7 @@ function shuffle(arr){
   return arr;
 }
 
-// â”€â”€ TEST MODE â”€â”€
+// ── TEST MODE ──
 var testMode = 'full';
 
 // Check URL param on load
@@ -1208,11 +1208,11 @@ var SHORT_ALLOC = {
 
 // buildShortSet inlined in startBtn handler
 
-// â”€â”€ MODE TOGGLE â”€â”€
+// ── MODE TOGGLE ──
 document.getElementById('modeFull').addEventListener('click', function(){ setTestMode('full'); });
 document.getElementById('modeShort').addEventListener('click', function(){ setTestMode('short'); });
 
-// â”€â”€ START â”€â”€
+// ── START ──
 document.getElementById('startBtn').addEventListener('click', function(){
   var activeQ;
   if(testMode === 'short') {
@@ -1248,7 +1248,7 @@ document.getElementById('startBtn').addEventListener('click', function(){
   renderQ();
 });
 
-// â”€â”€ IMPORT PROFILE â”€â”€
+// ── IMPORT PROFILE ──
 function parseProfileLink(raw){
   if(typeof raw !== 'string') return null;
   raw = raw.trim();
@@ -1348,11 +1348,11 @@ function doImport(){
   }, 200);
 }
 
-// â”€â”€ FILL GAPS â”€â”€
+// ── FILL GAPS ──
 document.getElementById('fillBtn').addEventListener('click', function(){ doFillGaps(); });
 document.getElementById('fillInput').addEventListener('keydown', function(e){ if(e.key==='Enter') doFillGaps(); });
 
-// â”€â”€ OBSERVER / ESTIMATOR MODE â”€â”€
+// ── OBSERVER / ESTIMATOR MODE ──
 var observerMode = false;
 var observerSubjectName = '';
 
@@ -1479,7 +1479,7 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
 
     var html = '<div class="q-header-row"><div class="q-text">' + qText + '</div></div>';
     if(hasExplain){
-      html += '<button class="btn-explain" id="btnExplain"><span class="btn-explain-icon">â—Ž</span>'
+      html += '<button class="btn-explain" id="btnExplain"><span class="btn-explain-icon">◎</span>'
         + (lang==='es'?'SIMPLIFICAR PREGUNTA':'SIMPLIFY QUESTION') + '</button>';
       html += '<div class="explain-bubble" id="explainBubble">' + explainText + '</div>';
     }
@@ -1524,8 +1524,8 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
       btnEx.addEventListener('click', function(){
         bubbleEl.classList.toggle('open');
         var isOpen = bubbleEl.classList.contains('open');
-        btnEx.innerHTML = '<span class="btn-explain-icon">'+(isOpen?'Ã—':'â—Ž')+'</span>'
-          +(isOpen?(lang==='es'?'CERRAR EXPLICACIÃ“N':'CLOSE EXPLANATION'):(lang==='es'?'SIMPLIFICAR PREGUNTA':'SIMPLIFY QUESTION'));
+        btnEx.innerHTML = '<span class="btn-explain-icon">'+(isOpen?'×':'◎')+'</span>'
+          +(isOpen?(lang==='es'?'CERRAR EXPLICACIÓN':'CLOSE EXPLANATION'):(lang==='es'?'SIMPLIFICAR PREGUNTA':'SIMPLIFY QUESTION'));
       });
     }
     body.querySelectorAll('[data-v]').forEach(function(btn){
@@ -1739,7 +1739,7 @@ function renderQ(){
   });
 }
 
-// â”€â”€ FINISH QUIZ (called when user completes last question) â”€â”€
+// ── FINISH QUIZ (called when user completes last question) ──
 function finishQuiz(){
   document.getElementById('quiz').style.display='none';
   document.getElementById('loading').style.display='flex';
@@ -1767,9 +1767,9 @@ function finishQuiz(){
 }
 
 
-// â”€â”€ HELPER: Attachment dominant type â”€â”€
+// ── HELPER: Attachment dominant type ──
 
-// â”€â”€ HELPER: Derive MBTI from cognitive function scores â”€â”€
+// ── HELPER: Derive MBTI from cognitive function scores ──
 function getMBTI(cog){
   var stacks={
     INTJ:['Ni','Te','Fi','Se'], INTP:['Ti','Ne','Si','Fe'],
@@ -1789,7 +1789,7 @@ function getMBTI(cog){
   return best||'INTP';
 }
 
-// â”€â”€ HELPER: Derive Enneagram type/wing/tritype from scores â”€â”€
+// ── HELPER: Derive Enneagram type/wing/tritype from scores ──
 function getEnneagram(eS){
   var nums=['E1','E2','E3','E4','E5','E6','E7','E8','E9'];
   var type=nums.reduce(function(a,b){ return (eS[a]||0)>(eS[b]||0)?a:b; },nums[0]).replace('E','');
@@ -1811,19 +1811,19 @@ function getAttachment(atS){
   return best;
 }
 
-// â”€â”€ HELPER: Philosophy dominant school â”€â”€
+// ── HELPER: Philosophy dominant school ──
 function getPhilosophy(phS){
   var types = ['PH_STO','PH_EPI','PH_KAN','PH_ARI','PH_NIE','PH_EXI','PH_PRA','PH_SKE'];
   return types.reduce(function(a,b){ return phS[a]>=phS[b]?a:b; }, types[0]);
 }
 
-// â”€â”€ HELPER: Instinctual stack (SP/SOC/SX ordered by score) â”€â”€
+// ── HELPER: Instinctual stack (SP/SOC/SX ordered by score) ──
 function getInstinctStack(ivS){
   var order = Object.keys(ivS).sort(function(a,b){ return ivS[b]-ivS[a]; });
   return order.map(function(k){ return k.replace('IV_',''); }).join('/');
 }
 
-// â”€â”€ MC CHOICE SELECTION â”€â”€
+// ── MC CHOICE SELECTION ──
 function pickMC(btn, score){
   answers[cur] = score;
   // Update visual state
@@ -1834,7 +1834,7 @@ function pickMC(btn, score){
   if(nb){ nb.disabled=false; nb.classList.remove('disabled'); }
 }
 
-// â”€â”€ SCORING â”€â”€
+// ── SCORING ──
 var _scoreCache = null;
 var _explainCache = {}; // per-question simplified text cache
 
@@ -1897,14 +1897,14 @@ function score(){
   var alS={};
   ['AL_INT','AL_SEN'].forEach(function(a){ alS[a]=avg(a); });
 
-  // â”€â”€ DERIVED TYPES â”€â”€
+  // ── DERIVED TYPES ──
   var mbti = getMBTI(cog);
   var ennResult = getEnneagram(eS);
   var att = getAttachment(atS);
   var phi = getPhilosophy(phS);
   var instStack = getInstinctStack(ivS);
 
-  // â”€â”€ POLITICAL (direct only — no compression) â”€â”€
+  // ── POLITICAL (direct only — no compression) ──
   var econL = avg('PC_ECON_L');
   var econR = avg('PC_ECON_R');
   var auth  = avg('PC_AUTH');
@@ -1929,7 +1929,7 @@ function score(){
   return data;
 }
 
-// â”€â”€ BUILD AI PROMPT â”€â”€
+// ── BUILD AI PROMPT ──
 function buildPrompt(data){
   var mbti = data.mbti;
   var enn  = data.ennResult;
@@ -2025,7 +2025,7 @@ function callAIWithRetry(prompt,retriesLeft,onSuccess,onFail){
   });
 }
 
-// â”€â”€ FALLBACK NARRATIVE â”€â”€
+// ── FALLBACK NARRATIVE ──
 var mbtiMeta={
   INTJ:{n:'The Strategic Visionary',t:'A mind built to see through the noise and reshape reality according to an internal standard nothing outside can compromise.'},
   INTP:{n:'The Analytical Architect',t:'A pure thinking engine that will not rest until every assumption has been examined and every model refined to precision.'},
@@ -2170,7 +2170,7 @@ function buildFallbackNarrative(mbti,enn,att,phi,data){
     keirsey: keirseyByMBTI[mbti] || 'Rational'
   };
 }
-// â”€â”€ RENDER RESULTS â”€â”€
+// ── RENDER RESULTS ──
 var TABS=[
   {id:'overview',label:'Overview'},
   {id:'cognitive',label:'Cognition'},
@@ -2222,7 +2222,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   // Build panels
   var panels='';
 
-  // â”€â”€ OVERVIEW PANEL â”€â”€
+  // ── OVERVIEW PANEL ──
   panels+='<div class="panel active" id="panel-overview">'
     +'<div class="panel-title">Your Profile at a Glance</div>'
     +'<p class="panel-sub">A complete summary of who you are across every dimension measured.</p>'
@@ -2246,7 +2246,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'</div>'
     +'</div>';
 
-  // â”€â”€ COGNITIVE PANEL â”€â”€
+  // ── COGNITIVE PANEL ──
   var fnLbls={Ni:'Introverted Intuition',Ne:'Extroverted Intuition',Ti:'Introverted Thinking',Te:'Extroverted Thinking',Fi:'Introverted Feeling',Fe:'Extroverted Feeling',Si:'Introverted Sensing',Se:'Extroverted Sensing'};
   var stackPos=['Dominant','Auxiliary','Tertiary','Inferior'];
 
@@ -2280,7 +2280,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'</div>'
     +'</div>';
 
-  // â”€â”€ PERSONALITY PANEL â”€â”€
+  // ── PERSONALITY PANEL ──
   var ennNames={1:'The Perfectionist',2:'The Helper',3:'The Achiever',4:'The Individualist',5:'The Investigator',6:'The Loyalist',7:'The Enthusiast',8:'The Challenger',9:'The Peacemaker'};
   var tmpNames={TMP_CHO:'Choleric',TMP_MEL:'Melancholic',TMP_SAN:'Sanguine',TMP_PHL:'Phlegmatic'};
   var sortedTmp=Object.keys(data.tmp).sort(function(a,b){return data.tmp[b]-data.tmp[a];});
@@ -2341,7 +2341,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     }).join('')+'</div>'
     +'</div>';
 
-  // â”€â”€ PHILOSOPHY PANEL â”€â”€
+  // ── PHILOSOPHY PANEL ──
   var phiNames2={'PH_STO':'Stoicism','PH_EPI':'Epicureanism','PH_KAN':'Kantianism','PH_ARI':'Aristotelianism','PH_NIE':'Nietzscheanism','PH_EXI':'Existentialism','PH_PRA':'Pragmatism','PH_SKE':'Skepticism'};
   var epNames={'EP_RAT':'Rationalism','EP_EMP':'Empiricism','EP_INT':'Intuitionism','EP_SKP':'Skepticism'};
   var etNames={'ET_VIR':'Virtue Ethics','ET_CON':'Consequentialism','ET_DEO':'Deontology','ET_EGO':'Rational Egoism'};
@@ -2394,7 +2394,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     }).join('')+'</div>'
     +'</div>';
 
-  // â”€â”€ POLITICAL PANEL â”€â”€
+  // ── POLITICAL PANEL ──
   // polX: positive=right(economic freedom), negative=left
   // polY: positive=authoritarian(up on SVG = low dotY), negative=libertarian(down = high dotY)
   var px=data.polX, py=data.polY;
@@ -2522,7 +2522,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
     +'</div>';
 
-  // â”€â”€ SOCIAL PANEL â”€â”€
+  // ── SOCIAL PANEL ──
   panels+='<div class="panel" id="panel-social">'
     +'<div class="panel-title">Social & Interpersonal Self</div>'
     +'<p class="panel-sub">How you operate with and without others — your presence, style, inner world alone, and interpersonal patterns.</p>'
@@ -2557,7 +2557,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'</div>'
     +'</div>';
 
-  // â”€â”€ FIGURES PANEL â”€â”€
+  // ── FIGURES PANEL ──
   var figures=Array.isArray(ai.figures)?ai.figures:[];
   var catOrder=['Historical','Celebrity','Pop Culture','Philosopher'];
   var figBycat={};
@@ -2679,7 +2679,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
       return _ref.set({latest:_snap,history:h,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     }).then(function(){
       var btn=document.getElementById('btnSave');
-      if(btn){btn.innerHTML='â†“ SAVED ✓';btn.style.opacity='0.7';}
+      if(btn){btn.innerHTML='↓ SAVED ✓';btn.style.opacity='0.7';}
     }).catch(function(e){console.error('Auto-save:',e);});
   });
 })();
@@ -2762,7 +2762,7 @@ document.getElementById('btnSave').addEventListener('click',function(){
   });
 }
 
-// â”€â”€ PDF GENERATION â”€â”€
+// ── PDF GENERATION ──
 function downloadPDF(snap, data, mbti, enn, att, phi, instStack, ai){
   var fnOrder=['Ni','Ne','Ti','Te','Fi','Fe','Si','Se'];
   var fnFull={Ni:'Introverted Intuition',Ne:'Extroverted Intuition',Ti:'Introverted Thinking',Te:'Extroverted Thinking',Fi:'Introverted Feeling',Fe:'Extroverted Feeling',Si:'Introverted Sensing',Se:'Extroverted Sensing'};
@@ -2857,15 +2857,15 @@ function downloadPDF(snap, data, mbti, enn, att, phi, instStack, ai){
     +'h2{page-break-after:avoid}.card{page-break-inside:avoid}'
     +'}'
     +'
-/* ═══ Enhanced answer options ═══ */
-.mc-choice { transition: all 0.15s !important; position: relative; }
-.mc-choice:hover { border-left-color: var(--gold) !important; background: rgba(200,169,110,0.04) !important; transform: translateX(3px) !important; }
-.mc-choice.selected, .mc-choice.active { border-color: var(--gold) !important; background: rgba(200,169,110,0.08) !important; box-shadow: inset 0 0 0 1px rgba(200,169,110,0.2) !important; }
-.scale-btn:hover { border-color: var(--gold2) !important; background: rgba(200,169,110,0.05) !important; color: var(--gold) !important; }
-.scale-btn.active, .scale-btn.selected { border-color: var(--gold) !important; background: rgba(200,169,110,0.1) !important; color: var(--gold) !important; }
-.agree-btn:hover { border-color: var(--gold2) !important; background: rgba(200,169,110,0.04) !important; }
-.agree-btn.active, .agree-btn.selected { border-color: var(--gold) !important; background: rgba(200,169,110,0.08) !important; }
-.pbar-fill { background: linear-gradient(to right, #8a6f3e, #c8a96e) !important; transition: width 0.4s ease !important; }
+/* ── TEST PROGRESS BAR ── */
+.test-progress-wrap{position:fixed;top:56px;left:0;right:0;height:3px;background:var(--border);z-index:150;display:none;}
+.test-progress-fill{height:100%;background:linear-gradient(to right,#8a6f3e,#c8a96e);transition:width 0.4s ease;width:0%;}
+.test-progress-label{position:fixed;top:62px;right:16px;font-size:10px;color:var(--muted);letter-spacing:0.15em;z-index:150;display:none;}
+/* Answer option enhancements */
+.mc-choice{transition:all 0.15s!important;}
+.mc-choice:hover{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.04)!important;transform:translateX(3px)!important;}
+.mc-choice.selected{border-left-color:var(--accent)!important;background:rgba(184,149,90,0.08)!important;}
+.pbar-fill{background:linear-gradient(to right,#8a6f3e,#b8955a)!important;transition:width 0.4s ease!important;}
 </style><link rel="stylesheet" href="/style.css">
 </head><body>'
 
@@ -2967,7 +2967,7 @@ function downloadPDF(snap, data, mbti, enn, att, phi, instStack, ai){
   };
 }
 
-// â”€â”€ TOAST â”€â”€
+// ── TOAST ──
 function showToast(msg){
   var t=document.getElementById('toast');
   t.textContent=msg;
@@ -2975,7 +2975,7 @@ function showToast(msg){
   setTimeout(function(){t.classList.remove('show');},2400);
 }
 
-// â”€â”€ COMPARISON VIEW â”€â”€
+// ── COMPARISON VIEW ──
 function showComparison(you, them){
   document.getElementById('results').style.display='none';
   document.getElementById('compareView').style.display='block';
@@ -3064,7 +3064,7 @@ function showComparison(you, them){
     +'</div></div>'
 
     +'<div style="text-align:center;padding:32px 0">'
-    +'<button class="btn-action" id="backToResults">â† BACK TO YOUR RESULTS</button>'
+    +'<button class="btn-action" id="backToResults">← BACK TO YOUR RESULTS</button>'
     +'</div>';
 
   document.getElementById('compareView').innerHTML=html;
@@ -3076,7 +3076,7 @@ function showComparison(you, them){
     var heroEl = document.getElementById('resHero');
     var banner = document.createElement('div');
     banner.style.cssText = 'background:rgba(200,169,110,0.08);border:1px solid var(--accent2);padding:12px 20px;margin-bottom:16px;font-size:12px;color:var(--muted2);letter-spacing:0.05em;';
-    banner.innerHTML = 'â—Ž ESTIMATED PROFILE — <strong style="color:var(--text)">'+(window._observerName||'Unknown')+'</strong> — Based on observed behaviors, not self-report. Results may differ from a self-administered test.';
+    banner.innerHTML = '◎ ESTIMATED PROFILE — <strong style="color:var(--text)">'+(window._observerName||'Unknown')+'</strong> — Based on observed behaviors, not self-report. Results may differ from a self-administered test.';
     heroEl.insertBefore(banner, heroEl.firstChild);
   }
     window.scrollTo(0,0);
@@ -3090,7 +3090,7 @@ function showComparison(you, them){
   },200);
 }
 
-// â”€â”€ CHECK URL HASH ON LOAD (load shared profile) â”€â”€
+// ── CHECK URL HASH ON LOAD (load shared profile) ──
 (function checkSharedProfile(){
   var hash=window.location.hash;
   if(hash && hash.indexOf('#profile=')===0){
@@ -3107,7 +3107,7 @@ function showComparison(you, them){
         +'<div style="font-family:Cormorant Garamond,serif;font-size:72px;font-weight:300;color:var(--text);line-height:1;margin-bottom:8px">'+shared.mbti+'</div>'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--accent);font-style:italic;margin-bottom:32px">'+(shared.mbtiName||'')+'</div>'
         +'<p style="max-width:480px;color:var(--muted2);font-size:12px;line-height:1.9;margin-bottom:40px">Someone shared their ANIMUS profile with you. Complete the assessment yourself and their results will be waiting for comparison at the end.</p>'
-        +'<button class="btn-primary" id="takeTestForCompare">TAKE THE TEST â†’</button>';
+        +'<button class="btn-primary" id="takeTestForCompare">TAKE THE TEST →</button>';
       document.body.insertBefore(notice, document.getElementById('quiz'));
 
       document.getElementById('takeTestForCompare').addEventListener('click',function(){
