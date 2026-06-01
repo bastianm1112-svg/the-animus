@@ -3,6 +3,10 @@
   'use strict';
   var Q = g.AnimusQuestions.Q;
   var ES = g.AnimusQuestions.ES;
+  var Cross = g.AnimusCross || {};
+  if (Cross.applyChoicePatches) Cross.applyChoicePatches(Q);
+
+  var _choiceIx = [];
 
 
 // ── SECURITY UTILITIES ──
@@ -139,12 +143,15 @@ function setTestMode(mode) {
 
 function saveTestProgress() {
   if(!window._activeQ || !answers) return;
+  var qKey = Cross.qKey || function (q) { return (q.fn || '') + '|' + (q.t || ''); };
   try {
     sessionStorage.setItem(AnimusShared.KEYS.testProgress, JSON.stringify({
       testMode: testMode,
       cur: cur,
       total: TOTAL,
       answers: answers,
+      choiceIx: _choiceIx.slice(),
+      activeKeys: window._activeQ.map(qKey),
       observerMode: !!observerMode,
       observerSubjectName: observerSubjectName || '',
       savedAt: Date.now()
@@ -186,9 +193,19 @@ function resumeTestFromStorage() {
   setTestMode(data.testMode || 'full');
   observerMode = !!data.observerMode;
   observerSubjectName = data.observerSubjectName || '';
-  buildActiveQuestionSet();
+  var qKey = Cross.qKey || function (q) { return (q.fn || '') + '|' + (q.t || ''); };
+  if (data.activeKeys && data.activeKeys.length) {
+    var keyToQ = {};
+    Q.forEach(function (q) { keyToQ[qKey(q)] = q; });
+    window._activeQ = data.activeKeys.map(function (k) { return keyToQ[k]; }).filter(Boolean);
+    TOTAL = window._activeQ.length;
+    if (!answers || answers.length !== TOTAL) answers = new Array(TOTAL).fill(null);
+  } else {
+    buildActiveQuestionSet();
+  }
   if(data.answers.length === TOTAL){
     answers = data.answers.slice();
+    _choiceIx = (data.choiceIx && data.choiceIx.length === TOTAL) ? data.choiceIx.slice() : new Array(TOTAL).fill(-1);
     cur = Math.min(data.cur, TOTAL - 1);
     document.getElementById('intro').style.display = 'none';
     document.getElementById('quiz').style.display = 'block';
@@ -200,23 +217,69 @@ function resumeTestFromStorage() {
   }
 }
 
+function buildTaggedPools() {
+  var byTag = {};
+  var qKey = Cross.qKey || function (q) { return (q.fn || '') + '|' + (q.t || ''); };
+  var questionTags = Cross.questionTags || function (q) { return [q.fn]; };
+  Q.forEach(function (q) {
+    questionTags(q).forEach(function (tag) {
+      if (!byTag[tag]) byTag[tag] = { mc: [], s: [] };
+      if (q.type === 'mc') byTag[tag].mc.push(q);
+      else byTag[tag].s.push(q);
+    });
+  });
+  return { byTag: byTag, qKey: qKey };
+}
+
+function takeUniqueQuestions(pool, n, used, qKey) {
+  shuffle(pool);
+  var out = [];
+  for (var i = 0; i < pool.length && out.length < n; i++) {
+    var q = pool[i];
+    var k = qKey(q);
+    if (used[k]) continue;
+    used[k] = true;
+    out.push(q);
+  }
+  return out;
+}
+
+function poolForAlloc(fn, byTag) {
+  var tags = [fn];
+  if (Cross.SHORT_POOL_TAGS && Cross.SHORT_POOL_TAGS[fn]) {
+    tags = Cross.SHORT_POOL_TAGS[fn];
+  }
+  var mc = [], s = [];
+  tags.forEach(function (tag) {
+    var p = byTag[tag];
+    if (!p) return;
+    mc = mc.concat(p.mc);
+    s = s.concat(p.s);
+  });
+  return { mc: mc, s: s };
+}
+
 function buildActiveQuestionSet() {
   var activeQ;
-  if(testMode === 'short') {
-    var byFnMC = {}, byFnS = {};
-    Q.forEach(function(q){
-      if(q.type==='mc'){ if(!byFnMC[q.fn]) byFnMC[q.fn]=[]; byFnMC[q.fn].push(q); }
-      else { if(!byFnS[q.fn]) byFnS[q.fn]=[]; byFnS[q.fn].push(q); }
-    });
+  _choiceIx = [];
+  if (testMode === 'short') {
+    var pools = buildTaggedPools();
+    var byTag = pools.byTag;
+    var qKey = pools.qKey;
+    var used = {};
     activeQ = [];
-    Object.keys(SHORT_ALLOC).forEach(function(fn){
+    Object.keys(SHORT_ALLOC).forEach(function (fn) {
       var alloc = SHORT_ALLOC[fn];
-      var mcPool = (byFnMC[fn]||[]).slice(); shuffle(mcPool);
-      var sPool  = (byFnS[fn]||[]).slice();  shuffle(sPool);
-      var mcCount = Math.floor(alloc/2);
-      var sCount  = alloc - mcCount;
-      activeQ = activeQ.concat(mcPool.slice(0,mcCount));
-      activeQ = activeQ.concat(sPool.slice(0,sCount));
+      var p = poolForAlloc(fn, byTag);
+      var mcCount = Math.floor(alloc / 2);
+      var sCount = alloc - mcCount;
+      var gotMc = takeUniqueQuestions(p.mc, mcCount, used, qKey);
+      var gotS = takeUniqueQuestions(p.s, sCount, used, qKey);
+      activeQ = activeQ.concat(gotMc).concat(gotS);
+      var need = alloc - gotMc.length - gotS.length;
+      if (need > 0) {
+        activeQ = activeQ.concat(takeUniqueQuestions(p.mc.concat(p.s), need, used, qKey));
+      }
     });
     shuffle(activeQ);
   } else {
@@ -225,24 +288,20 @@ function buildActiveQuestionSet() {
   }
   window._activeQ = activeQ;
   TOTAL = activeQ.length;
-  if(!answers || answers.length !== TOTAL) answers = new Array(TOTAL).fill(null);
+  if (!answers || answers.length !== TOTAL) answers = new Array(TOTAL).fill(null);
 }
 
-// Short test allocation — 100 questions spread across all 14 dimensions
+// Short test: 100 unique questions (all dimensions in bank; cross-scoring fills EP/MF/SOC/AL)
 var SHORT_ALLOC = {
-  Ni:4,Ne:4,Ti:4,Te:4,Fi:4,Fe:4,Si:4,Se:4,
-  E1:1,E2:1,E3:1,E4:1,E5:1,E6:1,E7:1,E8:1,E9:1,
-  PC_ECON_R:3,PC_ECON_L:3,PC_AUTH:3,PC_LIB:3,
-  PH_NIE:1,PH_STO:1,PH_KAN:1,PH_ARI:1,PH_EXI:1,PH_EPI:1,PH_PRA:1,PH_SKE:1,
-  ET_VIR:1,ET_CON:1,ET_DEO:1,ET_EGO:1,
-  AT_SEC:3,AT_ANX:3,AT_AVO:3,AT_DIS:3,
-  IV_SP:1,IV_SOC:1,IV_SX:1,
-  EP_RAT:1,EP_EMP:1,EP_INT:1,EP_SKP:1,
-  MF_CARE:1,MF_FAIR:1,MF_LOY:1,MF_AUTH:1,MF_PUR:1,MF_LIB:1,
-  TMP_CHO:1,TMP_MEL:1,TMP_SAN:1,TMP_PHL:1,
-  SOC_DOM:1,SOC_INT:1,SOC_WAR:1,SOC_DIR:1,
-  AL_INT:1,AL_SEN:1
-};;
+  Ni: 5, Ne: 5, Ti: 5, Te: 5, Fi: 5, Fe: 5, Si: 4, Se: 4,
+  E1: 2, E2: 2, E3: 2, E4: 2, E5: 2, E6: 2, E7: 3, E8: 2, E9: 2,
+  PC_ECON_R: 3, PC_ECON_L: 3, PC_AUTH: 3, PC_LIB: 3,
+  PH_NIE: 1, PH_STO: 1, PH_KAN: 1, PH_ARI: 1, PH_EXI: 1, PH_EPI: 1, PH_PRA: 1, PH_SKE: 1,
+  ET_VIR: 1, ET_CON: 1, ET_DEO: 1, ET_EGO: 1,
+  AT_SEC: 3, AT_ANX: 3, AT_AVO: 3, AT_DIS: 3,
+  IV_SP: 1, IV_SOC: 1, IV_SX: 1,
+  TMP_CHO: 1, TMP_MEL: 1, TMP_SAN: 1, TMP_PHL: 1
+};
 
 function startTest() {
   buildActiveQuestionSet();
@@ -664,9 +723,9 @@ function renderQ(){
 
   if(q.type==='mc' && q.choices){
     h += '<div class="mc-choices">';
-    q.choices.forEach(function(c){
-      var sel = answers[cur]===c.s ? ' selected' : '';
-      h += '<button class="mc-choice'+sel+'" data-v="'+c.s+'">'
+    q.choices.forEach(function(c, ci){
+      var sel = (_choiceIx[cur]===ci || (answers[cur]===c.s && _choiceIx[cur]===undefined)) ? ' selected' : '';
+      h += '<button class="mc-choice'+sel+'" data-v="'+c.s+'" data-ci="'+ci+'">'
         + '<span class="mc-letter">'+c.l+'</span>'
         + '<div class="mc-content"><span class="mc-text">'+escapeHTML(c.t)+'</span></div>'
         + '</button>';
@@ -736,6 +795,8 @@ function renderQ(){
   body.querySelectorAll('[data-v]').forEach(function(b){
     b.addEventListener('click', function(){
       answers[cur] = parseInt(this.getAttribute('data-v'), 10);
+      var ci = this.getAttribute('data-ci');
+      _choiceIx[cur] = ci !== null && ci !== '' ? parseInt(ci, 10) : -1;
       renderQ();
     });
   });
@@ -782,6 +843,33 @@ function finishQuiz(){
 // ── HELPER: Attachment dominant type ──
 
 // ── HELPER: Derive MBTI from cognitive function scores ──
+function answerFingerprint(){
+  var h = 2166136261;
+  if (!answers) return 0;
+  for (var i = 0; i < answers.length; i++) {
+    if (answers[i] !== null && answers[i] !== undefined) {
+      h ^= (answers[i] + i * 17);
+      h = Math.imul(h, 16777619);
+    }
+  }
+  return Math.abs(h);
+}
+
+function mbtiFromDichotomies(cog){
+  var I = ((cog.Si || 50) + (cog.Ni || 50)) / 2;
+  var E = ((cog.Se || 50) + (cog.Ne || 50)) / 2;
+  var N = ((cog.Ni || 50) + (cog.Ne || 50)) / 2;
+  var S = ((cog.Si || 50) + (cog.Se || 50)) / 2;
+  var T = ((cog.Ti || 50) + (cog.Te || 50)) / 2;
+  var F = ((cog.Fi || 50) + (cog.Fe || 50)) / 2;
+  var J = ((cog.Te || 50) + (cog.Fe || 50) + (cog.Si || 50)) / 3;
+  var P = ((cog.Ti || 50) + (cog.Fi || 50) + (cog.Ne || 50) + (cog.Se || 50)) / 4;
+  return (E >= I ? 'E' : 'I')
+    + (N >= S ? 'N' : 'S')
+    + (T >= F ? 'T' : 'F')
+    + (J >= P ? 'J' : 'P');
+}
+
 function getMBTI(cog){
   var stacks={
     INTJ:['Ni','Te','Fi','Se'], INTP:['Ti','Ne','Si','Fe'],
@@ -793,12 +881,21 @@ function getMBTI(cog){
     ISTP:['Ti','Se','Ni','Fe'], ISFP:['Fi','Se','Ni','Te'],
     ESTP:['Se','Ti','Fe','Ni'], ESFP:['Se','Fi','Te','Ni']
   };
-  var w=[4,3,2,1], best=null, bestScore=-Infinity;
+  var w=[4,3,2,1];
+  var ranked=[];
   Object.keys(stacks).forEach(function(type){
-    var s=0; stacks[type].forEach(function(fn,i){ s+=(cog[fn]||0)*w[i]; });
-    if(s>bestScore){ bestScore=s; best=type; }
+    var s=0; stacks[type].forEach(function(fn,i){ s+=(cog[fn]||50)*w[i]; });
+    ranked.push({ type: type, score: s });
   });
-  return best||'INTP';
+  ranked.sort(function(a,b){ return b.score - a.score; });
+  var top = ranked[0].score;
+  var tied = ranked.filter(function(r){ return r.score >= top - 0.5; });
+  if (tied.length === 1) return tied[0].type;
+  var dich = mbtiFromDichotomies(cog);
+  for (var j = 0; j < tied.length; j++) {
+    if (tied[j].type === dich) return dich;
+  }
+  return tied[answerFingerprint() % tied.length].type;
 }
 
 // ── HELPER: Derive Enneagram type/wing/tritype from scores ──
@@ -850,19 +947,69 @@ function pickMC(btn, score){
 var _scoreCache = null;
 var _explainCache = {}; // per-question simplified text cache
 
-function score(){
-  // Returns a full data object with all dimension scores + derived types
-  function avg(fn){
-    var sum=0,cnt=0;
-    (window._activeQ||Q).forEach(function(q,i){
-      if(q.fn===fn){
-        var raw=answers[i];
-        if(raw===null||raw===undefined) return;
-        // MC: raw is already 1-7 score; Likert: same format
-        sum+=(raw-1)/6*100; cnt++;
-      }
+function scoreContributionBuckets(activeQ){
+  var buckets = {};
+  var FN_ALSO = Cross.FN_ALSO || {};
+  var DERIVED_FN = Cross.DERIVED_FN || {};
+
+  function add(fn, val, weight){
+    if (val === null || val === undefined || isNaN(val)) return;
+    weight = weight || 1;
+    if (!buckets[fn]) buckets[fn] = { sum: 0, w: 0 };
+    buckets[fn].sum += val * weight;
+    buckets[fn].w += weight;
+  }
+
+  function valFromRaw(raw){
+    return ((raw - 1) / 6) * 100;
+  }
+
+  activeQ.forEach(function (q, i) {
+    var raw = answers[i];
+    if (raw === null || raw === undefined) return;
+    var val = valFromRaw(raw);
+    add(q.fn, val, 1);
+    if (q.also) {
+      Object.keys(q.also).forEach(function (k) {
+        add(k, val, q.also[k]);
+      });
+    }
+    (FN_ALSO[q.fn] || []).forEach(function (x) {
+      add(x.fn, val, x.w);
     });
-    return cnt ? Math.round(sum/cnt) : 50;
+    if (q.type === 'mc' && q.choices && _choiceIx[i] >= 0) {
+      var choice = q.choices[_choiceIx[i]];
+      if (choice && choice.also) {
+        Object.keys(choice.also).forEach(function (k) {
+          add(k, valFromRaw(choice.also[k]), 0.7);
+        });
+      }
+    }
+  });
+
+  function finalize(fn){
+    if (!buckets[fn] || buckets[fn].w < 0.01) {
+      var derived = DERIVED_FN[fn];
+      if (derived) {
+        derived.forEach(function (x) {
+          if (buckets[x.fn] && buckets[x.fn].w > 0) {
+            add(fn, buckets[x.fn].sum / buckets[x.fn].w, x.w);
+          }
+        });
+      }
+    }
+    if (!buckets[fn] || buckets[fn].w < 0.01) return 50;
+    return Math.round(buckets[fn].sum / buckets[fn].w);
+  }
+
+  return { buckets: buckets, finalize: finalize };
+}
+
+function score(){
+  var activeQ = window._activeQ || Q;
+  var scored = scoreContributionBuckets(activeQ);
+  function avg(fn){
+    return scored.finalize(fn);
   }
 
   // Cognitive functions

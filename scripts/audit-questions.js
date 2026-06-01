@@ -1,0 +1,12 @@
+const fs = require('fs');
+const s = fs.readFileSync(require('path').join(__dirname, '../js/psyche-questions.js'), 'utf8');
+const fns = [...s.matchAll(/"fn":"([^"]+)"/g)].map((m) => m[1]);
+const c = {};
+fns.forEach((fn) => { c[fn] = (c[fn] || 0) + 1; });
+console.log('Total questions:', fns.length);
+console.log('\nPolitics (should be balanced L/R and Auth/Lib):');
+['PC_ECON_L', 'PC_ECON_R', 'PC_AUTH', 'PC_LIB'].forEach((k) => console.log(' ', k, c[k] || 0));
+console.log('\nCognitive (should be ~35 each for 280 test):');
+['Ni', 'Ne', 'Ti', 'Te', 'Fi', 'Fe', 'Si', 'Se'].forEach((k) => console.log(' ', k, c[k] || 0));
+console.log('\nEnneagram types:');
+['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9'].forEach((k) => console.log(' ', k, c[k] || 0));
