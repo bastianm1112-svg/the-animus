@@ -75,6 +75,13 @@
     return econ + ', ' + soc;
   }
 
+  function plainField(text, maxLen) {
+    if (typeof g.AnimusShared !== 'undefined' && g.AnimusShared.sanitizePlainText) {
+      return g.AnimusShared.sanitizePlainText(text, maxLen || 2000);
+    }
+    return text || '';
+  }
+
   function buildInsights(snap, isOwner, name, voice) {
     var p = pron(isOwner);
     var narr = voice && voice.narrativeForViewer
@@ -181,7 +188,7 @@
         kicker: 'Shadow',
         title: p.poss + ' blind spots',
         body: narr(
-          snap.shadowDesc ||
+          plainField(snap.shadowDesc, 2000) ||
           p.subj + ' growth edge lives where ' + p.possL + ' weakest functions and repressed traits meet habit. ' +
           'Under stress, ' + p.subjL + ' may overuse ' + domFn + ' until it becomes rigidity rather than strength.'
         ),

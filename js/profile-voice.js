@@ -3,7 +3,11 @@
   'use strict';
 
   function narrativeForViewer(text, isOwner, displayName) {
-    if (!text || isOwner) return text || '';
+    if (!text) return '';
+    if (typeof g.AnimusShared !== 'undefined' && g.AnimusShared.sanitizePlainText) {
+      text = g.AnimusShared.sanitizePlainText(text, 2000);
+    }
+    if (isOwner) return text;
     var name = (displayName || '').trim();
     var out = String(text)
       .replace(/\bYou're\b/g, "They're")

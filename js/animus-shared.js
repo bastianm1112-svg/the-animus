@@ -58,6 +58,48 @@
     }).filter(function (f) { return f && f.name; });
   }
 
+  function safeInternalHref(href) {
+    if (!href || typeof href !== 'string') return '';
+    var h = href.trim();
+    if (h.indexOf('//') === 0 || /^https?:/i.test(h) || /^javascript:/i.test(h) || /^data:/i.test(h)) {
+      return '';
+    }
+    if (h.charAt(0) !== '/') return '';
+    return h.substring(0, 200);
+  }
+
+  var PROFILE_TEXT_KEYS = [
+    'mbtiName', 'tagline', 'socionics', 'keirsey', 'cogNarrative', 'ennNarrative',
+    'attNarrative', 'phiNarrative', 'politicalNarrative', 'politicalIdeology',
+    'politicalIdeologyDesc', 'politicalStrengths', 'politicalWeaknesses',
+    'aloneDesc', 'socialDesc', 'shadowDesc'
+  ];
+
+  function sanitizeProfileSnapshot(snapshot) {
+    var snap = Object.assign({}, snapshot || {});
+    PROFILE_TEXT_KEYS.forEach(function (k) {
+      if (snap[k] != null) snap[k] = sanitizePlainText(snap[k], 2000);
+    });
+    if (snap.values) snap.values = sanitizeStringArray(snap.values, 80, 24);
+    if (snap.politicalThinkers) snap.politicalThinkers = sanitizeStringArray(snap.politicalThinkers, 500, 8);
+    if (snap.similarPoliticians) snap.similarPoliticians = sanitizeStringArray(snap.similarPoliticians, 500, 8);
+    if (snap.similarParties) snap.similarParties = sanitizeStringArray(snap.similarParties, 500, 8);
+    if (snap.similarCountries) snap.similarCountries = sanitizeStringArray(snap.similarCountries, 500, 8);
+    if (snap.figures) snap.figures = sanitizeFigures(snap.figures);
+    return snap;
+  }
+
+  function sanitizeUserProfileFields(data) {
+    data = data || {};
+    return {
+      displayName: sanitizePlainText(data.displayName, 48),
+      bio: sanitizePlainText(data.bio, 160),
+      username: normalizeUsername(data.username),
+      language: sanitizePlainText(data.language, 16),
+      email: sanitizePlainText(data.email, 256)
+    };
+  }
+
   function safePhotoUrl(url) {
     if (!url || typeof url !== 'string') return '';
     try {
@@ -377,7 +419,7 @@
   }
 
   function enrichProfileSnapshot(snapshot, rawData, meta) {
-    var snap = Object.assign({}, snapshot);
+    var snap = sanitizeProfileSnapshot(Object.assign({}, snapshot));
     var data = rawData || {};
     snap.soc = socDisplayFromRaw(snap.soc || data.soc);
     snap.alone = aloneDisplayFromRaw(snap.alone || data.alone);
@@ -419,6 +461,7 @@
       .get()
       .then(function (doc) {
         var latest = doc.exists && doc.data().latest ? doc.data().latest : null;
+        if (latest) latest = sanitizeProfileSnapshot(latest);
         if (latest && latest.mbti) return latest;
         var authUser = firebase.auth && firebase.auth().currentUser;
         if (options.allowLocalFallback !== false && authUser && authUser.uid === uid) {
@@ -529,6 +572,9 @@
     sanitizeStringArray: sanitizeStringArray,
     sanitizeFigures: sanitizeFigures,
     safePhotoUrl: safePhotoUrl,
+    safeInternalHref: safeInternalHref,
+    sanitizeProfileSnapshot: sanitizeProfileSnapshot,
+    sanitizeUserProfileFields: sanitizeUserProfileFields,
     normalizeUsername: normalizeUsername,
     resolveProfileRoute: resolveProfileRoute,
     profilePathForUsername: profilePathForUsername,

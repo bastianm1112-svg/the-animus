@@ -967,13 +967,22 @@ function saveChanges() {
 
       // Save main user doc
       chain = chain.then(function(){
-        return db.collection('users').doc(uid).set({
-          displayName: displayNameVal,
-          bio: bio,
-          language: lang,
-          email: user.email || '',
-          username: newUsername
-        }, {merge: true});
+        var profileFields = typeof AnimusShared !== 'undefined' && AnimusShared.sanitizeUserProfileFields
+          ? AnimusShared.sanitizeUserProfileFields({
+              displayName: displayNameVal,
+              bio: bio,
+              language: lang,
+              email: user.email || '',
+              username: newUsername
+            })
+          : {
+              displayName: displayNameVal,
+              bio: bio,
+              language: lang,
+              email: user.email || '',
+              username: newUsername
+            };
+        return db.collection('users').doc(uid).set(profileFields, {merge: true});
       });
 
       // Update username lookup if changed

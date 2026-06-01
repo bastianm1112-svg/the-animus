@@ -187,6 +187,9 @@
     if (allValuesEqual(out.alone, 50)) {
       out.alone = { AL_INT: 0, AL_SEN: 0 };
     }
+    if (typeof g.AnimusShared !== 'undefined' && g.AnimusShared.sanitizeProfileSnapshot) {
+      out = g.AnimusShared.sanitizeProfileSnapshot(out);
+    }
     return out;
   }
 

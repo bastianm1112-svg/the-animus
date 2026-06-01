@@ -180,10 +180,16 @@
               '" onclick="AnimusSocial.declineFriendRequest(this.dataset.uid);this.closest(\'.feed-item\').remove()">Decline</button>' +
               '</div>';
           } else if (a.link) {
-            actionHtml =
-              '<a href="' +
-              escapeHTML(a.link) +
-              '" class="feed-action">View →</a>';
+            var safeLink =
+              typeof g.AnimusShared !== 'undefined' && g.AnimusShared.safeInternalHref
+                ? g.AnimusShared.safeInternalHref(a.link)
+                : '';
+            if (safeLink) {
+              actionHtml =
+                '<a href="' +
+                escapeHTML(safeLink) +
+                '" class="feed-action">View →</a>';
+            }
           }
           item.innerHTML =
             '<div class="feed-icon">' +
@@ -325,7 +331,7 @@
           type: 'friend_request',
           text: (user.displayName || 'Someone') + ' sent you a friend request',
           fromUid: user.uid,
-          fromName: user.displayName || '',
+          fromName: (user.displayName || 'Someone').substring(0, 48),
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         return batch.commit().then(function () {
@@ -358,12 +364,13 @@
       'friendRequests.sent': firebase.firestore.FieldValue.arrayRemove(user.uid)
     });
     var actRef = db.collection('activity').doc(fromUid).collection('feed').doc();
-    batch.set(actRef, {
-      text: (user.displayName || 'Someone') + ' accepted your friend request',
-      fromUid: user.uid,
-      fromName: user.displayName || '',
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
+        batch.set(actRef, {
+          type: 'friend_accept',
+          text: (user.displayName || 'Someone') + ' accepted your friend request',
+          fromUid: user.uid,
+          fromName: (user.displayName || 'Someone').substring(0, 48),
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
     batch.commit().then(function () {
       showToast('You and ' + escapeHTML(fromName) + ' are now friends!');
       loadNotifs(user.uid);
