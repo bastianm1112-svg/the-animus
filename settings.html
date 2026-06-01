@@ -1,6 +1,7 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080808">
 <title>ANIMUS — Settings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -365,10 +366,15 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .nav-mobile-item.active,.nav-mobile-item:hover{color:var(--gold);}
 @media(max-width:768px){.nav-items{display:none!important;}.nav-hamburger{display:flex!important;}}
 </style>
+<link rel="stylesheet" href="/css/animus-shell.css">
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-unified.css">
+<link rel="stylesheet" href="/css/animus-release.css">
+<script src="/js/animus-app.js" defer></script>
 </head>
 <body>
+<script>(function(){try{if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');}catch(e){}})();</script>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <!-- NAV -->
 <nav class="navbar">
@@ -409,7 +415,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   <a href="/settings" class="nav-mobile-item active">Settings</a>
 </div>
 
-<div class="page">
+<div class="page" id="main-content">
 
   <div class="settings-mobile-nav" id="settingsMobileNav">
     <button type="button" class="settings-mobile-nav-item active" data-section="profile" onclick="showSection('profile', this)">Profile</button>
@@ -1425,50 +1431,7 @@ function safeAtob(encoded){
 </script>
 
 
-<script>
-// Smart logo: dashboard if logged in, landing if not
-try {
-  auth.onAuthStateChanged(function(user){
-    document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){
-      el.href = user ? '/dashboard' : '/';
-    });
-  });
-} catch(e){}
-</script>
-<script>
-function toggleMobileMenu(){
-  document.getElementById('navMobileMenu').classList.toggle('open');
-}
-document.addEventListener('click',function(e){
-  var menu=document.getElementById('navMobileMenu');
-  var btn=document.getElementById('navHamburger');
-  if(menu&&btn&&!menu.contains(e.target)&&!btn.contains(e.target)){menu.classList.remove('open');}
-});
-function toggleThemeGlobal(){
-  var isLight = document.body.classList.toggle('light-mode');
-  localStorage.setItem('animus_theme', isLight ? 'light' : 'dark');
-  var btn = document.getElementById('themeToggleBtn');
-  if(btn) btn.innerHTML = isLight
-    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-}
-(function(){
-  var isLight = document.body.classList.contains('light-mode');
-  var btn = document.getElementById('themeToggleBtn');
-  if(btn) btn.innerHTML = isLight
-    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-})();
-</script>
-<style>
-.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(8,8,8,0.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);z-index:300;justify-content:space-around;align-items:center;padding:0 8px;}
-@media(max-width:768px){.mobile-bottom-nav{display:flex;}}
-.mbn-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;color:var(--muted);text-decoration:none;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s;position:relative;}
-.mbn-item.active{color:var(--gold);}
-.mbn-item svg{opacity:0.6;}
-.mbn-item.active svg{opacity:1;}
-.mbn-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:2px;background:linear-gradient(to right,transparent,var(--gold),transparent);border-radius:0 0 2px 2px;}
-</style><nav class="mobile-bottom-nav">
+<nav class="mobile-bottom-nav">
   <a href="/dashboard" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a>
   <a href="/profile" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
   <a href="/compare" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Compare</a>

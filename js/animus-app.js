@@ -1,0 +1,94 @@
+/**
+ * ANIMUS app bootstrap — theme, nav, mobile menu (all app shells).
+ */
+(function (g) {
+  'use strict';
+
+  function syncThemeButton() {
+    var btn = document.getElementById('themeToggleBtn');
+    if (!btn) return;
+    var isLight = document.body.classList.contains('light-mode');
+    btn.innerHTML = isLight
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+    btn.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+  }
+
+  function initTheme() {
+    if (localStorage.getItem('animus_theme') === 'light') {
+      document.body.classList.add('light-mode');
+    }
+    syncThemeButton();
+  }
+
+  function initMobileNav() {
+    var menu = document.getElementById('navMobileMenu');
+    var btn = document.getElementById('navHamburger');
+    if (!menu || !btn) return;
+
+    if (!g.toggleMobileMenu) {
+      g.toggleMobileMenu = function () {
+        var open = menu.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      };
+    }
+
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-controls', 'navMobileMenu');
+    if (!menu.id) menu.id = 'navMobileMenu';
+
+    document.addEventListener('click', function (e) {
+      if (!menu.classList.contains('open')) return;
+      if (menu.contains(e.target) || btn.contains(e.target)) return;
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+
+    menu.querySelectorAll('.nav-mobile-item').forEach(function (link) {
+      link.addEventListener('click', function () {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  function initSmartLogo() {
+    if (typeof firebase === 'undefined' || !firebase.auth) return;
+    try {
+      firebase.auth().onAuthStateChanged(function (user) {
+        document.querySelectorAll('a.nav-logo, a.panel-logo, a.footer-logo, a.mobile-logo').forEach(function (el) {
+          el.href = user ? '/dashboard' : '/';
+        });
+      });
+    } catch (e) { /* ignore */ }
+  }
+
+  function syncMbnNotifBadge(visible) {
+    var mbn = document.getElementById('mbnNotifBadge');
+    if (!mbn) return;
+    if (visible) mbn.classList.add('visible');
+    else mbn.classList.remove('visible');
+  }
+
+  function boot() {
+    initTheme();
+    initMobileNav();
+    if (typeof g.AnimusShared !== 'undefined') {
+      g.AnimusShared.bindNavAuth('navAvatar');
+    }
+    initSmartLogo();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
+  g.AnimusApp = {
+    boot: boot,
+    initTheme: initTheme,
+    syncThemeButton: syncThemeButton,
+    syncMbnNotifBadge: syncMbnNotifBadge
+  };
+})(typeof window !== 'undefined' ? window : globalThis);

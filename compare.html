@@ -1,6 +1,10 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<meta name="description" content="Compare personality profiles on ANIMUS — compatibility across cognition, politics, and values.">
 <title>ANIMUS — Compare</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -285,10 +289,14 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .nav-mobile-item.active,.nav-mobile-item:hover{color:var(--gold);}
 @media(max-width:768px){.nav-items{display:none!important;}.nav-hamburger{display:flex!important;}}
 </style>
+<link rel="stylesheet" href="/css/animus-shell.css">
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-unified.css">
+<link rel="stylesheet" href="/css/animus-release.css">
+<script src="/js/animus-app.js" defer></script>
 </head>
 <body>
+<a href="#compare-main" class="skip-link">Skip to compare</a>
 <script>
 // Apply saved theme immediately to prevent flash
 (function(){
@@ -346,7 +354,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
 </div>
 <p class="friends-picker-empty" id="friendsPickerEmpty" style="display:none;font-size:12px;color:var(--muted);margin:0 28px 12px;max-width:1000px;margin-left:auto;margin-right:auto"></p>
 
-<div class="compare-mode-bar" id="compareModeBar">
+<div class="compare-mode-bar compare-page-inner" id="compare-main">
   <button type="button" class="compare-mode-btn active" data-mode="pair">1-on-1</button>
   <button type="button" class="compare-mode-btn" data-mode="group">Group</button>
 </div>
@@ -686,7 +694,7 @@ function setCompareMode(mode) {
   } catch (e) {}
 }
 
-document.getElementById('compareModeBar').addEventListener('click', function (e) {
+document.getElementById('compare-main').addEventListener('click', function (e) {
   var btn = e.target.closest('.compare-mode-btn');
   if (!btn) return;
   setCompareMode(btn.getAttribute('data-mode'));
@@ -778,7 +786,6 @@ function shareComparison(){
 
 // Read ?u= param and update "View Profile" link dynamically
 (function(){
-  function escapeHTML(s){ if(typeof s!=='string')return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;'); }
   var params = new URLSearchParams(window.location.search);
   var u = params.get('u');
   if(u) u = u.replace(/[^a-zA-Z0-9_\-]/g,'').substring(0,32);
@@ -805,49 +812,6 @@ function showToast(msg){
 </script>
 
 
-<script>
-// Smart logo: dashboard if logged in, landing if not
-try {
-  firebase.auth().onAuthStateChanged(function(user){
-    document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){
-      el.href = user ? '/dashboard' : '/';
-    });
-  });
-} catch(e){}
-</script>
-<script>
-function toggleMobileMenu(){
-  document.getElementById('navMobileMenu').classList.toggle('open');
-}
-document.addEventListener('click',function(e){
-  var menu=document.getElementById('navMobileMenu');
-  var btn=document.getElementById('navHamburger');
-  if(menu&&btn&&!menu.contains(e.target)&&!btn.contains(e.target)){menu.classList.remove('open');}
-});
-function toggleThemeGlobal(){
-  var isLight = document.body.classList.toggle('light-mode');
-  localStorage.setItem('animus_theme', isLight ? 'light' : 'dark');
-  var btn = document.getElementById('themeToggleBtn');
-  if(btn) btn.innerHTML = isLight
-    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-}
-(function(){
-  var isLight = document.body.classList.contains('light-mode');
-  var btn = document.getElementById('themeToggleBtn');
-  if(btn) btn.innerHTML = isLight
-    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-})();
-</script>
-<style>
-.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(8,8,8,0.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);z-index:300;justify-content:space-around;align-items:center;padding:0 8px;}
-@media(max-width:768px){.mobile-bottom-nav{display:flex;}}
-.mbn-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;color:var(--muted);text-decoration:none;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s;}
-.mbn-item.active{color:var(--gold);}
-.mbn-item svg{opacity:0.6;}
-.mbn-item.active svg{opacity:1;}
-</style>
 <nav class="mobile-bottom-nav">
   <a href="/dashboard" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a>
   <a href="/profile" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>

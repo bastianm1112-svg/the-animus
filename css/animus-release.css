@@ -1,0 +1,183 @@
+/* ANIMUS — release polish (forms, cards, accessibility, mobile) */
+
+/* Prevent iOS zoom on focus — 16px minimum on inputs */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  button,
+  .btn-action-profile,
+  .btn-full,
+  .btn-retake,
+  .profile-tab,
+  .compare-tab {
+    min-height: 44px;
+  }
+}
+
+/* Focus visible for keyboard users */
+a:focus-visible,
+button:focus-visible,
+.profile-tab:focus-visible,
+.compare-tab:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(200, 169, 110, 0.55);
+  outline-offset: 2px;
+}
+
+/* Cards — consistent hover */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 20px 22px;
+  margin-bottom: 14px;
+}
+
+.card-title {
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 14px;
+}
+
+/* Empty states */
+.viz-empty {
+  padding: 48px 24px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px dashed var(--border2);
+}
+
+.viz-empty-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 0.08em;
+  color: var(--border2);
+  margin-bottom: 10px;
+}
+
+.viz-empty p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.75;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+/* Profile / compare content width */
+.profile-content,
+.compare-page-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .profile-content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .panel-main {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .profile-hero .hero-inner {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .profile-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .profile-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .profile-tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .hero-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .btn-action-profile {
+    flex: 1 1 auto;
+    min-width: 120px;
+    text-align: center;
+  }
+}
+
+/* Compare mode bar scroll on mobile */
+.compare-mode-bar {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Settings mobile nav strip */
+@media (max-width: 768px) {
+  .settings-layout {
+    flex-direction: column;
+  }
+}
+
+/* Skip link (a11y) */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.skip-link:focus {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  width: auto;
+  height: auto;
+  padding: 10px 16px;
+  background: var(--gold);
+  color: #000;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 9999;
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Print */
+@media print {
+  .navbar,
+  .profile-tabs,
+  .mobile-bottom-nav,
+  .nav-mobile-menu,
+  .hero-actions,
+  .profile-actions-card,
+  .toast {
+    display: none !important;
+  }
+
+  body {
+    padding-bottom: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+}

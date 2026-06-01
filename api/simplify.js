@@ -1,8 +1,9 @@
-const { assertQuestion, setApiHeaders } = require('./_lib');
+const { assertQuestion, setApiHeaders, rejectForeignOrigin } = require('./_lib');
 
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
   if (req.method !== 'POST') return res.status(405).end();
+  if (rejectForeignOrigin(req, res)) return;
 
   const checked = assertQuestion(req.body || {});
   if (checked.error) return res.status(checked.status).json({ error: checked.error });

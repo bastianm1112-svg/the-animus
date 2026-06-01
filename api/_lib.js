@@ -27,14 +27,40 @@ function assertQuestion(body) {
   return assertStringField(body && body.question, LIMITS.simplify, 'question');
 }
 
+const ALLOWED_HOSTS = new Set([
+  'the-animus.vercel.app',
+  'animustest.com',
+  'www.animustest.com',
+  'localhost',
+  '127.0.0.1'
+]);
+
 function setApiHeaders(res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Cache-Control', 'no-store');
+}
+
+/** Soft same-site guard — blocks casual cross-origin browser abuse, not server-side attacks. */
+function rejectForeignOrigin(req, res) {
+  const origin = (req.headers.origin || '').trim();
+  const referer = (req.headers.referer || '').trim();
+  if (!origin && !referer) return false;
+  let host = '';
+  try {
+    if (origin) host = new URL(origin).hostname;
+    else if (referer) host = new URL(referer).hostname;
+  } catch (e) {
+    return true;
+  }
+  if (!host || ALLOWED_HOSTS.has(host)) return false;
+  res.status(403).json({ error: 'Forbidden origin' });
+  return true;
 }
 
 module.exports = {
   LIMITS,
   assertPrompt,
   assertQuestion,
-  setApiHeaders
+  setApiHeaders,
+  rejectForeignOrigin
 };

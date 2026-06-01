@@ -1,6 +1,9 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080808">
 <title>ANIMUS Profile</title>
 <meta name="description" content="My complete personality profile on ANIMUS — MBTI, Enneagram, philosophy, political compass and more.">
 <meta property="og:title" content="ANIMUS — My Personality Profile">
@@ -179,6 +182,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 @media print { .navbar, .profile-tabs, .hero-actions, .profile-actions-card, .mobile-bottom-nav { display: none !important; } body { background: #fff !important; color: #000 !important; } .card { background: #fff !important; border: 1px solid #ccc !important; break-inside: avoid; } .bar-fill { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
 
 </style>
+<link rel="stylesheet" href="/css/animus-shell.css">
 <link rel="stylesheet" href="/css/animus-unified.css">
 <link rel="stylesheet" href="/css/animus-profile-panels.css">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -195,9 +199,12 @@ var auth=firebase.auth(); var db=firebase.firestore();
 <script src="/js/profile-panels-visual.js"></script>
 <script src="/js/profile-visuals.js"></script>
 <link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/css/animus-release.css">
+<script src="/js/animus-app.js" defer></script>
 </head>
 <body>
-<script>(function(){ var _st=localStorage.getItem('animus_theme'); if(_st==='light') document.body.classList.add('light-mode'); })();</script>
+<script>(function(){try{if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');}catch(e){}})();</script>
+<a href="#profile-content" class="skip-link">Skip to profile</a>
 
 <nav class="navbar">
   <a href="/" class="nav-logo">ANI<span>MUS</span></a>
@@ -270,7 +277,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
   </div>
 </div>
 
-<div class="profile-content">
+<div class="profile-content" id="profile-content">
 
   <div class="panel active" id="panel-overview">
     <div class="panel-main" id="overviewPanelRoot">
@@ -587,28 +594,12 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
     </div>
   </div>
   <div class="sc-actions sc-wrap">
-    <button class="sc-btn sc-btn-gold" onclick="downloadShareCard()">â¬‡ Save Image</button>
-    <button class="sc-btn sc-btn-outline" onclick="copyShareLink()">â¬¡ Copy Link</button>
-    <button class="sc-btn sc-btn-outline" onclick="closeShareCard()" style="max-width:80px">âœ•</button>
+    <button class="sc-btn sc-btn-gold" onclick="downloadShareCard()">↓ Save Image</button>
+    <button class="sc-btn sc-btn-outline" onclick="copyShareLink()">⎘ Copy Link</button>
+    <button class="sc-btn sc-btn-outline" onclick="closeShareCard()" style="max-width:80px">✕</button>
   </div>
 </div>
 
-<script>
-try { firebase.auth().onAuthStateChanged(function(user){ document.querySelectorAll('a.nav-logo,a.panel-logo,a.footer-logo,a.mobile-logo').forEach(function(el){ el.href=user?'/dashboard':'/'; }); if(user&&typeof AnimusShared!=='undefined')AnimusShared.bindNavAuth('navAvatar'); }); } catch(e){}
-</script>
-<script>
-try { if (typeof AnimusShared !== 'undefined') AnimusShared.bindNavAuth('navAvatar'); } catch (e) {}
-(function(){
-  var isLight=document.body.classList.contains('light-mode');
-  var btn=document.getElementById('themeToggleBtn');
-  if(btn)btn.innerHTML=isLight
-    ?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
-    :'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-})();
-
-function toggleMobileMenu(){ document.getElementById('navMobileMenu').classList.toggle('open'); }
-document.addEventListener('click',function(e){ var menu=document.getElementById('navMobileMenu'); var btn=document.getElementById('navHamburger'); if(menu&&btn&&!menu.contains(e.target)&&!btn.contains(e.target)){menu.classList.remove('open');} });
-</script>
 <nav class="mobile-bottom-nav"><a href="/dashboard" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a><a href="/profile" class="mbn-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a><a href="/compare" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Compare</a><a href="/settings" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>More</a></nav></body>
 </html>
 
