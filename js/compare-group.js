@@ -110,10 +110,13 @@
       return a.isYou ? -1 : b.isYou ? 1 : 0;
     });
     if (!allPeople.length) {
-      grid.innerHTML = '<div style="color:var(--muted);font-size:12px">Add friends on the dashboard to compare in a group.</div>';
+      grid.innerHTML = '<div style="color:var(--muted);font-size:12px">Loading…</div>';
       return;
     }
-    grid.innerHTML = allPeople.map(function (p) {
+    var hint = allPeople.length === 1
+      ? '<div style="color:var(--muted);font-size:12px;margin-bottom:10px">Add friends on the <a href="/dashboard" style="color:var(--gold)">dashboard</a>, then select 2–6 people (including you).</div>'
+      : '';
+    grid.innerHTML = hint + allPeople.map(function (p) {
       var init = (p.displayName || '?').charAt(0).toUpperCase();
       var isSel = _selected.indexOf(p.uid) > -1;
       var cls = 'person-chip' + (p.isYou ? ' you' : '') + (isSel ? ' selected' : '');
@@ -266,35 +269,61 @@
       }
       _people = {};
       _selected = [];
-      Promise.all([
-        _db.collection('users').doc(user.uid).get(),
-        _db.collection('profiles').doc(user.uid).get()
-      ]).then(function (res) {
-        var uData = res[0].exists ? res[0].data() : {};
-        var snap = res[1].exists ? (res[1].data().latest || {}) : {};
-        _people[user.uid] = buildPerson(user.uid, uData, snap, true);
-        if (!_selected.length) _selected.push(user.uid);
 
-        var friends = (uData.friends || []).filter(function (v, i, a) { return a.indexOf(v) === i; });
-        if (!friends.length) {
-          renderSelector();
-          renderGroup();
-          return;
-        }
-        return Promise.all(friends.map(function (fuid) {
-          return Promise.all([
-            _db.collection('users').doc(fuid).get(),
-            _db.collection('profiles').doc(fuid).get()
-          ]).then(function (r2) {
-            var fu = r2[0].exists ? r2[0].data() : {};
-            var fs = r2[1].exists ? (r2[1].data().latest || {}) : {};
-            _people[fuid] = buildPerson(fuid, fu, fs, false);
+      function loadPeople() {
+        _people[user.uid] = buildPerson(user.uid, {
+          displayName: user.displayName || 'You',
+          username: ''
+        }, {}, true);
+        if (!_selected.length) _selected.push(user.uid);
+        renderSelector();
+
+        Promise.all([
+          _db.collection('users').doc(user.uid).get(),
+          _db.collection('profiles').doc(user.uid).get()
+        ]).then(function (res) {
+          var uData = res[0].exists ? res[0].data() : {
+            displayName: user.displayName || 'You',
+            email: user.email || '',
+            friends: []
+          };
+          var snap = res[1].exists ? (res[1].data().latest || {}) : {};
+          _people[user.uid] = buildPerson(user.uid, uData, snap, true);
+          if (_selected.indexOf(user.uid) === -1) _selected.push(user.uid);
+
+          var friends = (uData.friends || []).filter(function (v, i, a) {
+            return v && v !== user.uid && a.indexOf(v) === i;
           });
-        })).then(function () {
+          if (!friends.length) {
+            renderSelector();
+            renderGroup();
+            return;
+          }
+          return Promise.all(friends.map(function (fuid) {
+            return Promise.all([
+              _db.collection('users').doc(fuid).get(),
+              _db.collection('profiles').doc(fuid).get()
+            ]).then(function (r2) {
+              var fu = r2[0].exists ? r2[0].data() : { displayName: 'Friend' };
+              var fs = r2[1].exists ? (r2[1].data().latest || {}) : {};
+              _people[fuid] = buildPerson(fuid, fu, fs, false);
+            });
+          })).then(function () {
+            renderSelector();
+            renderGroup();
+          });
+        }).catch(function (err) {
+          console.error('Group compare load error:', err);
           renderSelector();
           renderGroup();
         });
-      });
+      }
+
+      if (typeof AnimusCompareFriends !== 'undefined') {
+        AnimusCompareFriends.ensureUserDocument(_db, user).then(loadPeople).catch(loadPeople);
+      } else {
+        loadPeople();
+      }
     });
   }
 

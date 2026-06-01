@@ -183,6 +183,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/animus-shared.js"></script>
+<script src="/js/profile-voice.js"></script>
 <script>
 if(!firebase.apps.length){
   firebase.initializeApp({apiKey:"AIzaSyCc7icLCWC9beMexLfP5rKPgFr5WX1oHIg",authDomain:"animus-b3d83.firebaseapp.com",projectId:"animus-b3d83",storageBucket:"animus-b3d83.firebasestorage.app",messagingSenderId:"681221615050",appId:"1:681221615050:web:1d037cd07a8381c91b3333"});
@@ -251,7 +252,8 @@ var auth=firebase.auth(); var db=firebase.firestore();
         <button class="btn-action-profile btn-secondary-profile" onclick="editBio()">Edit</button>
       </div>
     </div>
-    <div class="type-strip" id="typeStrip"><div class="type-badge" style="color:var(--muted)">Take the assessment to see your types</div></div>
+    <div id="profileViewBanner" style="display:none;margin:12px 0 0;padding:10px 14px;background:rgba(200,169,110,0.08);border:1px solid var(--border2);font-size:12px;color:var(--muted2);line-height:1.5"></div>
+    <div class="type-strip" id="typeStrip"><div class="type-badge" style="color:var(--muted)" id="typeStripPlaceholder">Take the assessment to see your types</div></div>
     <div class="profile-tabs" id="profileTabs">
       <button class="profile-tab active" data-panel="overview">Overview</button>
       <button class="profile-tab" data-panel="cognition">Cognition</button>
@@ -274,9 +276,9 @@ var auth=firebase.auth(); var db=firebase.firestore();
         <div class="stat-cell"><span class="stat-big" id="statDomFn">&#8212;</span><span class="stat-lbl">Dominant Fn</span></div>
       </div>
       <div class="card"><div class="card-title">Tagline</div><p style="font-family:'Playfair Display',serif;font-style:italic;font-size:16px;color:var(--muted2);line-height:1.8"><span id="profileTagline" style="color:var(--muted)">Complete the assessment to generate your profile narrative.</span></p></div>
-      <div class="card"><div class="card-title">Alone &#8212; Inner World</div><p id="aloneNarrative" style="font-size:12px;color:var(--muted);line-height:1.9">Complete the assessment to see this section.</p></div>
-      <div class="card"><div class="card-title">With Others &#8212; Social Presence</div><p id="socialNarrative" style="font-size:12px;color:var(--muted);line-height:1.9">Complete the assessment to see this section.</p></div>
-      <div class="card"><div class="card-title">Shadow &amp; Blind Spots</div><p id="shadowNarrative" style="font-size:12px;color:var(--muted);line-height:1.9">Complete the assessment to see this section.</p></div>
+      <div class="card"><div class="card-title" data-voice-title-you="Alone — YOUR Inner World" data-voice-title-they="Alone — Their Inner World">Alone — Inner World</div><p id="aloneNarrative" style="font-size:12px;color:var(--muted);line-height:1.9">Complete the assessment to see this section.</p></div>
+      <div class="card"><div class="card-title" data-voice-title-you="With Others — YOUR Social Presence" data-voice-title-they="With Others — Their Social Presence">With Others — Social Presence</div><p id="socialNarrative" style="font-size:12px;color:var(--muted);line-height:1.9">Complete the assessment to see this section.</p></div>
+      <div class="card"><div class="card-title" data-voice-title-you="YOUR Shadow &amp; Blind Spots" data-voice-title-they="Their Shadow &amp; Blind Spots">Shadow &amp; Blind Spots</div><p id="shadowNarrative" style="font-size:12px;color:var(--muted);line-height:1.9">Complete the assessment to see this section.</p></div>
       <div class="card"><div class="card-title">Core Values</div><div class="values-grid" id="valuesGrid"><div style="color:var(--muted);font-size:12px;grid-column:1/-1">Complete the assessment to see your core values.</div></div></div>
     </div>
     <div class="panel-side">
@@ -534,11 +536,15 @@ function editBio(){ window.location.href='/settings'; }
 auth.onAuthStateChanged(function(currentUser){
   var params = new URLSearchParams(window.location.search);
   var u = params.get('u');
-  if(u){
+  var uidParam = params.get('uid');
+  if(uidParam){
+    uidParam = uidParam.replace(/[^a-zA-Z0-9]/g,'').substring(0,128);
+    loadProfileData(uidParam, currentUser && currentUser.uid === uidParam, currentUser);
+  } else if(u){
     u = u.replace(/[^a-zA-Z0-9_\-]/g,'').substring(0,32);
     db.collection('usernames').doc(u).get().then(function(doc){
       if(!doc.exists){ document.getElementById('profileName').textContent='Profile not found'; return; }
-      loadProfileData(doc.data().uid, false, currentUser);
+      loadProfileData(doc.data().uid, currentUser && currentUser.uid === doc.data().uid, currentUser);
     });
   } else if(currentUser){
     loadProfileData(currentUser.uid, true, currentUser);
@@ -565,6 +571,16 @@ function loadProfileData(uid, isOwner, currentUser){
     }
     _snap=snap; _pName=u.displayName||''; _pUser=u.username||'';
 
+    var voice = (typeof AnimusProfileVoice !== 'undefined')
+      ? AnimusProfileVoice.applyProfileVoice(isOwner, u.displayName || '')
+      : { narrativeForViewer: function (t) { return t; } };
+
+    if (!isOwner) {
+      document.querySelectorAll('.owner-only').forEach(function (el) { el.style.display = 'none'; });
+      var retake = document.querySelector('a[href="/test"].btn-primary-profile');
+      if (retake) retake.style.display = 'none';
+    }
+
     if(currentUser){
       AnimusShared.applyNavAvatarForSession(document.getElementById('navAvatar'), currentUser);
       if(isOwner) AnimusShared.applyProfilePhoto(document.getElementById('profilePhoto'), currentUser, u);
@@ -577,6 +593,12 @@ function loadProfileData(uid, isOwner, currentUser){
     document.getElementById('friendCount').textContent=(u.friends||[]).length;
     if(p.history) document.getElementById('assessCount').textContent=(p.history||[]).length;
 
+    var typePlaceholder=document.getElementById('typeStripPlaceholder');
+    if(typePlaceholder){
+      typePlaceholder.textContent=isOwner
+        ? 'Take the assessment to see YOUR types'
+        : (u.displayName||'They')+' has not completed the assessment yet';
+    }
     if(snap.mbti){
       var strip=document.getElementById('typeStrip');
       var badges=[[snap.mbti,snap.mbtiName||''],[snap.ennType+'w'+snap.ennWing,'Enneagram'],[snap.ennTritype||'','Tritype'],[snap.instStack||'','Instinct'],[snap.phi||'','Philosophy'],[snap.att||'','Attachment'],[snap.socionics||'','Socionics']];
@@ -585,12 +607,13 @@ function loadProfileData(uid, isOwner, currentUser){
       document.getElementById('statEnn').textContent=(snap.ennType||'&#8212;')+'w'+(snap.ennWing||'');
       var cog=snap.cog||{}; var domFn=Object.keys(cog).sort(function(a,b){return cog[b]-cog[a];})[0]||'&#8212;';
       document.getElementById('statDomFn').textContent=domFn;
-      document.getElementById('profileTagline').textContent=snap.tagline||'';
+      document.getElementById('profileTagline').textContent=voice.narrativeForViewer(snap.tagline||'',isOwner);
+      document.getElementById('profileTagline').dataset.filled='1';
     }
 
-    if(snap.aloneDesc){ var el=document.getElementById('aloneNarrative'); if(el){ el.textContent=snap.aloneDesc; el.style.color=''; } }
-    if(snap.socialDesc){ var el=document.getElementById('socialNarrative'); if(el){ el.textContent=snap.socialDesc; el.style.color=''; } }
-    if(snap.shadowDesc){ var el=document.getElementById('shadowNarrative'); if(el){ el.textContent=snap.shadowDesc; el.style.color=''; } }
+    if(snap.aloneDesc){ var el=document.getElementById('aloneNarrative'); if(el){ el.textContent=voice.narrativeForViewer(snap.aloneDesc,isOwner); el.style.color=''; el.dataset.filled='1'; } }
+    if(snap.socialDesc){ var el=document.getElementById('socialNarrative'); if(el){ el.textContent=voice.narrativeForViewer(snap.socialDesc,isOwner); el.style.color=''; el.dataset.filled='1'; } }
+    if(snap.shadowDesc){ var el=document.getElementById('shadowNarrative'); if(el){ el.textContent=voice.narrativeForViewer(snap.shadowDesc,isOwner); el.style.color=''; el.dataset.filled='1'; } }
     if(snap.values&&snap.values.length){ document.getElementById('valuesGrid').innerHTML=snap.values.map(function(v){return '<div class="value-tag"><div class="value-dot"></div>'+escapeHTML(v)+'</div>';}).join(''); }
 
     if(snap.phiS){ var phiTop=Object.keys(snap.phiS).sort(function(a,b){return snap.phiS[b]-snap.phiS[a];})[0]; var phiN={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'}; var spEl=document.getElementById('statPolitical'); if(spEl) spEl.textContent=phiN[phiTop]||phiTop||'--'; }
@@ -598,7 +621,7 @@ function loadProfileData(uid, isOwner, currentUser){
     if(snap.tmp){ var tmpTop=Object.keys(snap.tmp).sort(function(a,b){return snap.tmp[b]-snap.tmp[a];})[0]; var tmpN={TMP_CHO:'Choleric',TMP_MEL:'Melancholic',TMP_SAN:'Sanguine',TMP_PHL:'Phlegmatic'}; var stEl=document.getElementById('statTemp'); if(stEl) stEl.textContent=tmpN[tmpTop]||tmpTop||'--'; }
     if(snap.keirsey){ var skEl=document.getElementById('statKeirsey'); if(skEl) skEl.textContent=snap.keirsey; }
 
-    if(snap.cogNarrative){ document.getElementById('cogNarrativeText').textContent=snap.cogNarrative; document.getElementById('cogNarrativeBlock').style.display=''; var ph=document.getElementById('cogNarrativePlaceholder'); if(ph) ph.style.display='none'; }
+    if(snap.cogNarrative){ document.getElementById('cogNarrativeText').textContent=voice.narrativeForViewer(snap.cogNarrative,isOwner); document.getElementById('cogNarrativeBlock').style.display=''; var ph=document.getElementById('cogNarrativePlaceholder'); if(ph) ph.style.display='none'; }
     if(snap.cog){
       var cogFns=Object.keys(snap.cog).sort(function(a,b){return snap.cog[b]-snap.cog[a];});
       var cogColors=['','','','dim','dim','low','low','low'];
@@ -615,7 +638,7 @@ document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Mat
     if(snap.ennType){ document.getElementById('ennBig').textContent=snap.ennType; }
     if(snap.ennWing){ document.getElementById('ennWing').textContent='w'+snap.ennWing; }
     if(snap.ennTritype){ document.getElementById('ennTritype').textContent='TRITYPE: '+snap.ennTritype; }
-    if(snap.ennNarrative){ var en=document.getElementById('ennNarrative'); if(en) en.textContent=snap.ennNarrative; }
+    if(snap.ennNarrative){ var en=document.getElementById('ennNarrative'); if(en) en.textContent=voice.narrativeForViewer(snap.ennNarrative,isOwner); }
     if(snap.enn){
       var ennOrder=['E1','E6','E5','E8','E2','E3','E4','E7','E9'];
       var ennBars=document.querySelectorAll('#panel-personality .bar-fill[data-w]');
@@ -634,19 +657,19 @@ document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Mat
     if(snap.phiNarrative){
       var phiNameMap={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'};
       document.getElementById('phiNarrativeTitle').textContent=phiNameMap[snap.phi]||snap.phi||'Philosophy';
-      document.getElementById('phiNarrativeText').textContent=snap.phiNarrative;
+      document.getElementById('phiNarrativeText').textContent=voice.narrativeForViewer(snap.phiNarrative,isOwner);
       document.getElementById('phiNarrativeBlock').style.display='';
       var ph=document.getElementById('phiNarrativePlaceholder'); if(ph) ph.style.display='none';
     }
 
-    if(snap.politicalNarrative){ document.getElementById('polNarrativeText').textContent=snap.politicalNarrative; document.getElementById('polNarrativeBlock').style.display=''; var ph=document.getElementById('polNarrativePlaceholder'); if(ph) ph.style.display='none'; }
+    if(snap.politicalNarrative){ document.getElementById('polNarrativeText').textContent=voice.narrativeForViewer(snap.politicalNarrative,isOwner); document.getElementById('polNarrativeBlock').style.display=''; var ph=document.getElementById('polNarrativePlaceholder'); if(ph) ph.style.display='none'; }
     if(typeof snap.polX==='number'&&typeof snap.polY==='number'){ var svgX=Math.round(100+snap.polX); var svgY=Math.round(100-snap.polY); var dot=document.getElementById('compassDot'); var ring=document.getElementById('compassRing'); if(dot){dot.setAttribute('cx',svgX);dot.setAttribute('cy',svgY);dot.setAttribute('r','5');} if(ring){ring.setAttribute('cx',svgX);ring.setAttribute('cy',svgY);ring.setAttribute('r','16');} }
     if(typeof snap.polX==='number'){ var econLbl=snap.polX>0?'Right':'Left'; var el=document.getElementById('econAxisLabel'); if(el) el.textContent=econLbl; var es=document.getElementById('econAxisScore'); if(es) es.textContent=Math.abs(Math.round(snap.polX))+'/100'; }
     if(typeof snap.polY==='number'){ var socLbl=snap.polY>0?'Authoritarian':'Libertarian'; var sl=document.getElementById('socAxisLabel'); if(sl) sl.textContent=socLbl; var ss=document.getElementById('socAxisScore'); if(ss) ss.textContent=Math.abs(Math.round(snap.polY))+'/100'; }
     if(snap.mf){ var mfIdMap={MF_LIB:'mfLib',MF_FAIR:'mfFair',MF_CARE:'mfCare',MF_PUR:'mfPur',MF_LOY:'mfLoy',MF_AUTH:'mfAuth'}; Object.keys(mfIdMap).forEach(function(k){ var v=Math.round(snap.mf[k]||0); var bar=document.getElementById(mfIdMap[k]); var val=document.getElementById(mfIdMap[k]+'Val'); if(bar) bar.setAttribute('data-w',v); if(val){val.textContent=v; val.style.color='var(--gold)';} }); }
 
-    if(snap.aloneDesc){ document.getElementById('socialAloneText').textContent=snap.aloneDesc; document.getElementById('socialAloneBlock').style.display=''; }
-    if(snap.socialDesc){ document.getElementById('socialWithText').textContent=snap.socialDesc; document.getElementById('socialWithBlock').style.display=''; }
+    if(snap.aloneDesc){ document.getElementById('socialAloneText').textContent=voice.narrativeForViewer(snap.aloneDesc,isOwner); document.getElementById('socialAloneBlock').style.display=''; }
+    if(snap.socialDesc){ document.getElementById('socialWithText').textContent=voice.narrativeForViewer(snap.socialDesc,isOwner); document.getElementById('socialWithBlock').style.display=''; }
     if(snap.aloneDesc||snap.socialDesc){ var ph=document.getElementById('socialPlaceholder'); if(ph) ph.style.display='none'; }
 
     if(snap.figures&&snap.figures.length){ document.getElementById('figuresContent').innerHTML='<div class="figures-grid">'+snap.figures.map(function(f){return '<div class="fig-card"><div class="fig-init">'+escapeHTML(f.initials||f.name.charAt(0))+'</div><div class="fig-name">'+escapeHTML(f.name)+'</div><div class="fig-type">'+escapeHTML(f.type||'')+'</div></div>';}).join('')+'</div>'; }
@@ -666,10 +689,14 @@ document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Mat
       }).join('');
     }
 
-    if(!isOwner){
+    if(!isOwner && currentUser){
       var heroActions=document.querySelector('.hero-actions');
-      if(heroActions&&currentUser){ var uname=u.username||uid; heroActions.innerHTML='<a href="/compare?u='+encodeURIComponent(uname)+'" class="btn-action-profile btn-primary-profile">&#8652; Compare</a><button class="btn-action-profile btn-secondary-profile" onclick="shareProfile()">Share</button>'; }
-      document.querySelectorAll('.owner-only').forEach(function(el){el.style.display='none';});
+      if(heroActions && !heroActions.querySelector('a[href*="compare"]')){
+        var cmpUrl = u.username
+          ? '/compare?u=' + encodeURIComponent(u.username)
+          : '/compare?uid=' + encodeURIComponent(uid);
+        heroActions.innerHTML='<a href="'+cmpUrl+'" class="btn-action-profile btn-primary-profile">&#8652; Compare with them</a><button class="btn-action-profile btn-secondary-profile" onclick="shareProfile()">Share</button>';
+      }
     }
     setTimeout(animateBars, 300);
 

@@ -35,10 +35,30 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 /* ── LAYOUT ── */
 .page { padding-top: 56px; display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
 @media(max-width: 768px) {
-  .page { grid-template-columns: 1fr; }
-  .settings-nav { display: none; }
-  .settings-mobile-nav { display: flex; }
-  .settings-main { padding-top: 16px; }
+  .page {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+  }
+  .settings-nav { display: none !important; }
+  .settings-mobile-nav {
+    display: flex !important;
+    width: 100%;
+    order: 1;
+    flex-shrink: 0;
+  }
+  .settings-main {
+    order: 2;
+    width: 100%;
+    max-width: none;
+    padding: 20px 16px 96px;
+    box-sizing: border-box;
+  }
+  .settings-section.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
 }
 .settings-mobile-nav {
   display: none;
@@ -398,12 +418,12 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <div class="page">
 
   <div class="settings-mobile-nav" id="settingsMobileNav">
-    <button type="button" class="settings-mobile-nav-item active" data-section="profile" onclick="showSection('profile')">Profile</button>
-    <button type="button" class="settings-mobile-nav-item" data-section="account" onclick="showSection('account')">Account</button>
-    <button type="button" class="settings-mobile-nav-item" data-section="appearance" onclick="showSection('appearance')">Appearance</button>
-    <button type="button" class="settings-mobile-nav-item" data-section="notifications" onclick="showSection('notifications')">Alerts</button>
-    <button type="button" class="settings-mobile-nav-item" data-section="privacy" onclick="showSection('privacy')">Privacy</button>
-    <button type="button" class="settings-mobile-nav-item" data-section="data" onclick="showSection('data')">Data</button>
+    <button type="button" class="settings-mobile-nav-item active" data-section="profile" onclick="showSection('profile', this)">Profile</button>
+    <button type="button" class="settings-mobile-nav-item" data-section="account" onclick="showSection('account', this)">Account</button>
+    <button type="button" class="settings-mobile-nav-item" data-section="appearance" onclick="showSection('appearance', this)">Appearance</button>
+    <button type="button" class="settings-mobile-nav-item" data-section="notifications" onclick="showSection('notifications', this)">Alerts</button>
+    <button type="button" class="settings-mobile-nav-item" data-section="privacy" onclick="showSection('privacy', this)">Privacy</button>
+    <button type="button" class="settings-mobile-nav-item" data-section="data" onclick="showSection('data', this)">Data</button>
   </div>
 
   <!-- SETTINGS NAV -->
@@ -868,18 +888,31 @@ var reservedUsernames = ['admin', 'animus', 'test', 'api', 'support', 'help', 'l
 
 // Section switching
 function showSection(id, btn) {
+  if (!id) return;
   document.querySelectorAll('.settings-section').forEach(function(s){ s.classList.remove('active'); });
   document.querySelectorAll('.settings-nav-item').forEach(function(b){ b.classList.remove('active'); });
   document.querySelectorAll('.settings-mobile-nav-item').forEach(function(b){ b.classList.remove('active'); });
   var section = document.getElementById('section-' + id);
   if(section) section.classList.add('active');
-  if(btn) btn.classList.add('active');
+  if(btn && btn.classList) btn.classList.add('active');
   var sideBtn = document.querySelector('.settings-nav-item[onclick*="' + id + '"]');
   if(sideBtn) sideBtn.classList.add('active');
   var mobBtn = document.querySelector('.settings-mobile-nav-item[data-section="' + id + '"]');
   if(mobBtn) mobBtn.classList.add('active');
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+(function () {
+  var mobNav = document.getElementById('settingsMobileNav');
+  if (mobNav) {
+    mobNav.addEventListener('click', function (e) {
+      var btn = e.target.closest('.settings-mobile-nav-item[data-section]');
+      if (!btn) return;
+      e.preventDefault();
+      showSection(btn.getAttribute('data-section'), btn);
+    });
+  }
+})();
 
 // Dirty tracking
 function markDirty() {

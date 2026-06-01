@@ -118,7 +118,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 @media(max-width:600px) { .compare-content { padding: 20px 16px; } }
 
 .compare-mode-bar {
-  display: flex; gap: 0; padding-top: 56px;
+  display: flex; gap: 0; padding-top: 8px;
   background: var(--surface); border-bottom: 1px solid var(--border);
   max-width: 1000px; margin: 0 auto;
 }
@@ -239,7 +239,9 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .gap-high { background: rgba(192,57,43,0.1); color: #c0392b; border: 1px solid rgba(192,57,43,0.2); }
 
 /* Friends picker */
-.friends-picker-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+.friends-picker-bar { display: flex; align-items: center; gap: 12px; margin: 64px auto 12px; max-width: 1000px; padding: 0 28px; flex-wrap: wrap; }
+.friends-picker-bar .friends-picker-select { flex: 1; min-width: 200px; background: var(--surface2); border: 1px solid var(--border2); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 10px 12px; border-radius: 4px; cursor: pointer; }
+.friends-picker-inner { display: flex; align-items: center; gap: 12px; flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
 .friends-picker-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted2); white-space: nowrap; }
 .friends-picker-select { flex: 1; background: var(--surface2); border: 1px solid var(--border2); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 12px; border-radius: 4px; cursor: pointer; max-width: 320px; }
 .friends-picker-select:focus { outline: none; border-color: var(--gold2); }
@@ -340,6 +342,15 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
   <a href="/test" class="nav-mobile-item">Take Test</a>
   <a href="/settings" class="nav-mobile-item">Settings</a>
 </div>
+
+<div class="friends-picker-bar" id="friendsPickerBar">
+  <span class="friends-picker-label">Compare with</span>
+  <select class="friends-picker-select" id="friendsPickerSelect">
+    <option value="">— Choose a friend —</option>
+  </select>
+  <a href="/dashboard" class="friends-picker-link" id="friendsPickerAdd" style="font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap">+ Add friends</a>
+</div>
+<p class="friends-picker-empty" id="friendsPickerEmpty" style="display:none;font-size:12px;color:var(--muted);margin:0 28px 12px;max-width:1000px;margin-left:auto;margin-right:auto"></p>
 
 <div class="compare-mode-bar" id="compareModeBar">
   <button type="button" class="compare-mode-btn active" data-mode="pair">1-on-1</button>
@@ -461,14 +472,6 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
 
 <!-- CONTENT -->
 <div class="compare-content">
-
-  <!-- Friends picker -->
-  <div class="friends-picker-bar" id="friendsPickerBar" style="display:none">
-    <span class="friends-picker-label">Compare with</span>
-    <select class="friends-picker-select" id="friendsPickerSelect" onchange="if(this.value) window.location.href='/compare?u='+encodeURIComponent(this.value)">
-      <option value="">— Choose a friend —</option>
-    </select>
-  </div>
 
   <!-- Share bar -->
   <div class="compare-share-bar">
@@ -641,16 +644,33 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="/js/compare-friends.js"></script>
 <script src="/js/compare-group.js"></script>
 <script>
 AnimusShared.bindNavAuth('navAvatar');
 
+var friendsPickerSelect = document.getElementById('friendsPickerSelect');
+if (friendsPickerSelect) {
+  friendsPickerSelect.addEventListener('change', function () {
+    if (typeof AnimusCompareFriends !== 'undefined') {
+      AnimusCompareFriends.onFriendSelectChange(this);
+    }
+  });
+}
+
 function setCompareMode(mode) {
   var pair = document.getElementById('compareModePair');
   var group = document.getElementById('compareModeGroup');
+  var pickerBar = document.getElementById('friendsPickerBar');
+  var pickerEmpty = document.getElementById('friendsPickerEmpty');
   var isGroup = mode === 'group';
   if (pair) pair.classList.toggle('hidden', isGroup);
   if (group) group.classList.toggle('active', isGroup);
+  if (pickerBar) pickerBar.style.display = isGroup ? 'none' : '';
+  if (pickerEmpty && isGroup) pickerEmpty.style.display = 'none';
+  if (isGroup && typeof AnimusCompareGroup !== 'undefined' && AnimusCompareGroup.setModeVisible) {
+    AnimusCompareGroup.setModeVisible();
+  }
   document.querySelectorAll('.compare-mode-btn').forEach(function (btn) {
     btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
   });
@@ -685,34 +705,29 @@ if (typeof AnimusCompareGroup !== 'undefined') {
 auth.onAuthStateChanged(function(currentUser){
   if(!currentUser){ window.location.href='/login'; return; }
 
-  // Populate friends picker
-  db.collection('users').doc(currentUser.uid).get().then(function(doc){
-    if(!doc.exists) return;
-    var friends = (doc.data().friends||[]).filter(function(v,i,a){return a.indexOf(v)===i;});
-    if(!friends.length) return;
-    var select = document.getElementById('friendsPickerSelect');
-    var currentU = new URLSearchParams(window.location.search).get('u')||'';
-    Promise.all(friends.map(function(fuid){
-      return db.collection('users').doc(fuid).get();
-    })).then(function(docs){
-      docs.forEach(function(d){
-        if(!d.exists) return;
-        var u = d.data();
-        var uname = u.username||'';
-        if(!uname) return;
-        var opt = document.createElement('option');
-        opt.value = uname;
-        opt.textContent = (u.displayName||uname) + ' (@'+uname+')';
-        if(uname === currentU) opt.selected = true;
-        select.appendChild(opt);
-      });
-      document.getElementById('friendsPickerBar').style.display='flex';
-    });
-  });
-
   var params = new URLSearchParams(window.location.search);
   var u = params.get('u');
-  if(!u){
+  var uidParam = params.get('uid');
+  var selectedPicker = u || (uidParam ? ('uid:' + uidParam) : '');
+
+  if (typeof AnimusCompareFriends !== 'undefined') {
+    AnimusCompareFriends.fetchFriends(db, currentUser).then(function (friends) {
+      var select = document.getElementById('friendsPickerSelect');
+      var empty = document.getElementById('friendsPickerEmpty');
+      if (!friends.length) {
+        if (empty) {
+          empty.style.display = 'block';
+          empty.innerHTML = 'No friends yet. <a href="/dashboard" style="color:var(--gold)">Add friends on the dashboard</a>, then pick someone to compare.';
+        }
+      } else if (empty) {
+        empty.style.display = 'none';
+      }
+      AnimusCompareFriends.populateFriendSelect(select, friends, selectedPicker);
+    });
+  }
+
+  function loadComparisonTarget() {
+  if(!u && !uidParam){
     // No comparison target — clear the hardcoded placeholder values
     document.querySelector('.compat-pct').innerHTML = '—<span>%</span>';
     var fill = document.querySelector('.compat-fill');
@@ -727,33 +742,35 @@ auth.onAuthStateChanged(function(currentUser){
     return;
   }
 
-  u = u.replace(/[^a-zA-Z0-9_\-]/g,'').substring(0,32);
+  var themUidPromise;
+  if (uidParam) {
+    themUidPromise = Promise.resolve(uidParam.replace(/[^a-zA-Z0-9]/g, '').substring(0, 128));
+  } else {
+    u = u.replace(/[^a-zA-Z0-9_\-]/g,'').substring(0,32);
+    themUidPromise = db.collection('usernames').doc(u).get().then(function (doc) {
+      if (!doc.exists) return null;
+      return doc.data().uid;
+    });
+  }
 
-  // Load both profiles in parallel
-  Promise.all([
-    // Current user
-    db.collection('profiles').doc(currentUser.uid).get(),
-    db.collection('users').doc(currentUser.uid).get(),
-    // Target user by username
-    db.collection('usernames').doc(u).get()
-  ]).then(function(results){
-    var myProfile = results[0].exists ? results[0].data().latest : null;
-    var myUser    = results[1].exists ? results[1].data() : {};
-    var usernameDoc = results[2];
-
-    if(!usernameDoc.exists){
+  themUidPromise.then(function (themUid) {
+    if (!themUid) {
       document.getElementById('themName').textContent = 'User not found';
       return;
     }
-    var themUid = usernameDoc.data().uid;
 
-    return Promise.all([
-      db.collection('profiles').doc(themUid).get(),
-      db.collection('users').doc(themUid).get()
-    ]).then(function(r2){
-      var themProfile = r2[0].exists ? r2[0].data().latest : null;
-      var themUser    = r2[1].exists ? r2[1].data() : {};
+  Promise.all([
+    db.collection('profiles').doc(currentUser.uid).get(),
+    db.collection('users').doc(currentUser.uid).get(),
+    db.collection('profiles').doc(themUid).get(),
+    db.collection('users').doc(themUid).get()
+  ]).then(function(results){
+    var myProfile = results[0].exists ? results[0].data().latest : null;
+    var myUser    = results[1].exists ? results[1].data() : {};
+    var themProfile = results[2].exists ? results[2].data().latest : null;
+    var themUser    = results[3].exists ? results[3].data() : {};
 
+    return Promise.resolve().then(function(){
       // Populate YOU side
       var myName = escapeHTML(myUser.displayName || currentUser.displayName || 'You');
       var myUname = escapeHTML(myUser.username || '');
@@ -766,12 +783,15 @@ auth.onAuthStateChanged(function(currentUser){
       }
 
       // Populate THEM side
-      var themName = escapeHTML(themUser.displayName || u);
-      var themUname2 = escapeHTML(themUser.username || u);
+      var themName = escapeHTML(themUser.displayName || themUser.username || 'Them');
+      var themUname2 = escapeHTML(themUser.username || '—');
       document.getElementById('themName').textContent = themName;
       document.getElementById('themUsername').textContent = '@' + themUname2;
       document.getElementById('themAvatar').textContent = themName.charAt(0).toUpperCase();
-      document.getElementById('viewThemBtn').href = '/profile?u=' + encodeURIComponent(u);
+      var themProfileUrl = themUser.username
+        ? '/profile?u=' + encodeURIComponent(themUser.username)
+        : '/profile?uid=' + encodeURIComponent(themUid);
+      document.getElementById('viewThemBtn').href = themProfileUrl;
       document.getElementById('viewThemBtn').textContent = 'View ' + themName + "'s Profile →";
 
       // Update legend labels
@@ -788,11 +808,19 @@ auth.onAuthStateChanged(function(currentUser){
       // If both profiles exist, run AI comparison
       if(myProfile && themProfile){
         generateComparison(myProfile, themProfile, myName, themName);
+      } else if (!myProfile) {
+        document.getElementById('compatVerdict').textContent = 'Complete your assessment to compare scores';
+      } else if (!themProfile) {
+        document.getElementById('compatVerdict').textContent = themName + ' has not completed the assessment yet';
       }
     });
   }).catch(function(e){
     console.error('Compare load error:', e);
   });
+  });
+  }
+
+  loadComparisonTarget();
 });
 
 function generateComparison(mySnap, themSnap, myName, themName){
