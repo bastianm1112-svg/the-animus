@@ -712,7 +712,7 @@ const auth=firebase.auth();
         <span>Take the Assessment</span>
         <span>→</span>
       </a>
-      <a href="#about" class="btn-hero-secondary">Learn more</a>
+      <a href="#how" class="btn-hero-secondary">Learn more</a>
     </div>
   </div>
 
@@ -1005,7 +1005,7 @@ try {
     auth.onAuthStateChanged(function(user){
       if(user){
         var cta = document.querySelector('.nav-cta');
-        if(cta){ cta.textContent='Dashboard'; cta.href='dashboard.html'; }
+        if(cta){ cta.textContent='Dashboard'; cta.href='/dashboard'; }
       }
     });
   }
