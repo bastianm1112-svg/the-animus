@@ -189,6 +189,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/animus-shared.js"></script>
+<script src="/js/compare-normalize.js"></script>
 <script>
 AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 var auth=firebase.auth(); var db=firebase.firestore();
@@ -314,8 +315,12 @@ document.getElementById('profileTabs').querySelectorAll('.profile-tab').forEach(
 });
 
 function animateBars(){
-  document.querySelectorAll('.bar-fill[data-w], .moral-bar-fill[data-w]').forEach(function(el){
-    el.style.width = el.getAttribute('data-w') + '%';
+  document.querySelectorAll(
+    '.bar-fill[data-w], .moral-bar-fill[data-w], .fn-bar-fill[data-w], .b5-fill[data-w], .tmp-fill[data-w], '
+    + '.enn-ring-fill[data-w], .phi-fill[data-w], .eth-fill[data-w], .soc-dim-fill[data-w], .mf-mini-fill[data-w]'
+  ).forEach(function(el){
+    var w = el.getAttribute('data-w');
+    if (w !== null && w !== '') el.style.width = w + '%';
   });
 }
 window.animateBars = animateBars;
@@ -477,6 +482,9 @@ function loadProfileData(uid, isOwner, currentUser){
     if (isOwner && !snap.mbti && typeof AnimusShared !== 'undefined') {
       var localSnap = AnimusShared.loadLastResultLocal();
       if (localSnap && localSnap.mbti) snap = localSnap;
+    }
+    if (typeof AnimusCompareNormalize !== 'undefined' && AnimusCompareNormalize.normalizeProfileForDisplay) {
+      snap = AnimusCompareNormalize.normalizeProfileForDisplay(snap) || snap;
     }
     _snap=snap; _pName=u.displayName||''; _pUser=u.username||'';
 

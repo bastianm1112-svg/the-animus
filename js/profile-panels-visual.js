@@ -54,7 +54,7 @@
     if (!cog) return '';
     var sorted = FN_ORDER.slice().sort(function (a, b) { return (cog[b] || 0) - (cog[a] || 0); });
     var slices = FN_ORDER.map(function (fn, i) {
-      var v = Math.round(cog[fn] || 0);
+      var v = Math.min(100, Math.max(0, Math.round(cog[fn] || 0)));
       var angle = (i / 8) * 360;
       return '<div class="fn-wheel-spoke" style="--spoke-angle:' + angle + 'deg;--spoke-val:' + v + '%">'
         + '<div class="fn-wheel-bar ' + (FN_CLASS[fn] || '') + '"></div>'

@@ -338,13 +338,11 @@
   function dimBars(title, data, labels) {
     if (!data || !Object.keys(data).length) return '';
     var keys = Object.keys(labels);
-    var max = Math.max.apply(null, keys.map(function (k) { return data[k] || 0; }).concat([1]));
     return '<div class="soc-dim-card"><div class="soc-dim-title">' + escapeHTML(title) + '</div>'
       + keys.map(function (k) {
-        var v = Math.round(data[k] || 0);
-        var w = Math.round((v / max) * 100);
+        var v = Math.min(100, Math.max(0, Math.round(data[k] || 0)));
         return '<div class="soc-dim-row"><span>' + escapeHTML(labels[k]) + '</span>'
-          + '<div class="soc-dim-track"><div class="soc-dim-fill" data-w="' + w + '"></div></div>'
+          + '<div class="soc-dim-track"><div class="soc-dim-fill" data-w="' + v + '"></div></div>'
           + '<em>' + v + '</em></div>';
       }).join('') + '</div>';
   }
@@ -371,8 +369,13 @@
 
     var aloneSum = 0;
     var socSum = 0;
-    if (snap.alone) Object.keys(snap.alone).forEach(function (k) { aloneSum += snap.alone[k] || 0; });
-    if (snap.soc) Object.keys(snap.soc).forEach(function (k) { socSum += snap.soc[k] || 0; });
+    if (snap.alone) {
+      aloneSum += (snap.alone.AL_INT || 0) + (snap.alone.AL_SEN || 0);
+    }
+    if (snap.soc) {
+      socSum += (snap.soc.SOC_DOM || 0) + (snap.soc.SOC_INT || 0)
+        + (snap.soc.SOC_WAR || 0) + (snap.soc.SOC_DIR || 0);
+    }
     var total = aloneSum + socSum || 1;
     var alonePct = Math.round((aloneSum / total) * 100);
     var socPct = 100 - alonePct;

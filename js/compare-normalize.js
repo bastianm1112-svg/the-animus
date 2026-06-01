@@ -113,6 +113,83 @@
     return eth;
   }
 
+  function pickScore(obj, primary, fallback) {
+    if (!obj) return 0;
+    if (obj[primary] != null && obj[primary] !== '') return Math.round(Number(obj[primary]) || 0);
+    if (fallback && obj[fallback] != null) return Math.round(Number(obj[fallback]) || 0);
+    return 0;
+  }
+
+  function mapLegacyProfileFields(snap) {
+    var out = Object.assign({}, snap);
+    var catPers = out.categories && out.categories.personality;
+    var catPhil = out.categories && out.categories.philosophy;
+    var catPol = out.categories && out.categories.political;
+    var catSoc = out.categories && out.categories.social;
+
+    if (cogSum(out.cog) < 1 && catPers && catPers.cog) out.cog = Object.assign({}, catPers.cog);
+    if (cogSum(out.enn) < 1 && out.ennScores) out.enn = Object.assign({}, out.ennScores);
+    if (cogSum(out.enn) < 1 && catPers && catPers.enn) out.enn = Object.assign({}, catPers.enn);
+    if (cogSum(out.phiS) < 1 && out.phiScores) out.phiS = Object.assign({}, out.phiScores);
+    if (cogSum(out.phiS) < 1 && catPhil && catPhil.phiS) out.phiS = Object.assign({}, catPhil.phiS);
+    if (cogSum(out.att2) < 1 && out.attScores) out.att2 = Object.assign({}, out.attScores);
+    if (cogSum(out.att2) < 1 && catPers && catPers.att2) out.att2 = Object.assign({}, catPers.att2);
+    if (cogSum(out.tmp) < 1 && catPers && catPers.tmp) out.tmp = Object.assign({}, catPers.tmp);
+    if (cogSum(out.iv) < 1 && catPers && catPers.iv) out.iv = Object.assign({}, catPers.iv);
+    if (cogSum(out.big5) < 1 && catPers && catPers.big5) out.big5 = Object.assign({}, catPers.big5);
+    if (cogSum(out.eth) < 1 && catPhil && catPhil.eth) out.eth = Object.assign({}, catPhil.eth);
+    if (cogSum(out.ep) < 1 && catPhil && catPhil.ep) out.ep = Object.assign({}, catPhil.ep);
+    if (cogSum(out.mf) < 1 && catPol && catPol.mf) out.mf = Object.assign({}, catPol.mf);
+    if (!out.soc || !Object.keys(out.soc).length) {
+      if (catSoc && catSoc.soc) out.soc = Object.assign({}, catSoc.soc);
+    }
+    if (!out.alone || !Object.keys(out.alone).length) {
+      if (catSoc && catSoc.alone) out.alone = Object.assign({}, catSoc.alone);
+    }
+    return out;
+  }
+
+  function canonicalSocAlone(snap) {
+    var soc = snap.soc || {};
+    var alone = snap.alone || {};
+    return {
+      soc: {
+        SOC_DOM: pickScore(soc, 'SOC_DOM', 'dom'),
+        SOC_INT: pickScore(soc, 'SOC_INT', 'introvert'),
+        SOC_WAR: pickScore(soc, 'SOC_WAR', 'warmth'),
+        SOC_DIR: pickScore(soc, 'SOC_DIR', 'direct')
+      },
+      alone: {
+        AL_INT: pickScore(alone, 'AL_INT', 'intellectual'),
+        AL_SEN: pickScore(alone, 'AL_SEN', 'sensory')
+      }
+    };
+  }
+
+  function allValuesEqual(obj, sentinel) {
+    if (!obj || typeof obj !== 'object') return false;
+    var vals = Object.keys(obj).map(function (k) { return obj[k]; });
+    if (!vals.length) return false;
+    return vals.every(function (v) { return Math.round(Number(v) || 0) === sentinel; });
+  }
+
+  /** Hydrate snapshots for profile display (Firestore, friends, shared links). */
+  function normalizeProfileForDisplay(snap) {
+    if (!snap) return null;
+    var out = mapLegacyProfileFields(snap);
+    out = normalizeProfileForCompare(out) || out;
+    var canon = canonicalSocAlone(out);
+    out.soc = canon.soc;
+    out.alone = canon.alone;
+    if (allValuesEqual(out.soc, 50)) {
+      out.soc = { SOC_DOM: 0, SOC_INT: 0, SOC_WAR: 0, SOC_DIR: 0 };
+    }
+    if (allValuesEqual(out.alone, 50)) {
+      out.alone = { AL_INT: 0, AL_SEN: 0 };
+    }
+    return out;
+  }
+
   function normalizeProfileForCompare(snap) {
     if (!snap) return null;
     var out = Object.assign({}, snap);
@@ -211,6 +288,7 @@
   }
 
   g.AnimusCompareNormalize = {
+    normalizeProfileForDisplay: normalizeProfileForDisplay,
     normalizeProfileForCompare: normalizeProfileForCompare,
     hasRichCompareData: hasRichCompareData,
     hasRealCog: hasRealCog,
