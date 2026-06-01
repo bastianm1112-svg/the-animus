@@ -81,29 +81,35 @@
     }
   }
 
+  /** Nav avatar always reflects the signed-in user, never a profile being viewed. */
+  function applyNavAvatarForSession(el, authUser) {
+    if (!el) return Promise.resolve();
+    if (!authUser) {
+      applyNavAvatar(el, null);
+      return Promise.resolve();
+    }
+    if (typeof firebase === 'undefined' || !firebase.firestore) {
+      applyNavAvatar(el, authUser);
+      return Promise.resolve();
+    }
+    return firebase.firestore()
+      .collection('users')
+      .doc(authUser.uid)
+      .get()
+      .then(function (doc) {
+        applyNavAvatar(el, authUser, doc.exists ? doc.data() : {});
+      })
+      .catch(function () {
+        applyNavAvatar(el, authUser);
+      });
+  }
+
   function bindNavAuth(avatarId) {
     var el = document.getElementById(avatarId || 'navAvatar');
     if (!el || typeof firebase === 'undefined' || !firebase.auth) return;
 
     firebase.auth().onAuthStateChanged(function (user) {
-      if (!user) {
-        applyNavAvatar(el, null);
-        return;
-      }
-      if (!firebase.firestore) {
-        applyNavAvatar(el, user);
-        return;
-      }
-      firebase.firestore()
-        .collection('users')
-        .doc(user.uid)
-        .get()
-        .then(function (doc) {
-          applyNavAvatar(el, user, doc.exists ? doc.data() : {});
-        })
-        .catch(function () {
-          applyNavAvatar(el, user);
-        });
+      applyNavAvatarForSession(el, user);
     });
   }
 
@@ -293,6 +299,7 @@
     escapeHTML: escapeHTML,
     initialsFromName: initialsFromName,
     applyNavAvatar: applyNavAvatar,
+    applyNavAvatarForSession: applyNavAvatarForSession,
     applyProfilePhoto: applyProfilePhoto,
     bindNavAuth: bindNavAuth,
     initFirebaseApp: initFirebaseApp,

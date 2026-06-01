@@ -117,6 +117,73 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .compare-content { max-width: 1000px; margin: 0 auto; padding: 32px 28px; }
 @media(max-width:600px) { .compare-content { padding: 20px 16px; } }
 
+.compare-mode-bar {
+  display: flex; gap: 0; padding-top: 56px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  max-width: 1000px; margin: 0 auto;
+}
+.compare-mode-btn {
+  flex: 1; padding: 14px 16px; font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted2); background: none; border: none;
+  border-bottom: 2px solid transparent; cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+.compare-mode-btn:hover { color: var(--text); }
+.compare-mode-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+.compare-mode-pair .compare-hero { padding-top: 0; }
+.compare-mode-group { display: none; max-width: 1100px; margin: 0 auto; padding-bottom: 80px; }
+.compare-mode-group.active { display: block; }
+.compare-mode-pair.hidden { display: none; }
+.selector-section{padding:24px 28px;border-bottom:1px solid var(--border);}
+.selector-label{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold2);margin-bottom:14px;}
+.selector-grid{display:flex;flex-wrap:wrap;gap:10px;}
+.person-chip{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 10px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all 0.18s;user-select:none;}
+.person-chip:hover{border-color:var(--gold2);}
+.person-chip.selected{border-color:var(--gold);background:rgba(200,169,110,0.08);}
+.person-chip.you{border-color:var(--green2);background:rgba(74,158,106,0.06);}
+.person-chip.you.selected{border-color:var(--green);background:rgba(74,158,106,0.12);}
+.chip-avatar{width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);flex-shrink:0;}
+.chip-info{line-height:1.3;}
+.chip-name{font-size:13px;color:var(--text);}
+.chip-type{font-size:10px;color:var(--muted);}
+.chip-check{width:16px;height:16px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-left:4px;}
+.person-chip.selected .chip-check{background:var(--gold);border-color:var(--gold);color:#000;}
+.person-chip.you.selected .chip-check{background:var(--green);border-color:var(--green);color:#000;}
+.selector-hint{font-size:11px;color:var(--muted);margin-top:12px;}
+.group-content{padding:28px;}
+.group-placeholder{text-align:center;padding:60px 20px;color:var(--muted);font-size:13px;}
+.group-placeholder-title{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--border2);margin-bottom:8px;letter-spacing:0.1em;}
+.profiles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:32px;}
+.profile-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;}
+.profile-card.is-you{border-color:var(--green2);}
+.pc-you-badge{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);border:1px solid var(--green2);padding:2px 6px;}
+.pc-avatar{width:48px;height:48px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);margin-bottom:12px;}
+.pc-name{font-size:14px;font-weight:500;color:var(--white);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pc-username{font-size:11px;color:var(--muted);margin-bottom:12px;}
+.pc-mbti{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--gold);letter-spacing:0.04em;line-height:1;}
+.pc-enn{font-size:11px;color:var(--muted2);margin-top:2px;}
+.pc-no-data{font-size:11px;color:var(--muted);font-style:italic;margin-top:8px;}
+.matrix-section{margin-bottom:32px;}
+.section-title{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold2);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.matrix-wrap{overflow-x:auto;}
+.matrix-table{border-collapse:collapse;min-width:100%;}
+.matrix-table th,.matrix-table td{padding:10px 14px;border:1px solid var(--border);text-align:center;font-size:12px;white-space:nowrap;}
+.matrix-table th{background:var(--surface2);color:var(--muted2);font-weight:400;font-size:11px;}
+.matrix-table td.matrix-name{text-align:left;color:var(--text);background:var(--surface2);font-weight:500;}
+.matrix-table td.self{background:var(--surface);color:var(--muted);}
+.matrix-pct{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;}
+.compat-high{color:var(--green);}
+.compat-mid{color:var(--gold);}
+.compat-low{color:var(--muted2);}
+.insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
+.insight-card{background:var(--surface);border:1px solid var(--border);padding:16px;}
+.insight-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.insight-value{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);letter-spacing:0.04em;line-height:1.1;}
+.insight-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+.group-page-header{padding:28px 28px 0;border-bottom:1px solid var(--border);background:var(--surface);}
+.group-page-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:0.06em;color:var(--white);line-height:1;}
+.group-page-sub{font-size:13px;color:var(--muted2);margin-top:4px;padding-bottom:20px;}
+
 /* Panel display */
 .c-panel { display: none; }
 .c-panel.active { display: block; }
@@ -252,10 +319,6 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
       Compare
     </a>
-    <a href="/group" class="nav-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Group
-    </a>
     <a href="/types" class="nav-item">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h8M4 18h8"/></svg>
       Types
@@ -273,12 +336,17 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
   <a href="/dashboard" class="nav-mobile-item">Dashboard</a>
   <a href="/profile" class="nav-mobile-item">Profile</a>
   <a href="/compare" class="nav-mobile-item active">Compare</a>
-  <a href="/group" class="nav-mobile-item">Group</a>
   <a href="/types" class="nav-mobile-item">Types</a>
   <a href="/test" class="nav-mobile-item">Take Test</a>
   <a href="/settings" class="nav-mobile-item">Settings</a>
 </div>
 
+<div class="compare-mode-bar" id="compareModeBar">
+  <button type="button" class="compare-mode-btn active" data-mode="pair">1-on-1</button>
+  <button type="button" class="compare-mode-btn" data-mode="group">Group</button>
+</div>
+
+<div id="compareModePair" class="compare-mode-pair">
 <!-- COMPARE HERO -->
 <div class="compare-hero">
   <div class="compare-hero-inner">
@@ -548,12 +616,70 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
   </div>
 
 </div>
+</div><!-- /compareModePair -->
+
+<div id="compareModeGroup" class="compare-mode-group">
+  <div class="group-page-header">
+    <div class="group-page-title">GROUP COMPARE</div>
+    <div class="group-page-sub">Select friends and see compatibility across the whole group.</div>
+  </div>
+  <div class="selector-section">
+    <div class="selector-label">Select People to Compare</div>
+    <div class="selector-grid" id="selectorGrid">
+      <div style="color:var(--muted);font-size:12px">Loading friends...</div>
+    </div>
+    <div class="selector-hint" id="selectorHint">Select 2–6 people to see group comparison</div>
+  </div>
+  <div class="group-content" id="groupContent">
+    <div class="group-placeholder">
+      <div class="group-placeholder-title">SELECT PEOPLE ABOVE</div>
+      <div>Choose 2 or more people to compare their personalities</div>
+    </div>
+  </div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="/js/compare-group.js"></script>
 <script>
 AnimusShared.bindNavAuth('navAvatar');
+
+function setCompareMode(mode) {
+  var pair = document.getElementById('compareModePair');
+  var group = document.getElementById('compareModeGroup');
+  var isGroup = mode === 'group';
+  if (pair) pair.classList.toggle('hidden', isGroup);
+  if (group) group.classList.toggle('active', isGroup);
+  document.querySelectorAll('.compare-mode-btn').forEach(function (btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+  });
+  try {
+    var qs = new URLSearchParams(window.location.search);
+    if (isGroup) {
+      history.replaceState(null, '', '/compare?mode=group');
+    } else {
+      qs.delete('mode');
+      var s = qs.toString();
+      history.replaceState(null, '', '/compare' + (s ? '?' + s : ''));
+    }
+  } catch (e) {}
+}
+
+document.getElementById('compareModeBar').addEventListener('click', function (e) {
+  var btn = e.target.closest('.compare-mode-btn');
+  if (!btn) return;
+  setCompareMode(btn.getAttribute('data-mode'));
+});
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('mode') === 'group') setCompareMode('group');
+})();
+
+if (typeof AnimusCompareGroup !== 'undefined') {
+  AnimusCompareGroup.init(db, auth);
+}
 
 // ── LOAD COMPARISON DATA FROM FIREBASE ──
 auth.onAuthStateChanged(function(currentUser){
@@ -633,7 +759,7 @@ auth.onAuthStateChanged(function(currentUser){
       var myUname = escapeHTML(myUser.username || '');
       document.getElementById('youName').textContent = myName;
       document.getElementById('youUsername').textContent = '@' + myUname;
-      AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), currentUser, myUser);
+      AnimusShared.applyNavAvatarForSession(document.getElementById('navAvatar'), currentUser);
       if(myProfile){
         document.getElementById('youType').textContent = myProfile.mbti || '—';
         document.getElementById('youEnn').textContent = (myProfile.ennType||'—')+'w'+(myProfile.ennWing||'')+(myProfile.instStack?' · '+myProfile.instStack:'');
@@ -701,7 +827,8 @@ function generateComparison(mySnap, themSnap, myName, themName){
                 overall>=55?'Significant overlap with meaningful differences':
                 overall>=40?'Complementary differences — potential for growth':
                 'Strong contrasts — challenging but stimulating';
-  document.querySelector('.compat-verdict').textContent = verdict;
+  var verdictEl = document.getElementById('compatVerdict');
+  if (verdictEl) verdictEl.textContent = verdict;
 
   // Update dual bars with real data
   updateDualBars(mySnap, themSnap);
@@ -928,7 +1055,6 @@ function toggleThemeGlobal(){
 <nav class="mobile-bottom-nav">
   <a href="/dashboard" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a>
   <a href="/profile" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
-  <a href="/group" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Group</a>
   <a href="/compare" class="mbn-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Compare</a>
   <a href="/settings" class="mbn-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>More</a>
 </nav></body>
