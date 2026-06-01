@@ -34,7 +34,15 @@ const MBTI_STACKS = {
   ESFP: ['Se', 'Fi', 'Te', 'Ni']
 };
 const STACK_W = [4, 3, 2, 1];
-const TIE_EPS = 0.5;
+const MBTI_TIE_EPS = 0.5;
+const MBTI_STACK_TIE_GAP = 0.5;
+const MBTI_BLUR_PRIOR_BONUS = 0.35;
+const POPULAR_MBTI = 'ISFJ';
+const ENN_TYPE_TIE_GAP = 2;
+const ENN_WING_TIE_GAP = 1.5;
+const ENN_BLUR_PRIOR_BONUS = 0.5;
+const POPULAR_ENN_TYPE = '9';
+const POPULAR_ENN_WING = '1';
 
 function answerFingerprint(answers) {
   let h = 2166136261;
@@ -57,18 +65,22 @@ function mbtiFromDichotomies(cog, fp) {
   const J = ((cog.Te || 50) + (cog.Fe || 50) + (cog.Si || 50)) / 3;
   const P = ((cog.Ti || 50) + (cog.Fi || 50) + (cog.Ne || 50) + (cog.Se || 50)) / 4;
 
-  function letter(high, low, pos, neg, bit) {
-    if (Math.abs(high - low) < TIE_EPS) {
-      return (fp >> bit) & 1 ? pos : neg;
-    }
-    return high > low ? pos : neg;
+  function letter(high, low, pos, neg, bit, preferOnBlur) {
+    const diff = high - low;
+    const ad = Math.abs(diff);
+    if (ad >= MBTI_TIE_EPS) return diff > 0 ? pos : neg;
+    if (ad < 0.12) return preferOnBlur;
+    if (ad >= 0.28) return diff > 0 ? pos : neg;
+    const bucket = (fp >> bit) & 9;
+    if (bucket < 3) return preferOnBlur;
+    return diff >= 0 ? pos : neg;
   }
 
   return (
-    letter(E, I, 'E', 'I', 0) +
-    letter(N, S, 'N', 'S', 1) +
-    letter(T, F, 'T', 'F', 2) +
-    letter(J, P, 'J', 'P', 3)
+    letter(E, I, 'E', 'I', 0, 'I') +
+    letter(N, S, 'N', 'S', 1, 'S') +
+    letter(T, F, 'T', 'F', 2, 'F') +
+    letter(J, P, 'J', 'P', 3, 'J')
   );
 }
 
@@ -83,35 +95,62 @@ function getMBTI(cog, fp) {
   });
   ranked.sort((a, b) => b.score - a.score);
   const top = ranked[0].score;
-  const tied = ranked.filter((r) => r.score >= top - 0.5);
-  if (tied.length === 1) return { mbti: tied[0].type, tied: false, ranked: ranked.slice(0, 4) };
+  const tied = ranked.filter((r) => r.score >= top - MBTI_STACK_TIE_GAP);
+  if (tied.length === 1) {
+    return { mbti: tied[0].type, tied: false, ranked: ranked.slice(0, 4) };
+  }
   const dich = mbtiFromDichotomies(cog, fp);
   const hit = tied.find((t) => t.type === dich);
   if (hit) return { mbti: hit.type, tied: true, dich, ranked: ranked.slice(0, 4) };
+  const withPrior = tied
+    .map((r) => ({
+      type: r.type,
+      raw: r.score,
+      adj: r.score + (r.type === POPULAR_MBTI ? MBTI_BLUR_PRIOR_BONUS : 0)
+    }))
+    .sort((a, b) => b.adj - a.adj || b.raw - a.raw);
   return {
-    mbti: tied[fp % tied.length].type,
+    mbti: withPrior[0].type,
     tied: true,
     dich,
     ranked: ranked.slice(0, 4)
   };
 }
 
-function getEnneagram(eS, fp) {
+function getEnneagram(eS) {
   const nums = ['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9'];
   let max = -1;
   nums.forEach((k) => {
     max = Math.max(max, eS[k] || 0);
   });
-  const leaders = nums.filter((k) => (eS[k] || 0) >= max - 0.01);
-  const typeKey =
-    leaders.length === 1
-      ? leaders[0]
-      : nums[fp % nums.length];
+  const leaders = nums.filter((k) => (eS[k] || 0) >= max - ENN_TYPE_TIE_GAP);
+  let typeKey;
+  if (leaders.length === 1) {
+    typeKey = leaders[0];
+  } else {
+    typeKey = leaders[0];
+    let bestAdj = -1;
+    leaders.forEach((k) => {
+      const adj = (eS[k] || 0) + (k === 'E' + POPULAR_ENN_TYPE ? ENN_BLUR_PRIOR_BONUS : 0);
+      if (adj > bestAdj) {
+        bestAdj = adj;
+        typeKey = k;
+      }
+    });
+  }
   const type = typeKey.replace('E', '');
   const t = parseInt(type, 10);
   const wL = t === 1 ? 9 : t - 1;
   const wR = t === 9 ? 1 : t + 1;
-  const wing = (eS['E' + wL] || 0) > (eS['E' + wR] || 0) ? String(wL) : String(wR);
+  const wLScore = eS['E' + wL] || 0;
+  const wRScore = eS['E' + wR] || 0;
+  let wing;
+  if (Math.abs(wLScore - wRScore) < ENN_WING_TIE_GAP) {
+    if (t === parseInt(POPULAR_ENN_TYPE, 10)) wing = POPULAR_ENN_WING;
+    else wing = wLScore >= wRScore ? String(wL) : String(wR);
+  } else {
+    wing = wLScore > wRScore ? String(wL) : String(wR);
+  }
   return { type, wing };
 }
 
@@ -199,7 +238,7 @@ function scoreFull(activeQ, answers, choiceIx) {
   });
   const fp = answerFingerprint(answers);
   const mbtiResult = getMBTI(cog, fp);
-  const enn = getEnneagram(eS, fp);
+  const enn = getEnneagram(eS);
   const att = getAttachment(atS);
   const econL = avg('PC_ECON_L');
   const econR = avg('PC_ECON_R');
@@ -213,6 +252,7 @@ function scoreFull(activeQ, answers, choiceIx) {
     mbtiMeta: mbtiResult,
     cog,
     enn,
+    ennScores: eS,
     att,
     polX,
     polY,
@@ -220,9 +260,14 @@ function scoreFull(activeQ, answers, choiceIx) {
   };
 }
 
-function shuffle(arr) {
+function shuffle(arr, seed) {
+  let s = seed != null ? seed : Date.now();
+  function rnd() {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    return s / 0x7fffffff;
+  }
   for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rnd() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
@@ -291,7 +336,7 @@ const SHORT_ALLOC = {
   AL_SEN: 1
 };
 
-function buildShortActiveQ() {
+function buildShortActiveQ(seed) {
   const byFnMC = {};
   const byFnS = {};
   Q.forEach((q) => {
@@ -307,16 +352,47 @@ function buildShortActiveQ() {
   Object.keys(SHORT_ALLOC).forEach((fn) => {
     const alloc = SHORT_ALLOC[fn];
     const mcPool = (byFnMC[fn] || []).slice();
-    shuffle(mcPool);
+    shuffle(mcPool, seed);
     const sPool = (byFnS[fn] || []).slice();
-    shuffle(sPool);
+    shuffle(sPool, seed + 1);
     const mcCount = Math.floor(alloc / 2);
     const sCount = alloc - mcCount;
     activeQ = activeQ.concat(mcPool.slice(0, mcCount));
     activeQ = activeQ.concat(sPool.slice(0, sCount));
   });
-  shuffle(activeQ);
+  shuffle(activeQ, (seed || 0) + 2);
   return activeQ;
+}
+
+function pickForTargets(q, targets, defaultScore) {
+  defaultScore = defaultScore == null ? 4 : defaultScore;
+  const want = targets[q.fn];
+  const low = targets['!' + q.fn];
+  if (q.type === 'mc' && q.choices && q.choices.length) {
+    let bestIx = 0;
+    let bestScore = -Infinity;
+    q.choices.forEach((c, ci) => {
+      let sc = 0;
+      if (want != null) sc += (7 - Math.abs((c.s || 4) - want)) * 10;
+      else if (low != null) sc += Math.abs((c.s || 4) - low) * 10;
+      else sc = -(Math.abs((c.s || 4) - defaultScore));
+      if (c.also) {
+        Object.keys(c.also).forEach((k) => {
+          const w = targets[k];
+          if (w != null) sc += (7 - Math.abs(c.also[k] - w)) * 5;
+        });
+      }
+      if (targets[q.fn] != null) sc += (7 - Math.abs((c.s || 4) - targets[q.fn])) * 3;
+      if (sc > bestScore) {
+        bestScore = sc;
+        bestIx = ci;
+      }
+    });
+    return q.choices[bestIx].s;
+  }
+  if (want != null) return want;
+  if (low != null) return low;
+  return defaultScore;
 }
 
 function buildFullActiveQ() {
@@ -381,6 +457,7 @@ module.exports = {
   buildShortActiveQ,
   buildFullActiveQ,
   pickEsfp,
+  pickForTargets,
   getMBTI,
   mbtiFromDichotomies,
   answerFingerprint
