@@ -464,3 +464,6 @@ body.light-mode .card, body.light-mode .side-card {
 .page-title {
   line-height: 0.9 !important;
 }
+
+/* Normalize --green across all pages */
+:root { --green: #27ae60; }
