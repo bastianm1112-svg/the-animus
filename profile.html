@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANIMUS Profile</title>
-<meta name="description" content="My complete personality profile on ANIMUS — MBTI, Enneagram, philosophy, political compass and more.">
-<meta property="og:title" content="ANIMUS — My Personality Profile">
+<meta name="description" content="My complete personality profile on ANIMUS â€” MBTI, Enneagram, philosophy, political compass and more.">
+<meta property="og:title" content="ANIMUS â€” My Personality Profile">
 <meta property="og:description" content="Complete personality mapping: cognitive functions, Enneagram, philosophy, political compass, attachment style and more.">
 <meta property="og:type" content="profile">
 <meta name="twitter:card" content="summary">
@@ -131,7 +131,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .nav-mobile-item.active,.nav-mobile-item:hover{color:var(--gold);}
 @media(max-width:768px){.nav-items{display:none!important;}.nav-hamburger{display:flex!important;}}
 
-/* ── SHARE CARD MODAL ── */
+/* â”€â”€ SHARE CARD MODAL â”€â”€ */
 .sc-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);z-index:900;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;padding:20px;}
 .sc-modal-overlay.open{display:flex;}
 .sc-wrap{width:100%;max-width:560px;}
@@ -159,7 +159,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .sc-btn-gold:hover{background:var(--gold3);}
 .sc-btn-outline{background:none;border:1px solid var(--border2);color:var(--muted2);}
 .sc-btn-outline:hover{border-color:var(--gold2);color:var(--gold);}
-/* ── COLOR-CODED FUNCTION BARS ── */
+/* â”€â”€ COLOR-CODED FUNCTION BARS â”€â”€ */
 .bar-fill.fn-ni, .bar-fill.fn-ne { background: #7c5cbf; }
 .bar-fill.fn-ti, .bar-fill.fn-te { background: #4a7abf; }
 .bar-fill.fn-fi, .bar-fill.fn-fe { background: #c8a96e; }
@@ -188,6 +188,7 @@ if(!firebase.apps.length){
 }
 var auth=firebase.auth(); var db=firebase.firestore();
 </script>
+<link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <script>(function(){ var _st=localStorage.getItem('animus_theme'); if(_st==='light') document.body.classList.add('light-mode'); })();</script>
@@ -438,16 +439,16 @@ function shareProfile(){
   if(_snap.instStack) det.push(_snap.instStack);
   var phiN={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'};
   if(_snap.phi) det.push(phiN[_snap.phi]||_snap.phi);
-  document.getElementById('scDetails').textContent = det.join(' · ');
+  document.getElementById('scDetails').textContent = det.join(' Â· ');
   document.getElementById('scTagline').textContent = _snap.tagline||'';
-  document.getElementById('scName').textContent = _pName + (_pUser?' · @'+_pUser:'');
+  document.getElementById('scName').textContent = _pName + (_pUser?' Â· @'+_pUser:'');
   document.getElementById('scModal').classList.add('open');
 }
 function closeShareCard(){ document.getElementById('scModal').classList.remove('open'); }
 function copyShareLink(){
   var u = window.location.origin+(_pUser?'/'+_pUser:'/profile');
-  if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){showToast('Link copied ✓');});
-  else { var ta=document.createElement('textarea');ta.value=u;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Link copied ✓'); }
+  if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){showToast('Link copied âœ“');});
+  else { var ta=document.createElement('textarea');ta.value=u;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Link copied âœ“'); }
 }
 function downloadShareCard(){
   var canvas=document.createElement('canvas');
@@ -471,7 +472,7 @@ function downloadShareCard(){
     // MBTI type
     ctx.fillStyle='#f0ece4';
     ctx.font='400 '+((_snap.mbti||'').length>4?'160':'190')+'px "Bebas Neue",sans-serif';
-    ctx.fillText(_snap.mbti||'—',50,340);
+    ctx.fillText(_snap.mbti||'â€”',50,340);
     // Type name
     if(_snap.mbtiName){
       ctx.font='400 15px "DM Sans",sans-serif'; ctx.fillStyle='#c8a96e';
@@ -487,7 +488,7 @@ function downloadShareCard(){
     var phiN2={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'};
     if(_snap.phi)det.push(phiN2[_snap.phi]||_snap.phi);
     ctx.font='400 14px "DM Sans",sans-serif'; ctx.fillStyle='#555';
-    ctx.fillText(det.join('  ·  '),50,432);
+    ctx.fillText(det.join('  Â·  '),50,432);
     // Tagline word-wrap
     if(_snap.tagline){
       ctx.font='italic 400 15px "Playfair Display",serif'; ctx.fillStyle='#666';
@@ -498,7 +499,7 @@ function downloadShareCard(){
     }
     // Name
     ctx.font='400 14px "DM Sans",sans-serif'; ctx.fillStyle='#888';
-    ctx.fillText(_pName+(_pUser?' · @'+_pUser:''),50,618);
+    ctx.fillText(_pName+(_pUser?' Â· @'+_pUser:''),50,618);
     // URL
     ctx.font='400 13px "DM Sans",sans-serif'; ctx.fillStyle='#2a2a2a';
     var urlTxt='animustest.com'; var uw=ctx.measureText(urlTxt).width;
@@ -577,7 +578,7 @@ function loadProfileData(uid, isOwner, currentUser){
       var cogFns=Object.keys(snap.cog).sort(function(a,b){return snap.cog[b]-snap.cog[a];});
       var cogColors=['','','','dim','dim','low','low','low'];
       var fnColorMap={Ni:'fn-ni',Ne:'fn-ne',Ti:'fn-ti',Te:'fn-te',Fi:'fn-fi',Fe:'fn-fe',Si:'fn-si',Se:'fn-se'};
-var fnTooltips={Ni:'Introverted Intuition — pattern recognition, long-range vision',Ne:'Extraverted Intuition — possibility mapping, lateral thinking',Ti:'Introverted Thinking — internal logical frameworks',Te:'Extraverted Thinking — external systematization, efficiency',Fi:'Introverted Feeling — deep personal values, authenticity',Fe:'Extraverted Feeling — interpersonal harmony, emotional attunement',Si:'Introverted Sensing — experiential memory, established procedure',Se:'Extraverted Sensing — present-moment awareness, physical mastery'};
+var fnTooltips={Ni:'Introverted Intuition â€” pattern recognition, long-range vision',Ne:'Extraverted Intuition â€” possibility mapping, lateral thinking',Ti:'Introverted Thinking â€” internal logical frameworks',Te:'Extraverted Thinking â€” external systematization, efficiency',Fi:'Introverted Feeling â€” deep personal values, authenticity',Fe:'Extraverted Feeling â€” interpersonal harmony, emotional attunement',Si:'Introverted Sensing â€” experiential memory, established procedure',Se:'Extraverted Sensing â€” present-moment awareness, physical mastery'};
 document.getElementById('cogBars').innerHTML=cogFns.map(function(fn,i){var v=Math.round(snap.cog[fn]||0);var cls=fnColorMap[fn]||'';return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><div class="fn-tooltip-wrap"><strong>'+escapeHTML(fn)+'</strong><div class="fn-tooltip">'+escapeHTML(fnTooltips[fn]||fn)+'</div></div></div><div class="bar-wrap"><div class="bar-fill '+cls+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');return '<div class="bar-row"><div class="bar-label" style="min-width:28px"><strong>'+escapeHTML(fn)+'</strong></div><div class="bar-wrap"><div class="bar-fill '+(cogColors[i]||'low')+'" data-w="'+v+'"></div></div><div class="bar-num">'+v+'</div></div>';}).join('');
       var stackLabels=['Dominant','Auxiliary','Tertiary','Inferior']; var stackColors=['var(--gold)','var(--gold)','var(--gold2)','var(--muted)'];
       document.getElementById('stackSummaryList').innerHTML=cogFns.slice(0,4).map(function(fn,i){return '<div>'+stackLabels[i]+' &rarr; <strong style="color:'+stackColors[i]+'">'+escapeHTML(fn)+'</strong></div>';}).join('');
@@ -667,7 +668,7 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
           <div class="sc-type" id="scType">INTJ</div>
           <div class="sc-typename" id="scTypeName">THE STRATEGIC VISIONARY</div>
           <div class="sc-sep"></div>
-          <div class="sc-details" id="scDetails">5w4 · SP/SO · Stoic</div>
+          <div class="sc-details" id="scDetails">5w4 Â· SP/SO Â· Stoic</div>
           <div class="sc-tagline" id="scTagline"></div>
         </div>
         <div class="sc-footer">
@@ -678,9 +679,9 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
     </div>
   </div>
   <div class="sc-actions sc-wrap">
-    <button class="sc-btn sc-btn-gold" onclick="downloadShareCard()">⬇ Save Image</button>
-    <button class="sc-btn sc-btn-outline" onclick="copyShareLink()">⬡ Copy Link</button>
-    <button class="sc-btn sc-btn-outline" onclick="closeShareCard()" style="max-width:80px">✕</button>
+    <button class="sc-btn sc-btn-gold" onclick="downloadShareCard()">â¬‡ Save Image</button>
+    <button class="sc-btn sc-btn-outline" onclick="copyShareLink()">â¬¡ Copy Link</button>
+    <button class="sc-btn sc-btn-outline" onclick="closeShareCard()" style="max-width:80px">âœ•</button>
   </div>
 </div>
 
