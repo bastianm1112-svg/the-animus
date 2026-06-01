@@ -1,0 +1,20 @@
+---
+description: Commit and push completed work to origin without waiting to be asked
+alwaysApply: true
+---
+
+# Auto commit and push
+
+After you finish a coherent batch of changes in this repository (bug fix, feature, config, or rules deploy companion files):
+
+1. Run `git status` and `git diff` to verify only intended files changed. Never commit `node_modules/`, secrets (`.env`, keys), or local-only artifacts.
+2. Stage relevant paths and create a commit with a clear message focused on **why** (1–2 sentences).
+3. Push to `origin` on the current branch (`git push -u origin HEAD` if the branch has no upstream).
+4. Briefly tell the user the commit hash and that push succeeded.
+
+Skip committing when:
+- The user explicitly says not to commit, or the session is question-only / review-only with no code changes.
+- There are no staged-worthy changes.
+- Only exploratory edits were reverted.
+
+Do not amend, force-push, or change git config. Do not push if the user disabled it for that turn.
