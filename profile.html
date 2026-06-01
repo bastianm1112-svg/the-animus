@@ -461,16 +461,16 @@ function shareProfile(){
   if(_snap.instStack) det.push(_snap.instStack);
   var phiN={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'};
   if(_snap.phi) det.push(phiN[_snap.phi]||_snap.phi);
-  document.getElementById('scDetails').textContent = det.join(' Â· ');
+  document.getElementById('scDetails').textContent = det.join(' · ');
   document.getElementById('scTagline').textContent = _snap.tagline||'';
-  document.getElementById('scName').textContent = _pName + (_pUser?' Â· @'+_pUser:'');
+  document.getElementById('scName').textContent = _pName + (_pUser?' · @'+_pUser:'');
   document.getElementById('scModal').classList.add('open');
 }
 function closeShareCard(){ document.getElementById('scModal').classList.remove('open'); }
 function copyShareLink(){
   var u = window.location.origin+(_pUser?'/'+_pUser:'/profile');
-  if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){showToast('Link copied âœ“');});
-  else { var ta=document.createElement('textarea');ta.value=u;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Link copied âœ“'); }
+  if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){showToast('Link copied ✓');});
+  else { var ta=document.createElement('textarea');ta.value=u;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Link copied ✓'); }
 }
 function downloadShareCard(){
   var canvas=document.createElement('canvas');
@@ -510,7 +510,7 @@ function downloadShareCard(){
     var phiN2={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'};
     if(_snap.phi)det.push(phiN2[_snap.phi]||_snap.phi);
     ctx.font='400 14px "DM Sans",sans-serif'; ctx.fillStyle='#555';
-    ctx.fillText(det.join('  Â·  '),50,432);
+    ctx.fillText(det.join('  ·  '),50,432);
     // Tagline word-wrap
     if(_snap.tagline){
       ctx.font='italic 400 15px "Playfair Display",serif'; ctx.fillStyle='#666';
@@ -521,7 +521,7 @@ function downloadShareCard(){
     }
     // Name
     ctx.font='400 14px "DM Sans",sans-serif'; ctx.fillStyle='#888';
-    ctx.fillText(_pName+(_pUser?' Â· @'+_pUser:''),50,618);
+    ctx.fillText(_pName+(_pUser?' · @'+_pUser:''),50,618);
     // URL
     ctx.font='400 13px "DM Sans",sans-serif'; ctx.fillStyle='#2a2a2a';
     var urlTxt='animustest.com'; var uw=ctx.measureText(urlTxt).width;
@@ -690,7 +690,7 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
           <div class="sc-type" id="scType">INTJ</div>
           <div class="sc-typename" id="scTypeName">THE STRATEGIC VISIONARY</div>
           <div class="sc-sep"></div>
-          <div class="sc-details" id="scDetails">5w4 Â· SP/SO Â· Stoic</div>
+          <div class="sc-details" id="scDetails">5w4 · SP/SO · Stoic</div>
           <div class="sc-tagline" id="scTagline"></div>
         </div>
         <div class="sc-footer">
