@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function isAdminFlagUnchanged() {
+      return !('isAdmin' in request.resource.data)
+        || request.resource.data.isAdmin == resource.data.get('isAdmin', false);
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn();
+      allow create: if isOwner(userId)
+        && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false);
+      allow update: if isOwner(userId) && isAdminFlagUnchanged();
+      allow delete: if isOwner(userId);
+    }
+
+    match /usernames/{username} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
+    }
+
+    match /profiles/{userId} {
+      allow read: if true;
+      allow create, update: if isOwner(userId) || isAdmin();
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    match /notifications/{notifId} {
+      allow read, write: if signedIn();
+    }
+  }
+}

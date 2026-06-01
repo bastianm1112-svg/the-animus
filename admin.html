@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>ANIMUS — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="/js/animus-shared.js"></script>
+<script>
+AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
+var auth = firebase.auth();
+var db = firebase.firestore();
+</script>
+<link rel="stylesheet" href="/css/animus-shell.css">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/css/animus-release.css">
+<link rel="stylesheet" href="/css/animus-admin.css">
+<script src="/js/animus-app.js" defer></script>
+</head>
+<body class="has-app-nav">
+<script>(function(){try{if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');}catch(e){}})();</script>
+
+<div id="appNavMount"></div>
+
+<div id="adminDenied" class="admin-denied" style="display:none">
+  <p>You do not have admin access.</p>
+  <p style="margin-top:12px;font-size:12px">In Firebase Console → Firestore → <strong>users</strong> → your document, add field <code>isAdmin</code> (boolean) = <code>true</code>. Then deploy <code>firestore.rules</code> from the repo.</p>
+  <p style="margin-top:20px"><a href="/settings">Back to settings</a></p>
+</div>
+
+<div id="adminApp" style="display:none">
+  <main class="admin-page" id="main-content">
+    <h1 class="admin-page-title">Profile admin</h1>
+    <p class="admin-page-sub">Edit any user&apos;s assessment snapshot. Changes save to Firestore <code>profiles.latest</code> and appear on profile, compare, friends, and daily facts.</p>
+
+    <div class="admin-card">
+      <div class="admin-card-title">Find user</div>
+      <div class="admin-row">
+        <div class="admin-field">
+          <label for="adminUsername">Username</label>
+          <input type="text" id="adminUsername" placeholder="username" autocomplete="off" />
+        </div>
+        <div class="admin-field">
+          <label for="adminUid">Or UID</label>
+          <input type="text" id="adminUid" placeholder="Firebase user id" autocomplete="off" />
+        </div>
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadProfile()">Load profile</button>
+      </div>
+      <div class="admin-status" id="adminStatus"></div>
+    </div>
+
+    <div id="adminEditor" style="display:none">
+      <p class="admin-meta" id="adminTargetMeta"></p>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Quick fields</div>
+        <div class="admin-grid">
+          <div class="admin-field"><label for="adminMbti">MBTI</label><input id="adminMbti" maxlength="8" /></div>
+          <div class="admin-field"><label for="adminMbtiName">MBTI name</label><input id="adminMbtiName" maxlength="80" /></div>
+          <div class="admin-field"><label for="adminEnnType">Enneagram</label><input id="adminEnnType" maxlength="8" /></div>
+          <div class="admin-field"><label for="adminEnnWing">Wing</label><input id="adminEnnWing" maxlength="8" /></div>
+          <div class="admin-field"><label for="adminEnnTritype">Tritype</label><input id="adminEnnTritype" maxlength="16" /></div>
+          <div class="admin-field"><label for="adminAtt">Attachment</label><input id="adminAtt" maxlength="32" /></div>
+          <div class="admin-field"><label for="adminPhi">Philosophy</label><input id="adminPhi" maxlength="32" /></div>
+          <div class="admin-field"><label for="adminInst">Instinct</label><input id="adminInst" maxlength="24" /></div>
+          <div class="admin-field"><label for="adminSocionics">Socionics</label><input id="adminSocionics" maxlength="16" /></div>
+          <div class="admin-field"><label for="adminKeirsey">Keirsey</label><input id="adminKeirsey" maxlength="24" /></div>
+          <div class="admin-field"><label for="adminPolX">Pol X</label><input id="adminPolX" type="number" step="1" /></div>
+          <div class="admin-field"><label for="adminPolY">Pol Y</label><input id="adminPolY" type="number" step="1" /></div>
+        </div>
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.syncJsonFromQuick()">Merge quick fields into JSON</button>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Full profile JSON (latest snapshot)</div>
+        <textarea id="adminJson" class="admin-json" spellcheck="false"></textarea>
+        <div class="admin-actions">
+          <button type="button" class="admin-btn-primary" id="adminSaveBtn" onclick="AnimusAdmin.saveProfile()">Save profile</button>
+          <a href="/" class="admin-btn-secondary" style="display:inline-flex;align-items:center;text-decoration:none">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="appBottomMount"></div>
+
+<script src="/js/animus-social.js"></script>
+<script src="/js/animus-nav.js"></script>
+<script src="/js/animus-admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  AnimusNav.mountTop('appNavMount', '');
+  AnimusNav.mountBottom('appBottomMount', '');
+  AnimusAdmin.boot(auth, db);
+});
+</script>
+</body>
+</html>

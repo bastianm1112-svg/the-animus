@@ -342,32 +342,80 @@
     }
   }
 
-  function saveProfileToFirestore(userId, snapshot, options) {
-    options = options || {};
-    if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
-      return Promise.reject(new Error('Firestore unavailable'));
+  function isUserAdmin(uid) {
+    if (!uid || typeof firebase === 'undefined' || !firebase.firestore) {
+      return Promise.resolve(false);
     }
-    var snap = enrichProfileSnapshot(snapshot, options.rawData, {
-      completedAt: options.completedAt,
-      testMode: options.testMode,
-      answerCount: options.answerCount
-    });
+    return firebase
+      .firestore()
+      .collection('users')
+      .doc(uid)
+      .get()
+      .then(function (doc) {
+        return !!(doc.exists && doc.data() && doc.data().isAdmin === true);
+      })
+      .catch(function () {
+        return false;
+      });
+  }
+
+  function writeProfileDoc(userId, snap, meta) {
+    meta = meta || {};
     var nowIso = new Date().toISOString();
     var ref = firebase.firestore().collection('profiles').doc(userId);
     return firebase.firestore().runTransaction(function (tx) {
       return tx.get(ref).then(function (doc) {
         var history = doc.exists ? (doc.data().history || []) : [];
-        history.push({ snapshot: snap, timestamp: nowIso });
+        var entry = { snapshot: snap, timestamp: nowIso };
+        if (meta.adminEdit) entry.source = 'admin-edit';
+        history.push(entry);
         if (history.length > 10) history = history.slice(-10);
-        tx.set(ref, {
+        var payload = {
           latest: snap,
           history: history,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+        };
+        if (meta.adminEdit) {
+          payload.adminEditedAt = firebase.firestore.FieldValue.serverTimestamp();
+        }
+        tx.set(ref, payload, { merge: true });
       });
-    }).then(function () {
-      saveLastResultLocal(snap);
-      return snap;
+    });
+  }
+
+  function saveProfileToFirestore(userId, snapshot, options) {
+    options = options || {};
+    if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
+      return Promise.reject(new Error('Firestore unavailable'));
+    }
+    var authUser = firebase.auth && firebase.auth().currentUser;
+    if (!authUser) {
+      return Promise.reject(new Error('Not signed in'));
+    }
+    var snap = enrichProfileSnapshot(snapshot, options.rawData, {
+      completedAt: options.completedAt || snapshot.completedAt || new Date().toISOString(),
+      testMode: options.testMode || snapshot.testMode || 'full',
+      answerCount: options.answerCount || snapshot.answerCount
+    });
+
+    function finishWrite(adminEdit) {
+      return writeProfileDoc(userId, snap, { adminEdit: !!adminEdit }).then(function () {
+        if (authUser.uid === userId) {
+          saveLastResultLocal(snap);
+        }
+        return snap;
+      });
+    }
+
+    if (authUser.uid === userId) {
+      return finishWrite(false);
+    }
+
+    return isUserAdmin(authUser.uid).then(function (admin) {
+      if (!admin) {
+        return Promise.reject(new Error('Only admins can edit other profiles'));
+      }
+      return finishWrite(true);
     });
   }
 
@@ -412,6 +460,7 @@
     enrichProfileSnapshot: enrichProfileSnapshot,
     saveLastResultLocal: saveLastResultLocal,
     loadLastResultLocal: loadLastResultLocal,
+    isUserAdmin: isUserAdmin,
     saveProfileToFirestore: saveProfileToFirestore,
     trySyncLocalResultToFirestore: trySyncLocalResultToFirestore
   };
