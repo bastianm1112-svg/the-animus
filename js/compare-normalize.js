@@ -21,11 +21,17 @@
     ESFP: { Se: 90, Fi: 75, Fe: 68, Te: 35, Ne: 52, Si: 48, Ti: 30, Ni: 32 }
   };
 
-  function cogSum(cog) {
-    if (!cog) return 0;
-    return Object.keys(cog).reduce(function (s, k) {
-      return s + (Number(cog[k]) || 0);
+  var PHI_KEYS = ['PH_NIE', 'PH_EXI', 'PH_PRA', 'PH_STO', 'PH_EPI', 'PH_KAN', 'PH_ARI', 'PH_SKE'];
+
+  function cogSum(obj) {
+    if (!obj || typeof obj !== 'object') return 0;
+    return Object.keys(obj).reduce(function (s, k) {
+      return s + (Number(obj[k]) || 0);
     }, 0);
+  }
+
+  function hasRealCog(snap) {
+    return !!(snap && snap._hasRealCog);
   }
 
   function deriveBig5FromCog(cog) {
@@ -48,39 +54,97 @@
     };
   }
 
+  function spreadEnn(snap) {
+    var enn = snap.enn && typeof snap.enn === 'object' ? Object.assign({}, snap.enn) : {};
+    if (cogSum(enn) > 0) return enn;
+    var t = parseInt(snap.ennType, 10);
+    if (!t || t < 1 || t > 9) return enn;
+    var i;
+    for (i = 1; i <= 9; i++) {
+      enn['E' + i] = i === t ? 72 : Math.max(12, 28 - Math.abs(i - t) * 3);
+    }
+    return enn;
+  }
+
+  function spreadPhiS(snap) {
+    var phiS = snap.phiS && typeof snap.phiS === 'object' ? Object.assign({}, snap.phiS) : {};
+    if (cogSum(phiS) > 0) return phiS;
+    var primary = snap.phi || '';
+    PHI_KEYS.forEach(function (k) {
+      phiS[k] = k === primary ? 70 : 12;
+    });
+    return phiS;
+  }
+
+  function spreadIv(snap) {
+    var iv = snap.iv && typeof snap.iv === 'object' ? Object.assign({}, snap.iv) : {};
+    if (cogSum(iv) > 0) return iv;
+    var stack = (snap.instStack || 'SP/SO/SX').split('/');
+    var map = { SP: 'IV_SP', SO: 'IV_SOC', SX: 'IV_SX', SOC: 'IV_SOC' };
+    var scores = [58, 32, 22];
+    stack.forEach(function (part, idx) {
+      var key = map[part.trim().toUpperCase()];
+      if (key) iv[key] = scores[idx] !== undefined ? scores[idx] : 20;
+    });
+    if (cogSum(iv) < 1) {
+      iv.IV_SP = 40;
+      iv.IV_SOC = 35;
+      iv.IV_SX = 30;
+    }
+    return iv;
+  }
+
+  function spreadAtt2(snap) {
+    var att2 = snap.att2 && typeof snap.att2 === 'object' ? Object.assign({}, snap.att2) : {};
+    if (cogSum(att2) > 0) return att2;
+    var primary = snap.att || 'AT_SEC';
+    ['AT_SEC', 'AT_ANX', 'AT_AVO', 'AT_DIS'].forEach(function (k) {
+      att2[k] = k === primary ? 65 : 15;
+    });
+    return att2;
+  }
+
+  function spreadEth(snap) {
+    var eth = snap.eth && typeof snap.eth === 'object' ? Object.assign({}, snap.eth) : {};
+    if (cogSum(eth) > 0) return eth;
+    ['ET_VIR', 'ET_CON', 'ET_DEO', 'ET_EGO'].forEach(function (k, i) {
+      eth[k] = 40 - i * 8;
+    });
+    return eth;
+  }
+
   function normalizeProfileForCompare(snap) {
     if (!snap) return null;
     var out = Object.assign({}, snap);
-    var cog = out.cog && typeof out.cog === 'object' ? Object.assign({}, out.cog) : {};
-    if (cogSum(cog) < 1 && out.mbti && MBTI_COG[out.mbti]) {
+    var rawCog = out.cog && typeof out.cog === 'object' ? Object.assign({}, out.cog) : {};
+    out._hasRealCog = cogSum(rawCog) > 0;
+
+    var cog = rawCog;
+    if (!out._hasRealCog && out.mbti && MBTI_COG[out.mbti]) {
       cog = Object.assign({}, MBTI_COG[out.mbti]);
       out._compareDerivedCog = true;
     }
     out.cog = cog;
+
     if (!out.big5 || cogSum(out.big5) < 1) {
       out.big5 = deriveBig5FromCog(cog);
     }
-    if (!out.enn || typeof out.enn !== 'object') out.enn = {};
-    if (out.ennType && !out.enn['E' + out.ennType]) {
-      out.enn['E' + out.ennType] = Math.max(
-        out.enn['E' + out.ennType] || 0,
-        72
-      );
-    }
-    if (!out.phiS || typeof out.phiS !== 'object') out.phiS = {};
-    if (!out.eth || typeof out.eth !== 'object') out.eth = {};
-    if (!out.iv || typeof out.iv !== 'object') out.iv = {};
-    if (!out.att2 || typeof out.att2 !== 'object') out.att2 = {};
+    out.enn = spreadEnn(out);
+    out.phiS = spreadPhiS(out);
+    out.iv = spreadIv(out);
+    out.att2 = spreadAtt2(out);
+    out.eth = spreadEth(out);
     if (typeof out.polX !== 'number') out.polX = 0;
     if (typeof out.polY !== 'number') out.polY = 0;
     return out;
   }
 
   function hasRichCompareData(snap) {
-    if (!snap || !snap.mbti) return false;
-    if (cogSum(snap.cog) > 0) return true;
-    if (snap.big5 && cogSum(snap.big5) > 0) return true;
-    return false;
+    return !!(snap && snap.mbti && snap.cog && cogSum(snap.cog) > 0);
+  }
+
+  function canShowCompatScore(my, them) {
+    return hasRealCog(my) && hasRealCog(them);
   }
 
   function buildOfflineAnalysis(my, them, myName, themName, scores) {
@@ -149,6 +213,8 @@
   g.AnimusCompareNormalize = {
     normalizeProfileForCompare: normalizeProfileForCompare,
     hasRichCompareData: hasRichCompareData,
+    hasRealCog: hasRealCog,
+    canShowCompatScore: canShowCompatScore,
     buildOfflineAnalysis: buildOfflineAnalysis,
     deriveBig5FromCog: deriveBig5FromCog
   };

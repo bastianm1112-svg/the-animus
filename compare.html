@@ -222,7 +222,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .dual-label { font-size: 11px; color: var(--muted2); min-width: 72px; }
 .dual-label strong { display: block; color: var(--text); }
 .dual-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
-.dual-bar-wrap { height: 4px; background: var(--border); flex: 1; }
+.dual-bar-wrap { height: 8px; background: var(--border); flex: 1; border-radius: 2px; overflow: hidden; }
 .dual-bar-you { height: 100%; background: var(--gold); transition: width 1s ease; width: 0%; }
 .dual-bar-them { height: 100%; background: var(--green); transition: width 1s ease; width: 0%; }
 .dual-nums { display: flex; flex-direction: column; gap: 3px; min-width: 48px; text-align: right; }
@@ -353,6 +353,9 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
       </div>
     </div>
 
+    <p class="compare-data-notice" id="compareDataNotice" style="display:none" role="status"></p>
+
+    <div id="compareScoreBlock" class="compare-score-block is-hidden">
     <!-- Compatibility score -->
     <div class="compat-bar-wrap">
       <div class="compat-label">Overall Compatibility</div>
@@ -426,24 +429,27 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
         <div class="ring-label">Social</div>
       </div>
     </div>
+    </div><!-- /compareScoreBlock -->
 
-    <!-- Tabs -->
-    <div class="compare-tabs" id="compareTabs">
-      <button class="compare-tab active" data-panel="ai">AI Analysis</button>
-      <button class="compare-tab" data-panel="cognition">Cognition</button>
-      <button class="compare-tab" data-panel="personality">Personality</button>
-      <button class="compare-tab" data-panel="philosophy">Philosophy</button>
-      <button class="compare-tab" data-panel="summary">Summary</button>
-    </div>
+  </div>
+</div>
+
+<div class="compare-tabs-wrap">
+  <div class="compare-tabs" id="compareTabs" role="tablist">
+    <button type="button" class="compare-tab active" data-panel="ai" role="tab" aria-selected="true">AI Analysis</button>
+    <button type="button" class="compare-tab" data-panel="cognition" role="tab">Cognition</button>
+    <button type="button" class="compare-tab" data-panel="personality" role="tab">Personality</button>
+    <button type="button" class="compare-tab" data-panel="philosophy" role="tab">Philosophy</button>
+    <button type="button" class="compare-tab" data-panel="summary" role="tab">Summary</button>
   </div>
 </div>
 
 <!-- CONTENT -->
-<div class="compare-content">
+<div class="compare-content" id="comparePanels">
 
   <!-- Share bar -->
   <div class="compare-share-bar">
-    <button class="btn-share-comp btn-gold" onclick="shareComparison()">â¬¡ Share This Comparison</button>
+    <button type="button" class="btn-share-comp btn-gold" onclick="shareComparison()">Share This Comparison</button>
     <a href="/profile" class="btn-share-comp btn-outline" id="viewThemBtn">View Their Profile →</a>
   </div>
 
@@ -454,27 +460,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
       <div class="dual-legend-item"><div class="legend-dot legend-them"></div><span id="legendThemAI">Them</span></div>
     </div>
     <div id="aiAnalysisContent">
-      <div style="padding:40px 0;text-align:center;color:var(--muted);font-size:12px;letter-spacing:0.05em">Choose a friend above to generate AI analysis.</div>
-    </div>
-    <div class="ai-section" style="display:none">
-      <div class="ai-section-title">Where You Align</div>
-      <div class="ai-block">
-        <div class="ai-block-title">Intellectual Chemistry</div>
-      <div class="dual-row"><div class="dual-label"><strong>Ne</strong><span style="font-size:10px;color:var(--muted)">Ext. Intuition</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Te</strong><span style="font-size:10px;color:var(--muted)">Ext. Thinking</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Ni</strong><span style="font-size:10px;color:var(--muted)">Int. Intuition</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Fi</strong><span style="font-size:10px;color:var(--muted)">Int. Feeling</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Si</strong><span style="font-size:10px;color:var(--muted)">Int. Sensing</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Se</strong><span style="font-size:10px;color:var(--muted)">Ext. Sensing</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Fe</strong><span style="font-size:10px;color:var(--muted)">Ext. Feeling</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-    </div>
-    <div class="dual-section">
-      <div class="dual-section-title">Big Five</div>
-      <div class="dual-row"><div class="dual-label"><strong>Openness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Conscientiousness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Extraversion</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Agreeableness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Neuroticism</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
+      <div class="compare-panel-empty">Choose a friend above to generate AI analysis.</div>
     </div>
   </div>
 
@@ -613,13 +599,13 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
 <script src="/js/compare-friends.js"></script>
 <script src="/js/compare-group.js"></script>
 <script src="/js/compare-pair.js"></script>
+<script src="/js/compare-page.js"></script>
 <script>
 AnimusShared.bindNavAuth('navAvatar');
 
 if (typeof AnimusComparePair !== 'undefined') {
   AnimusComparePair.clearDemoCompat();
 }
-
 
 function setCompareMode(mode) {
   var pair = document.getElementById('compareModePair');
@@ -668,32 +654,9 @@ if (typeof AnimusComparePair !== 'undefined') {
   AnimusComparePair.init(db, auth);
 }
 
-// Tab switching
-document.getElementById('compareTabs').querySelectorAll('.compare-tab').forEach(function(tab){
-  tab.addEventListener('click', function(){
-    var panel = this.getAttribute('data-panel');
-    document.querySelectorAll('.compare-tab').forEach(function(t){ t.classList.remove('active'); });
-    document.querySelectorAll('.c-panel').forEach(function(p){ p.classList.remove('active'); });
-    this.classList.add('active');
-    document.getElementById('c-panel-' + panel).classList.add('active');
-    animateCompareBars();
-  });
-});
-
-function animateCompareBars(){
-  setTimeout(function(){
-    var active = document.querySelector('.c-panel.active');
-    var scope = active || document.getElementById('compareResultsWrap');
-    if (!scope) return;
-    scope.querySelectorAll('[data-w]').forEach(function(el){
-      var w = el.getAttribute('data-w');
-      if (w !== null && w !== '') el.style.width = w + '%';
-    });
-    var fill = document.querySelector('.compat-fill');
-    if (fill) fill.style.width = fill.getAttribute('data-w') + '%';
-  }, 80);
+if (typeof AnimusComparePage !== 'undefined') {
+  AnimusComparePage.initTabs();
 }
-window.animateCompareBars = animateCompareBars;
 
 function sanitizeText(str, maxLen) {
   if (!str) return '';

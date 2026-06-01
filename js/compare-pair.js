@@ -4,6 +4,7 @@
 
   var Compat = g.AnimusCompareCompat;
   var Normalize = g.AnimusCompareNormalize;
+  var _cache = { my: null, them: null, myName: '', themName: '' };
 
   function escapeHTML(s) {
     if (!s) return '';
@@ -36,13 +37,11 @@
     if (nums[1]) nums[1].textContent = themVal;
   }
 
-  function clearDemoCompat() {
+  function clearCompatScoresOnly() {
     var pct = document.querySelector('.compat-pct');
     if (pct) pct.innerHTML = '—<span>%</span>';
     var fill = document.querySelector('.compat-fill');
     if (fill) { fill.setAttribute('data-w', '0'); fill.style.width = '0%'; }
-    var verdict = document.getElementById('compatVerdict');
-    if (verdict) verdict.textContent = 'Choose a friend above to compare';
     document.querySelectorAll('.ring-svg').forEach(function (svg) {
       var circles = svg.querySelectorAll('circle');
       if (circles[1]) circles[1].setAttribute('stroke-dashoffset', '138.16');
@@ -51,6 +50,16 @@
       var scoreEl = svg.parentElement && svg.parentElement.querySelector('.ring-score');
       if (scoreEl) scoreEl.textContent = '—';
     });
+  }
+
+  function clearDemoCompat() {
+    clearCompatScoresOnly();
+    var verdict = document.getElementById('compatVerdict');
+    if (verdict) verdict.textContent = 'Choose a friend above to compare';
+  }
+
+  function polBarPct(axis) {
+    return Math.min(100, Math.max(0, Math.round(50 + (Number(axis) || 0))));
   }
 
   function updateDualBars(my, them) {
@@ -95,7 +104,7 @@
         });
       }
       var attSec = panelPers.querySelectorAll('.dual-section')[2];
-      if (attSec && (my.att2 || them.att2)) {
+      if (attSec) {
         var attRows = attSec.querySelectorAll('.dual-row');
         [['AT_AVO', 0], ['AT_SEC', 1], ['AT_ANX', 2], ['AT_DIS', 3]].forEach(function (pair) {
           if (!attRows[pair[1]]) return;
@@ -109,17 +118,21 @@
     }
 
     var panelPhi = document.getElementById('c-panel-philosophy');
-    if (panelPhi && my.phiS && them.phiS) {
+    if (panelPhi) {
       var phiKeys = ['PH_NIE', 'PH_EXI', 'PH_PRA', 'PH_STO'];
       var phiSec = panelPhi.querySelectorAll('.dual-section')[0];
       if (phiSec) {
         var phiRows = phiSec.querySelectorAll('.dual-row');
         phiKeys.forEach(function (k, i) {
-          setDualRowEl(phiRows[i], Math.round(my.phiS[k] || 0), Math.round(them.phiS[k] || 0));
+          setDualRowEl(
+            phiRows[i],
+            Math.round((my.phiS && my.phiS[k]) || 0),
+            Math.round((them.phiS && them.phiS[k]) || 0)
+          );
         });
       }
       var ethSec = panelPhi.querySelectorAll('.dual-section')[1];
-      if (ethSec && (my.eth || them.eth)) {
+      if (ethSec) {
         var ethRows = ethSec.querySelectorAll('.dual-row');
         [['ET_EGO', 0], ['ET_CON', 1], ['ET_DEO', 2], ['ET_VIR', 3]].forEach(function (pair) {
           if (!ethRows[pair[1]]) return;
@@ -130,20 +143,12 @@
           );
         });
       }
-      if (typeof my.polX === 'number' && typeof them.polX === 'number') {
+      if (typeof my.polX === 'number' || typeof them.polX === 'number') {
         var polSec = panelPhi.querySelectorAll('.dual-section')[2];
         if (polSec) {
           var polRows = polSec.querySelectorAll('.dual-row');
-          setDualRowEl(
-            polRows[0],
-            Math.min(100, Math.round(Math.abs(my.polX))),
-            Math.min(100, Math.round(Math.abs(them.polX)))
-          );
-          setDualRowEl(
-            polRows[1],
-            Math.min(100, Math.round(Math.abs(my.polY || 0))),
-            Math.min(100, Math.round(Math.abs(them.polY || 0)))
-          );
+          setDualRowEl(polRows[0], polBarPct(my.polX), polBarPct(them.polX));
+          setDualRowEl(polRows[1], polBarPct(my.polY), polBarPct(them.polY));
           var polNums = polRows[0] && polRows[0].querySelectorAll('.dual-num');
           if (polNums && polNums[0]) polNums[0].textContent = (my.polX > 0 ? '+' : '') + Math.round(my.polX);
           if (polNums && polNums[1]) polNums[1].textContent = (them.polX > 0 ? '+' : '') + Math.round(them.polX);
@@ -332,6 +337,26 @@
     });
   }
 
+  function setScoresVisible(show) {
+    var wrap = document.getElementById('compareScoreBlock');
+    if (wrap) wrap.classList.toggle('is-hidden', !show);
+    if (!show) clearCompatScoresOnly();
+  }
+
+  function showDerivedNotice(my, them) {
+    var el = document.getElementById('compareDataNotice');
+    if (!el) return;
+    var derived =
+      (my && my._compareDerivedCog) || (them && them._compareDerivedCog);
+    if (derived) {
+      el.textContent =
+        'Charts use type-based estimates where full test scores are missing. Overall % only appears when both people have completed the full assessment.';
+      el.style.display = 'block';
+    } else {
+      el.style.display = 'none';
+    }
+  }
+
   function generateComparison(mySnap, themSnap, myName, themName) {
     if (!Compat) return;
     mySnap =
@@ -342,47 +367,74 @@
       Normalize && Normalize.normalizeProfileForCompare
         ? Normalize.normalizeProfileForCompare(themSnap)
         : themSnap;
-    if (
-      Normalize &&
-      Normalize.hasRichCompareData &&
-      (!Normalize.hasRichCompareData(mySnap) || !Normalize.hasRichCompareData(themSnap))
-    ) {
-      clearDemoCompat();
-      var verdictEl = document.getElementById('compatVerdict');
-      if (verdictEl) {
-        verdictEl.textContent =
-          'One or both profiles need a full assessment (not just type labels) to score charts.';
-      }
-      return;
-    }
-
-    var scores = Compat.calcOverall(mySnap, themSnap);
-    if (!scores) {
+    if (!mySnap || !themSnap || !mySnap.mbti || !themSnap.mbti) {
       clearDemoCompat();
       return;
     }
 
-    var pct = document.querySelector('.compat-pct');
-    if (pct) pct.innerHTML = scores.overall + '<span>%</span>';
-    var fill = document.querySelector('.compat-fill');
-    if (fill) {
-      fill.setAttribute('data-w', scores.overall);
-      setTimeout(function () { fill.style.width = scores.overall + '%'; }, 200);
-    }
+    _cache.my = mySnap;
+    _cache.them = themSnap;
+    _cache.myName = myName;
+    _cache.themName = themName;
 
-    applyRings(scores);
-
-    var verdict = scores.overall >= 75 ? 'High alignment across most dimensions' :
-      scores.overall >= 55 ? 'Significant overlap with meaningful differences' :
-        scores.overall >= 40 ? 'Complementary differences — room to grow together' :
-          'Strong contrasts — challenging but stimulating';
-    var verdictEl = document.getElementById('compatVerdict');
-    if (verdictEl) verdictEl.textContent = verdict;
-
+    showDerivedNotice(mySnap, themSnap);
     updateDualBars(mySnap, themSnap);
     updateSummaryTable(mySnap, themSnap, myName, themName);
 
-    runCompareAnalysis(mySnap, themSnap, myName, themName, scores);
+    var showScore =
+      Normalize && Normalize.canShowCompatScore
+        ? Normalize.canShowCompatScore(mySnap, themSnap)
+        : Compat.hasCogData && Compat.hasCogData(mySnap) && Compat.hasCogData(themSnap);
+
+    setScoresVisible(showScore);
+
+    var scores = null;
+    if (showScore) {
+      scores = Compat.calcOverall(mySnap, themSnap);
+    }
+
+    if (scores) {
+      var pct = document.querySelector('.compat-pct');
+      if (pct) pct.innerHTML = scores.overall + '<span>%</span>';
+      var fill = document.querySelector('.compat-fill');
+      if (fill) {
+        fill.setAttribute('data-w', scores.overall);
+        setTimeout(function () { fill.style.width = scores.overall + '%'; }, 200);
+      }
+      applyRings(scores);
+      var verdict =
+        scores.overall >= 75
+          ? 'High alignment across most dimensions'
+          : scores.overall >= 55
+            ? 'Significant overlap with meaningful differences'
+            : scores.overall >= 40
+              ? 'Complementary differences — room to grow together'
+              : 'Strong contrasts — challenging but stimulating';
+      var verdictEl = document.getElementById('compatVerdict');
+      if (verdictEl) verdictEl.textContent = verdict;
+    } else {
+      var verdictEl2 = document.getElementById('compatVerdict');
+      if (verdictEl2) {
+        verdictEl2.textContent =
+          'Select a friend with full assessment data to see an overall compatibility score.';
+      }
+    }
+
+    runCompareAnalysis(mySnap, themSnap, myName, themName, scores || {});
+
+    if (typeof g.animateCompareBars === 'function') {
+      g.animateCompareBars(document.getElementById('comparePanels'));
+    }
+  }
+
+  function refreshCharts() {
+    if (_cache.my && _cache.them) {
+      updateDualBars(_cache.my, _cache.them);
+      if (typeof g.animateCompareBars === 'function') {
+        var active = document.querySelector('.c-panel.active');
+        g.animateCompareBars(active || document.getElementById('comparePanels'));
+      }
+    }
   }
 
   function setCompareResultsState(state) {
@@ -513,27 +565,7 @@
 
         if (myProfile && themProfile) {
           setCompareResultsState('is-ready');
-          if (
-            Normalize &&
-            Normalize.hasRichCompareData &&
-            Normalize.hasRichCompareData(myNorm) &&
-            Normalize.hasRichCompareData(themNorm)
-          ) {
-            generateComparison(myProfile, themProfile, myName, themName);
-            if (typeof g.animateCompareBars === 'function') g.animateCompareBars();
-          } else {
-            clearDemoCompat();
-            var aiBox = document.getElementById('aiAnalysisContent');
-            if (aiBox) {
-              aiBox.innerHTML =
-                '<div class="compare-panel-empty">Types are set, but detailed scores are missing. Complete the full test (or save full profile data in admin) to unlock charts and compatibility.</div>';
-            }
-            var vPartial = document.getElementById('compatVerdict');
-            if (vPartial) {
-              vPartial.textContent =
-                'Add full assessment data to compare dimension-by-dimension.';
-            }
-          }
+          generateComparison(myProfile, themProfile, myName, themName);
         } else {
           setCompareResultsState('is-pending');
           clearDemoCompat();
@@ -590,6 +622,7 @@
     generateComparison: generateComparison,
     clearDemoCompat: clearDemoCompat,
     updateDualBars: updateDualBars,
+    refreshCharts: refreshCharts,
     runCompareAnalysis: runCompareAnalysis
   };
 })(typeof window !== 'undefined' ? window : globalThis);
