@@ -147,6 +147,10 @@
     }
 
     snap = hydrateSparseProfile(snap);
+    if (global.AnimusScoring && global.AnimusScoring.reconcileSnapshotTypes && snap.cog && !snap._compareDerivedCog) {
+      snap = global.AnimusScoring.reconcileSnapshotTypes(snap);
+      snap = fillMbtiBasics(snap);
+    }
     var PN = global.ProfileNarratives;
     if (!PN || !PN.buildFallbackNarrative) {
       snap._narrativeIdentity = narrativeIdentityKey(snap);
@@ -796,6 +800,16 @@
     snap = fillMbtiBasics(Object.assign({}, snap || {}));
     if (global.AnimusCompareNormalize && global.AnimusCompareNormalize.normalizeProfileForDisplay) {
       snap = global.AnimusCompareNormalize.normalizeProfileForDisplay(snap) || snap;
+    }
+    if (
+      global.AnimusScoring &&
+      global.AnimusScoring.reconcileSnapshotTypes &&
+      snap &&
+      snap.cog &&
+      !snap._compareDerivedCog
+    ) {
+      snap = global.AnimusScoring.reconcileSnapshotTypes(snap);
+      snap = fillMbtiBasics(snap);
     }
     return stripCompareInternals(snap);
   }

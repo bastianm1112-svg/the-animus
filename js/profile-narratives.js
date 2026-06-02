@@ -76,7 +76,12 @@ function buildFallbackNarrative(mbti,enn,att,phi,data){
     {name:'Hannah Arendt',cat:'Historical',type:'INTP 5w6',initials:'HA',note:'Political philosopher who analyzed power, freedom, and human action with rare precision.'}
   ];
 
-  var figures = figsByType[mbti] || defaultFigs;
+  var figures;
+  if (typeof AnimusFigures !== 'undefined' && AnimusFigures.pickFigures) {
+    figures = AnimusFigures.pickFigures(mbti, enn.type, enn.wing, 10);
+  } else {
+    figures = figsByType[mbti] || defaultFigs;
+  }
 
   // Values — based on type
   var valuesByType = {

@@ -14,6 +14,7 @@ vm.runInContext(fs.readFileSync(path.join(root, 'js/psyche-cross.js'), 'utf8'), 
 const Q = ctx.window.AnimusQuestions.Q;
 const Cross = ctx.window.AnimusCross || {};
 if (Cross.applyChoicePatches) Cross.applyChoicePatches(Q);
+const Scoring = require(path.join(root, 'js/animus-scoring-core.js'));
 
 const MBTI_STACKS = {
   INTJ: ['Ni', 'Te', 'Fi', 'Se'],
@@ -289,8 +290,9 @@ function scoreFull(activeQ, answers, choiceIx) {
     ivS[v] = avg(v);
   });
   const fp = answerFingerprint(answers);
-  const mbtiResult = getMBTI(cog, fp);
-  const enn = getEnneagram(eS);
+  const mbtiResult = Scoring.getMBTI(cog, fp, true);
+  let enn = Scoring.getEnneagram(eS);
+  enn = Scoring.refineEnneagramForMbti(mbtiResult.mbti, enn, eS);
   const att = getAttachment(atS);
   const phi = getPhilosophy(phS);
   const instStack = getInstinctStack(ivS);
@@ -466,14 +468,9 @@ function runPattern(activeQ, pickAnswer) {
     if (q.type === 'mc' && q.choices && q.choices.length) {
       let ix = q.choices.findIndex((c) => c.s === raw);
       if (ix < 0) {
-        ix = 0;
-        let best = -1;
-        q.choices.forEach((c, ci) => {
-          if (c.s > best) {
-            best = c.s;
-            ix = ci;
-          }
-        });
+        const picked = Scoring.pickMcScoreForRaw(q, raw);
+        ix = q.choices.findIndex((c) => c.s === picked);
+        if (ix < 0) ix = 0;
       }
       choiceIx.push(ix);
     } else {

@@ -983,6 +983,9 @@ function stackDomConflicts(userDom, typeDom){
 }
 
 function getMBTI(cog){
+  if (typeof AnimusScoring !== 'undefined' && AnimusScoring.getMBTI) {
+    return AnimusScoring.getMBTI(cog, answerFingerprint());
+  }
   var stacks={
     INTJ:['Ni','Te','Fi','Se'], INTP:['Ti','Ne','Si','Fe'],
     INFJ:['Ni','Fe','Ti','Se'], INFP:['Fi','Ne','Si','Te'],
@@ -1226,6 +1229,9 @@ function score(){
   // ── DERIVED TYPES ──
   var mbti = getMBTI(cog);
   var ennResult = getEnneagram(eS);
+  if (typeof AnimusScoring !== 'undefined' && AnimusScoring.refineEnneagramForMbti) {
+    ennResult = AnimusScoring.refineEnneagramForMbti(mbti, ennResult, eS);
+  }
   var att = getAttachment(atS);
   var phi = getPhilosophy(phS);
   var instStack = getInstinctStack(ivS);

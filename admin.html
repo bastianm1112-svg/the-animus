@@ -11,6 +11,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/psyche-cross.js"></script>
+<script src="/js/animus-scoring-core.js"></script>
+<script src="/js/figures-library.js"></script>
 <script src="/js/profile-narratives.js"></script>
 <script src="/js/animus-shared.js"></script>
 <script>
@@ -77,6 +79,8 @@ var db = firebase.firestore();
         </div>
         <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.syncJsonFromQuick()">Merge quick fields into JSON</button>
         <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.hydrateEditorFromMbti()">Fill chart defaults from MBTI</button>
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.reconcileFromCog()">Recompute MBTI/Enn from cognition scores</button>
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.refreshFiguresAndNarratives()">Refresh figures + narratives</button>
       </div>
 
       <div class="admin-card">

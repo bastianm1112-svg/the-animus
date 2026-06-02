@@ -349,11 +349,77 @@
     }
   }
 
+  function reconcileFromCog() {
+    if (!targetUid) {
+      setStatus('Load a user first', 'err');
+      return;
+    }
+    var ta = document.getElementById('adminJson');
+    if (!ta) return;
+    try {
+      var snap = JSON.parse(ta.value || '{}');
+      if (!snap.cog || typeof snap.cog !== 'object') {
+        setStatus('Snapshot has no cognition scores — user must retake the test.', 'err');
+        return;
+      }
+      if (g.AnimusScoring && g.AnimusScoring.reconcileSnapshotTypes) {
+        delete snap._compareDerivedCog;
+        snap = g.AnimusScoring.reconcileSnapshotTypes(snap);
+      }
+      if (g.AnimusShared && g.AnimusShared.hydrateSparseProfile) {
+        snap = g.AnimusShared.hydrateSparseProfile(snap);
+      }
+      if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
+        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
+      }
+      fillQuickFields(snap);
+      ta.value = JSON.stringify(snap, null, 2);
+      setStatus(
+        'Recomputed MBTI ' +
+          snap.mbti +
+          ' and Enneagram ' +
+          snap.ennType +
+          'w' +
+          snap.ennWing +
+          ' from stored cognition. Save to publish.',
+        'ok'
+      );
+    } catch (e) {
+      setStatus('Invalid JSON: ' + e.message, 'err');
+    }
+  }
+
+  function refreshFiguresAndNarratives() {
+    if (!targetUid) {
+      setStatus('Load a user first', 'err');
+      return;
+    }
+    var ta = document.getElementById('adminJson');
+    if (!ta) return;
+    try {
+      var snap = JSON.parse(ta.value || '{}');
+      if (!snap.mbti) {
+        setStatus('Set MBTI first', 'err');
+        return;
+      }
+      if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
+        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
+      }
+      fillQuickFields(snap);
+      ta.value = JSON.stringify(snap, null, 2);
+      setStatus('Figures and narratives refreshed from library (canonical typings).', 'ok');
+    } catch (e) {
+      setStatus('Invalid JSON: ' + e.message, 'err');
+    }
+  }
+
   g.AnimusAdmin = {
     boot: boot,
     loadProfile: loadProfile,
     saveProfile: saveProfile,
     syncJsonFromQuick: syncJsonFromQuick,
-    hydrateEditorFromMbti: hydrateEditorFromMbti
+    hydrateEditorFromMbti: hydrateEditorFromMbti,
+    reconcileFromCog: reconcileFromCog,
+    refreshFiguresAndNarratives: refreshFiguresAndNarratives
   };
 })(typeof window !== 'undefined' ? window : globalThis);

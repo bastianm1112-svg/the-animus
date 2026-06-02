@@ -31,7 +31,7 @@ const PATTERNS = [
     name: '1. All neutral (blur baseline)',
     targets: {},
     expect: {
-      forbidMbti: ['ENTJ', 'INTJ'],
+      forbidMbti: ['ENTJ', 'INTJ', 'INTP', 'INFJ', 'ENTP'],
       cogFlat: true,
       polCentrist: true,
       ennTypeIn: ['9', '6', '2', '5', '1']
