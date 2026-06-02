@@ -190,6 +190,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/psyche-cross.js"></script>
 <script src="/js/profile-narratives.js"></script>
+<script src="/js/animus-i18n.js"></script>
 <script src="/js/animus-shared.js"></script>
 <script src="/js/compare-normalize.js"></script>
 <script>
@@ -233,13 +234,13 @@ var auth=firebase.auth(); var db=firebase.firestore();
     <div id="profileViewBanner" style="display:none;margin:12px 0 0;padding:10px 14px;background:rgba(200,169,110,0.08);border:1px solid var(--border2);font-size:12px;color:var(--muted2);line-height:1.5"></div>
     <div class="type-strip" id="typeStrip"><div class="type-badge" style="color:var(--muted)" id="typeStripPlaceholder" data-voice-you="Take the assessment to see your types" data-voice-they="%name% has not completed the assessment yet">Take the assessment to see your types</div></div>
     <div class="profile-tabs" id="profileTabs">
-      <button class="profile-tab active" data-panel="overview">Overview</button>
-      <button class="profile-tab" data-panel="cognition">Cognition</button>
-      <button class="profile-tab" data-panel="personality">Personality</button>
-      <button class="profile-tab" data-panel="philosophy">Philosophy</button>
-      <button class="profile-tab" data-panel="political">Political</button>
-      <button class="profile-tab" data-panel="social">Social</button>
-      <button class="profile-tab" data-panel="figures">Figures</button>
+      <button class="profile-tab active" data-panel="overview" data-en="Overview" data-es="Resumen">Overview</button>
+      <button class="profile-tab" data-panel="cognition" data-en="Cognition" data-es="Cognición">Cognition</button>
+      <button class="profile-tab" data-panel="personality" data-en="Personality" data-es="Personalidad">Personality</button>
+      <button class="profile-tab" data-panel="philosophy" data-en="Philosophy" data-es="Filosofía">Philosophy</button>
+      <button class="profile-tab" data-panel="political" data-en="Political" data-es="Política">Political</button>
+      <button class="profile-tab" data-panel="social" data-en="Social" data-es="Social">Social</button>
+      <button class="profile-tab" data-panel="figures" data-en="Figures" data-es="Figuras">Figures</button>
     </div>
   </div>
 </div>
@@ -649,6 +650,12 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
 <script src="/js/animus-nav.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  if (typeof AnimusI18n !== 'undefined' && typeof AnimusShared !== 'undefined') {
+    AnimusI18n.applyPageI18n(AnimusShared.getResolvedLang());
+  }
+  document.addEventListener('animus-lang-change', function (e) {
+    if (typeof AnimusI18n !== 'undefined') AnimusI18n.applyPageI18n((e.detail && e.detail.lang) || 'en');
+  });
   AnimusNav.mountTop('appNavMount', '');
   AnimusNav.mountBottom('appBottomMount', '');
   if (typeof firebase !== 'undefined' && firebase.auth && typeof AnimusSocial !== 'undefined') {

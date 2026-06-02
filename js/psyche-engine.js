@@ -3,6 +3,10 @@
   'use strict';
   var Q = g.AnimusQuestions.Q;
   var ES = g.AnimusQuestions.ES;
+  Q.forEach(function (q, i) { q._qIdx = i; });
+  if (g.AnimusI18n && g.AnimusI18n.bindQuestionEsIndex) {
+    g.AnimusI18n.bindQuestionEsIndex(Q, g.AnimusI18n.Q_ES);
+  }
   var Cross = g.AnimusCross || {};
   if (Cross.applyChoicePatches) Cross.applyChoicePatches(Q);
 
@@ -135,14 +139,34 @@ function refreshAnimusLang() {
 })();
 
 function updateIntroLang(){
-  document.querySelectorAll('[data-en]').forEach(function(el){
-    el.textContent = lang==='es' ? (el.getAttribute('data-es')||el.getAttribute('data-en')) : el.getAttribute('data-en');
-  });
-  // Translate import input placeholder
-  var inp = document.getElementById('importInput');
+  refreshAnimusLang();
+  if (typeof AnimusI18n !== 'undefined' && AnimusI18n.applyDomI18n) {
+    var intro = document.getElementById('intro');
+    AnimusI18n.applyDomI18n(intro || document, lang);
+  } else {
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      el.textContent = lang==='es' ? (el.getAttribute('data-es')||el.getAttribute('data-en')) : el.getAttribute('data-en');
+    });
+  }
+  var inp = document.getElementById('importInput') || document.getElementById('profileLinkInput');
   if(inp) inp.placeholder = lang==='es' ? 'Pegá un link de perfil acá...' : 'Paste a profile link here...';
   var fill = document.getElementById('fillInput');
   if(fill) fill.placeholder = lang==='es' ? 'Pegá un link incompleto acá...' : 'Paste incomplete profile link here...';
+}
+
+function localizedForQuestion(q, qIdx) {
+  if (typeof AnimusI18n !== 'undefined' && AnimusI18n.localizeQuestion) {
+    return AnimusI18n.localizeQuestion(q, lang, ES, qIdx);
+  }
+  var _esEntry = ES[q.t] || {};
+  return {
+    sec: q.sec || '',
+    text: (lang==='es' && (_esEntry.es_t || q.es_t)) ? (_esEntry.es_t || q.es_t) : q.t,
+    explain: lang==='es' ? (_esEntry.es || q.es || q.e || '') : (q.e || ''),
+    lo: q.lo,
+    hi: q.hi,
+    choices: (q.choices || []).map(function(c){ return { letter: c.l, text: c.t, score: c.s }; })
+  };
 }
 
 // Scale/agree option labels
@@ -580,26 +604,35 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
     document.getElementById('pbarFill').style.width = pct + '%';
     document.getElementById('qNum').textContent = (fillCur + 1) + ' / ' + filteredQ.length + ' (' + missingLabel + ')';
 
-    var _esEntry = ES[q.t] || {};
-    var qText = (lang==='es' && (_esEntry.es_t || q.es_t)) ? (_esEntry.es_t || q.es_t) : q.t;
-    var hasExplain = !!(q.e || _esEntry.es);
-    var explainText = lang==='es' ? (_esEntry.es || q.es || q.e || '') : (q.e || '');
+    var loc = localizedForQuestion(q, q._qIdx != null ? q._qIdx : Q.indexOf(q));
+    var qText = loc.text;
+    var hasExplain = !!(loc.explain || q.e);
+    var explainText = loc.explain || (q.e || '');
     var lbl = scaleLabels[lang] || scaleLabels['en'];
 
-    var html = '<div class="q-header-row"><div class="q-text">' + qText + '</div></div>';
+    var html = '<div class="q-header-row"><div class="q-text">' + escapeHTML(qText) + '</div></div>';
     if(hasExplain){
       html += '<button class="btn-explain" id="btnExplain"><span class="btn-explain-icon">◎</span>'
         + (lang==='es'?'SIMPLIFICAR PREGUNTA':'SIMPLIFY QUESTION') + '</button>';
       html += '<div class="explain-bubble" id="explainBubble">' + explainText + '</div>';
     }
 
-    if(q.type === 's'){
+    if(q.type === 'mc' && q.choices){
+      html += '<div class="mc-choices">';
+      (loc.choices.length ? loc.choices : q.choices.map(function(c){ return { letter:c.l, text:c.t, score:c.s }; })).forEach(function(c, ci){
+        var sel = fillAnswers[fillCur]===c.score ? ' selected' : '';
+        html += '<button class="mc-choice'+sel+'" data-v="'+c.score+'" data-ci="'+ci+'">'
+          + '<span class="mc-letter">'+c.letter+'</span>'
+          + '<div class="mc-content"><span class="mc-text">'+escapeHTML(c.text)+'</span></div></button>';
+      });
+      html += '</div>';
+    } else if(q.type === 's'){
       html += '<div class="scale-wrap"><div class="scale-row">';
       for(var i=1;i<=7;i++){
         var c = fillAnswers[fillCur]===i ? 'scale-btn sel' : 'scale-btn';
         html += '<button class="'+c+'" data-v="'+i+'">'+i+'</button>';
       }
-      html += '</div><div class="scale-lbls"><span>'+lbl.lo+'</span><span>'+lbl.hi+'</span></div></div>';
+      html += '</div><div class="scale-lbls"><span>'+escapeHTML(loc.lo || lbl.lo)+'</span><span>'+escapeHTML(loc.hi || lbl.hi)+'</span></div></div>';
     } else {
       html += '<div class="agree-grid">';
       for(var j=0;j<lbl.opts.length;j++){
@@ -745,19 +778,17 @@ function finishFill(filteredQ, fillAnswers, baseProfile){
 function renderQ(){
   refreshAnimusLang();
   var q=(window._activeQ||Q)[cur];
+  var loc = localizedForQuestion(q, cur);
   var pct=Math.round((cur/TOTAL)*100);
   document.getElementById('pbarFill').style.width=pct+'%';
   document.getElementById('qNum').textContent=(cur+1)+' / '+TOTAL;
-  document.getElementById('qSection').textContent=q.sec||'';
+  document.getElementById('qSection').textContent=loc.sec||'';
 
-  var _esEntry = ES[q.t] || {};
-  var qText = (lang==='es' && (_esEntry.es_t || q.es_t)) ? (_esEntry.es_t || q.es_t) : q.t;
-  var explainText = lang==='es'
-    ? (_esEntry.es || q.es || q.e || '')
-    : (q.e || _explainCache[cur] || '');
+  var qText = loc.text;
+  var explainText = loc.explain || (lang==='es' ? '' : (_explainCache[cur] || ''));
   var lbl = scaleLabels[lang]||scaleLabels['en'];
 
-  var h = '<div class="q-header-row"><div class="q-text">'+qText+'</div></div>';
+  var h = '<div class="q-header-row"><div class="q-text">'+escapeHTML(qText)+'</div></div>';
 
   // Always show simplify button
   h += '<button class="btn-explain" id="btnExplain">&#9711; '+(lang==='es'?'Simplificar pregunta':'Simplify question')+'</button>';
@@ -765,11 +796,11 @@ function renderQ(){
 
   if(q.type==='mc' && q.choices){
     h += '<div class="mc-choices">';
-    q.choices.forEach(function(c, ci){
-      var sel = (_choiceIx[cur]===ci || (answers[cur]===c.s && _choiceIx[cur]===undefined)) ? ' selected' : '';
-      h += '<button class="mc-choice'+sel+'" data-v="'+c.s+'" data-ci="'+ci+'">'
-        + '<span class="mc-letter">'+c.l+'</span>'
-        + '<div class="mc-content"><span class="mc-text">'+escapeHTML(c.t)+'</span></div>'
+    (loc.choices.length ? loc.choices : q.choices.map(function(c){ return { letter:c.l, text:c.t, score:c.s }; })).forEach(function(c, ci){
+      var sel = (_choiceIx[cur]===ci || (answers[cur]===c.score && _choiceIx[cur]===undefined)) ? ' selected' : '';
+      h += '<button class="mc-choice'+sel+'" data-v="'+c.score+'" data-ci="'+ci+'">'
+        + '<span class="mc-letter">'+c.letter+'</span>'
+        + '<div class="mc-content"><span class="mc-text">'+escapeHTML(c.text)+'</span></div>'
         + '</button>';
     });
     h += '</div>';
@@ -779,7 +810,7 @@ function renderQ(){
       var sc = answers[cur]===i ? 'scale-btn sel' : 'scale-btn';
       h += '<button class="'+sc+'" data-v="'+i+'">'+i+'</button>';
     }
-    h += '</div><div class="scale-lbls"><span>'+lbl.lo+'</span><span>'+lbl.hi+'</span></div></div>';
+    h += '</div><div class="scale-lbls"><span>'+escapeHTML(loc.lo || lbl.lo)+'</span><span>'+escapeHTML(loc.hi || lbl.hi)+'</span></div></div>';
   } else {
     var opts = lbl.opts;
     h += '<div class="agree-grid">';
@@ -1363,6 +1394,8 @@ var TABS=[
 ];
 
 function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
+  refreshAnimusLang();
+  var es = lang === 'es';
   var res=document.getElementById('results');
   res.style.display='block';
   setTestPhase('results');
@@ -1370,15 +1403,15 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
   // Hero
   var badge=isFallback
-    ?'<div class="ai-badge"><div class="ai-dot" style="background:#333"></div>LOCAL ANALYSIS</div>'
-    :'<div class="ai-badge"><div class="ai-dot" style="background:var(--accent)"></div>AI ANALYSIS</div>';
+    ?'<div class="ai-badge"><div class="ai-dot" style="background:#333"></div>'+(es?'ANÁLISIS LOCAL':'LOCAL ANALYSIS')+'</div>'
+    :'<div class="ai-badge"><div class="ai-dot" style="background:var(--accent)"></div>'+(es?'ANÁLISIS IA':'AI ANALYSIS')+'</div>';
 
-  var phiNames={'PH_STO':'Stoic','PH_EPI':'Epicurean','PH_KAN':'Kantian','PH_ARI':'Aristotelian','PH_NIE':'Nietzschean','PH_EXI':'Existentialist','PH_PRA':'Pragmatist','PH_SKE':'Skeptic'};
-  var attNames={'AT_SEC':'Secure','AT_ANX':'Anxious-Preoccupied','AT_AVO':'Dismissive-Avoidant','AT_DIS':'Fearful-Avoidant'};
-  var polLabel=(data.polX>5?'Econ Freedom':(data.polX<-5?'State Economy':'Mixed'))+'/'+(data.polY>5?'Authoritarian':(data.polY<-5?'Libertarian':'Moderate'));
+  var phiNames={'PH_STO':es?'Estoico':'Stoic','PH_EPI':es?'Epicúreo':'Epicurean','PH_KAN':es?'Kantiano':'Kantian','PH_ARI':es?'Aristotélico':'Aristotelian','PH_NIE':es?'Nietzscheano':'Nietzschean','PH_EXI':es?'Existencialista':'Existentialist','PH_PRA':es?'Pragmatista':'Pragmatist','PH_SKE':es?'Escéptico':'Skeptic'};
+  var attNames={'AT_SEC':es?'Seguro':'Secure','AT_ANX':es?'Ansioso-Preocupado':'Anxious-Preoccupied','AT_AVO':es?'Evitativo-Dismissivo':'Dismissive-Avoidant','AT_DIS':es?'Evitativo-Temeroso':'Fearful-Avoidant'};
+  var polLabel=(data.polX>5?(es?'Libertad económica':'Econ Freedom'):(data.polX<-5?(es?'Economía estatal':'State Economy'):(es?'Mixto':'Mixed')))+'/'+(data.polY>5?(es?'Autoritario':'Authoritarian'):(data.polY<-5?(es?'Libertario':'Libertarian'):(es?'Moderado':'Moderate')));
 
   document.getElementById('resHero').innerHTML=badge
-    +'<div class="res-eyebrow">Your Complete Profile</div>'
+    +'<div class="res-eyebrow">'+(es?'Tu perfil completo':'Your Complete Profile')+'</div>'
     +'<div class="res-type">'+mbti+'</div>'
     +'<div class="res-archetype">'+(sanitizeText(ai.mbtiName,2000)||'')+'</div>'
     +'<p class="res-tagline">'+(sanitizeText(ai.tagline,2000)||'')+'</p>'
@@ -1395,9 +1428,13 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'</div>';
 
   // Build tabs
+  var tabLbl = function (en, esKey) {
+    if (!es) return en;
+    return (typeof AnimusI18n !== 'undefined' && AnimusI18n.RESULT_TABS_ES && AnimusI18n.RESULT_TABS_ES[en]) || esKey || en;
+  };
   var tabsHtml='';
   TABS.forEach(function(t,i){
-    tabsHtml+='<div class="tab'+(i===0?' active':'')+'" data-tab="'+t.id+'">'+t.label+'</div>';
+    tabsHtml+='<div class="tab'+(i===0?' active':'')+'" data-tab="'+t.id+'">'+tabLbl(t.label, t.label)+'</div>';
   });
   document.getElementById('tabsBar').innerHTML=tabsHtml;
 

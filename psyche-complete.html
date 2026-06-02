@@ -390,14 +390,14 @@ if(window.top!==window.self){window.top.location=window.self.location;}
   </div>
   <!-- OBSERVER / ESTIMATOR MODE -->
   <div class="intro-observer">
-    <div class="intro-import-divider"><span>or estimate someone else's profile</span></div>
+    <div class="intro-import-divider"><span data-en="or estimate someone else's profile" data-es="o estimar el perfil de otra persona">or estimate someone else's profile</span></div>
     <div class="observer-card">
       <div class="observer-icon">?</div>
       <div class="observer-info">
-        <div class="observer-title">Test Estimator</div>
-        <div class="observer-desc">Answer based on someone's observed behaviors and habits ? not your own. Attach a name to save the estimated profile.</div>
+        <div class="observer-title" data-en="Test Estimator" data-es="Estimador de perfil">Test Estimator</div>
+        <div class="observer-desc" data-en="Answer based on someone's observed behaviors and habits — not your own. Attach a name to save the estimated profile." data-es="Respondé según los comportamientos y hábitos que observás en otra persona — no los tuyos. Agregá un nombre para guardar el perfil estimado.">Answer based on someone's observed behaviors and habits — not your own. Attach a name to save the estimated profile.</div>
       </div>
-      <button type="button" class="observer-btn" id="observerBtn">ESTIMATE ?</button>
+      <button type="button" class="observer-btn" id="observerBtn" data-en="ESTIMATE →" data-es="ESTIMAR →">ESTIMATE →</button>
     </div>
     <div class="observer-name-wrap" id="observerNameWrap" style="display:none">
       <input class="intro-import-input" id="observerName" type="text" placeholder="Enter their name (e.g. Marco, Mom, Friend)" maxlength="64" style="border-right:1px solid var(--border);width:100%" />
@@ -471,7 +471,9 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="/js/animus-i18n.js"></script>
 <script src="/js/psyche-questions.js"></script>
+<script src="/js/psyche-q-es.js"></script>
 <script src="/js/psyche-cross.js"></script>
 <script src="/js/profile-narratives.js"></script>
 <script src="/js/psyche-engine.js"></script>
@@ -482,6 +484,18 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <script src="/js/animus-nav.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  if (typeof AnimusI18n !== 'undefined' && typeof AnimusShared !== 'undefined') {
+    AnimusI18n.applyPageI18n(AnimusShared.getResolvedLang());
+    if (typeof AnimusQuestions !== 'undefined' && AnimusI18n.bindQuestionEsIndex) {
+      AnimusI18n.bindQuestionEsIndex(AnimusQuestions.Q, AnimusI18n.Q_ES);
+    }
+  }
+  document.addEventListener('animus-lang-change', function (e) {
+    if (typeof AnimusI18n !== 'undefined') {
+      AnimusI18n.applyPageI18n((e.detail && e.detail.lang) || 'en');
+      if (typeof renderQ === 'function') renderQ();
+    }
+  });
   AnimusNav.mountTop('appNavMount', 'test');
   AnimusNav.mountBottom('appBottomMount', 'test');
   if (typeof firebase !== 'undefined' && firebase.auth && typeof AnimusSocial !== 'undefined') {

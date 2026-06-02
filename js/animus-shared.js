@@ -221,6 +221,9 @@
     if (global.document && global.document.documentElement) {
       global.document.documentElement.lang = lang;
     }
+    if (global.AnimusI18n && global.AnimusI18n.applyPageI18n) {
+      global.AnimusI18n.applyPageI18n(lang);
+    }
     try {
       global.dispatchEvent(new CustomEvent('animus-lang-change', { detail: { lang: lang } }));
     } catch (e) {}

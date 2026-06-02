@@ -37,37 +37,37 @@
       ac(active, 'home') +
       '">' +
       SVG_HOME +
-      ' Home</a>' +
+      ' <span data-en="Home" data-es="Inicio">Home</span></a>' +
       '<a href="/settings" class="nav-item' +
       ac(active, 'settings') +
       '">' +
       SVG_SETTINGS +
-      ' Settings</a>' +
+      ' <span data-en="Settings" data-es="Ajustes">Settings</span></a>' +
       '<a href="/friends" class="nav-item' +
       ac(active, 'friends') +
       '">' +
       SVG_FRIENDS +
-      ' Friends</a>' +
+      ' <span data-en="Friends" data-es="Amigos">Friends</span></a>' +
       '<a href="/notifications" class="nav-item nav-item-notif' +
       ac(active, 'notifications') +
       '" id="navNotifBtn">' +
       SVG_BELL +
-      ' Notifications<div class="notif-badge" id="notifBadge"></div></a>' +
+      ' <span data-en="Notifications" data-es="Notificaciones">Notifications</span><div class="notif-badge" id="notifBadge"></div></a>' +
       '<a href="/test" class="nav-item' +
       ac(active, 'test') +
       '">' +
       SVG_TEST +
-      ' Take Test</a>' +
+      ' <span data-en="Take Test" data-es="Hacer test">Take Test</span></a>' +
       '<a href="/compare" class="nav-item' +
       ac(active, 'compare') +
       '">' +
       SVG_COMPARE +
-      ' Compare</a>' +
+      ' <span data-en="Compare" data-es="Comparar">Compare</span></a>' +
       '<a href="/types" class="nav-item' +
       ac(active, 'types') +
       '">' +
       SVG_TYPES +
-      ' Types</a>' +
+      ' <span data-en="Types" data-es="Tipos">Types</span></a>' +
       '</div>' +
       '<div class="nav-right">' +
       '<button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleThemeGlobal()" title="Toggle theme">' +
@@ -130,14 +130,25 @@
     );
   }
 
+  function applyNavLang() {
+    if (g.AnimusI18n && g.AnimusI18n.applyDomI18n) {
+      var lang = g.AnimusShared && g.AnimusShared.getResolvedLang
+        ? g.AnimusShared.getResolvedLang()
+        : 'en';
+      g.AnimusI18n.applyDomI18n(document, lang);
+    }
+  }
+
   function mountTop(rootId, active) {
     var root = document.getElementById(rootId);
     if (root) root.innerHTML = buildNavbar(active);
+    applyNavLang();
   }
 
   function mountBottom(rootId, active) {
     var root = document.getElementById(rootId);
     if (root) root.innerHTML = buildBottomNav(active);
+    applyNavLang();
   }
 
   function mount(rootId, active) {
