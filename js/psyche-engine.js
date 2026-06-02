@@ -1288,16 +1288,18 @@ function buildPrompt(data){
     +'Social interpretation: '+(data.polY<-60?'Strong libertarian / near-anarchist':data.polY<-30?'Libertarian':data.polY<-10?'Centre-libertarian':data.polY<10?'Moderate':data.polY<30?'Centre-authoritarian':data.polY<60?'Authoritarian':'Hard authoritarian')+'\n\n'
     +'IMPORTANT: Base ALL analysis on the actual scores above. Do NOT default to stereotype assumptions (INTJ, ENTJ, etc.). '
     +'This person is '+mbti+' type '+enn.type+'w'+enn.wing+'. Their dominant function is '+fnsSorted[0]+'. '
-    +'Be specific to THEIR actual profile — every narrative must match their actual scores.\n\n'
+    +'Be specific to THEIR actual profile — every narrative must match their actual scores.\n'
+    +'Write for the person reading their own profile: explain what each result MEANS for daily life, relationships, and decisions — not only what the label is. '
+    +'Use second person (you/your). Avoid textbook definitions without application.\n\n'
     +'Return a JSON object with EXACTLY these keys:\n'
     +'{\n'
     +'"mbtiName":"archetype name 3-4 words — specific to '+mbti+', NOT generic",\n'
     +'"tagline":"one sentence capturing '+mbti+' type '+enn.type+'w'+enn.wing+' essence",\n'
-    +'"cogNarrative":"2-3 paragraphs on '+mbti+' cognitive style — must reference '+fnsSorted[0]+' as dominant function and '+fnsSorted[1]+' as auxiliary. Describe how THEY think, not how INTJs think.",\n'
-    +'"ennNarrative":"2 paragraphs on type '+enn.type+'w'+enn.wing+' motivation and pattern — specific to this type, not generic enneagram text",\n'
-    +'"attNarrative":"1-2 paragraphs on '+att+' attachment pattern in relationships",\n'
-    +'"phiNarrative":"1-2 paragraphs on '+phi+' philosophical orientation",\n'
-    +'"politicalNarrative":"3 paragraphs: (1) Exact position for quadrant '+polQuadrant+' with X='+data.polX+' Y='+data.polY+' — name the specific ideology. (2) How their personality type '+mbti+' enn '+enn.type+'w'+enn.wing+' connects to this politics. (3) Genuine tensions and blind spots of this position.",\n'
+    +'"cogNarrative":"3 paragraphs: (1) How dominant '+fnsSorted[0]+' and auxiliary '+fnsSorted[1]+' work together for '+mbti+'. (2) What this feels like in daily decisions and stress. (3) What others misunderstand about their thinking.",\n'
+    +'"ennNarrative":"3 paragraphs on '+enn.type+'w'+enn.wing+': core fear/desire, how the wing shows up, and what this means in work and love — tied to '+mbti+', not generic Enneagram copy.",\n'
+    +'"attNarrative":"2 paragraphs on '+att+': what it means for closeness, conflict, and trust — practical, not clinical only.",\n'
+    +'"phiNarrative":"2-3 paragraphs on '+phi+': what this philosophical lens means for ethics, meaning, and how they judge ideas — applied to life.",\n'
+    +'"politicalNarrative":"4 paragraphs: (1) What X='+data.polX+' Y='+data.polY+' in '+polQuadrant+' means in plain language. (2) Economic values for them. (3) Social liberty vs order for them. (4) How '+mbti+' '+enn.type+'w'+enn.wing+' connects — plus real blind spots.",\n'
     +'"politicalIdeology":"specific label — e.g. Classical Liberal, Paleolibertarian, National Conservative, Democratic Socialist, Left-Libertarian",\n'
     +'"politicalIdeologyDesc":"3 sentences on what this ideology believes and why it fits polX='+data.polX+' polY='+data.polY+'",\n'
     +'"similarCountries":["5 countries matching polX='+data.polX+' polY='+data.polY+' — format \'Country: specific reason\'"],\n'
@@ -1880,9 +1882,9 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     mbtiName:sanitizeText(ai.mbtiName,2000)||'', tagline:sanitizeText(ai.tagline,2000)||'',
     socionics:sanitizeText(ai.socionics,2000)||'', keirsey:sanitizeText(ai.keirsey,2000)||'',
     figures:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeFigures(ai.figures):(ai.figures||[])),
-    cogNarrative:sanitizeText(ai.cogNarrative,2000)||'', ennNarrative:sanitizeText(ai.ennNarrative,2000)||'',
-    attNarrative:sanitizeText(ai.attNarrative,2000)||'', phiNarrative:sanitizeText(ai.phiNarrative,2000)||'',
-    politicalNarrative:sanitizeText(ai.politicalNarrative,2000)||'',
+    cogNarrative:sanitizeText(ai.cogNarrative,4000)||'', ennNarrative:sanitizeText(ai.ennNarrative,4000)||'',
+    attNarrative:sanitizeText(ai.attNarrative,4000)||'', phiNarrative:sanitizeText(ai.phiNarrative,4000)||'',
+    politicalNarrative:sanitizeText(ai.politicalNarrative,4000)||'',
     politicalIdeology:sanitizeText(ai.politicalIdeology,2000)||'',
     politicalIdeologyDesc:sanitizeText(ai.politicalIdeologyDesc,2000)||'',
     politicalStrengths:sanitizeText(ai.politicalStrengths,2000)||'',
@@ -2381,9 +2383,9 @@ showResults=function(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
         values:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.values,80,24):(ai.values||[])),
         figures:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeFigures(ai.figures):(ai.figures||[])),
         mbtiName:sanitizeText(ai.mbtiName,2000)||'',socionics:sanitizeText(ai.socionics,2000)||'',keirsey:sanitizeText(ai.keirsey,2000)||'',
-        cogNarrative:sanitizeText(ai.cogNarrative,2000)||'',ennNarrative:sanitizeText(ai.ennNarrative,2000)||'',
-        attNarrative:sanitizeText(ai.attNarrative,2000)||'',phiNarrative:sanitizeText(ai.phiNarrative,2000)||'',
-        politicalNarrative:sanitizeText(ai.politicalNarrative,2000)||'',
+        cogNarrative:sanitizeText(ai.cogNarrative,4000)||'',ennNarrative:sanitizeText(ai.ennNarrative,4000)||'',
+        attNarrative:sanitizeText(ai.attNarrative,4000)||'',phiNarrative:sanitizeText(ai.phiNarrative,4000)||'',
+        politicalNarrative:sanitizeText(ai.politicalNarrative,4000)||'',
         politicalThinkers:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.politicalThinkers,500,8):[]),
         similarPoliticians:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.similarPoliticians,500,8):[]),
         similarParties:(typeof AnimusShared!=='undefined'?AnimusShared.sanitizeStringArray(ai.similarParties,500,8):[]),

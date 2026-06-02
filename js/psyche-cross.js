@@ -7,7 +7,7 @@
     Ne: [{ fn: 'E7', w: 0.78 }, { fn: 'EP_INT', w: 0.42 }, { fn: 'TMP_CHO', w: 0.38 }],
     Ni: [{ fn: 'E5', w: 0.38 }, { fn: 'PH_NIE', w: 0.45 }, { fn: 'EP_INT', w: 0.35 }],
     Fi: [{ fn: 'E4', w: 0.74 }, { fn: 'MF_CARE', w: 0.62 }, { fn: 'E9', w: 0.22 }],
-    Fe: [{ fn: 'E2', w: 0.48 }, { fn: 'SOC_INT', w: 0.52 }, { fn: 'MF_CARE', w: 0.38 }],
+    Fe: [{ fn: 'E2', w: 0.32 }, { fn: 'SOC_INT', w: 0.52 }, { fn: 'MF_CARE', w: 0.38 }],
     Te: [{ fn: 'E3', w: 0.48 }, { fn: 'E8', w: 0.32 }, { fn: 'ET_VIR', w: 0.35 }, { fn: 'SOC_DOM', w: 0.4 }],
     Ti: [{ fn: 'E5', w: 0.5 }, { fn: 'EP_RAT', w: 0.58 }, { fn: 'PH_SKE', w: 0.42 }],
     Si: [{ fn: 'E1', w: 0.42 }, { fn: 'E6', w: 0.35 }, { fn: 'MF_LOY', w: 0.38 }, { fn: 'AL_SEN', w: 0.35 }],
@@ -107,10 +107,10 @@
       'Living in alignment with my own deep values, regardless of what others think': { Fi: 7, E4: 5, MF_CARE: 5 }
     },
     'When you walk into a room, you naturally:': {
-      'Read the emotional atmosphere and adjust to make everyone comfortable': { Fe: 7, E2: 6, SOC_INT: 6 }
+      'Read the emotional atmosphere and adjust to make everyone comfortable': { Fe: 7, E2: 4, SOC_INT: 6 }
     },
     'You feel most valuable when:': {
-      'Someone needs me and I\'m able to give them exactly what they need': { E2: 7, Fe: 6, MF_CARE: 6 }
+      'Someone needs me and I\'m able to give them exactly what they need': { E2: 5, Fe: 6, MF_CARE: 6 }
     }
   };
 

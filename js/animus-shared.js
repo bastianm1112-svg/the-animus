@@ -74,6 +74,8 @@
     'politicalIdeologyDesc', 'politicalStrengths', 'politicalWeaknesses',
     'aloneDesc', 'socialDesc', 'shadowDesc'
   ];
+  var PROFILE_NARRATIVE_MAX = 4000;
+  var PROFILE_SHORT_TEXT_MAX = 2000;
 
   var MBTI_ALL_TYPES = [
     'INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP',
@@ -126,6 +128,13 @@
     opts = opts || {};
     if (!snap || !snap.mbti) return false;
     if (opts.force) return true;
+    if (
+      (snap.cogNarrative && snap.cogNarrative.length < 520) ||
+      (snap.phiNarrative && snap.phiNarrative.length < 280) ||
+      (snap.politicalNarrative && snap.politicalNarrative.length < 400)
+    ) {
+      return true;
+    }
     if (narrativesReferenceWrongIdentity(snap)) return true;
     if (opts.previousLatest && narrativeIdentityKey(opts.previousLatest) !== narrativeIdentityKey(snap)) {
       return true;
@@ -248,7 +257,12 @@
   function sanitizeProfileSnapshot(snapshot) {
     var snap = Object.assign({}, snapshot || {});
     PROFILE_TEXT_KEYS.forEach(function (k) {
-      if (snap[k] != null) snap[k] = sanitizePlainText(snap[k], 2000);
+      if (snap[k] == null) return;
+      var maxLen =
+        k.indexOf('Narrative') >= 0 || k === 'politicalIdeologyDesc' || k === 'politicalStrengths' || k === 'politicalWeaknesses'
+          ? PROFILE_NARRATIVE_MAX
+          : PROFILE_SHORT_TEXT_MAX;
+      snap[k] = sanitizePlainText(snap[k], maxLen);
     });
     if (snap.values) snap.values = sanitizeStringArray(snap.values, 80, 24);
     if (snap.politicalThinkers) snap.politicalThinkers = sanitizeStringArray(snap.politicalThinkers, 500, 8);

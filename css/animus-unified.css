@@ -88,6 +88,15 @@
   margin-bottom: 16px;
 }
 
+.profile-content .narrative-sub {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+  margin-bottom: 10px;
+}
+
 .profile-content .card,
 .compare-content .dual-section {
   border-radius: 0;

@@ -185,7 +185,7 @@
 
     root.innerHTML = ''
       + '<p class="section-lead">' + escapeHTML(narr(voice, p.subj + ' process reality through <strong>' + sorted[0] + '</strong> first — the function stack below ranks all eight cognitive tools.', isOwner)) + '</p>'
-      + (snap.cogNarrative ? '<div class="narrative"><div class="narrative-title">Cognitive analysis</div><div class="narrative-text">'
+      + (snap.cogNarrative ? '<div class="narrative"><div class="narrative-title">What this means for you</div><div class="narrative-sub">Cognitive analysis</div><div class="narrative-text">'
         + escapeHTML(narr(voice, snap.cogNarrative, isOwner)) + '</div></div>' : '')
       + '<div class="cog-layout">'
       + '<div class="card"><div class="card-title">Function wheel</div>' + buildFnWheel(cog) + '</div>'
@@ -226,7 +226,7 @@
 
     root.innerHTML = ''
       + '<p class="section-lead">' + escapeHTML(narr(voice, 'Enneagram intensity across all nine types — peaks show motivation, not just the core type.', isOwner)) + '</p>'
-      + (snap.ennNarrative ? '<div class="narrative"><div class="narrative-title">Enneagram</div><div class="narrative-text">'
+      + (snap.ennNarrative ? '<div class="narrative"><div class="narrative-title">What this means for you</div><div class="narrative-sub">Enneagram motivation</div><div class="narrative-text">'
         + escapeHTML(narr(voice, snap.ennNarrative, isOwner)) + '</div></div>' : '')
       + '<div class="enn-hero card">'
       + '<div class="enn-hero-type"><span class="enn-hero-big">' + escapeHTML(snap.ennType || '—') + '</span>'
@@ -242,7 +242,7 @@
         return '<div class="tmp-row"><span>' + escapeHTML(TMP_LABELS[k]) + '</span>'
           + '<div class="tmp-track"><div class="tmp-fill" data-w="' + v + '"></div></div><em>' + v + '</em></div>';
       }).join('') : '<p class="muted">—</p>') + '</div></div></div>'
-      + (snap.attNarrative ? '<div class="card"><div class="card-title">Attachment</div><p class="att-blurb">'
+      + (snap.attNarrative ? '<div class="card"><div class="card-title">Attachment — what this means</div><p class="att-blurb">'
         + escapeHTML(narr(voice, snap.attNarrative, isOwner)) + '</p></div>' : '');
   }
 
@@ -267,7 +267,7 @@
           ? 'Philosophical schools scored in parallel — the shape shows where your moral reasoning anchors.'
           : 'Philosophical schools scored in parallel — the shape shows where ' + name + "'s moral reasoning anchors."
       ) + '</p>'
-      + (snap.phiNarrative ? '<div class="narrative"><div class="narrative-title">' + escapeHTML(phiName) + ' orientation</div><div class="narrative-text">'
+      + (snap.phiNarrative ? '<div class="narrative"><div class="narrative-title">What this means for you</div><div class="narrative-sub">' + escapeHTML(phiName) + ' orientation</div><div class="narrative-text">'
         + escapeHTML(narr(voice, snap.phiNarrative, isOwner)) + '</div></div>' : '')
       + '<div class="phi-layout">'
       + '<div class="card phi-radar-card"><div class="card-title">School radar</div>'

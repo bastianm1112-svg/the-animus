@@ -267,7 +267,7 @@
       + '<div class="pol-hero-chips">'
       + '<span class="pol-chip">' + escapeHTML(q.auth) + '</span>'
       + '<span class="pol-chip">' + escapeHTML(q.econ) + '</span></div></div>'
-      + (polText ? '<div class="narrative pol-narrative"><div class="narrative-text">' + polText + '</div></div>' : '')
+      + (polText ? '<div class="narrative pol-narrative"><div class="narrative-title">What this means for you</div><div class="narrative-sub">Political compass</div><div class="narrative-text">' + polText + '</div></div>' : '')
       + '<div class="pol-layout">'
       + '<div class="card pol-compass-card"><div class="card-title">Compass position</div>'
       + '<div class="pol-compass-wrap">' + buildCompassSvg(snap.polX, snap.polY) + '</div>'

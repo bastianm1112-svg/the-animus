@@ -254,17 +254,24 @@
     if (!priors || priors.indexOf(enn.type) >= 0) return enn;
 
     var currentScore = eS['E' + enn.type] || 0;
-    var bestType = enn.type;
-    var bestScore = currentScore;
+    var bestType = priors[0];
+    var bestScore = eS['E' + bestType] || 0;
 
     priors.forEach(function (p) {
       var sc = eS['E' + p] || 0;
-      if (sc >= currentScore - 4 && sc >= bestScore - 0.01) {
+      if (sc > bestScore) {
         bestType = p;
         bestScore = sc;
       }
     });
 
+    var marginToKeepRaw = 4;
+    if (enn.type === '2' && priors.indexOf('2') < 0) {
+      marginToKeepRaw = 2;
+    }
+    if (currentScore > bestScore + marginToKeepRaw) {
+      return enn;
+    }
     if (bestType === enn.type) return enn;
 
     var t = parseInt(bestType, 10);

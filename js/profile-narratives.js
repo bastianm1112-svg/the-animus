@@ -38,7 +38,12 @@ function buildFallbackNarrative(mbti,enn,att,phi,data){
     'Si': 'operates through detailed sensory memory and established procedure — you build reliable frameworks from accumulated experience and find security in what has proven to work.',
     'Se': 'operates through immediate sensory engagement — you are fully present to physical reality and respond to it with speed and precision that others often cannot match.'
   };
-  var cogNarr = 'As '+mbti+', your dominant function, '+dom+', '+(cogDesc[dom]||'shapes your entire cognitive architecture.')+'\n\nYour auxiliary function, '+aux+', '+(cogDesc[aux]||'provides crucial support.')+' Together these two functions create the characteristic '+mbti+' way of engaging with problems, people, and ideas that others around you likely recognize as distinctly yours.';
+  var cogNarr;
+  if (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.buildCogNarrative) {
+    cogNarr = ProfileNarrativeDepth.buildCogNarrative(mbti, dom, aux, cogDesc);
+  } else {
+    cogNarr = 'As '+mbti+', your dominant function, '+dom+', '+(cogDesc[dom]||'shapes your entire cognitive architecture.')+'\n\nYour auxiliary function, '+aux+', '+(cogDesc[aux]||'provides crucial support.')+' Together these two functions create the characteristic '+mbti+' way of engaging with problems, people, and ideas that others around you likely recognize as distinctly yours.';
+  }
 
   // Social/alone — based on E/I
   var isIntro = 'INFJ,INTJ,INFP,INTP,ISFJ,ISTJ,ISFP,ISTP'.indexOf(mbti) >= 0;
@@ -135,21 +140,35 @@ function buildFallbackNarrative(mbti,enn,att,phi,data){
     mbtiName: mm.n,
     tagline: mm.t,
     cogNarrative: cogNarr,
-    ennNarrative: 'Your Enneagram type '+enn.type+'w'+enn.wing+' (alongside '+mbti+') is driven by a core fear and desire that shapes major life decisions, even when invisible. The wing adds specific texture to how this motivation shows up day to day.'
-      + (enn.tritype ? '\n\nYour tritype of '+enn.tritype+' reflects how your head, heart, and gut centers each operate — a fuller map of motivation than the core type alone.' : ''),
-    attNarrative: 'Your attachment pattern shapes how you seek and experience closeness — the invisible architecture that determines what feels safe, what feels threatening, and what you do when vulnerability is required.',
-    phiNarrative: 'Your philosophical alignment toward '+phi.replace('PH_','')+' reflects a structural orientation that goes beyond intellectual preference — it shapes how you interpret knowledge, ethics, and the nature of reality.',
+    ennNarrative: (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.buildEnnNarrative)
+      ? ProfileNarrativeDepth.buildEnnNarrative(mbti, enn)
+      : 'Your Enneagram type '+enn.type+'w'+enn.wing+' (alongside '+mbti+') is driven by a core fear and desire that shapes major life decisions, even when invisible. The wing adds specific texture to how this motivation shows up day to day.'
+        + (enn.tritype ? '\n\nYour tritype of '+enn.tritype+' reflects how your head, heart, and gut centers each operate — a fuller map of motivation than the core type alone.' : ''),
+    attNarrative: (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.buildAttNarrative)
+      ? ProfileNarrativeDepth.buildAttNarrative(att, mbti, enn)
+      : 'Your attachment pattern shapes how you seek and experience closeness — the invisible architecture that determines what feels safe, what feels threatening, and what you do when vulnerability is required.',
+    phiNarrative: (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.buildPhiNarrative)
+      ? ProfileNarrativeDepth.buildPhiNarrative(phi, mbti, enn)
+      : 'Your philosophical alignment toward '+phi.replace('PH_','')+' reflects a structural orientation that goes beyond intellectual preference — it shapes how you interpret knowledge, ethics, and the nature of reality.',
     aloneDesc: aloneD,
     socialDesc: socialD,
     shadowDesc: shadowD,
     figures: figures,
     values: values,
     big5: big5,
-    politicalNarrative: polNarr[polQuad]+' Your compass position (X='+polX+', Y='+polY+') comes from your political answers. As '+mbti+' with Enneagram '+enn.type+'w'+enn.wing+', that placement fits how this type pattern often maps values onto economics and institutions — your scores determine the result, not the label alone.',
+    politicalNarrative: (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.buildPoliticalNarrative)
+      ? ProfileNarrativeDepth.buildPoliticalNarrative(mbti, enn, polX, polY, polQuad, polIdeology)
+      : polNarr[polQuad]+' Your compass position (X='+polX+', Y='+polY+') comes from your political answers. As '+mbti+' with Enneagram '+enn.type+'w'+enn.wing+', that placement fits how this type pattern often maps values onto economics and institutions — your scores determine the result, not the label alone.',
     politicalIdeology: polIdeology,
-    politicalIdeologyDesc: 'This position reflects a specific tradition with its own intellectual history, strengths, and genuine blind spots. Explore the political tab for a full analysis.',
-    politicalStrengths: 'This position has genuine intellectual coherence and real historical achievements. Its strongest moments tend to come when it operates within its core assumptions about human nature and the proper role of institutions.',
-    politicalWeaknesses: 'Every political position has blind spots that become visible under pressure. This position is most vulnerable when its foundational assumptions about human nature or institutional behavior prove incorrect in specific contexts.',
+    politicalIdeologyDesc: (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.buildPoliticalIdeologyDesc)
+      ? ProfileNarrativeDepth.buildPoliticalIdeologyDesc(polIdeology, polX, polY, polQuad)
+      : 'This position reflects a specific tradition with its own intellectual history, strengths, and genuine blind spots. Explore the political tab for a full analysis.',
+    politicalStrengths: (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.POL_QUAD_DEPTH && ProfileNarrativeDepth.POL_QUAD_DEPTH[polQuad])
+      ? 'Strengths of your ' + ProfileNarrativeDepth.POL_QUAD_DEPTH[polQuad].title + ' cluster: ' + ProfileNarrativeDepth.POL_QUAD_DEPTH[polQuad].forYou
+      : 'This position has genuine intellectual coherence and real historical achievements. Its strongest moments tend to come when it operates within its core assumptions about human nature and the proper role of institutions.',
+    politicalWeaknesses: (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.POL_QUAD_DEPTH && ProfileNarrativeDepth.POL_QUAD_DEPTH[polQuad])
+      ? 'Watch for: ' + ProfileNarrativeDepth.POL_QUAD_DEPTH[polQuad].blind
+      : 'Every political position has blind spots that become visible under pressure. This position is most vulnerable when its foundational assumptions about human nature or institutional behavior prove incorrect in specific contexts.',
     politicalThinkers: polCompare.politicalThinkers || ['Key thinkers in this tradition have shaped its most coherent arguments.'],
     similarCountries: polCompare.similarCountries || ['Country comparisons are derived from your economic and social axes.'],
     similarPoliticians: polCompare.similarPoliticians || ['Politician comparisons are derived from your economic and social axes.'],

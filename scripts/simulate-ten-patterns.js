@@ -130,6 +130,15 @@ const PATTERNS = [
     }
   },
   {
+    name: '10b. INTJ cognition + Fe helper spillover (no E2)',
+    targets: { Ni: 7, Te: 7, Ti: 6, Fe: 6, E2: 7, E5: 6, E1: 5, E3: 4 },
+    expect: {
+      mbti: ['INTJ'],
+      ennTypeIn: ['5', '1', '3', '6'],
+      forbidEnnType: ['2']
+    }
+  },
+  {
     name: '10. Lib-left + anxious attachment',
     targets: {
       PC_ECON_L: 7,
@@ -202,6 +211,9 @@ function validateExpect(r, exp, ctx) {
   }
   if (exp.ennTypeIn && exp.ennTypeIn.indexOf(r.enn.type) < 0) {
     issues.push('enn type want ' + exp.ennTypeIn.join('/') + ' got ' + r.enn.type + 'w' + r.enn.wing);
+  }
+  if (exp.forbidEnnType && exp.forbidEnnType.indexOf(r.enn.type) >= 0) {
+    issues.push('forbidden Enneagram type ' + r.enn.type + 'w' + r.enn.wing);
   }
   if (exp.attIn && exp.attIn.indexOf(r.att) < 0) {
     issues.push('attachment want ' + exp.attIn.join('/') + ' got ' + r.att);
