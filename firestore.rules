@@ -128,6 +128,24 @@ service cloud.firestore {
       allow delete: if isOwner(userId) || isAdmin();
     }
 
+    function testSessionRecordValid() {
+      return request.resource.data.keys().hasAll(['completedAt', 'testMode', 'items', 'resultSummary'])
+        && request.resource.data.completedAt is string
+        && request.resource.data.completedAt.size() <= 40
+        && request.resource.data.testMode is string
+        && request.resource.data.testMode.size() <= 16
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 320
+        && request.resource.data.resultSummary is map;
+    }
+
+    match /testSessions/{userId}/records/{recordId} {
+      allow read: if isAdmin();
+      allow create: if isOwner(userId) && testSessionRecordValid();
+      allow update, delete: if isAdmin();
+    }
+
     // Legacy collection — unused by app; deny all client access.
     match /notifications/{notifId} {
       allow read, write: if false;

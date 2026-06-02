@@ -897,9 +897,145 @@
     return stripCompareInternals(snap);
   }
 
+  var PROFILE_PRIVATE_KEYS = [
+    'answers', 'choiceIx', 'activeKeys', 'testItems', 'testResponses', 'items', 'questions'
+  ];
+
+  function stripPrivateFromProfileSnapshot(snapshot) {
+    var snap = Object.assign({}, snapshot || {});
+    PROFILE_PRIVATE_KEYS.forEach(function (k) {
+      delete snap[k];
+    });
+    return snap;
+  }
+
+  function buildTestSessionItems(activeQ, answers, choiceIx) {
+    if (!activeQ || !answers) return [];
+    var items = [];
+    var max = Math.min(activeQ.length, answers.length, 320);
+    for (var i = 0; i < max; i++) {
+      var q = activeQ[i];
+      if (!q) continue;
+      var raw = answers[i];
+      if (raw === null || raw === undefined) continue;
+      var item = {
+        index: i,
+        fn: sanitizePlainText(q.fn || '', 32),
+        type: sanitizePlainText(q.type || 'scale', 16),
+        question: sanitizePlainText(q.t || '', 500)
+      };
+      if (q.type === 'mc' && q.choices && choiceIx && choiceIx[i] >= 0 && q.choices[choiceIx[i]]) {
+        var ch = q.choices[choiceIx[i]];
+        item.choiceIndex = choiceIx[i];
+        item.answerRaw = raw;
+        item.answerLabel = sanitizePlainText(ch.t || '', 300);
+      } else {
+        item.answerRaw = raw;
+        item.answerLabel = String(raw);
+      }
+      items.push(item);
+    }
+    return items;
+  }
+
+  function saveTestSessionToFirestore(userId, sessionInput, options) {
+    options = options || {};
+    if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
+      return Promise.reject(new Error('Firestore unavailable'));
+    }
+    var authUser = firebase.auth && firebase.auth().currentUser;
+    if (!authUser || authUser.uid !== userId) {
+      return Promise.reject(new Error('Can only save your own test session'));
+    }
+
+    var items = buildTestSessionItems(
+      sessionInput.activeQ,
+      sessionInput.answers,
+      sessionInput.choiceIx
+    );
+    if (!items.length) {
+      return Promise.resolve(null);
+    }
+
+    var summary = sessionInput.resultSummary || {};
+    var payload = sanitizeForFirestore({
+      completedAt: sessionInput.completedAt || new Date().toISOString(),
+      testMode: sanitizePlainText(sessionInput.testMode || 'full', 16),
+      answerCount: items.length,
+      resultSummary: {
+        mbti: sanitizePlainText(summary.mbti || '', 8),
+        ennType: sanitizePlainText(summary.ennType || '', 8),
+        ennWing: sanitizePlainText(summary.ennWing || '', 8),
+        ennTritype: sanitizePlainText(summary.ennTritype || '', 16),
+        att: sanitizePlainText(summary.att || '', 16),
+        phi: sanitizePlainText(summary.phi || '', 16),
+        polX: typeof summary.polX === 'number' ? summary.polX : null,
+        polY: typeof summary.polY === 'number' ? summary.polY : null
+      },
+      items: items
+    });
+
+    var col = firebase.firestore().collection('testSessions').doc(userId).collection('records');
+    return col
+      .add(
+        Object.assign({}, payload, {
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+      )
+      .then(function (ref) {
+        return col
+          .orderBy('completedAt', 'desc')
+          .limit(25)
+          .get()
+          .then(function (snap) {
+            var toDelete = [];
+            snap.docs.forEach(function (doc, idx) {
+              if (idx >= 15) toDelete.push(doc.ref);
+            });
+            if (!toDelete.length) return ref.id;
+            var batch = firebase.firestore().batch();
+            toDelete.forEach(function (r) {
+              batch.delete(r);
+            });
+            return batch.commit().then(function () {
+              return ref.id;
+            });
+          });
+      });
+  }
+
+  function fetchTestSessionsForAdmin(userId, limit) {
+    limit = limit || 10;
+    if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
+      return Promise.resolve([]);
+    }
+    return isUserAdmin(
+      firebase.auth && firebase.auth().currentUser && firebase.auth().currentUser.uid
+    ).then(function (admin) {
+      if (!admin) {
+        return Promise.reject(new Error('Admin only'));
+      }
+      return firebase
+        .firestore()
+        .collection('testSessions')
+        .doc(userId)
+        .collection('records')
+        .orderBy('completedAt', 'desc')
+        .limit(limit)
+        .get()
+        .then(function (snap) {
+          return snap.docs.map(function (doc) {
+            var d = doc.data() || {};
+            d.id = doc.id;
+            return d;
+          });
+        });
+    });
+  }
+
   function enrichProfileSnapshot(snapshot, rawData, meta) {
     meta = meta || {};
-    var snap = sanitizeProfileSnapshot(Object.assign({}, snapshot));
+    var snap = sanitizeProfileSnapshot(stripPrivateFromProfileSnapshot(snapshot));
     var data = rawData || {};
     if (meta.adminEdit) {
       snap._typesLocked = true;
@@ -1244,6 +1380,9 @@
     saveProfileToFirestore: saveProfileToFirestore,
     adminSaveProfileToFirestore: adminSaveProfileToFirestore,
     profileHasAdminLock: profileHasAdminLock,
+    stripPrivateFromProfileSnapshot: stripPrivateFromProfileSnapshot,
+    saveTestSessionToFirestore: saveTestSessionToFirestore,
+    fetchTestSessionsForAdmin: fetchTestSessionsForAdmin,
     trySyncLocalResultToFirestore: trySyncLocalResultToFirestore,
     getResolvedLang: getResolvedLang,
     setResolvedLang: setResolvedLang,

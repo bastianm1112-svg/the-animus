@@ -37,6 +37,10 @@
   var MBTI_TIE_EPS = 0.5;
   var MBTI_STACK_TIE_GAP = 2.5;
   var MBTI_BLUR_PRIOR_BONUS = 0.35;
+  /** On near-flat cognition, avoid NT analyst types winning arbitrary ties. */
+  var MBTI_BLUR_COG_SPREAD_MAX = 14;
+  var MBTI_TIE_NT_PENALTY = 1.2;
+  var MBTI_TIE_NT_TYPES = { INTJ: 1, INTP: 1 };
   var ENN_TYPE_TIE_GAP = 2;
   var ENN_WING_TIE_GAP = 1.5;
   var ENN_BLUR_PRIOR_BONUS = 0.35;
@@ -112,10 +116,31 @@
   }
 
   function domBoostAmount(margin) {
-    if (margin < 4) return 0;
-    if (margin >= 12) return 16;
-    if (margin >= 8) return 12;
-    return 8;
+    if (margin < 5) return 0;
+    if (margin >= 14) return 12;
+    if (margin >= 9) return 8;
+    return 4;
+  }
+
+  function cogSpread(cog) {
+    var vals = ['Ni', 'Ne', 'Ti', 'Te', 'Fi', 'Fe', 'Si', 'Se'].map(function (k) {
+      return cog[k] != null ? Number(cog[k]) : 50;
+    });
+    var min = vals[0];
+    var max = vals[0];
+    vals.forEach(function (v) {
+      if (v < min) min = v;
+      if (v > max) max = v;
+    });
+    return max - min;
+  }
+
+  function mbtiTieAdjust(type, cog) {
+    var adj = type === POPULAR_MBTI ? MBTI_BLUR_PRIOR_BONUS : 0;
+    if (cogSpread(cog) < MBTI_BLUR_COG_SPREAD_MAX && MBTI_TIE_NT_TYPES[type]) {
+      adj -= MBTI_TIE_NT_PENALTY;
+    }
+    return adj;
   }
 
   function getMBTI(cog, fp, withMeta) {
@@ -170,7 +195,7 @@
           return {
             type: r.type,
             raw: r.score,
-            adj: r.score + (r.type === POPULAR_MBTI ? MBTI_BLUR_PRIOR_BONUS : 0)
+            adj: r.score + mbtiTieAdjust(r.type, cog)
           };
         });
         withPrior.sort(function (a, b) {

@@ -103,6 +103,12 @@ var db = firebase.firestore();
         </div>
       </div>
 
+      <details class="admin-advanced" id="adminTestSessionsWrap" hidden>
+        <summary>Test responses (admin only)</summary>
+        <p class="admin-hint">Raw questions and answers from completed tests. Not stored on public profiles — only in <code>testSessions</code>.</p>
+        <div id="adminTestSessionsList" class="admin-test-sessions"></div>
+      </details>
+
       <details class="admin-advanced">
         <summary>Advanced · raw JSON &amp; scoring tools</summary>
         <div class="admin-card admin-card-nested">

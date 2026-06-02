@@ -311,9 +311,82 @@
         } else {
           setStatus('Loaded. Change identity → Update preview → Publish changes.', 'ok');
         }
+        loadTestSessionsForTarget();
       })
       .catch(function (e) {
         setStatus(e.message || 'Load failed', 'err');
+      });
+  }
+
+  function formatSessionWhen(iso) {
+    if (!iso) return '—';
+    return String(iso).replace('T', ' ').slice(0, 19);
+  }
+
+  function renderTestSessions(sessions) {
+    var wrap = document.getElementById('adminTestSessionsWrap');
+    var list = document.getElementById('adminTestSessionsList');
+    if (!wrap || !list) return;
+
+    if (!sessions || !sessions.length) {
+      wrap.hidden = false;
+      list.innerHTML =
+        '<p class="admin-hint">No saved test responses yet. They are stored when the user completes a test while signed in (after this deploy).</p>';
+      return;
+    }
+
+    wrap.hidden = false;
+    var html = '';
+    sessions.forEach(function (sess, si) {
+      var sum = sess.resultSummary || {};
+      var label =
+        formatSessionWhen(sess.completedAt) +
+        ' · ' +
+        (sess.testMode || 'test') +
+        ' · ' +
+        (sum.mbti || '?') +
+        ' ' +
+        (sum.ennType || '') +
+        'w' +
+        (sum.ennWing || '') +
+        ' · ' +
+        (sess.items ? sess.items.length : 0) +
+        ' answers';
+      html +=
+        '<details class="admin-test-session"' +
+        (si === 0 ? ' open' : '') +
+        '><summary>' +
+        (g.AnimusShared ? g.AnimusShared.escapeHTML(label) : label) +
+        '</summary><ol class="admin-test-qa">';
+      (sess.items || []).forEach(function (item) {
+        var q = item.question || '(question)';
+        var a =
+          item.answerLabel != null && item.answerLabel !== ''
+            ? item.answerLabel
+            : item.answerRaw != null
+              ? String(item.answerRaw)
+              : '—';
+        html +=
+          '<li><span class="admin-test-q">' +
+          (g.AnimusShared ? g.AnimusShared.escapeHTML(q) : q) +
+          '</span><span class="admin-test-a">' +
+          (g.AnimusShared ? g.AnimusShared.escapeHTML(String(a)) : a) +
+          '</span></li>';
+      });
+      html += '</ol></details>';
+    });
+    list.innerHTML = html;
+  }
+
+  function loadTestSessionsForTarget() {
+    if (!targetUid || !g.AnimusShared || !g.AnimusShared.fetchTestSessionsForAdmin) {
+      return;
+    }
+    g.AnimusShared.fetchTestSessionsForAdmin(targetUid, 8)
+      .then(renderTestSessions)
+      .catch(function () {
+        var wrap = document.getElementById('adminTestSessionsWrap');
+        if (wrap) wrap.hidden = true;
       });
   }
 

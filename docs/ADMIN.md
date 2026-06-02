@@ -43,3 +43,13 @@ Rules live in `firestore.rules` at the repo root.
 - Invalid JSON or missing `mbti` is rejected before publish.
 - Each publish appends to profile `history` (last 10 entries) with `source: admin-edit`.
 - If edits “don’t stick,” ensure you **Publish** (not only preview) and that you are on the latest deploy with `adminSaveProfileToFirestore`.
+
+## Test responses (admin only)
+
+When a signed-in user finishes the test, questions and answers are saved to **`testSessions/{uid}/records`** (not on the public `profiles` document). In `/admin`, after loading a user, open **Test responses (admin only)**.
+
+Deploy **`firestore.rules`** so clients can write test sessions and only admins can read them:
+
+```bash
+firebase deploy --only firestore:rules
+```

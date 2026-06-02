@@ -1932,12 +1932,39 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
     function doSave(user) {
       if (!user || typeof AnimusShared === 'undefined') return;
+      var activeQ = window._activeQ || Q;
+      var choiceIx = _choiceIx ? _choiceIx.slice() : [];
+      var answersCopy = answers ? answers.slice() : [];
+
       AnimusShared.saveProfileToFirestore(user.uid, snapshot, {
         rawData: data,
         testMode: meta.testMode,
         answerCount: meta.answerCount,
         completedAt: meta.completedAt
       })
+        .then(function () {
+          if (AnimusShared.saveTestSessionToFirestore) {
+            return AnimusShared.saveTestSessionToFirestore(user.uid, {
+              activeQ: activeQ,
+              answers: answersCopy,
+              choiceIx: choiceIx,
+              testMode: meta.testMode,
+              completedAt: meta.completedAt,
+              resultSummary: {
+                mbti: snapshot.mbti,
+                ennType: snapshot.ennType,
+                ennWing: snapshot.ennWing,
+                ennTritype: snapshot.ennTritype,
+                att: snapshot.att,
+                phi: snapshot.phi,
+                polX: snapshot.polX,
+                polY: snapshot.polY
+              }
+            }).catch(function (e) {
+              console.warn('Test session save:', e);
+            });
+          }
+        })
         .then(onCloudSaved)
         .catch(function (e) {
           console.error('Profile save:', e);

@@ -57,6 +57,27 @@ if (esfp.mbti !== 'ESFP') {
   console.log('\nFAIL: ESFP-targeted run did not yield ESFP (got ' + esfp.mbti + ').');
   fail++;
 }
+['INTJ', 'INTP'].forEach(function (bad) {
+  if (neutral.mbti === bad) {
+    console.log('\nFAIL: Neutral run biased to ' + bad + '.');
+    fail++;
+  }
+  if (agree.mbti === bad) {
+    console.log('\nFAIL: Agree-all run biased to ' + bad + ' (got ' + agree.mbti + ').');
+    fail++;
+  }
+});
+const agreeTop = agree.mbtiMeta.ranked && agree.mbtiMeta.ranked[0];
+const agreeSecond = agree.mbtiMeta.ranked && agree.mbtiMeta.ranked[1];
+if (
+  agreeTop &&
+  agreeSecond &&
+  agreeTop.score > agreeSecond.score + 1 &&
+  ['INTJ', 'INTP'].indexOf(agreeTop.type) >= 0
+) {
+  console.log('\nFAIL: Agree-all uniquely top stack is ' + agreeTop.type + ' — NT skew.');
+  fail++;
+}
 if (neutral.polX !== 0 || neutral.polY !== 0) {
   console.log('\nWARN: Neutral political axes not centered:', neutral.polX, neutral.polY);
 }
