@@ -469,6 +469,9 @@
       })
       .then(function () {
         showToast('You and ' + escapeHTML(fromName) + ' are now friends!');
+        if (typeof g.AnimusXp !== 'undefined') {
+          g.AnimusXp.awardXp(db, user.uid, 'friend_accept');
+        }
         loadNotifs(user.uid);
         loadFriends(user.uid);
       })

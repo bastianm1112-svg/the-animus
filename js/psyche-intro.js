@@ -1,55 +1,23 @@
 /**
- * ANIMUS test page intro — isolated UI controller (loads before/after engine).
- * Buttons use direct handlers + no dependency on the large engine bundle parsing first.
+ * ANIMUS test page intro — main test only (100-question short mode).
  */
 (function (g) {
   'use strict';
 
-  var KEY_MODE = 'animus_test_mode';
   var KEY_PROGRESS = 'animus_test_progress';
 
   function el(id) {
     return document.getElementById(id);
   }
 
-  function setMode(mode) {
-    mode = mode === 'short' ? 'short' : 'full';
+  function setMainMode() {
     try {
-      localStorage.setItem(KEY_MODE, mode);
+      localStorage.setItem('animus_test_mode', 'short');
     } catch (e) {}
-
-    var fullBtn = el('modeFull');
-    var shortBtn = el('modeShort');
-    if (fullBtn) {
-      fullBtn.classList.toggle('active', mode === 'full');
-      fullBtn.setAttribute('aria-pressed', mode === 'full' ? 'true' : 'false');
-    }
-    if (shortBtn) {
-      shortBtn.classList.toggle('active', mode === 'short');
-      shortBtn.setAttribute('aria-pressed', mode === 'short' ? 'true' : 'false');
-    }
-    var metaQ = el('metaQ');
-    var metaMin = el('metaMin');
-    if (metaQ) metaQ.textContent = mode === 'full' ? '280' : '100';
-    if (metaMin) metaMin.textContent = mode === 'full' ? '~30' : '~12';
-    g.__animusTestMode = mode;
-
+    g.__animusTestMode = 'short';
     if (g.AnimusPsyche && typeof g.AnimusPsyche.setTestMode === 'function') {
-      g.AnimusPsyche.setTestMode(mode);
+      g.AnimusPsyche.setTestMode('short');
     }
-  }
-
-  function loadMode() {
-    var saved = 'full';
-    if (g.AnimusShared && typeof g.AnimusShared.getSavedTestMode === 'function') {
-      saved = g.AnimusShared.getSavedTestMode();
-    } else {
-      try {
-        saved = localStorage.getItem(KEY_MODE) || 'full';
-      } catch (e) {}
-    }
-    if (g.location.search.indexOf('mode=short') > -1) saved = 'short';
-    setMode(saved === 'short' ? 'short' : 'full');
   }
 
   function showResume() {
@@ -90,28 +58,11 @@
   }
 
   function bindIntro() {
-    loadMode();
+    setMainMode();
     showResume();
 
-    var fullBtn = el('modeFull');
-    var shortBtn = el('modeShort');
     var startBtn = el('startBtn');
     var resumeBtn = el('resumeTestBtn');
-
-    if (fullBtn) {
-      fullBtn.onclick = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        setMode('full');
-      };
-    }
-    if (shortBtn) {
-      shortBtn.onclick = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        setMode('short');
-      };
-    }
     if (startBtn) {
       startBtn.onclick = function (e) {
         e.preventDefault();
@@ -136,11 +87,11 @@
 
   g.AnimusIntro = {
     refresh: function () {
-      loadMode();
+      setMainMode();
       showResume();
     },
     onEngineReady: function () {
-      loadMode();
+      setMainMode();
       showResume();
     }
   };

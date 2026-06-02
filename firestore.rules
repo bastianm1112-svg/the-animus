@@ -98,6 +98,41 @@ service cloud.firestore {
         && (!profileFieldsChanged() || userTextFieldsValid());
     }
 
+    function entitlementsUnchanged() {
+      return !('entitlements' in request.resource.data)
+        || request.resource.data.entitlements == resource.data.get('entitlements', {
+          'detailedTest': false, 'testEstimator': false, 'animusPlus': false, 'animusPlusUntil': null
+        });
+    }
+
+    function retentionKeysOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['compareUsage', 'xp', 'lastXpReason', 'lastXpAt', 'lastDailyInsight']);
+    }
+
+    function compareUsageIncrementValid() {
+      return resource.data.get('entitlements', {}).get('animusPlus', false) == true
+        || (
+          request.resource.data.get('compareUsage', {}).count is int
+          && request.resource.data.get('compareUsage', {}).count >= 0
+          && request.resource.data.get('compareUsage', {}).count <= 10
+        );
+    }
+
+    function ownerRetentionUpdate(userId) {
+      return isOwner(userId)
+        && retentionKeysOnly()
+        && compareUsageIncrementValid();
+    }
+
+    function ownerProfileUpdateSafe(userId) {
+      return ownerProfileUpdate(userId) && entitlementsUnchanged();
+    }
+
+    function adminUserUpdate(userId) {
+      return isAdmin();
+    }
+
     match /users/{userId} {
       allow read: if signedIn();
       allow create: if isOwner(userId)
@@ -105,9 +140,11 @@ service cloud.firestore {
         && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false);
       allow update: if signedIn()
         && (
-          ownerProfileUpdate(userId)
+          ownerProfileUpdateSafe(userId)
+          || ownerRetentionUpdate(userId)
           || incomingFriendRequest(userId)
           || peerAcceptFriend(userId)
+          || adminUserUpdate(userId)
         );
       allow delete: if isOwner(userId);
     }

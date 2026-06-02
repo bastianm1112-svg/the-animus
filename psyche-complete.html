@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="/css/animus-unified.css">
 <link rel="stylesheet" href="/css/animus-release.css">
 <link rel="stylesheet" href="/css/animus-test.css">
+<link rel="stylesheet" href="/css/animus-shop.css">
 <script src="/js/animus-app.js" defer></script>
 <style>
 :root {
@@ -366,54 +367,17 @@ if(window.top!==window.self){window.top.location=window.self.location;}
   <div class="intro-title">ANI<em>MUS</em></div>
   <div class="intro-subtitle" data-en="Know thyself completely" data-es="Con?cete completamente">Know thyself completely</div>
   <div class="intro-rule"></div>
-  <p class="intro-desc" data-en="The most comprehensive personality instrument available. Maps your cognitive architecture, philosophical orientation, political geometry, attachment patterns, moral foundations, and the full depth of who you are ? alone and with others." data-es="La herramienta de personalidad m?s completa que existe. Mapea tu arquitectura cognitiva, orientaci?n filos?fica, geometr?a pol?tica, patrones de apego, fundamentos morales y la profundidad total de qui?n sos ? solo y con los dem?s.">The most comprehensive personality instrument available. Maps your cognitive architecture, philosophical orientation, political geometry, attachment patterns, moral foundations, and the full depth of who you are ? alone and with others.</p>
+  <p class="intro-desc" data-en="Map your cognitive architecture, philosophical orientation, political geometry, attachment patterns, and moral foundations — the core of who you are." data-es="Mapea tu arquitectura cognitiva, orientación filosófica, geometría política, patrones de apego y fundamentos morales — el núcleo de quién eres.">Map your cognitive architecture, philosophical orientation, political geometry, attachment patterns, and moral foundations — the core of who you are.</p>
   <div class="intro-actions">
-  <div class="intro-mode-toggle" id="introModeToggle">
-    <button type="button" class="intro-mode-btn active" id="modeFull" data-intro-action="mode-full" aria-pressed="true">
-      <span class="mode-label" data-en="Full" data-es="Completo">Full</span>
-      <span class="mode-sub" data-en="280 questions ? ~30 min" data-es="280 preguntas ? ~30 min">280 questions ? ~30 min</span>
-    </button>
-    <button type="button" class="intro-mode-btn" id="modeShort" data-intro-action="mode-short" aria-pressed="false">
-      <span class="mode-label" data-en="Short" data-es="Corto">Short</span>
-      <span class="mode-sub" data-en="100 questions ? ~12 min" data-es="100 preguntas ? ~12 min">100 questions ? ~12 min</span>
-    </button>
-  </div>
-  <div class="intro-meta">
-    <div class="intro-meta-item"><strong id="metaQ">280</strong><span data-en="Questions" data-es="Preguntas">Questions</span></div>
+  <div class="intro-main-label">Main Test</div>
+  <div class="intro-meta intro-meta-compact">
     <div class="intro-meta-item"><strong>14</strong><span data-en="Dimensions" data-es="Dimensiones">Dimensions</span></div>
-    <div class="intro-meta-item"><strong id="metaMin">~30</strong><span data-en="Minutes" data-es="Minutos">Minutes</span></div>
   </div>
   <button type="button" class="btn-primary" id="startBtn" data-intro-action="start" data-en="BEGIN" data-es="COMENZAR">BEGIN</button>
   <p id="resumeTestWrap" style="display:none;font-size:10px;color:var(--muted2);letter-spacing:0.08em;">
-    <button type="button" id="resumeTestBtn" class="intro-import-btn" style="margin-top:8px;width:auto;padding:8px 16px;">RESUME WHERE YOU LEFT OFF ?</button>
+    <button type="button" id="resumeTestBtn" class="intro-import-btn" style="margin-top:8px;width:auto;padding:8px 16px;">RESUME WHERE YOU LEFT OFF →</button>
   </p>
-  </div>
-  <!-- OBSERVER / ESTIMATOR MODE -->
-  <div class="intro-observer">
-    <div class="intro-import-divider"><span data-en="or estimate someone else's profile" data-es="o estimar el perfil de otra persona">or estimate someone else's profile</span></div>
-    <div class="observer-card">
-      <div class="observer-icon">?</div>
-      <div class="observer-info">
-        <div class="observer-title" data-en="Test Estimator" data-es="Estimador de perfil">Test Estimator</div>
-        <div class="observer-desc" data-en="Answer based on someone's observed behaviors and habits — not your own. Attach a name to save the estimated profile." data-es="Respondé según los comportamientos y hábitos que observás en otra persona — no los tuyos. Agregá un nombre para guardar el perfil estimado.">Answer based on someone's observed behaviors and habits — not your own. Attach a name to save the estimated profile.</div>
-      </div>
-      <button type="button" class="observer-btn" id="observerBtn" data-en="ESTIMATE →" data-es="ESTIMAR →">ESTIMATE →</button>
-    </div>
-    <div class="observer-name-wrap" id="observerNameWrap" style="display:none">
-      <input class="intro-import-input" id="observerName" type="text" placeholder="Enter their name (e.g. Marco, Mom, Friend)" maxlength="64" style="border-right:1px solid var(--border);width:100%" />
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:0.04em">Answer each question as you observe this person to behave ? not how you think they should.</div>
-      <button type="button" class="intro-import-btn" id="startObserverBtn" style="margin-top:10px;width:100%">BEGIN ESTIMATOR ?</button>
-    </div>
-  </div>
-
-  <div class="intro-import">
-    <div class="intro-import-divider"><span data-en="or open an existing profile" data-es="o abrir un perfil existente">or open an existing profile</span></div>
-    <div class="intro-import-row">
-      <input class="intro-import-input" id="profileLinkInput" maxlength="4096" placeholder="Paste profile link here..." aria-label="Profile link" />
-      <button type="button" class="intro-import-btn" id="profileLinkBtn">OPEN ?</button>
-    </div>
-    <div class="intro-import-error" id="profileLinkError"></div>
-    <p class="intro-import-hint">Opens a complete profile or continues an incomplete link with only the missing sections.</p>
+  <p class="intro-shop-hint">Want more depth? Unlock the <a href="/shop">Detailed Test</a> in the Shop.</p>
   </div>
 </div>
 
@@ -423,10 +387,8 @@ if(window.top!==window.self){window.top.location=window.self.location;}
     <a href="/" class="qhdr-logo">ANI<span>MUS</span></a>
     <div class="qhdr-right">
       <span class="qhdr-section" id="qSection"></span>
-      <span class="qhdr-num" id="qNum">1 / ?</span>
     </div>
   </div>
-  <div class="pbar-wrap"><div class="pbar-fill" id="pbarFill"></div></div>
   <div class="qbody" id="qBody"></div>
 </div>
 
@@ -473,6 +435,8 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 
 <script src="/js/animus-scoring-core.js"></script>
 <script src="/js/animus-i18n.js"></script>
+<script src="/js/animus-entitlements.js"></script>
+<script src="/js/animus-xp.js"></script>
 <script src="/js/psyche-questions.js"></script>
 <script src="/js/psyche-q-es.js"></script>
 <script src="/js/psyche-cross.js"></script>

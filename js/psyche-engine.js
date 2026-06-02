@@ -187,25 +187,58 @@ function shuffle(arr){
 }
 
 // ── TEST MODE ──
-var testMode = 'full';
+var testMode = 'short';
+
+function applyRouteTestMode() {
+  var params = new URLSearchParams(window.location.search);
+  var mode = params.get('mode');
+  if (mode === 'detailed') testMode = 'full';
+  else if (mode === 'estimator') testMode = 'estimator';
+  else testMode = 'short';
+  if (mode === 'estimator') {
+    var name = params.get('name');
+    if (name) {
+      observerMode = true;
+      observerSubjectName = decodeURIComponent(name).substring(0, 64);
+    }
+  }
+  return mode;
+}
+
+function entitlementGateForMode(userData) {
+  if (typeof AnimusEntitlements === 'undefined') return null;
+  if (testMode === 'full' && !AnimusEntitlements.hasEntitlement(userData, 'detailedTest')) {
+    return 'Unlock the Detailed Test in the Shop to continue.';
+  }
+  if (testMode === 'estimator' && !AnimusEntitlements.hasEntitlement(userData, 'testEstimator')) {
+    return 'Unlock the Test Estimator in the Shop to continue.';
+  }
+  return null;
+}
+
+function configureIntroForMode() {
+  var mode = applyRouteTestMode();
+  var intro = document.getElementById('intro');
+  if (!intro || !mode || mode === 'short') return;
+  var title = intro.querySelector('.intro-subtitle');
+  var label = intro.querySelector('.intro-main-label');
+  var hint = intro.querySelector('.intro-shop-hint');
+  if (mode === 'detailed') {
+    if (title) title.textContent = 'Detailed Test';
+    if (label) label.textContent = 'Detailed Test';
+    if (hint) hint.style.display = 'none';
+  } else if (mode === 'estimator') {
+    if (title) title.textContent = 'Profile Estimator';
+    if (label) label.textContent = 'Estimator';
+    if (hint) hint.style.display = 'none';
+  }
+}
 
 function setTestMode(mode) {
-  testMode = mode === 'short' ? 'short' : 'full';
+  if (mode === 'estimator') testMode = 'estimator';
+  else if (mode === 'full' || mode === 'detailed') testMode = 'full';
+  else testMode = 'short';
   try { localStorage.setItem(AnimusShared.KEYS.testMode, testMode); } catch(e){}
-  var fullBtn = document.getElementById('modeFull');
-  var shortBtn = document.getElementById('modeShort');
-  if(fullBtn){
-    fullBtn.classList.toggle('active', testMode === 'full');
-    fullBtn.setAttribute('aria-pressed', testMode === 'full' ? 'true' : 'false');
-  }
-  if(shortBtn){
-    shortBtn.classList.toggle('active', testMode === 'short');
-    shortBtn.setAttribute('aria-pressed', testMode === 'short' ? 'true' : 'false');
-  }
-  var metaQ = document.getElementById('metaQ');
-  var metaMin = document.getElementById('metaMin');
-  if(metaQ) metaQ.textContent = testMode === 'full' ? '280' : '100';
-  if(metaMin) metaMin.textContent = testMode === 'full' ? '~30' : '~12';
 }
 
 function saveTestProgress() {
@@ -233,9 +266,10 @@ function clearTestProgress() {
 function loadSavedTestMode() {
   var saved = null;
   try { saved = localStorage.getItem(AnimusShared.KEYS.testMode); } catch(e){}
-  if(saved === 'short' || saved === 'full') return saved;
-  if(window.location.search.indexOf('mode=short') > -1) return 'short';
-  return 'full';
+  if(saved === 'short' || saved === 'full' || saved === 'estimator') return saved;
+  if(window.location.search.indexOf('mode=detailed') > -1) return 'full';
+  if(window.location.search.indexOf('mode=estimator') > -1) return 'estimator';
+  return 'short';
 }
 
 function showResumePromptIfNeeded() {
@@ -330,21 +364,22 @@ function poolForAlloc(fn, byTag) {
 function buildActiveQuestionSet() {
   var activeQ;
   _choiceIx = [];
-  if (testMode === 'short') {
+  if (testMode === 'short' || testMode === 'estimator') {
     var pools = buildTaggedPools();
     var byTag = pools.byTag;
     var qKey = pools.qKey;
     var used = {};
     activeQ = [];
-    Object.keys(SHORT_ALLOC).forEach(function (fn) {
-      var alloc = SHORT_ALLOC[fn];
+    var alloc = testMode === 'estimator' ? ESTIMATOR_ALLOC : SHORT_ALLOC;
+    Object.keys(alloc).forEach(function (fn) {
+      var count = alloc[fn];
       var p = poolForAlloc(fn, byTag);
-      var mcCount = Math.floor(alloc / 2);
-      var sCount = alloc - mcCount;
+      var mcCount = Math.floor(count / 2);
+      var sCount = count - mcCount;
       var gotMc = takeUniqueQuestions(p.mc, mcCount, used, qKey);
       var gotS = takeUniqueQuestions(p.s, sCount, used, qKey);
       activeQ = activeQ.concat(gotMc).concat(gotS);
-      var need = alloc - gotMc.length - gotS.length;
+      var need = count - gotMc.length - gotS.length;
       if (need > 0) {
         activeQ = activeQ.concat(takeUniqueQuestions(p.mc.concat(p.s), need, used, qKey));
       }
@@ -371,17 +406,60 @@ var SHORT_ALLOC = {
   TMP_CHO: 1, TMP_MEL: 1, TMP_SAN: 1, TMP_PHL: 1
 };
 
+var ESTIMATOR_ALLOC = {
+  Ni: 3, Ne: 3, Ti: 3, Te: 3, Fi: 3, Fe: 3, Si: 2, Se: 2,
+  E1: 1, E2: 1, E3: 1, E4: 1, E5: 1, E6: 1, E7: 1, E8: 1, E9: 1,
+  PC_ECON_R: 2, PC_ECON_L: 2, PC_AUTH: 2, PC_LIB: 2,
+  PH_NIE: 1, PH_STO: 1, PH_KAN: 1, PH_ARI: 1,
+  ET_VIR: 1, ET_CON: 1,
+  AT_SEC: 2, AT_ANX: 2, AT_AVO: 2, AT_DIS: 2,
+  IV_SP: 1, IV_SOC: 1,
+  TMP_CHO: 1, TMP_MEL: 1
+};
+
 function startTest() {
-  buildActiveQuestionSet();
-  answers = new Array(TOTAL).fill(null);
-  cur = 0;
-  _explainCache = {};
-  clearTestProgress();
-  document.getElementById('intro').style.display='none';
-  document.getElementById('quiz').style.display='block';
-  setTestPhase('quiz');
-  renderQ();
-  saveTestProgress();
+  function launch() {
+    buildActiveQuestionSet();
+    answers = new Array(TOTAL).fill(null);
+    cur = 0;
+    _explainCache = {};
+    clearTestProgress();
+    document.getElementById('intro').style.display='none';
+    document.getElementById('quiz').style.display='block';
+    setTestPhase('quiz');
+    if(observerMode && observerSubjectName){
+      var logo = document.querySelector('.qhdr-logo');
+      if(logo) logo.innerHTML = 'ANI<span>MUS</span> <span class="qhdr-est">ESTIMATOR</span>';
+      document.getElementById('qSection').textContent = 'Estimating: ' + observerSubjectName;
+    } else if(testMode === 'full') {
+      document.getElementById('qSection').textContent = 'Detailed Test';
+    } else {
+      document.getElementById('qSection').textContent = 'Main Test';
+    }
+    renderQ();
+    saveTestProgress();
+  }
+
+  if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+    var user = firebase.auth().currentUser;
+    firebase.firestore().collection('users').doc(user.uid).get().then(function(doc){
+      var data = doc.exists ? doc.data() : {};
+      var gate = entitlementGateForMode(data);
+      if(gate){
+        alert(gate);
+        window.location.href = '/shop';
+        return;
+      }
+      launch();
+    }).catch(function(){ launch(); });
+    return;
+  }
+  if(testMode === 'full' || testMode === 'estimator'){
+    alert('Sign in and unlock this feature in the Shop.');
+    window.location.href = '/shop';
+    return;
+  }
+  launch();
 }
 
 
@@ -525,35 +603,12 @@ function doFillGapsFromProfile(profile, missingDims) {
 var observerMode = false;
 var observerSubjectName = '';
 
-document.getElementById('observerBtn').addEventListener('click', function(){
-  var wrap = document.getElementById('observerNameWrap');
-  var isOpen = wrap.style.display !== 'none';
-  wrap.style.display = isOpen ? 'none' : 'flex';
-  if(!isOpen) document.getElementById('observerName').focus();
-});
-
-document.getElementById('startObserverBtn').addEventListener('click', function(){
-  var name = document.getElementById('observerName').value.trim();
-  if(!name){ document.getElementById('observerName').style.borderColor='var(--red)'; return; }
+configureIntroForMode();
+if (applyRouteTestMode() === 'estimator' && observerSubjectName) {
   observerMode = true;
-  observerSubjectName = name;
-  // Start the test in full mode for the observer
-  var activeQ = Q.slice();
-  shuffle(activeQ);
-  window._activeQ = activeQ;
   window._observerMode = true;
-  window._observerName = name;
-  TOTAL = activeQ.length;
-  answers = new Array(TOTAL).fill(null);
-  cur = 0;
-  _explainCache = {};
-  document.getElementById('intro').style.display='none';
-  document.getElementById('quiz').style.display='block';
-  setTestPhase('quiz');
-  document.querySelector('.qhdr-logo').innerHTML = 'ANI<span>MUS</span> <span class="qhdr-est">ESTIMATOR</span>';
-  document.getElementById('qSection').textContent = 'Estimating: ' + name;
-  renderQ();
-});
+  window._observerName = observerSubjectName;
+}
 
 // Which fn codes belong to which dimension
 var DIM_FNS = {
@@ -601,8 +656,11 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
   function renderFill(){
     var q = filteredQ[fillCur];
     var pct = Math.round((fillCur / filteredQ.length) * 100);
-    document.getElementById('pbarFill').style.width = pct + '%';
-    document.getElementById('qNum').textContent = (fillCur + 1) + ' / ' + filteredQ.length + ' (' + missingLabel + ')';
+    var pct = Math.round((fillCur / filteredQ.length) * 100);
+    var pbar = document.getElementById('pbarFill');
+    var qNum = document.getElementById('qNum');
+    if (pbar) pbar.style.width = pct + '%';
+    if (qNum) qNum.textContent = (fillCur + 1) + ' / ' + filteredQ.length + ' (' + missingLabel + ')';
 
     var loc = localizedForQuestion(q, q._qIdx != null ? q._qIdx : Q.indexOf(q));
     var qText = loc.text;
@@ -779,10 +837,12 @@ function renderQ(){
   refreshAnimusLang();
   var q=(window._activeQ||Q)[cur];
   var loc = localizedForQuestion(q, cur);
-  var pct=Math.round((cur/TOTAL)*100);
-  document.getElementById('pbarFill').style.width=pct+'%';
-  document.getElementById('qNum').textContent=(cur+1)+' / '+TOTAL;
-  document.getElementById('qSection').textContent=loc.sec||'';
+  var qSection = document.getElementById('qSection');
+  if(qSection && !observerMode && testMode !== 'full'){
+    qSection.textContent = (qSection.textContent.indexOf('Main') > -1 ? 'Main Test' : qSection.textContent) || loc.sec || '';
+  } else if(qSection && loc.sec && !observerMode && testMode === 'full'){
+    qSection.textContent = 'Detailed Test';
+  }
 
   var qText = loc.text;
   var explainText = loc.explain || (lang==='es' ? '' : (_explainCache[cur] || ''));
@@ -1963,6 +2023,12 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
             }).catch(function (e) {
               console.warn('Test session save:', e);
             });
+          }
+        })
+        .then(function () {
+          if (typeof AnimusXp !== 'undefined' && user) {
+            var xpReason = observerMode ? 'estimator_complete' : 'test_complete';
+            return AnimusXp.awardXp(firebase.firestore(), user.uid, xpReason);
           }
         })
         .then(onCloudSaved)

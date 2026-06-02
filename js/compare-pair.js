@@ -564,8 +564,26 @@
             : themProfile;
 
         if (myProfile && themProfile) {
+          if (g.AnimusEntitlements && !g.AnimusEntitlements.canCompare(myUser)) {
+            setCompareResultsState('is-empty');
+            clearDemoCompat();
+            var verdict = document.getElementById('compatVerdict');
+            if (verdict) {
+              verdict.textContent =
+                'You have used all ' +
+                g.AnimusEntitlements.FREE_COMPARES_PER_MONTH +
+                ' free compares this month. Get Animus Plus in the Shop for unlimited compares.';
+            }
+            return;
+          }
           setCompareResultsState('is-ready');
           generateComparison(myProfile, themProfile, myName, themName);
+          if (g.AnimusEntitlements) {
+            g.AnimusEntitlements.recordCompareUsage(db, currentUser.uid, myUser);
+          }
+          if (g.AnimusXp) {
+            g.AnimusXp.awardXp(db, currentUser.uid, 'compare');
+          }
         } else {
           setCompareResultsState('is-pending');
           clearDemoCompat();

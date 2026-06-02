@@ -1,0 +1,198 @@
+.shop-page {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 88px 20px calc(var(--mbn-h, 64px) + var(--safe-bottom, 0px) + 32px);
+}
+.shop-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 8vw, 52px);
+  letter-spacing: 0.08em;
+  color: var(--white, #f0ece4);
+  margin-bottom: 8px;
+}
+.shop-sub {
+  color: var(--muted2, #888);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.shop-plus-status {
+  font-size: 12px;
+  color: var(--gold, #c8a96e);
+  letter-spacing: 0.06em;
+  margin-bottom: 28px;
+}
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.shop-card {
+  background: var(--surface, #111);
+  border: 1px solid var(--border, #1e1e1e);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+.shop-card-featured {
+  border-color: var(--gold, #c8a96e);
+  box-shadow: 0 0 0 1px rgba(200, 169, 110, 0.15);
+}
+.shop-deal-banner {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  background: linear-gradient(90deg, #8a6f3e, #c8a96e);
+  color: #000;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.shop-card-featured .shop-card-title {
+  margin-top: 28px;
+}
+.shop-deal-save {
+  font-size: 9px;
+  opacity: 0.85;
+}
+.shop-card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.06em;
+  color: var(--white, #f0ece4);
+}
+.shop-card-desc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted2, #888);
+  flex: 1;
+}
+.shop-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+.shop-price {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: var(--gold, #c8a96e);
+}
+.shop-buy-btn {
+  background: var(--gold, #c8a96e);
+  color: #000;
+  border: none;
+  padding: 10px 18px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  min-height: 44px;
+}
+.shop-buy-btn:hover {
+  filter: brightness(1.08);
+}
+.shop-owned {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green, #6fcf97);
+}
+
+.xp-bar-wrap {
+  margin: 16px 0 24px;
+  padding: 14px 16px;
+  background: var(--surface, #111);
+  border: 1px solid var(--border, #1e1e1e);
+}
+.xp-bar-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.xp-level { color: var(--gold, #c8a96e); }
+.xp-points { color: var(--muted2, #888); }
+.xp-bar-track {
+  height: 6px;
+  background: var(--border, #1e1e1e);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8a6f3e, #c8a96e);
+  transition: width 0.4s ease;
+}
+
+.activity-estimator {
+  margin: 0 0 28px;
+  padding: 18px;
+  border: 1px solid var(--border2, #2a2a2a);
+  background: var(--surface, #111);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+.activity-estimator-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+}
+.activity-estimator-desc {
+  font-size: 13px;
+  color: var(--muted2, #888);
+  max-width: 420px;
+}
+.activity-estimator-cta {
+  background: transparent;
+  border: 1px solid var(--gold, #c8a96e);
+  color: var(--gold, #c8a96e);
+  padding: 10px 16px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  min-height: 44px;
+}
+.activity-estimator-locked {
+  opacity: 0.7;
+}
+.shop-open-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.intro-main-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 0.12em;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.intro-meta-compact {
+  margin-bottom: 32px;
+}
+.intro-shop-hint {
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--muted2);
+  letter-spacing: 0.04em;
+}
+.intro-shop-hint a {
+  color: var(--accent);
+}

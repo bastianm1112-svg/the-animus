@@ -1168,7 +1168,14 @@
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           friends: [],
           friendRequests: { sent: [], received: [] },
-          language: localStorage.getItem(KEYS.lang) || 'en'
+          language: localStorage.getItem(KEYS.lang) || 'en',
+          entitlements: g.AnimusEntitlements
+            ? g.AnimusEntitlements.defaultEntitlements()
+            : { detailedTest: false, testEstimator: false, animusPlus: false, animusPlusUntil: null },
+          compareUsage: g.AnimusEntitlements
+            ? g.AnimusEntitlements.defaultCompareUsage()
+            : { monthKey: '', count: 0 },
+          xp: g.AnimusEntitlements ? g.AnimusEntitlements.defaultXp() : { total: 0, level: 1 }
         };
         return db
           .collection('users')

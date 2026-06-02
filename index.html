@@ -663,6 +663,8 @@ footer {
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="/js/animus-entitlements.js"></script>
+<script src="/js/animus-xp.js"></script>
 <script src="/js/animus-shared.js"></script>
 <script>
 AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
@@ -689,6 +691,7 @@ var db = firebase.firestore();
     <p>Take the assessment to unlock your full profile and daily insights.</p>
     <a href="/test">Begin assessment</a>
   </div>
+  <div id="homeXpMount"></div>
   <div class="daily-fact-card" id="dailyFactCard">
     <div class="daily-fact-label" id="dailyFactLabel">Daily insight</div>
     <p class="daily-fact-text" id="dailyFactText">Loading?</p>
@@ -696,16 +699,16 @@ var db = firebase.firestore();
   <h2 class="home-prompt">What would you like to do today?</h2>
   <div class="home-actions">
     <a href="/test" class="home-action-card primary">
-      <span class="home-action-title">Take test</span>
-      <span class="home-action-desc">Full or short assessment</span>
+      <span class="home-action-title">Main test</span>
+      <span class="home-action-desc">Your core personality assessment</span>
     </a>
-    <a href="/profile" class="home-action-card">
-      <span class="home-action-title">Your profile</span>
-      <span class="home-action-desc">View your latest results</span>
+    <a href="/activity" class="home-action-card">
+      <span class="home-action-title">Activity</span>
+      <span class="home-action-desc">Friends, requests, and updates</span>
     </a>
-    <a href="/friends" class="home-action-card">
-      <span class="home-action-title">Friends</span>
-      <span class="home-action-desc">Add people and see activity</span>
+    <a href="/shop" class="home-action-card">
+      <span class="home-action-title">Shop</span>
+      <span class="home-action-desc">Detailed test, estimator, and Plus</span>
     </a>
     <a href="/compare" class="home-action-card">
       <span class="home-action-title">Compare</span>

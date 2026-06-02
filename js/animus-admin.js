@@ -314,6 +314,7 @@
           setStatus('Loaded. Change identity → Update preview → Publish changes.', 'ok');
         }
         loadTestSessionsForTarget();
+        loadEntitlementsIntoForm();
       })
       .catch(function (e) {
         setStatus(e.message || 'Load failed', 'err');
@@ -606,6 +607,59 @@
     });
   }
 
+  function loadEntitlementsIntoForm() {
+    if (!targetUid) return;
+    db.collection('users')
+      .doc(targetUid)
+      .get()
+      .then(function (doc) {
+        var ent =
+          g.AnimusEntitlements && doc.exists
+            ? g.AnimusEntitlements.normalizeUserEntitlements(doc.data())
+            : { detailedTest: false, testEstimator: false, animusPlus: false };
+        var d = document.getElementById('adminEntDetailed');
+        var e = document.getElementById('adminEntEstimator');
+        var p = document.getElementById('adminEntPlus');
+        if (d) d.checked = !!ent.detailedTest;
+        if (e) e.checked = !!ent.testEstimator;
+        if (p) p.checked = g.AnimusEntitlements && g.AnimusEntitlements.hasAnimusPlus(doc.data());
+      });
+  }
+
+  function saveEntitlements() {
+    if (!targetUid) {
+      setStatus('Load a user first', 'err');
+      return;
+    }
+    var ent = {
+      detailedTest: document.getElementById('adminEntDetailed') && document.getElementById('adminEntDetailed').checked,
+      testEstimator: document.getElementById('adminEntEstimator') && document.getElementById('adminEntEstimator').checked,
+      animusPlus: document.getElementById('adminEntPlus') && document.getElementById('adminEntPlus').checked,
+      animusPlusUntil: null
+    };
+    if (ent.animusPlus) {
+      var until = new Date();
+      until.setMonth(until.getMonth() + 1);
+      ent.animusPlusUntil = until.toISOString();
+    }
+    db.collection('users')
+      .doc(targetUid)
+      .set(
+        {
+          entitlements: ent,
+          entitlementsGrantedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          entitlementsGrantedBy: adminUid || 'admin'
+        },
+        { merge: true }
+      )
+      .then(function () {
+        setStatus('Entitlements saved for user.', 'ok');
+      })
+      .catch(function (e) {
+        setStatus(e.message || 'Could not save entitlements', 'err');
+      });
+  }
+
   g.AnimusAdmin = {
     boot: boot,
     loadProfile: loadProfile,
@@ -613,6 +667,7 @@
     updatePreview: updatePreview,
     saveProfile: saveProfile,
     reconcileFromCog: reconcileFromCog,
-    unlockTypes: unlockTypes
+    unlockTypes: unlockTypes,
+    saveEntitlements: saveEntitlements
   };
 })(typeof window !== 'undefined' ? window : globalThis);

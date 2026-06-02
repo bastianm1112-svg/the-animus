@@ -11,6 +11,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/psyche-cross.js"></script>
+<script src="/js/animus-entitlements.js"></script>
 <script src="/js/animus-scoring-core.js"></script>
 <script src="/js/figures-library.js"></script>
 <script src="/js/profile-narrative-depth.js"></script>
@@ -102,6 +103,21 @@ var db = firebase.firestore();
           <a href="/" class="admin-btn-secondary admin-btn-link">Done</a>
         </div>
       </div>
+
+      <details class="admin-advanced" open>
+        <summary>Entitlements · Shop access</summary>
+        <div class="admin-card admin-card-nested">
+          <p class="admin-hint">Grant paid features on this account for free.</p>
+          <div class="admin-ent-grid">
+            <label class="admin-ent-check"><input type="checkbox" id="adminEntDetailed" /> Detailed Test ($10)</label>
+            <label class="admin-ent-check"><input type="checkbox" id="adminEntEstimator" /> Test Estimator ($10)</label>
+            <label class="admin-ent-check"><input type="checkbox" id="adminEntPlus" /> Animus Plus ($5/mo)</label>
+          </div>
+          <div class="admin-actions" style="margin-top:12px">
+            <button type="button" class="admin-btn-primary" onclick="AnimusAdmin.saveEntitlements()">Save entitlements</button>
+          </div>
+        </div>
+      </details>
 
       <details class="admin-advanced" id="adminTestSessionsWrap" hidden>
         <summary>Test responses (admin only)</summary>

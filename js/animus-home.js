@@ -55,7 +55,7 @@
       }
       setMemberMode(true);
       if (location.hash === '#friends') {
-        g.location.replace('/friends');
+        g.location.replace('/activity');
         return;
       }
 
@@ -107,6 +107,10 @@
               })
               .catch(function () {});
           }
+          if (g.AnimusXp) {
+            g.AnimusXp.renderXpBar(document.getElementById('homeXpMount'), userData);
+          }
+          window.__animusHomeUserData = userData;
         });
 
       var profilePromise =
@@ -127,6 +131,9 @@
             var fact = g.AnimusDailyFacts.pickDailyFact(profile, user.uid);
             factEl.textContent = fact.text;
             if (factLabel) factLabel.textContent = 'Daily insight · ' + fact.label;
+            if (g.AnimusXp && window.__animusHomeUserData) {
+              g.AnimusXp.awardDailyInsightIfNew(db, user.uid, window.__animusHomeUserData);
+            }
           }
           var banner = document.getElementById('onboardingBanner');
           if (banner) {
