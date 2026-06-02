@@ -188,6 +188,16 @@ function getEnneagram(eS) {
   return { type, wing };
 }
 
+function getPhilosophy(phS) {
+  const types = ['PH_STO', 'PH_EPI', 'PH_KAN', 'PH_ARI', 'PH_NIE', 'PH_EXI', 'PH_PRA', 'PH_SKE'];
+  return types.reduce((a, b) => ((phS[a] || 0) >= (phS[b] || 0) ? a : b), types[0]);
+}
+
+function getInstinctStack(ivS) {
+  const order = Object.keys(ivS).sort((a, b) => (ivS[b] || 0) - (ivS[a] || 0));
+  return order.map((k) => k.replace('IV_', '')).join('/');
+}
+
 function getAttachment(atS) {
   const types = ['AT_SEC', 'AT_ANX', 'AT_AVO', 'AT_DIS'];
   let best = types[0];
@@ -270,10 +280,20 @@ function scoreFull(activeQ, answers, choiceIx) {
   ['AT_SEC', 'AT_ANX', 'AT_AVO', 'AT_DIS'].forEach((a) => {
     atS[a] = avg(a);
   });
+  const phS = {};
+  ['PH_STO', 'PH_EPI', 'PH_KAN', 'PH_ARI', 'PH_NIE', 'PH_EXI', 'PH_PRA', 'PH_SKE'].forEach((p) => {
+    phS[p] = avg(p);
+  });
+  const ivS = {};
+  ['IV_SP', 'IV_SOC', 'IV_SX'].forEach((v) => {
+    ivS[v] = avg(v);
+  });
   const fp = answerFingerprint(answers);
   const mbtiResult = getMBTI(cog, fp);
   const enn = getEnneagram(eS);
   const att = getAttachment(atS);
+  const phi = getPhilosophy(phS);
+  const instStack = getInstinctStack(ivS);
   const econL = avg('PC_ECON_L');
   const econR = avg('PC_ECON_R');
   const auth = avg('PC_AUTH');
@@ -288,6 +308,10 @@ function scoreFull(activeQ, answers, choiceIx) {
     enn,
     ennScores: eS,
     att,
+    attScores: atS,
+    phi,
+    phiScores: phS,
+    instStack,
     polX,
     polY,
     fp
