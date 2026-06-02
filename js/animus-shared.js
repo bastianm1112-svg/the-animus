@@ -136,6 +136,47 @@
     return false;
   }
 
+  function shouldSkipCogReconcile(snap, opts) {
+    opts = opts || {};
+    if (opts.skipReconcile) return true;
+    if (snap && (snap._typesLocked || snap.adminEditedAt)) return true;
+    return false;
+  }
+
+  /** Align charts + dimension scores with declared MBTI / Enneagram (admin overrides). */
+  function applyIdentityPanelsSync(snap) {
+    snap = Object.assign({}, snap || {});
+    var mbti = snap.mbti ? String(snap.mbti).toUpperCase().trim() : '';
+    if (!mbti) return snap;
+
+    var CN = global.AnimusCompareNormalize;
+    if (CN && CN.MBTI_COG && CN.MBTI_COG[mbti]) {
+      snap.cog = Object.assign({}, CN.MBTI_COG[mbti]);
+      snap._hasRealCog = true;
+      delete snap._compareDerivedCog;
+    }
+
+    if (CN && CN.spreadEnn) {
+      snap.enn = CN.spreadEnn(snap);
+    }
+    if (CN && CN.spreadPhiS) {
+      snap.phiS = CN.spreadPhiS(snap);
+    }
+    if (CN && CN.spreadIv) {
+      snap.iv = CN.spreadIv(snap);
+    }
+    if (CN && CN.spreadAtt2) {
+      snap.att2 = CN.spreadAtt2(snap);
+    }
+    if (CN && CN.deriveBig5FromCog && snap.cog) {
+      snap.big5 = CN.deriveBig5FromCog(snap.cog);
+    }
+
+    snap = fillMbtiBasics(snap);
+    snap._identitySyncedAt = new Date().toISOString();
+    return snap;
+  }
+
   function refreshSnapshotNarratives(snap, opts) {
     opts = opts || {};
     snap = Object.assign({}, snap || {});
@@ -146,8 +187,21 @@
       return snap;
     }
 
-    snap = hydrateSparseProfile(snap);
-    if (global.AnimusScoring && global.AnimusScoring.reconcileSnapshotTypes && snap.cog && !snap._compareDerivedCog) {
+    if (opts.syncPanels !== false && (opts.force || snap._typesLocked || snap.adminEditedAt)) {
+      snap = applyIdentityPanelsSync(snap);
+    }
+
+    snap = fillMbtiBasics(Object.assign({}, snap));
+    if (global.AnimusCompareNormalize && global.AnimusCompareNormalize.normalizeProfileForDisplay) {
+      snap = global.AnimusCompareNormalize.normalizeProfileForDisplay(snap) || snap;
+    }
+    if (
+      !shouldSkipCogReconcile(snap, opts) &&
+      global.AnimusScoring &&
+      global.AnimusScoring.reconcileSnapshotTypes &&
+      snap.cog &&
+      !snap._compareDerivedCog
+    ) {
       snap = global.AnimusScoring.reconcileSnapshotTypes(snap);
       snap = fillMbtiBasics(snap);
     }
@@ -747,16 +801,24 @@
     return score;
   }
 
-  function pickBestProfileSnapshot(profileDocData) {
+  function pickBestProfileSnapshot(profileDocData, opts) {
+    opts = opts || {};
     if (!profileDocData || typeof profileDocData !== 'object') return null;
+
     var latest = profileDocData.latest;
     if (latest && typeof latest === 'object' && latest.mbti) {
-      latest = refreshSnapshotNarratives(sanitizeProfileSnapshot(latest), {});
-      if (profileSnapshotScore(latest) >= 25) return latest;
+      latest = sanitizeProfileSnapshot(Object.assign({}, latest));
+      if (!opts.rawLatest) {
+        latest = refreshSnapshotNarratives(latest, {
+          skipReconcile: shouldSkipCogReconcile(latest, opts)
+        });
+      }
+      return latest;
     }
+
     var candidates = [];
     (profileDocData.history || []).forEach(function (entry) {
-      if (entry && entry.snapshot && typeof entry.snapshot === 'object') {
+      if (entry && entry.snapshot && typeof entry.snapshot === 'object' && entry.snapshot.mbti) {
         candidates.push(entry.snapshot);
       }
     });
@@ -769,7 +831,12 @@
         best = snap;
       }
     });
-    if (best) best = refreshSnapshotNarratives(sanitizeProfileSnapshot(best), {});
+    if (best) {
+      best = sanitizeProfileSnapshot(Object.assign({}, best));
+      if (!opts.rawLatest) {
+        best = refreshSnapshotNarratives(best, { skipReconcile: shouldSkipCogReconcile(best, opts) });
+      }
+    }
     return best;
   }
 
@@ -796,12 +863,14 @@
     return snap;
   }
 
-  function hydrateSparseProfile(snap) {
+  function hydrateSparseProfile(snap, opts) {
+    opts = opts || {};
     snap = fillMbtiBasics(Object.assign({}, snap || {}));
     if (global.AnimusCompareNormalize && global.AnimusCompareNormalize.normalizeProfileForDisplay) {
       snap = global.AnimusCompareNormalize.normalizeProfileForDisplay(snap) || snap;
     }
     if (
+      !shouldSkipCogReconcile(snap, opts) &&
       global.AnimusScoring &&
       global.AnimusScoring.reconcileSnapshotTypes &&
       snap &&
@@ -815,16 +884,24 @@
   }
 
   function enrichProfileSnapshot(snapshot, rawData, meta) {
+    meta = meta || {};
     var snap = sanitizeProfileSnapshot(Object.assign({}, snapshot));
     var data = rawData || {};
+    if (meta.adminEdit) {
+      snap._typesLocked = true;
+      snap.adminEditedAt = snap.adminEditedAt || new Date().toISOString();
+      snap = applyIdentityPanelsSync(snap);
+    }
     snap.soc = socDisplayFromRaw(snap.soc || data.soc);
     snap.alone = aloneDisplayFromRaw(snap.alone || data.alone);
-    snap.completedAt = (meta && meta.completedAt) || snap.completedAt || new Date().toISOString();
-    snap.testMode = (meta && meta.testMode) || snap.testMode || 'full';
-    snap.answerCount = (meta && meta.answerCount) || snap.answerCount || null;
+    snap.completedAt = meta.completedAt || snap.completedAt || new Date().toISOString();
+    snap.testMode = meta.testMode || snap.testMode || 'full';
+    snap.answerCount = meta.answerCount || snap.answerCount || null;
     snap = refreshSnapshotNarratives(snap, {
-      force: !!(meta && meta.forceRefreshNarratives),
-      previousLatest: meta && meta.previousLatest
+      force: !!meta.forceRefreshNarratives,
+      previousLatest: meta.previousLatest,
+      skipReconcile: shouldSkipCogReconcile(snap, meta),
+      syncPanels: meta.adminEdit ? true : undefined
     });
     snap.categories = buildExportCategories(snap);
     return sanitizeForFirestore(snap);
@@ -862,7 +939,10 @@
       .then(function (doc) {
         var latest = doc.exists && doc.data().latest ? doc.data().latest : null;
         if (latest) {
-          latest = refreshSnapshotNarratives(sanitizeProfileSnapshot(latest), {});
+          latest = sanitizeProfileSnapshot(Object.assign({}, latest));
+          latest = refreshSnapshotNarratives(latest, {
+            skipReconcile: shouldSkipCogReconcile(latest, {})
+          });
         }
         if (latest && latest.mbti) return latest;
         var authUser = firebase.auth && firebase.auth().currentUser;
@@ -979,7 +1059,8 @@
         var previousLatest = doc.exists && doc.data().latest ? doc.data().latest : null;
         snap = refreshSnapshotNarratives(snap, {
           force: !!meta.forceRefreshNarratives,
-          previousLatest: previousLatest
+          previousLatest: previousLatest,
+          skipReconcile: shouldSkipCogReconcile(snap, meta)
         });
         var history = doc.exists ? (doc.data().history || []) : [];
         var entry = { snapshot: snap, timestamp: nowIso };
@@ -1011,11 +1092,14 @@
     var snap = enrichProfileSnapshot(snapshot, options.rawData, {
       completedAt: options.completedAt || snapshot.completedAt || new Date().toISOString(),
       testMode: options.testMode || snapshot.testMode || 'full',
-      answerCount: options.answerCount || snapshot.answerCount
+      answerCount: options.answerCount || snapshot.answerCount,
+      forceRefreshNarratives: options.forceRefreshNarratives,
+      adminEdit: !!options.adminEdit,
+      skipReconcile: !!(options.adminEdit || snapshot._typesLocked)
     });
 
     function finishWrite(adminEdit) {
-      return writeProfileDoc(userId, snap, { adminEdit: !!adminEdit }).then(function () {
+      return writeProfileDoc(userId, snap, { adminEdit: !!adminEdit, skipReconcile: !!adminEdit }).then(function () {
         if (authUser.uid === userId) {
           saveLastResultLocal(snap);
         }
@@ -1040,7 +1124,9 @@
     var local = loadLastResultLocal();
     if (!local || !local.mbti) return Promise.resolve(false);
     return firebase.firestore().collection('profiles').doc(user.uid).get().then(function (doc) {
-      if (doc.exists && doc.data().latest && doc.data().latest.mbti) return false;
+      var remote = doc.exists ? doc.data() : null;
+      if (remote && remote.latest && remote.latest.mbti) return false;
+      if (remote && remote.adminEditedAt) return false;
       return saveProfileToFirestore(user.uid, local, {
         testMode: local.testMode,
         completedAt: local.completedAt
@@ -1091,6 +1177,7 @@
     ensureUserDocument: ensureUserDocument,
     profileSnapshotScore: profileSnapshotScore,
     pickBestProfileSnapshot: pickBestProfileSnapshot,
+    applyIdentityPanelsSync: applyIdentityPanelsSync,
     refreshSnapshotNarratives: refreshSnapshotNarratives,
     narrativeIdentityKey: narrativeIdentityKey,
     isSparseProfileSnapshot: isSparseProfileSnapshot,

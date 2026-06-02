@@ -14,6 +14,7 @@
 <script src="/js/animus-scoring-core.js"></script>
 <script src="/js/figures-library.js"></script>
 <script src="/js/profile-narratives.js"></script>
+<script src="/js/compare-normalize.js"></script>
 <script src="/js/animus-shared.js"></script>
 <script>
 AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
@@ -87,7 +88,8 @@ var db = firebase.firestore();
         <div class="admin-card-title">Full profile JSON (latest snapshot)</div>
         <textarea id="adminJson" class="admin-json" spellcheck="false"></textarea>
         <div class="admin-actions">
-          <button type="button" class="admin-btn-primary" id="adminSaveBtn" onclick="AnimusAdmin.saveProfile()">Save profile</button>
+          <p class="admin-page-sub" style="margin-top:8px">After changing MBTI/Enneagram, use <strong>Merge quick fields</strong> or <strong>Refresh figures + narratives</strong>, then <strong>Save profile</strong>. Saving locks types so they are not overwritten by old test scores.</p>
+        <button type="button" class="admin-btn-primary" id="adminSaveBtn" onclick="AnimusAdmin.saveProfile()">Save profile</button>
           <a href="/" class="admin-btn-secondary" style="display:inline-flex;align-items:center;text-decoration:none">Cancel</a>
         </div>
       </div>
@@ -98,7 +100,6 @@ var db = firebase.firestore();
 <div class="toast" id="toast"></div>
 <div id="appBottomMount"></div>
 
-<script src="/js/compare-normalize.js"></script>
 <script src="/js/animus-social.js"></script>
 <script src="/js/animus-nav.js"></script>
 <script src="/js/animus-admin.js"></script>

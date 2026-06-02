@@ -291,12 +291,17 @@
   }
 
   g.AnimusCompareNormalize = {
+    MBTI_COG: MBTI_COG,
     normalizeProfileForDisplay: normalizeProfileForDisplay,
     normalizeProfileForCompare: normalizeProfileForCompare,
     hasRichCompareData: hasRichCompareData,
     hasRealCog: hasRealCog,
     canShowCompatScore: canShowCompatScore,
     buildOfflineAnalysis: buildOfflineAnalysis,
-    deriveBig5FromCog: deriveBig5FromCog
+    deriveBig5FromCog: deriveBig5FromCog,
+    spreadEnn: spreadEnn,
+    spreadPhiS: spreadPhiS,
+    spreadIv: spreadIv,
+    spreadAtt2: spreadAtt2
   };
 })(typeof window !== 'undefined' ? window : globalThis);

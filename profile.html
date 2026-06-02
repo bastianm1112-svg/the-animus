@@ -193,8 +193,8 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script src="/js/figures-library.js"></script>
 <script src="/js/profile-narratives.js"></script>
 <script src="/js/animus-i18n.js"></script>
-<script src="/js/animus-shared.js"></script>
 <script src="/js/compare-normalize.js"></script>
+<script src="/js/animus-shared.js"></script>
 <script>
 AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 var auth=firebase.auth(); var db=firebase.firestore();
@@ -483,9 +483,25 @@ function loadProfileData(uid, isOwner, currentUser){
     } else if(!uDoc.exists){ return; }
     var p=pDoc.exists ? pDoc.data() : {};
     var snap =
-      (typeof AnimusShared !== 'undefined' && AnimusShared.pickBestProfileSnapshot)
-        ? (AnimusShared.pickBestProfileSnapshot(p) || p.latest || {})
-        : (p.latest || {});
+      p.latest && p.latest.mbti
+        ? Object.assign({}, p.latest)
+        : typeof AnimusShared !== 'undefined' && AnimusShared.pickBestProfileSnapshot
+          ? AnimusShared.pickBestProfileSnapshot(p) || {}
+          : p.latest || {};
+    if (typeof AnimusShared !== 'undefined' && AnimusShared.sanitizeProfileSnapshot) {
+      snap = AnimusShared.sanitizeProfileSnapshot(snap);
+    }
+    if (snap._typesLocked || snap.adminEditedAt) {
+      if (typeof AnimusShared !== 'undefined' && AnimusShared.applyIdentityPanelsSync) {
+        snap = AnimusShared.applyIdentityPanelsSync(snap);
+      }
+    }
+    if (typeof AnimusShared !== 'undefined' && AnimusShared.refreshSnapshotNarratives) {
+      snap = AnimusShared.refreshSnapshotNarratives(snap, {
+        skipReconcile: !!(snap._typesLocked || snap.adminEditedAt),
+        force: !!(snap._typesLocked || snap.adminEditedAt)
+      });
+    }
     if (isOwner && !snap.mbti && typeof AnimusShared !== 'undefined') {
       var localSnap = AnimusShared.loadLastResultLocal();
       if (localSnap && localSnap.mbti) snap = localSnap;

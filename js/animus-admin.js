@@ -151,9 +151,11 @@
         targetUser = uDoc.data();
         var pData = pDoc.exists ? pDoc.data() : {};
         var snap =
-          g.AnimusShared && g.AnimusShared.pickBestProfileSnapshot
-            ? g.AnimusShared.pickBestProfileSnapshot(pData)
-            : pData.latest || null;
+          pData.latest && pData.latest.mbti
+            ? Object.assign({}, pData.latest)
+            : g.AnimusShared && g.AnimusShared.pickBestProfileSnapshot
+              ? g.AnimusShared.pickBestProfileSnapshot(pData)
+              : pData.latest || null;
         if (!snap || !snap.mbti) {
           snap = {};
           fillQuickFields(snap);
@@ -223,8 +225,10 @@
       return;
     }
     snap.mbti = mbtiUp;
-    if (g.AnimusShared && g.AnimusShared.hydrateSparseProfile) {
-      snap = g.AnimusShared.hydrateSparseProfile(snap);
+    snap._typesLocked = true;
+    snap.adminEditedAt = new Date().toISOString();
+    if (g.AnimusShared && g.AnimusShared.applyIdentityPanelsSync) {
+      snap = g.AnimusShared.applyIdentityPanelsSync(snap);
     }
     if (g.AnimusShared && g.AnimusShared.stripCompareInternals) {
       snap = g.AnimusShared.stripCompareInternals(snap);
@@ -240,12 +244,9 @@
     var btn = document.getElementById('adminSaveBtn');
     if (btn) btn.disabled = true;
 
-    if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
-      snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
-    }
-
     g.AnimusShared.saveProfileToFirestore(targetUid, snap, {
       testMode: 'admin',
+      adminEdit: true,
       forceRefreshNarratives: true,
       completedAt: snap.completedAt || new Date().toISOString()
     })
@@ -270,11 +271,16 @@
       var snap = JSON.parse(ta.value || '{}');
       if (typeof snap !== 'object' || Array.isArray(snap)) snap = {};
       snap = applyQuickFieldsToSnapshot(snap);
+      snap._typesLocked = true;
+      snap.adminEditedAt = snap.adminEditedAt || new Date().toISOString();
+      if (g.AnimusShared && g.AnimusShared.applyIdentityPanelsSync) {
+        snap = g.AnimusShared.applyIdentityPanelsSync(snap);
+      }
       if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
-        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
+        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true, skipReconcile: true });
       }
       ta.value = JSON.stringify(snap, null, 2);
-      setStatus('Quick fields merged — descriptions regenerated', 'ok');
+      setStatus('Quick fields merged — all panels synced to new identity', 'ok');
     } catch (e) {
       setStatus('Fix JSON before merging quick fields', 'err');
     }
@@ -335,15 +341,17 @@
         setStatus('Set MBTI in quick fields or JSON first', 'err');
         return;
       }
-      if (g.AnimusShared && g.AnimusShared.hydrateSparseProfile) {
-        snap = g.AnimusShared.hydrateSparseProfile(snap);
+      snap._typesLocked = true;
+      snap.adminEditedAt = snap.adminEditedAt || new Date().toISOString();
+      if (g.AnimusShared && g.AnimusShared.applyIdentityPanelsSync) {
+        snap = g.AnimusShared.applyIdentityPanelsSync(snap);
       }
       if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
-        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
+        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true, skipReconcile: true });
       }
       fillQuickFields(snap);
       ta.value = JSON.stringify(snap, null, 2);
-      setStatus('Chart defaults and descriptions updated from MBTI.', 'ok');
+      setStatus('All profile panels synced to MBTI in quick fields.', 'ok');
     } catch (e) {
       setStatus('Invalid JSON: ' + e.message, 'err');
     }
@@ -362,12 +370,11 @@
         setStatus('Snapshot has no cognition scores — user must retake the test.', 'err');
         return;
       }
+      delete snap._typesLocked;
+      delete snap.adminEditedAt;
       if (g.AnimusScoring && g.AnimusScoring.reconcileSnapshotTypes) {
         delete snap._compareDerivedCog;
         snap = g.AnimusScoring.reconcileSnapshotTypes(snap);
-      }
-      if (g.AnimusShared && g.AnimusShared.hydrateSparseProfile) {
-        snap = g.AnimusShared.hydrateSparseProfile(snap);
       }
       if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
         snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
@@ -398,12 +405,18 @@
     if (!ta) return;
     try {
       var snap = JSON.parse(ta.value || '{}');
+      snap = applyQuickFieldsToSnapshot(snap);
       if (!snap.mbti) {
         setStatus('Set MBTI first', 'err');
         return;
       }
+      snap._typesLocked = true;
+      snap.adminEditedAt = snap.adminEditedAt || new Date().toISOString();
+      if (g.AnimusShared && g.AnimusShared.applyIdentityPanelsSync) {
+        snap = g.AnimusShared.applyIdentityPanelsSync(snap);
+      }
       if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
-        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
+        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true, skipReconcile: true });
       }
       fillQuickFields(snap);
       ta.value = JSON.stringify(snap, null, 2);
