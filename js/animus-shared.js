@@ -1050,6 +1050,13 @@
       });
   }
 
+  function profileHasAdminLock(profileDocOrSnap) {
+    if (!profileDocOrSnap || typeof profileDocOrSnap !== 'object') return false;
+    if (profileDocOrSnap.adminEditedAt) return true;
+    var latest = profileDocOrSnap.latest || profileDocOrSnap;
+    return !!(latest && (latest._typesLocked || latest.adminEditedAt));
+  }
+
   function writeProfileDoc(userId, snap, meta) {
     meta = meta || {};
     var nowIso = new Date().toISOString();
@@ -1057,10 +1064,12 @@
     return firebase.firestore().runTransaction(function (tx) {
       return tx.get(ref).then(function (doc) {
         var previousLatest = doc.exists && doc.data().latest ? doc.data().latest : null;
+        var skipReconcile = shouldSkipCogReconcile(snap, meta);
         snap = refreshSnapshotNarratives(snap, {
           force: !!meta.forceRefreshNarratives,
           previousLatest: previousLatest,
-          skipReconcile: shouldSkipCogReconcile(snap, meta)
+          skipReconcile: skipReconcile,
+          syncPanels: meta.adminEdit ? true : undefined
         });
         var history = doc.exists ? (doc.data().history || []) : [];
         var entry = { snapshot: snap, timestamp: nowIso };
@@ -1089,21 +1098,38 @@
     if (!authUser) {
       return Promise.reject(new Error('Not signed in'));
     }
+    var isAdminSave = !!options.adminEdit;
     var snap = enrichProfileSnapshot(snapshot, options.rawData, {
       completedAt: options.completedAt || snapshot.completedAt || new Date().toISOString(),
       testMode: options.testMode || snapshot.testMode || 'full',
       answerCount: options.answerCount || snapshot.answerCount,
       forceRefreshNarratives: options.forceRefreshNarratives,
-      adminEdit: !!options.adminEdit,
-      skipReconcile: !!(options.adminEdit || snapshot._typesLocked)
+      adminEdit: isAdminSave,
+      skipReconcile: !!(isAdminSave || snapshot._typesLocked || snapshot.adminEditedAt)
     });
 
     function finishWrite(adminEdit) {
-      return writeProfileDoc(userId, snap, { adminEdit: !!adminEdit, skipReconcile: !!adminEdit }).then(function () {
+      var writeMeta = {
+        adminEdit: !!adminEdit,
+        skipReconcile: shouldSkipCogReconcile(snap, {
+          skipReconcile: adminEdit || isAdminSave
+        }),
+        forceRefreshNarratives: !!options.forceRefreshNarratives
+      };
+      return writeProfileDoc(userId, snap, writeMeta).then(function () {
         if (authUser.uid === userId) {
           saveLastResultLocal(snap);
         }
         return snap;
+      });
+    }
+
+    if (isAdminSave) {
+      return isUserAdmin(authUser.uid).then(function (admin) {
+        if (!admin) {
+          return Promise.reject(new Error('Only admins can save admin edits'));
+        }
+        return finishWrite(true);
       });
     }
 
@@ -1119,6 +1145,22 @@
     });
   }
 
+  /** Admin UI: always persists with adminEdit + types lock (works for own profile too). */
+  function adminSaveProfileToFirestore(userId, snapshot, options) {
+    options = options || {};
+    snapshot = Object.assign({}, snapshot || {});
+    snapshot._typesLocked = true;
+    snapshot.adminEditedAt = snapshot.adminEditedAt || new Date().toISOString();
+    return saveProfileToFirestore(userId, snapshot, {
+      testMode: options.testMode || 'admin',
+      adminEdit: true,
+      forceRefreshNarratives: options.forceRefreshNarratives !== false,
+      completedAt: options.completedAt || snapshot.completedAt || new Date().toISOString(),
+      answerCount: options.answerCount || snapshot.answerCount,
+      rawData: options.rawData
+    });
+  }
+
   function trySyncLocalResultToFirestore(user) {
     if (!user || !user.uid) return Promise.resolve(false);
     var local = loadLastResultLocal();
@@ -1126,7 +1168,8 @@
     return firebase.firestore().collection('profiles').doc(user.uid).get().then(function (doc) {
       var remote = doc.exists ? doc.data() : null;
       if (remote && remote.latest && remote.latest.mbti) return false;
-      if (remote && remote.adminEditedAt) return false;
+      if (profileHasAdminLock(remote)) return false;
+      if (local._typesLocked || local.adminEditedAt) return false;
       return saveProfileToFirestore(user.uid, local, {
         testMode: local.testMode,
         completedAt: local.completedAt
@@ -1185,6 +1228,8 @@
     hydrateSparseProfile: hydrateSparseProfile,
     stripCompareInternals: stripCompareInternals,
     saveProfileToFirestore: saveProfileToFirestore,
+    adminSaveProfileToFirestore: adminSaveProfileToFirestore,
+    profileHasAdminLock: profileHasAdminLock,
     trySyncLocalResultToFirestore: trySyncLocalResultToFirestore,
     getResolvedLang: getResolvedLang,
     setResolvedLang: setResolvedLang,

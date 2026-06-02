@@ -1,6 +1,6 @@
 # ANIMUS admin profile editing
 
-Only accounts with `isAdmin: true` on their **users** document can edit any user's profile data. Changes are saved to `profiles/{uid}.latest`, which powers profile pages, compare, friends cards, and daily facts.
+Only accounts with `isAdmin: true` on their **users** document can edit any user's profile data. Changes are saved to `profiles/{uid}.latest` with `_typesLocked` and `adminEditedAt`, which powers profile pages, compare, friends cards, and daily facts.
 
 ## One-time: grant yourself admin
 
@@ -26,12 +26,20 @@ Rules live in `firestore.rules` at the repo root.
 ## Use the admin editor
 
 1. Go to **Settings** → **Admin** (visible only when `isAdmin` is true), or open `/admin`.
-2. Search by **@username** or paste a **user UID**.
-3. Edit quick fields and/or the full **profile JSON** (`latest` snapshot).
-4. Click **Save profile** — updates appear everywhere that reads Firestore profiles.
+2. **Load** by @username or UID, or **My profile** for your own account.
+3. Edit **identity fields** (MBTI, Enneagram, etc.) — these are the source of truth.
+4. Click **Update preview** to rebuild chart scores, narratives, and figures to match (does not recompute MBTI from old test cognition).
+5. Click **Publish changes** — writes to Firestore, sets the type lock, and **re-reads** the document to verify your MBTI was stored (works for your own profile and others).
+
+### Advanced
+
+- **Raw JSON** — full snapshot for power users; still merged with identity fields on preview/publish.
+- **Recompute from cognition** — only when you intentionally want MBTI/Enn derived from stored test scores again (removes lock in the draft until you publish).
+- **Remove type lock (draft)** — allows test reconciliation again after publish if you unlock and save.
 
 ## Tips
 
 - Export your own profile from Settings → Data & Export → Export JSON as a template.
-- Invalid JSON or missing `mbti` will be rejected before save.
-- Each save appends to profile `history` (last 10 entries).
+- Invalid JSON or missing `mbti` is rejected before publish.
+- Each publish appends to profile `history` (last 10 entries) with `source: admin-edit`.
+- If edits “don’t stick,” ensure you **Publish** (not only preview) and that you are on the latest deploy with `adminSaveProfileToFirestore`.

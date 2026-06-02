@@ -1,13 +1,18 @@
 /**
- * Admin profile editor — only users with users/{uid}.isAdmin === true.
+ * Admin profile editor — users/{uid}.isAdmin === true only.
+ * Identity fields are the source of truth; JSON is advanced. Saves use adminSaveProfileToFirestore.
  */
 (function (g) {
   'use strict';
 
   var auth = null;
   var db = null;
+  var adminUid = null;
   var targetUid = null;
   var targetUser = null;
+  var publishedSnap = null;
+  var dirty = false;
+
   var VALID_MBTI = {
     INTJ: 1, INTP: 1, ENTJ: 1, ENTP: 1, INFJ: 1, INFP: 1, ENFJ: 1, ENFP: 1,
     ISTJ: 1, ISFJ: 1, ESTJ: 1, ESFJ: 1, ISTP: 1, ISFP: 1, ESTP: 1, ESFP: 1
@@ -19,6 +24,14 @@
     if (!el) return;
     el.textContent = msg || '';
     el.className = 'admin-status' + (kind ? ' ' + kind : '');
+  }
+
+  function setDirty(isDirty) {
+    dirty = !!isDirty;
+    var badge = document.getElementById('adminDirtyBadge');
+    if (badge) badge.hidden = !dirty;
+    var saveBtn = document.getElementById('adminSaveBtn');
+    if (saveBtn) saveBtn.textContent = dirty ? 'Publish changes' : 'Save to Firestore';
   }
 
   function normalizeUsername(raw) {
@@ -120,6 +133,87 @@
     return snap;
   }
 
+  function parseEditorJson() {
+    var ta = document.getElementById('adminJson');
+    var rawJson = (ta && ta.value) || '';
+    if (rawJson.length > MAX_ADMIN_JSON_CHARS) {
+      throw new Error('JSON too large (max ' + MAX_ADMIN_JSON_CHARS + ' chars)');
+    }
+    var snap = JSON.parse(rawJson);
+    if (!snap || typeof snap !== 'object' || Array.isArray(snap)) {
+      throw new Error('JSON must be an object');
+    }
+    return snap;
+  }
+
+  function writeEditorJson(snap) {
+    var ta = document.getElementById('adminJson');
+    if (ta) ta.value = JSON.stringify(snap, null, 2);
+  }
+
+  function buildDraftFromEditor() {
+    var snap = parseEditorJson();
+    snap = applyQuickFieldsToSnapshot(snap);
+    return normalizeDraft(snap);
+  }
+
+  function normalizeDraft(snap) {
+    if (!snap.mbti) {
+      throw new Error('Profile must include MBTI (e.g. INTJ)');
+    }
+    var mbtiUp = String(snap.mbti).toUpperCase().trim();
+    if (!VALID_MBTI[mbtiUp]) {
+      throw new Error('Invalid MBTI — use one of the 16 standard types');
+    }
+    snap.mbti = mbtiUp;
+    if (typeof snap.polX === 'number') {
+      snap.polX = Math.max(-100, Math.min(100, Math.round(snap.polX)));
+    }
+    if (typeof snap.polY === 'number') {
+      snap.polY = Math.max(-100, Math.min(100, Math.round(snap.polY)));
+    }
+    snap._typesLocked = true;
+    snap.adminEditedAt = snap.adminEditedAt || new Date().toISOString();
+    if (g.AnimusShared && g.AnimusShared.stripCompareInternals) {
+      snap = g.AnimusShared.stripCompareInternals(snap);
+    }
+    return snap;
+  }
+
+  function syncDraftPanels(snap) {
+    if (g.AnimusShared && g.AnimusShared.applyIdentityPanelsSync) {
+      snap = g.AnimusShared.applyIdentityPanelsSync(snap);
+    }
+    if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
+      snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true, skipReconcile: true });
+    }
+    return snap;
+  }
+
+  function updatePublishedBanner(profileDoc) {
+    var el = document.getElementById('adminPublished');
+    if (!el) return;
+    var latest = profileDoc && profileDoc.latest ? profileDoc.latest : null;
+    if (!latest || !latest.mbti) {
+      el.hidden = true;
+      return;
+    }
+    el.hidden = false;
+    var lock =
+      latest._typesLocked || latest.adminEditedAt || (g.AnimusShared && g.AnimusShared.profileHasAdminLock(profileDoc));
+    var enn = (latest.ennType || '?') + 'w' + (latest.ennWing || '?');
+    var edited = latest.adminEditedAt ? String(latest.adminEditedAt).slice(0, 19) : '—';
+    el.innerHTML =
+      '<span class="admin-published-label">Live on site</span> ' +
+      '<strong>' +
+      (g.AnimusShared ? g.AnimusShared.escapeHTML(String(latest.mbti)) : latest.mbti) +
+      '</strong> · ' +
+      enn +
+      (lock ? ' · <span class="admin-lock">locked</span>' : '') +
+      ' · edited ' +
+      (g.AnimusShared ? g.AnimusShared.escapeHTML(edited) : edited);
+  }
+
   function updateTargetMeta() {
     var meta = document.getElementById('adminTargetMeta');
     if (!meta || !targetUser) return;
@@ -128,12 +222,45 @@
       ? g.AnimusShared.escapeHTML(targetUser.displayName || 'User')
       : String(targetUser.displayName || 'User');
     var safeUid = g.AnimusShared ? g.AnimusShared.escapeHTML(targetUid) : targetUid;
+    var profileLink = targetUser.username
+      ? '/profile/' + encodeURIComponent(targetUser.username)
+      : '/profile?uid=' + encodeURIComponent(targetUid);
     meta.innerHTML =
-      'Editing <strong>' + name + '</strong> ' + un + ' · <code style="font-size:11px;color:var(--muted)">' + safeUid + '</code>';
+      'Editing <strong>' +
+      name +
+      '</strong> ' +
+      un +
+      ' · <code class="admin-uid">' +
+      safeUid +
+      '</code> · <a href="' +
+      profileLink +
+      '" target="_blank" rel="noopener">View profile</a>';
+  }
+
+  function loadSnapshotFromFirestore(pData) {
+    if (pData.latest && pData.latest.mbti) {
+      return Object.assign({}, pData.latest);
+    }
+    if (g.AnimusShared && g.AnimusShared.pickBestProfileSnapshot) {
+      var picked = g.AnimusShared.pickBestProfileSnapshot(pData, { rawLatest: true });
+      return picked ? Object.assign({}, picked) : null;
+    }
+    return pData.latest ? Object.assign({}, pData.latest) : null;
+  }
+
+  function prepareLoadedSnapshot(snap) {
+    var locked = !!(snap._typesLocked || snap.adminEditedAt);
+    if (!locked && g.AnimusShared && g.AnimusShared.hydrateSparseProfile) {
+      snap = g.AnimusShared.hydrateSparseProfile(snap, { skipReconcile: false });
+    } else if (locked && g.AnimusShared && g.AnimusShared.fillMbtiBasics) {
+      snap = g.AnimusShared.fillMbtiBasics(Object.assign({}, snap));
+    }
+    return snap;
   }
 
   function loadProfile() {
     setStatus('Loading…');
+    setDirty(false);
     return resolveTargetUid()
       .then(function (uid) {
         targetUid = uid;
@@ -150,46 +277,102 @@
         }
         targetUser = uDoc.data();
         var pData = pDoc.exists ? pDoc.data() : {};
-        var snap =
-          pData.latest && pData.latest.mbti
-            ? Object.assign({}, pData.latest)
-            : g.AnimusShared && g.AnimusShared.pickBestProfileSnapshot
-              ? g.AnimusShared.pickBestProfileSnapshot(pData)
-              : pData.latest || null;
+        updatePublishedBanner(pData);
+
+        var snap = loadSnapshotFromFirestore(pData);
+        document.getElementById('adminEditor').style.display = 'block';
+        updateTargetMeta();
+
         if (!snap || !snap.mbti) {
-          snap = {};
+          snap = { mbti: '', _typesLocked: true };
           fillQuickFields(snap);
-          var taEmpty = document.getElementById('adminJson');
-          if (taEmpty) taEmpty.value = '{\n  "mbti": ""\n}';
-          updateTargetMeta();
-          document.getElementById('adminEditor').style.display = 'block';
+          writeEditorJson(snap);
+          publishedSnap = null;
           setStatus(
-            'No assessment saved for this user yet. They need to finish the test (signed in), or paste a full JSON snapshot below.',
+            'No saved assessment yet. Set MBTI and identity below, click Update preview, then Publish.',
             'err'
           );
           return;
         }
-        if (g.AnimusShared && g.AnimusShared.hydrateSparseProfile) {
-          snap = g.AnimusShared.hydrateSparseProfile(snap);
-        }
+
+        snap = prepareLoadedSnapshot(snap);
+        publishedSnap = JSON.parse(JSON.stringify(snap));
         fillQuickFields(snap);
-        var ta = document.getElementById('adminJson');
-        if (ta) ta.value = JSON.stringify(snap, null, 2);
-        updateTargetMeta();
-        document.getElementById('adminEditor').style.display = 'block';
+        writeEditorJson(snap);
+        setDirty(false);
+
         var sparse =
           g.AnimusShared && g.AnimusShared.isSparseProfileSnapshot && g.AnimusShared.isSparseProfileSnapshot(snap);
         if (sparse) {
           setStatus(
-            'Loaded partial profile (often only MBTI). Chart defaults were filled where possible; narratives/figures may still be empty until they retake the test or you paste a full JSON export.',
+            'Loaded partial profile. Set identity fields, use Update preview to fill charts/narratives, then Publish.',
             'err'
           );
         } else {
-          setStatus('Profile loaded. Edit fields and save.', 'ok');
+          setStatus('Loaded. Change identity → Update preview → Publish changes.', 'ok');
         }
       })
       .catch(function (e) {
         setStatus(e.message || 'Load failed', 'err');
+      });
+  }
+
+  function loadMyProfile() {
+    if (!adminUid) {
+      setStatus('Sign in as admin first', 'err');
+      return;
+    }
+    var uidEl = document.getElementById('adminUid');
+    var userEl = document.getElementById('adminUsername');
+    if (uidEl) uidEl.value = adminUid;
+    if (userEl) userEl.value = '';
+    loadProfile();
+  }
+
+  function updatePreview() {
+    if (!targetUid) {
+      setStatus('Load a user first', 'err');
+      return;
+    }
+    try {
+      var snap = buildDraftFromEditor();
+      snap = syncDraftPanels(snap);
+      fillQuickFields(snap);
+      writeEditorJson(snap);
+      setDirty(true);
+      setStatus('Preview updated — charts and narratives match identity fields. Publish to go live.', 'ok');
+    } catch (e) {
+      setStatus(e.message || 'Preview failed', 'err');
+    }
+  }
+
+  function verifyPublished(uid, expectedMbti) {
+    return db
+      .collection('profiles')
+      .doc(uid)
+      .get()
+      .then(function (doc) {
+        if (!doc.exists) {
+          throw new Error('Verify failed: profile document missing');
+        }
+        var data = doc.data();
+        var latest = data.latest;
+        if (!latest || !latest.mbti) {
+          throw new Error('Verify failed: latest snapshot missing');
+        }
+        var got = String(latest.mbti).toUpperCase().trim();
+        var want = String(expectedMbti).toUpperCase().trim();
+        if (got !== want) {
+          throw new Error('Verify failed: Firestore has ' + got + ', expected ' + want);
+        }
+        if (!latest._typesLocked && !latest.adminEditedAt && !data.adminEditedAt) {
+          throw new Error('Verify failed: types lock not stored');
+        }
+        updatePublishedBanner(data);
+        publishedSnap = JSON.parse(JSON.stringify(latest));
+        fillQuickFields(latest);
+        writeEditorJson(latest);
+        return latest;
       });
   }
 
@@ -200,60 +383,38 @@
     }
     var snap;
     try {
-      var ta = document.getElementById('adminJson');
-      var rawJson = ta.value || '';
-      if (rawJson.length > MAX_ADMIN_JSON_CHARS) {
-        throw new Error('JSON too large (max ' + MAX_ADMIN_JSON_CHARS + ' chars)');
-      }
-      snap = JSON.parse(rawJson);
-      if (!snap || typeof snap !== 'object' || Array.isArray(snap)) {
-        throw new Error('JSON must be an object');
-      }
+      snap = buildDraftFromEditor();
+      snap = syncDraftPanels(snap);
     } catch (e) {
-      setStatus('Invalid JSON: ' + e.message, 'err');
+      setStatus(e.message || 'Cannot save', 'err');
       return;
     }
 
-    snap = applyQuickFieldsToSnapshot(snap);
-    if (!snap.mbti) {
-      setStatus('Profile must include mbti (e.g. INTJ)', 'err');
+    if (!g.AnimusShared || !g.AnimusShared.adminSaveProfileToFirestore) {
+      setStatus('Admin save unavailable — reload the page', 'err');
       return;
-    }
-    var mbtiUp = String(snap.mbti).toUpperCase().trim();
-    if (!VALID_MBTI[mbtiUp]) {
-      setStatus('Invalid MBTI — use one of the 16 standard types (e.g. ESFP)', 'err');
-      return;
-    }
-    snap.mbti = mbtiUp;
-    snap._typesLocked = true;
-    snap.adminEditedAt = new Date().toISOString();
-    if (g.AnimusShared && g.AnimusShared.applyIdentityPanelsSync) {
-      snap = g.AnimusShared.applyIdentityPanelsSync(snap);
-    }
-    if (g.AnimusShared && g.AnimusShared.stripCompareInternals) {
-      snap = g.AnimusShared.stripCompareInternals(snap);
-    }
-    if (typeof snap.polX === 'number') {
-      snap.polX = Math.max(-100, Math.min(100, Math.round(snap.polX)));
-    }
-    if (typeof snap.polY === 'number') {
-      snap.polY = Math.max(-100, Math.min(100, Math.round(snap.polY)));
     }
 
-    setStatus('Saving…');
+    setStatus('Publishing to Firestore…');
     var btn = document.getElementById('adminSaveBtn');
     if (btn) btn.disabled = true;
 
-    g.AnimusShared.saveProfileToFirestore(targetUid, snap, {
-      testMode: 'admin',
-      adminEdit: true,
-      forceRefreshNarratives: true,
-      completedAt: snap.completedAt || new Date().toISOString()
-    })
-      .then(function () {
-        setStatus('Saved — profile, compare, and friends will use this data.', 'ok');
-        var ta = document.getElementById('adminJson');
-        if (ta) ta.value = JSON.stringify(snap, null, 2);
+    g.AnimusShared
+      .adminSaveProfileToFirestore(targetUid, snap, {
+        forceRefreshNarratives: true,
+        completedAt: snap.completedAt || new Date().toISOString()
+      })
+      .then(function (saved) {
+        return verifyPublished(targetUid, saved.mbti);
+      })
+      .then(function (verified) {
+        setDirty(false);
+        setStatus(
+          'Published — verified ' +
+            verified.mbti +
+            ' on profiles.latest. Profile, compare, and friends will show this.',
+          'ok'
+        );
       })
       .catch(function (e) {
         setStatus(e.message || 'Save failed. Deploy firestore.rules if editing others.', 'err');
@@ -263,27 +424,68 @@
       });
   }
 
-  function syncJsonFromQuick() {
-    if (!targetUid) return;
-    var ta = document.getElementById('adminJson');
-    if (!ta) return;
+  function reconcileFromCog() {
+    if (!targetUid) {
+      setStatus('Load a user first', 'err');
+      return;
+    }
+    if (!g.confirm || !g.confirm('Recompute MBTI/Enneagram from stored cognition scores? This removes the admin lock until you publish again.')) {
+      return;
+    }
     try {
-      var snap = JSON.parse(ta.value || '{}');
-      if (typeof snap !== 'object' || Array.isArray(snap)) snap = {};
-      snap = applyQuickFieldsToSnapshot(snap);
-      snap._typesLocked = true;
-      snap.adminEditedAt = snap.adminEditedAt || new Date().toISOString();
-      if (g.AnimusShared && g.AnimusShared.applyIdentityPanelsSync) {
-        snap = g.AnimusShared.applyIdentityPanelsSync(snap);
+      var snap = parseEditorJson();
+      if (!snap.cog || typeof snap.cog !== 'object') {
+        setStatus('No cognition scores in snapshot — user must retake the test.', 'err');
+        return;
+      }
+      delete snap._typesLocked;
+      delete snap.adminEditedAt;
+      if (g.AnimusScoring && g.AnimusScoring.reconcileSnapshotTypes) {
+        delete snap._compareDerivedCog;
+        snap = g.AnimusScoring.reconcileSnapshotTypes(snap);
       }
       if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
-        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true, skipReconcile: true });
+        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
       }
-      ta.value = JSON.stringify(snap, null, 2);
-      setStatus('Quick fields merged — all panels synced to new identity', 'ok');
+      fillQuickFields(snap);
+      writeEditorJson(snap);
+      setDirty(true);
+      setStatus(
+        'Recomputed ' + snap.mbti + ' / ' + snap.ennType + 'w' + snap.ennWing + ' from cognition. Publish to save.',
+        'ok'
+      );
     } catch (e) {
-      setStatus('Fix JSON before merging quick fields', 'err');
+      setStatus(e.message || 'Recompute failed', 'err');
     }
+  }
+
+  function unlockTypes() {
+    try {
+      var snap = parseEditorJson();
+      delete snap._typesLocked;
+      delete snap.adminEditedAt;
+      writeEditorJson(snap);
+      setDirty(true);
+      setStatus('Lock removed in draft only — publish or re-lock before leaving if you want scores to stay fixed.', 'ok');
+    } catch (e) {
+      setStatus(e.message || 'Invalid JSON', 'err');
+    }
+  }
+
+  function bindEditorDirtyTracking() {
+    var ta = document.getElementById('adminJson');
+    if (ta) {
+      ta.addEventListener('input', function () {
+        setDirty(true);
+      });
+    }
+    [
+      'adminMbti', 'adminMbtiName', 'adminEnnType', 'adminEnnWing', 'adminEnnTritype',
+      'adminAtt', 'adminPhi', 'adminInst', 'adminSocionics', 'adminKeirsey', 'adminPolX', 'adminPolY'
+    ].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('input', function () { setDirty(true); });
+    });
   }
 
   function boot(a, d) {
@@ -291,6 +493,8 @@
     db = d;
     var denied = document.getElementById('adminDenied');
     var app = document.getElementById('adminApp');
+
+    bindEditorDirtyTracking();
 
     auth.onAuthStateChanged(function (user) {
       if (!user) {
@@ -307,6 +511,7 @@
           if (app) app.style.display = 'none';
           return;
         }
+        adminUid = user.uid;
         if (denied) denied.style.display = 'none';
         if (app) app.style.display = 'block';
         g.AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), user, null);
@@ -326,113 +531,13 @@
     });
   }
 
-  function hydrateEditorFromMbti() {
-    if (!targetUid) {
-      setStatus('Load a user first', 'err');
-      return;
-    }
-    var ta = document.getElementById('adminJson');
-    if (!ta) return;
-    try {
-      var snap = JSON.parse(ta.value || '{}');
-      if (typeof snap !== 'object' || Array.isArray(snap)) snap = {};
-      snap = applyQuickFieldsToSnapshot(snap);
-      if (!snap.mbti) {
-        setStatus('Set MBTI in quick fields or JSON first', 'err');
-        return;
-      }
-      snap._typesLocked = true;
-      snap.adminEditedAt = snap.adminEditedAt || new Date().toISOString();
-      if (g.AnimusShared && g.AnimusShared.applyIdentityPanelsSync) {
-        snap = g.AnimusShared.applyIdentityPanelsSync(snap);
-      }
-      if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
-        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true, skipReconcile: true });
-      }
-      fillQuickFields(snap);
-      ta.value = JSON.stringify(snap, null, 2);
-      setStatus('All profile panels synced to MBTI in quick fields.', 'ok');
-    } catch (e) {
-      setStatus('Invalid JSON: ' + e.message, 'err');
-    }
-  }
-
-  function reconcileFromCog() {
-    if (!targetUid) {
-      setStatus('Load a user first', 'err');
-      return;
-    }
-    var ta = document.getElementById('adminJson');
-    if (!ta) return;
-    try {
-      var snap = JSON.parse(ta.value || '{}');
-      if (!snap.cog || typeof snap.cog !== 'object') {
-        setStatus('Snapshot has no cognition scores — user must retake the test.', 'err');
-        return;
-      }
-      delete snap._typesLocked;
-      delete snap.adminEditedAt;
-      if (g.AnimusScoring && g.AnimusScoring.reconcileSnapshotTypes) {
-        delete snap._compareDerivedCog;
-        snap = g.AnimusScoring.reconcileSnapshotTypes(snap);
-      }
-      if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
-        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
-      }
-      fillQuickFields(snap);
-      ta.value = JSON.stringify(snap, null, 2);
-      setStatus(
-        'Recomputed MBTI ' +
-          snap.mbti +
-          ' and Enneagram ' +
-          snap.ennType +
-          'w' +
-          snap.ennWing +
-          ' from stored cognition. Save to publish.',
-        'ok'
-      );
-    } catch (e) {
-      setStatus('Invalid JSON: ' + e.message, 'err');
-    }
-  }
-
-  function refreshFiguresAndNarratives() {
-    if (!targetUid) {
-      setStatus('Load a user first', 'err');
-      return;
-    }
-    var ta = document.getElementById('adminJson');
-    if (!ta) return;
-    try {
-      var snap = JSON.parse(ta.value || '{}');
-      snap = applyQuickFieldsToSnapshot(snap);
-      if (!snap.mbti) {
-        setStatus('Set MBTI first', 'err');
-        return;
-      }
-      snap._typesLocked = true;
-      snap.adminEditedAt = snap.adminEditedAt || new Date().toISOString();
-      if (g.AnimusShared && g.AnimusShared.applyIdentityPanelsSync) {
-        snap = g.AnimusShared.applyIdentityPanelsSync(snap);
-      }
-      if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
-        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true, skipReconcile: true });
-      }
-      fillQuickFields(snap);
-      ta.value = JSON.stringify(snap, null, 2);
-      setStatus('Figures and narratives refreshed from library (canonical typings).', 'ok');
-    } catch (e) {
-      setStatus('Invalid JSON: ' + e.message, 'err');
-    }
-  }
-
   g.AnimusAdmin = {
     boot: boot,
     loadProfile: loadProfile,
+    loadMyProfile: loadMyProfile,
+    updatePreview: updatePreview,
     saveProfile: saveProfile,
-    syncJsonFromQuick: syncJsonFromQuick,
-    hydrateEditorFromMbti: hydrateEditorFromMbti,
     reconcileFromCog: reconcileFromCog,
-    refreshFiguresAndNarratives: refreshFiguresAndNarratives
+    unlockTypes: unlockTypes
   };
 })(typeof window !== 'undefined' ? window : globalThis);

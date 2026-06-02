@@ -41,10 +41,17 @@ var db = firebase.firestore();
 <div id="adminApp" style="display:none">
   <main class="admin-page" id="main-content">
     <h1 class="admin-page-title">Profile admin</h1>
-    <p class="admin-page-sub">Edit any user&apos;s assessment snapshot. Changes save to Firestore <code>profiles.latest</code> and appear on profile, compare, friends, and daily facts.</p>
+    <p class="admin-page-sub">Edit any user&apos;s live assessment. Changes write to <code>profiles.latest</code> with a type lock so test scores cannot overwrite your edits.</p>
+
+    <ol class="admin-steps" aria-label="Workflow">
+      <li>Find user</li>
+      <li>Edit identity</li>
+      <li>Update preview</li>
+      <li>Publish</li>
+    </ol>
 
     <div class="admin-card">
-      <div class="admin-card-title">Find user</div>
+      <div class="admin-card-title">1 · Find user</div>
       <div class="admin-row">
         <div class="admin-field">
           <label for="adminUsername">Username</label>
@@ -54,18 +61,20 @@ var db = firebase.firestore();
           <label for="adminUid">Or UID</label>
           <input type="text" id="adminUid" placeholder="Firebase user id" autocomplete="off" />
         </div>
-        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadProfile()">Load profile</button>
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadProfile()">Load</button>
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadMyProfile()">My profile</button>
       </div>
       <div class="admin-status" id="adminStatus"></div>
     </div>
 
     <div id="adminEditor" style="display:none">
       <p class="admin-meta" id="adminTargetMeta"></p>
+      <div class="admin-published" id="adminPublished" hidden></div>
 
       <div class="admin-card">
-        <div class="admin-card-title">Quick fields</div>
+        <div class="admin-card-title">2 · Identity <span class="admin-dirty-badge" id="adminDirtyBadge" hidden>unsaved</span></div>
         <div class="admin-grid">
-          <div class="admin-field"><label for="adminMbti">MBTI</label><input id="adminMbti" maxlength="8" /></div>
+          <div class="admin-field"><label for="adminMbti">MBTI</label><input id="adminMbti" maxlength="8" placeholder="ENFJ" /></div>
           <div class="admin-field"><label for="adminMbtiName">MBTI name</label><input id="adminMbtiName" maxlength="80" /></div>
           <div class="admin-field"><label for="adminEnnType">Enneagram</label><input id="adminEnnType" maxlength="8" /></div>
           <div class="admin-field"><label for="adminEnnWing">Wing</label><input id="adminEnnWing" maxlength="8" /></div>
@@ -78,21 +87,32 @@ var db = firebase.firestore();
           <div class="admin-field"><label for="adminPolX">Pol X</label><input id="adminPolX" type="number" step="1" /></div>
           <div class="admin-field"><label for="adminPolY">Pol Y</label><input id="adminPolY" type="number" step="1" /></div>
         </div>
-        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.syncJsonFromQuick()">Merge quick fields into JSON</button>
-        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.hydrateEditorFromMbti()">Fill chart defaults from MBTI</button>
-        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.reconcileFromCog()">Recompute MBTI/Enn from cognition scores</button>
-        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.refreshFiguresAndNarratives()">Refresh figures + narratives</button>
-      </div>
-
-      <div class="admin-card">
-        <div class="admin-card-title">Full profile JSON (latest snapshot)</div>
-        <textarea id="adminJson" class="admin-json" spellcheck="false"></textarea>
+        <p class="admin-hint">Identity fields are authoritative. Preview rebuilds chart scores, narratives, and figures to match — without recomputing MBTI from old test data.</p>
         <div class="admin-actions">
-          <p class="admin-page-sub" style="margin-top:8px">After changing MBTI/Enneagram, use <strong>Merge quick fields</strong> or <strong>Refresh figures + narratives</strong>, then <strong>Save profile</strong>. Saving locks types so they are not overwritten by old test scores.</p>
-        <button type="button" class="admin-btn-primary" id="adminSaveBtn" onclick="AnimusAdmin.saveProfile()">Save profile</button>
-          <a href="/" class="admin-btn-secondary" style="display:inline-flex;align-items:center;text-decoration:none">Cancel</a>
+          <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.updatePreview()">3 · Update preview</button>
         </div>
       </div>
+
+      <div class="admin-card admin-card-publish">
+        <div class="admin-card-title">4 · Publish</div>
+        <p class="admin-hint">Writes to Firestore and re-reads the document to confirm your MBTI and lock are stored (including when editing your own profile).</p>
+        <div class="admin-actions">
+          <button type="button" class="admin-btn-primary" id="adminSaveBtn" onclick="AnimusAdmin.saveProfile()">Publish changes</button>
+          <a href="/" class="admin-btn-secondary admin-btn-link">Done</a>
+        </div>
+      </div>
+
+      <details class="admin-advanced">
+        <summary>Advanced · raw JSON &amp; scoring tools</summary>
+        <div class="admin-card admin-card-nested">
+          <label for="adminJson" class="admin-field-label">Full snapshot JSON</label>
+          <textarea id="adminJson" class="admin-json" spellcheck="false" aria-label="Profile JSON"></textarea>
+          <div class="admin-actions admin-actions-danger">
+            <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.reconcileFromCog()">Recompute from cognition</button>
+            <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.unlockTypes()">Remove type lock (draft)</button>
+          </div>
+        </div>
+      </details>
     </div>
   </main>
 </div>
