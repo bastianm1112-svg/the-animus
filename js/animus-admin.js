@@ -240,8 +240,13 @@
     var btn = document.getElementById('adminSaveBtn');
     if (btn) btn.disabled = true;
 
+    if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
+      snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
+    }
+
     g.AnimusShared.saveProfileToFirestore(targetUid, snap, {
       testMode: 'admin',
+      forceRefreshNarratives: true,
       completedAt: snap.completedAt || new Date().toISOString()
     })
       .then(function () {
@@ -265,8 +270,11 @@
       var snap = JSON.parse(ta.value || '{}');
       if (typeof snap !== 'object' || Array.isArray(snap)) snap = {};
       snap = applyQuickFieldsToSnapshot(snap);
+      if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
+        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
+      }
       ta.value = JSON.stringify(snap, null, 2);
-      setStatus('Quick fields merged into JSON', 'ok');
+      setStatus('Quick fields merged — descriptions regenerated', 'ok');
     } catch (e) {
       setStatus('Fix JSON before merging quick fields', 'err');
     }
@@ -330,9 +338,12 @@
       if (g.AnimusShared && g.AnimusShared.hydrateSparseProfile) {
         snap = g.AnimusShared.hydrateSparseProfile(snap);
       }
+      if (g.AnimusShared && g.AnimusShared.refreshSnapshotNarratives) {
+        snap = g.AnimusShared.refreshSnapshotNarratives(snap, { force: true });
+      }
       fillQuickFields(snap);
       ta.value = JSON.stringify(snap, null, 2);
-      setStatus('Chart/score defaults applied from MBTI. Add narratives manually or have them retake the test.', 'ok');
+      setStatus('Chart defaults and descriptions updated from MBTI.', 'ok');
     } catch (e) {
       setStatus('Invalid JSON: ' + e.message, 'err');
     }

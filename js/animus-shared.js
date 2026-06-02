@@ -75,6 +75,118 @@
     'aloneDesc', 'socialDesc', 'shadowDesc'
   ];
 
+  var MBTI_ALL_TYPES = [
+    'INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP',
+    'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ', 'ISTP', 'ISFP', 'ESTP', 'ESFP'
+  ];
+
+  function narrativeIdentityKey(snap) {
+    if (!snap) return '';
+    return [
+      String(snap.mbti || '').toUpperCase(),
+      String(snap.ennType || '').replace(/\D/g, ''),
+      String(snap.ennWing || '').replace(/\D/g, ''),
+      String(snap.ennTritype || ''),
+      String(snap.att || ''),
+      String(snap.phi || ''),
+      typeof snap.polX === 'number' ? snap.polX : '',
+      typeof snap.polY === 'number' ? snap.polY : ''
+    ].join('|');
+  }
+
+  function narrativeTextBlob(snap) {
+    if (!snap) return '';
+    return PROFILE_TEXT_KEYS.map(function (k) {
+      return snap[k] || '';
+    }).join('\n');
+  }
+
+  function narrativesReferenceWrongIdentity(snap) {
+    if (!snap || !snap.mbti) return false;
+    var mbti = String(snap.mbti).toUpperCase().trim();
+    var blob = narrativeTextBlob(snap);
+    var i;
+    for (i = 0; i < MBTI_ALL_TYPES.length; i++) {
+      if (MBTI_ALL_TYPES[i] !== mbti && blob.indexOf(MBTI_ALL_TYPES[i]) >= 0) {
+        return true;
+      }
+    }
+    var enn = String(snap.ennType || '').replace(/\D/g, '');
+    if (enn) {
+      var typeRe = /(?:Type|Enneagram)\s+(\d)/gi;
+      var m;
+      while ((m = typeRe.exec(blob)) !== null) {
+        if (m[1] !== enn) return true;
+      }
+    }
+    return false;
+  }
+
+  function shouldRefreshNarratives(snap, opts) {
+    opts = opts || {};
+    if (!snap || !snap.mbti) return false;
+    if (opts.force) return true;
+    if (narrativesReferenceWrongIdentity(snap)) return true;
+    if (opts.previousLatest && narrativeIdentityKey(opts.previousLatest) !== narrativeIdentityKey(snap)) {
+      return true;
+    }
+    if (snap._narrativeIdentity && snap._narrativeIdentity !== narrativeIdentityKey(snap)) {
+      return true;
+    }
+    return false;
+  }
+
+  function refreshSnapshotNarratives(snap, opts) {
+    opts = opts || {};
+    snap = Object.assign({}, snap || {});
+    if (!snap.mbti) return snap;
+
+    if (!shouldRefreshNarratives(snap, opts)) {
+      if (!snap._narrativeIdentity) snap._narrativeIdentity = narrativeIdentityKey(snap);
+      return snap;
+    }
+
+    snap = hydrateSparseProfile(snap);
+    var PN = global.ProfileNarratives;
+    if (!PN || !PN.buildFallbackNarrative) {
+      snap._narrativeIdentity = narrativeIdentityKey(snap);
+      return snap;
+    }
+
+    var mbti = String(snap.mbti).toUpperCase().trim();
+    var enn = {
+      type: String(snap.ennType || '9').replace(/\D/g, '') || '9',
+      wing: String(snap.ennWing || '1').replace(/\D/g, '') || '1',
+      tritype: snap.ennTritype || ''
+    };
+    var att = snap.att || 'AT_SEC';
+    var phi = snap.phi || 'PH_STO';
+    var cog = snap.cog && typeof snap.cog === 'object' ? snap.cog : {};
+    var data = {
+      cog: cog,
+      polX: typeof snap.polX === 'number' ? snap.polX : 0,
+      polY: typeof snap.polY === 'number' ? snap.polY : 0
+    };
+    var built = PN.buildFallbackNarrative(mbti, enn, att, phi, data);
+
+    PROFILE_TEXT_KEYS.forEach(function (k) {
+      if (built[k] != null && built[k] !== '') snap[k] = built[k];
+    });
+    if (built.figures && built.figures.length) snap.figures = built.figures;
+    if (built.values && built.values.length) snap.values = built.values;
+    if (built.big5 && typeof built.big5 === 'object') snap.big5 = built.big5;
+    if (built.politicalThinkers) snap.politicalThinkers = built.politicalThinkers;
+    if (built.similarCountries) snap.similarCountries = built.similarCountries;
+    if (built.similarPoliticians) snap.similarPoliticians = built.similarPoliticians;
+    if (built.similarParties) snap.similarParties = built.similarParties;
+    if (built.socionics) snap.socionics = built.socionics;
+    if (built.keirsey) snap.keirsey = built.keirsey;
+
+    snap._narrativeIdentity = narrativeIdentityKey(snap);
+    snap._narrativesRefreshedAt = new Date().toISOString();
+    return snap;
+  }
+
   function sanitizeProfileSnapshot(snapshot) {
     var snap = Object.assign({}, snapshot || {});
     PROFILE_TEXT_KEYS.forEach(function (k) {
@@ -587,10 +699,12 @@
 
   function pickBestProfileSnapshot(profileDocData) {
     if (!profileDocData || typeof profileDocData !== 'object') return null;
-    var candidates = [];
-    if (profileDocData.latest && typeof profileDocData.latest === 'object') {
-      candidates.push(profileDocData.latest);
+    var latest = profileDocData.latest;
+    if (latest && typeof latest === 'object' && latest.mbti) {
+      latest = refreshSnapshotNarratives(sanitizeProfileSnapshot(latest), {});
+      if (profileSnapshotScore(latest) >= 25) return latest;
     }
+    var candidates = [];
     (profileDocData.history || []).forEach(function (entry) {
       if (entry && entry.snapshot && typeof entry.snapshot === 'object') {
         candidates.push(entry.snapshot);
@@ -605,6 +719,7 @@
         best = snap;
       }
     });
+    if (best) best = refreshSnapshotNarratives(sanitizeProfileSnapshot(best), {});
     return best;
   }
 
@@ -647,6 +762,10 @@
     snap.completedAt = (meta && meta.completedAt) || snap.completedAt || new Date().toISOString();
     snap.testMode = (meta && meta.testMode) || snap.testMode || 'full';
     snap.answerCount = (meta && meta.answerCount) || snap.answerCount || null;
+    snap = refreshSnapshotNarratives(snap, {
+      force: !!(meta && meta.forceRefreshNarratives),
+      previousLatest: meta && meta.previousLatest
+    });
     snap.categories = buildExportCategories(snap);
     return sanitizeForFirestore(snap);
   }
@@ -682,7 +801,9 @@
       .get()
       .then(function (doc) {
         var latest = doc.exists && doc.data().latest ? doc.data().latest : null;
-        if (latest) latest = sanitizeProfileSnapshot(latest);
+        if (latest) {
+          latest = refreshSnapshotNarratives(sanitizeProfileSnapshot(latest), {});
+        }
         if (latest && latest.mbti) return latest;
         var authUser = firebase.auth && firebase.auth().currentUser;
         if (options.allowLocalFallback !== false && authUser && authUser.uid === uid) {
@@ -795,6 +916,11 @@
     var ref = firebase.firestore().collection('profiles').doc(userId);
     return firebase.firestore().runTransaction(function (tx) {
       return tx.get(ref).then(function (doc) {
+        var previousLatest = doc.exists && doc.data().latest ? doc.data().latest : null;
+        snap = refreshSnapshotNarratives(snap, {
+          force: !!meta.forceRefreshNarratives,
+          previousLatest: previousLatest
+        });
         var history = doc.exists ? (doc.data().history || []) : [];
         var entry = { snapshot: snap, timestamp: nowIso };
         if (meta.adminEdit) entry.source = 'admin-edit';
@@ -905,6 +1031,8 @@
     ensureUserDocument: ensureUserDocument,
     profileSnapshotScore: profileSnapshotScore,
     pickBestProfileSnapshot: pickBestProfileSnapshot,
+    refreshSnapshotNarratives: refreshSnapshotNarratives,
+    narrativeIdentityKey: narrativeIdentityKey,
     isSparseProfileSnapshot: isSparseProfileSnapshot,
     fillMbtiBasics: fillMbtiBasics,
     hydrateSparseProfile: hydrateSparseProfile,
