@@ -44,6 +44,7 @@ const PATTERNS = [
     name: '3. Strong ESFP / 7',
     expectedMbti: ['ESFP'],
     expectedEnn: ['7', '8', '3'],
+    strictMbti: true,
     targets: { Se: 7, Fi: 7, Te: 5, Ni: 1, Ne: 6, E7: 7, E8: 5 }
   },
   {
@@ -107,8 +108,9 @@ function topEnn(eS) {
     .join(', ');
 }
 
-function mbtiOk(expected, actual) {
+function mbtiOk(expected, actual, strict) {
   if (!expected) return true;
+  if (strict) return expected.indexOf(actual) >= 0;
   const allowed = new Set();
   expected.forEach((t) => {
     allowed.add(t);
@@ -145,7 +147,7 @@ PATTERNS.forEach((p) => {
       issues.push('neutral run defaulted to ' + r.mbti + ' (old bias)');
     }
   } else if (p.expectedMbti) {
-    if (!mbtiOk(p.expectedMbti, r.mbti)) {
+    if (!mbtiOk(p.expectedMbti, r.mbti, p.strictMbti)) {
       issues.push('MBTI expected one of ' + p.expectedMbti.join('/') + ', got ' + r.mbti);
     }
     if (!ennOk(p.expectedEnn, r.enn.type)) {

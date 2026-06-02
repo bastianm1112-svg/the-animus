@@ -84,13 +84,47 @@ function mbtiFromDichotomies(cog, fp) {
   );
 }
 
+function cogDominantMargin(cog) {
+  const fns = ['Ni', 'Ne', 'Ti', 'Te', 'Fi', 'Fe', 'Si', 'Se'];
+  const sorted = fns.slice().sort((a, b) => (cog[b] || 50) - (cog[a] || 50));
+  const top = cog[sorted[0]] || 50;
+  const second = cog[sorted[1]] || 50;
+  return { topFn: sorted[0], secondFn: sorted[1], margin: top - second };
+}
+
+function stackDomConflicts(userDom, typeDom) {
+  if ((userDom === 'Se' || userDom === 'Si') && (typeDom === 'Ne' || typeDom === 'Ni')) return true;
+  if ((userDom === 'Ne' || userDom === 'Ni') && (typeDom === 'Se' || typeDom === 'Si')) return true;
+  if ((userDom === 'Te' || userDom === 'Ti') && (typeDom === 'Fe' || typeDom === 'Fi')) return true;
+  if ((userDom === 'Fe' || userDom === 'Fi') && (typeDom === 'Te' || typeDom === 'Ti')) return true;
+  return false;
+}
+
 function getMBTI(cog, fp) {
+  const domInfo = cogDominantMargin(cog);
+  const lead = domInfo.topFn;
+  const isSensing = lead === 'Se' || lead === 'Si';
+  const isIntuitive = lead === 'Ne' || lead === 'Ni';
+  const isThinking = lead === 'Te' || lead === 'Ti';
+  const isFeeling = lead === 'Fe' || lead === 'Fi';
+  let domBoost = domInfo.margin >= 10 ? 52 : domInfo.margin >= 6 ? 34 : domInfo.margin >= 3 ? 22 : 0;
+  if ((isSensing || isIntuitive) && domInfo.margin >= 3) domBoost = Math.max(domBoost, 38);
+  if ((isThinking || isFeeling) && domInfo.margin >= 3) domBoost = Math.max(domBoost, 30);
   const ranked = [];
   Object.keys(MBTI_STACKS).forEach((type) => {
+    const stack = MBTI_STACKS[type];
     let s = 0;
-    MBTI_STACKS[type].forEach((fn, i) => {
+    stack.forEach((fn, i) => {
       s += (cog[fn] || 50) * STACK_W[i];
     });
+    if (domBoost > 0) {
+      if (stack[0] === domInfo.topFn) s += domBoost;
+      else if (stack[1] === domInfo.secondFn && !stackDomConflicts(domInfo.topFn, stack[0])) {
+        s += Math.round(domBoost * 0.22);
+      } else if (stackDomConflicts(domInfo.topFn, stack[0])) {
+        s -= Math.round(domBoost * 0.85);
+      }
+    }
     ranked.push({ type, score: s });
   });
   ranked.sort((a, b) => b.score - a.score);

@@ -904,6 +904,22 @@ function mbtiFromDichotomies(cog, fp){
     + letter(J, P, 'J', 'P', 3, 'J');
 }
 
+function cogDominantMargin(cog){
+  var fns=['Ni','Ne','Ti','Te','Fi','Fe','Si','Se'];
+  var sorted=fns.slice().sort(function(a,b){ return (cog[b]||50)-(cog[a]||50); });
+  var top=cog[sorted[0]]||50;
+  var second=cog[sorted[1]]||50;
+  return { topFn:sorted[0], secondFn:sorted[1], margin:top-second };
+}
+
+function stackDomConflicts(userDom, typeDom){
+  if((userDom==='Se'||userDom==='Si')&&(typeDom==='Ne'||typeDom==='Ni')) return true;
+  if((userDom==='Ne'||userDom==='Ni')&&(typeDom==='Se'||typeDom==='Si')) return true;
+  if((userDom==='Te'||userDom==='Ti')&&(typeDom==='Fe'||typeDom==='Fi')) return true;
+  if((userDom==='Fe'||userDom==='Fi')&&(typeDom==='Te'||typeDom==='Ti')) return true;
+  return false;
+}
+
 function getMBTI(cog){
   var stacks={
     INTJ:['Ni','Te','Fi','Se'], INTP:['Ti','Ne','Si','Fe'],
@@ -916,9 +932,25 @@ function getMBTI(cog){
     ESTP:['Se','Ti','Fe','Ni'], ESFP:['Se','Fi','Te','Ni']
   };
   var w=[4,3,2,1];
+  var domInfo=cogDominantMargin(cog);
+  var lead=domInfo.topFn;
+  var isSensing=lead==='Se'||lead==='Si';
+  var isIntuitive=lead==='Ne'||lead==='Ni';
+  var isThinking=lead==='Te'||lead==='Ti';
+  var isFeeling=lead==='Fe'||lead==='Fi';
+  var domBoost=domInfo.margin>=10?52:(domInfo.margin>=6?34:(domInfo.margin>=3?22:0));
+  if((isSensing||isIntuitive)&&domInfo.margin>=3) domBoost=Math.max(domBoost,38);
+  if((isThinking||isFeeling)&&domInfo.margin>=3) domBoost=Math.max(domBoost,30);
   var ranked=[];
   Object.keys(stacks).forEach(function(type){
-    var s=0; stacks[type].forEach(function(fn,i){ s+=(cog[fn]||50)*w[i]; });
+    var stack=stacks[type];
+    var s=0;
+    stack.forEach(function(fn,i){ s+=(cog[fn]||50)*w[i]; });
+    if(domBoost>0){
+      if(stack[0]===domInfo.topFn) s+=domBoost;
+      else if(stack[1]===domInfo.secondFn&&!stackDomConflicts(domInfo.topFn,stack[0])) s+=Math.round(domBoost*0.22);
+      else if(stackDomConflicts(domInfo.topFn,stack[0])) s-=Math.round(domBoost*0.85);
+    }
     ranked.push({ type: type, score: s });
   });
   ranked.sort(function(a,b){ return b.score - a.score; });
