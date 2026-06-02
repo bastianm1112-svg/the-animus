@@ -908,7 +908,27 @@ function discardChanges() {
     document.getElementById('usernamePreview').textContent = escapeHTML(p.username || 'yourname');
     document.getElementById('bio').value = p.bio || '';
     document.getElementById('email').value = user.email || '';
-    document.getElementById('language').value = p.language || localStorage.getItem('animus_lang') || 'en';
+    var langRestore =
+      typeof AnimusShared !== 'undefined' && AnimusShared.getResolvedLang
+        ? AnimusShared.getResolvedLang(p.language)
+        : (p.language === 'es' ? 'es' : 'en');
+    document.getElementById('language').value = langRestore;
+    if (typeof AnimusShared !== 'undefined' && AnimusShared.setResolvedLang) {
+      AnimusShared.setResolvedLang(langRestore);
+    } else {
+      applyLanguage(langRestore);
+    }
+    var themeRestore = localStorage.getItem('animus_theme') || 'dark';
+    document.getElementById('theme').value = themeRestore;
+    applyTheme(themeRestore);
+    var modeEl = document.getElementById('defaultMode');
+    if (modeEl) {
+      var modeRestore =
+        typeof AnimusShared !== 'undefined' && AnimusShared.getSavedTestMode
+          ? AnimusShared.getSavedTestMode()
+          : localStorage.getItem('animus_test_mode') || 'full';
+      modeEl.value = modeRestore === 'short' ? 'short' : 'full';
+    }
     updateCharCount();
     showToast('Changes discarded');
   }).catch(function(){ showToast('Changes discarded'); });
@@ -943,6 +963,8 @@ function saveChanges() {
   var bio = document.getElementById('bio').value.trim();
   var lang = document.getElementById('language').value;
   var theme = document.getElementById('theme').value;
+  var defaultModeEl = document.getElementById('defaultMode');
+  var defaultMode = defaultModeEl ? defaultModeEl.value : 'full';
 
   // Use set+merge so it works for new users AND existing users
   var displayNameVal = document.getElementById('displayName').value.trim();
@@ -1012,8 +1034,19 @@ function saveChanges() {
     document.getElementById('saveBar').classList.remove('visible');
     btn.disabled = false;
     btn.textContent = 'Save Changes';
-    applyLanguage(lang);
+    if (typeof AnimusShared !== 'undefined' && AnimusShared.setResolvedLang) {
+      AnimusShared.setResolvedLang(lang);
+    } else {
+      applyLanguage(lang);
+    }
     applyTheme(theme);
+    if (typeof AnimusShared !== 'undefined' && AnimusShared.setSavedTestMode) {
+      AnimusShared.setSavedTestMode(defaultMode);
+    } else {
+      try {
+        localStorage.setItem('animus_test_mode', defaultMode === 'short' ? 'short' : 'full');
+      } catch (e) {}
+    }
     document.getElementById('usernamePreview').textContent = escapeHTML(un);
     showToast('Settings saved ✓');
   }).catch(function(e){
@@ -1208,10 +1241,26 @@ auth.onAuthStateChanged(function(user){
     document.getElementById('usernamePreview').textContent=username||'yourname';
     document.getElementById('bio').value=p.bio||'';
     document.getElementById('email').value=email;
-    var resolvedLang = p.language || localStorage.getItem('animus_lang') || 'en';
+    var resolvedLang =
+      typeof AnimusShared !== 'undefined' && AnimusShared.getResolvedLang
+        ? AnimusShared.getResolvedLang(p.language)
+        : (p.language === 'es' ? 'es' : 'en');
     document.getElementById('language').value = resolvedLang;
-    applyLanguage(resolvedLang);
-    document.getElementById('theme').value=localStorage.getItem('animus_theme')||'dark';
+    if (typeof AnimusShared !== 'undefined' && AnimusShared.setResolvedLang) {
+      AnimusShared.setResolvedLang(resolvedLang);
+    } else {
+      applyLanguage(resolvedLang);
+    }
+    document.getElementById('theme').value = localStorage.getItem('animus_theme') || 'dark';
+    applyTheme(document.getElementById('theme').value);
+    var modeEl = document.getElementById('defaultMode');
+    if (modeEl) {
+      var savedMode =
+        typeof AnimusShared !== 'undefined' && AnimusShared.getSavedTestMode
+          ? AnimusShared.getSavedTestMode()
+          : localStorage.getItem('animus_test_mode') || 'full';
+      modeEl.value = savedMode === 'short' ? 'short' : 'full';
+    }
     updateCharCount();
     // Google email
     var googleEl=document.getElementById('googleEmail');
@@ -1241,12 +1290,18 @@ auth.onAuthStateChanged(function(user){
     var el2=document.getElementById('assess2Desc');
     if(history[0] && el1){
       var r=history[0].snapshot||{};
-      var d=history[0].timestamp?new Date(history[0].timestamp.toDate()).toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
+      var pd0=typeof AnimusShared!=='undefined'&&AnimusShared.parseHistoryTimestamp
+        ? AnimusShared.parseHistoryTimestamp(history[0].timestamp)
+        : null;
+      var d=pd0?pd0.toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
       el1.textContent=(r.testMode==='short'?'Short':'Full')+' Assessment · '+d+' · '+(r.mbti||'—')+' '+(r.ennType?r.ennType+'w'+r.ennWing:'');
     }
     if(history[1] && el2){
       var r2=history[1].snapshot||{};
-      var d2=history[1].timestamp?new Date(history[1].timestamp.toDate()).toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
+      var pd1=typeof AnimusShared!=='undefined'&&AnimusShared.parseHistoryTimestamp
+        ? AnimusShared.parseHistoryTimestamp(history[1].timestamp)
+        : null;
+      var d2=pd1?pd1.toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
       el2.textContent=(r2.testMode==='short'?'Short':'Full')+' Assessment · '+d2+' · '+(r2.mbti||'—')+' '+(r2.ennType?r2.ennType+'w'+r2.ennWing:'');
     }
   });
@@ -1301,7 +1356,13 @@ var _i18n_es = {
 };
 
 function applyLanguage(lang) {
-  localStorage.setItem('animus_lang', lang);
+  lang = lang === 'es' ? 'es' : 'en';
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.setResolvedLang) {
+    AnimusShared.setResolvedLang(lang);
+  } else {
+    localStorage.setItem('animus_lang', lang);
+    document.documentElement.lang = lang;
+  }
   var map = lang === 'es' ? _i18n_es : null;
 
   // Pure-text elements (no child elements with content)
@@ -1351,13 +1412,29 @@ function applyLanguage(lang) {
   });
 }
 
-// Load saved preferences
+// Load saved preferences (before Firebase returns user doc)
 (function(){
   var savedTheme = localStorage.getItem('animus_theme') || 'dark';
-  var savedLang = localStorage.getItem('animus_lang') || 'en';
+  var savedLang =
+    typeof AnimusShared !== 'undefined' && AnimusShared.getResolvedLang
+      ? AnimusShared.getResolvedLang()
+      : (localStorage.getItem('animus_lang') === 'es' ? 'es' : 'en');
   applyTheme(savedTheme);
   document.getElementById('theme').value = savedTheme;
   document.getElementById('language').value = savedLang;
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.setResolvedLang) {
+    AnimusShared.setResolvedLang(savedLang);
+  } else {
+    applyLanguage(savedLang);
+  }
+  var modeEl = document.getElementById('defaultMode');
+  if (modeEl) {
+    var savedMode =
+      typeof AnimusShared !== 'undefined' && AnimusShared.getSavedTestMode
+        ? AnimusShared.getSavedTestMode()
+        : localStorage.getItem('animus_test_mode') || 'full';
+    modeEl.value = savedMode === 'short' ? 'short' : 'full';
+  }
 })();
 
 // ── SECURITY UTILITIES ──

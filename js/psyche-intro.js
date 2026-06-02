@@ -41,9 +41,13 @@
 
   function loadMode() {
     var saved = 'full';
-    try {
-      saved = localStorage.getItem(KEY_MODE) || 'full';
-    } catch (e) {}
+    if (g.AnimusShared && typeof g.AnimusShared.getSavedTestMode === 'function') {
+      saved = g.AnimusShared.getSavedTestMode();
+    } else {
+      try {
+        saved = localStorage.getItem(KEY_MODE) || 'full';
+      } catch (e) {}
+    }
     if (g.location.search.indexOf('mode=short') > -1) saved = 'short';
     setMode(saved === 'short' ? 'short' : 'full');
   }

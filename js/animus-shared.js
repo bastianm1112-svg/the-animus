@@ -201,13 +201,56 @@
     return snap;
   }
 
+  function getResolvedLang(pref) {
+    var raw = pref;
+    if (raw === undefined || raw === null || raw === '') {
+      try {
+        raw = localStorage.getItem(KEYS.lang);
+      } catch (e) {
+        raw = 'en';
+      }
+    }
+    return String(raw).toLowerCase().trim() === 'es' ? 'es' : 'en';
+  }
+
+  function setResolvedLang(lang) {
+    lang = getResolvedLang(lang);
+    try {
+      localStorage.setItem(KEYS.lang, lang);
+    } catch (e) {}
+    if (global.document && global.document.documentElement) {
+      global.document.documentElement.lang = lang;
+    }
+    try {
+      global.dispatchEvent(new CustomEvent('animus-lang-change', { detail: { lang: lang } }));
+    } catch (e) {}
+    return lang;
+  }
+
+  function getSavedTestMode() {
+    try {
+      var m = localStorage.getItem(KEYS.testMode);
+      return m === 'short' ? 'short' : 'full';
+    } catch (e) {
+      return 'full';
+    }
+  }
+
+  function setSavedTestMode(mode) {
+    mode = mode === 'short' ? 'short' : 'full';
+    try {
+      localStorage.setItem(KEYS.testMode, mode);
+    } catch (e) {}
+    return mode;
+  }
+
   function sanitizeUserProfileFields(data) {
     data = data || {};
     return {
       displayName: sanitizePlainText(data.displayName, 48),
       bio: sanitizePlainText(data.bio, 160),
       username: normalizeUsername(data.username),
-      language: sanitizePlainText(data.language, 16),
+      language: getResolvedLang(data.language),
       email: sanitizePlainText(data.email, 256)
     };
   }
@@ -1038,6 +1081,10 @@
     hydrateSparseProfile: hydrateSparseProfile,
     stripCompareInternals: stripCompareInternals,
     saveProfileToFirestore: saveProfileToFirestore,
-    trySyncLocalResultToFirestore: trySyncLocalResultToFirestore
+    trySyncLocalResultToFirestore: trySyncLocalResultToFirestore,
+    getResolvedLang: getResolvedLang,
+    setResolvedLang: setResolvedLang,
+    getSavedTestMode: getSavedTestMode,
+    setSavedTestMode: setSavedTestMode
   };
 })(typeof window !== 'undefined' ? window : this);

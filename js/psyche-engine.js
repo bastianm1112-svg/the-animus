@@ -94,14 +94,44 @@ var TOTAL = Q.length;
 var answers = new Array(TOTAL).fill(null);
 var cur = 0;
 
-// ── LANGUAGE ──
-var _rawLang = localStorage.getItem('animus_lang'); var lang = (_rawLang==='es') ? 'es' : 'en';
+// ── LANGUAGE (reads localStorage; updates on settings save + storage events) ──
+function getAnimusLang() {
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.getResolvedLang) {
+    return AnimusShared.getResolvedLang();
+  }
+  try {
+    return localStorage.getItem('animus_lang') === 'es' ? 'es' : 'en';
+  } catch (e) {
+    return 'en';
+  }
+}
+var lang = getAnimusLang();
 
-// Language now set via settings page (localStorage)
+function refreshAnimusLang() {
+  lang = getAnimusLang();
+}
 
-// Auto-apply language on load
-(function(){
-  if(lang === 'es') updateIntroLang();
+(function () {
+  refreshAnimusLang();
+  if (lang === 'es') updateIntroLang();
+  window.addEventListener('animus-lang-change', function () {
+    refreshAnimusLang();
+    updateIntroLang();
+    var quiz = document.getElementById('quiz');
+    if (quiz && quiz.style.display !== 'none' && typeof renderQ === 'function') {
+      renderQ();
+    }
+  });
+  window.addEventListener('storage', function (e) {
+    if (e.key === 'animus_lang') {
+      refreshAnimusLang();
+      updateIntroLang();
+      var quizEl = document.getElementById('quiz');
+      if (quizEl && quizEl.style.display !== 'none' && typeof renderQ === 'function') {
+        renderQ();
+      }
+    }
+  });
 })();
 
 function updateIntroLang(){
@@ -713,6 +743,7 @@ function finishFill(filteredQ, fillAnswers, baseProfile){
 }
 
 function renderQ(){
+  refreshAnimusLang();
   var q=(window._activeQ||Q)[cur];
   var pct=Math.round((cur/TOTAL)*100);
   document.getElementById('pbarFill').style.width=pct+'%';
@@ -1827,45 +1858,73 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   function persistProfileSnapshot(redirectAfter) {
     var meta = {
       testMode: TOTAL <= 100 ? 'short' : 'full',
-      answerCount: Object.keys(answers || {}).length
+      answerCount: Object.keys(answers || {}).length,
+      completedAt: new Date().toISOString()
     };
+    snapshot.completedAt = meta.completedAt;
+    snapshot.testMode = meta.testMode;
+    snapshot.answerCount = meta.answerCount;
+
     if (typeof AnimusShared !== 'undefined') {
       AnimusShared.saveLastResultLocal(
         AnimusShared.enrichProfileSnapshot(snapshot, data, meta)
       );
     }
+
+    function onCloudSaved() {
+      var btn = document.getElementById('btnSave');
+      if (btn) {
+        btn.innerHTML = '↓ SAVED ✓';
+        btn.style.opacity = '0.7';
+      }
+      if (redirectAfter) {
+        showToast('Profile saved to your account ✓');
+        setTimeout(function () { window.location.href = '/profile'; }, 1200);
+      } else {
+        showToast('Saved to your profile automatically ✓');
+      }
+    }
+
     function doSave(user) {
       if (!user || typeof AnimusShared === 'undefined') return;
       AnimusShared.saveProfileToFirestore(user.uid, snapshot, {
         rawData: data,
         testMode: meta.testMode,
-        answerCount: meta.answerCount
-      }).then(function () {
-        var btn = document.getElementById('btnSave');
-        if (btn) { btn.innerHTML = '↓ SAVED ✓'; btn.style.opacity = '0.7'; }
-        showToast('Profile saved to your account ✓');
-        if (redirectAfter) {
-          setTimeout(function () { window.location.href = '/profile'; }, 1200);
-        }
-      }).catch(function (e) {
-        console.error('Profile save:', e);
-        showToast('Could not save to cloud — results kept on this device. Tap Save again.');
-      });
+        answerCount: meta.answerCount,
+        completedAt: meta.completedAt
+      })
+        .then(onCloudSaved)
+        .catch(function (e) {
+          console.error('Profile save:', e);
+          showToast('Could not save to cloud — results kept on this device. Tap Save again.');
+        });
     }
-    var cur = firebase.auth().currentUser;
-    if (cur) doSave(cur);
-    else {
+
+    var cur =
+      typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser
+        ? firebase.auth().currentUser
+        : null;
+    if (cur) {
+      doSave(cur);
+    } else if (typeof firebase !== 'undefined' && firebase.auth) {
       var unsub = firebase.auth().onAuthStateChanged(function (user) {
-        if (user) { unsub(); doSave(user); }
+        if (user) {
+          try {
+            unsub();
+          } catch (e) {}
+          doSave(user);
+        }
       });
-      setTimeout(function () { try { unsub(); } catch (e) {} }, 45000);
+      setTimeout(function () {
+        try {
+          unsub();
+        } catch (e) {}
+      }, 45000);
     }
   }
 
-  // Auto-save for signed-in users (local + cloud) so results aren't lost if Save isn't tapped
-  if (typeof firebase !== 'undefined' && firebase.auth) {
-    persistProfileSnapshot(false);
-  }
+  // Auto-save to local storage + Firestore (test page requires sign-in)
+  persistProfileSnapshot(false);
 
   document.getElementById('btnSave').addEventListener('click', function () {
     var user = firebase.auth().currentUser;
