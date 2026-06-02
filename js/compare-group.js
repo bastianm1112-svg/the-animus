@@ -78,7 +78,7 @@
         + '<div class="chip-avatar">' + init + '</div>'
         + '<div class="chip-info">'
         + '<div class="chip-name">' + escapeHTML(p.isYou ? 'You (' + p.displayName + ')' : p.displayName) + '</div>'
-        + '<div class="chip-type">' + (p.mbti || 'No profile') + '</div>'
+        + '<div class="chip-type">' + escapeHTML(p.mbti || 'No profile') + '</div>'
         + '</div>'
         + '<div class="chip-check">' + (isSel ? '&#10003;' : '') + '</div>'
         + '</div>';
@@ -142,13 +142,13 @@
         + '<div class="matrix-wrap"><table class="matrix-table"><thead><tr><th></th>'
         + people.map(function (p) {
           return '<th>' + (p.isYou ? 'You' : escapeHTML(p.displayName.split(' ')[0]))
-            + '<br><span style="color:var(--gold);font-family:\'Bebas Neue\',sans-serif;font-size:14px">' + (p.mbti || '—') + '</span></th>';
+            + '<br><span style="color:var(--gold);font-family:\'Bebas Neue\',sans-serif;font-size:14px">' + escapeHTML(p.mbti || '—') + '</span></th>';
         }).join('')
         + '</tr></thead><tbody>'
         + people.map(function (a) {
           return '<tr><td class="matrix-name">'
             + (a.isYou ? '<span style="color:var(--green)">You</span>' : escapeHTML(a.displayName.split(' ')[0]))
-            + ' <span style="font-size:10px;color:var(--gold)">' + (a.mbti || '') + '</span></td>'
+            + ' <span style="font-size:10px;color:var(--gold)">' + escapeHTML(a.mbti || '') + '</span></td>'
             + people.map(function (b) {
               if (a.uid === b.uid) return '<td class="self">—</td>';
               var score = calcCompat(a, b);

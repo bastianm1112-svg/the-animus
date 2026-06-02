@@ -11,6 +11,18 @@
 
   var PHI_ROW_LABELS = ['Nietzschean', 'Existentialist', 'Aristotelian', 'Kantian', 'Stoic', 'Pragmatist', 'Skeptic', 'Epicurean'];
 
+  function esc(s) {
+    if (typeof g.AnimusShared !== 'undefined' && g.AnimusShared.escapeHTML) {
+      return g.AnimusShared.escapeHTML(s);
+    }
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   var ATT_LABELS = {
     AT_SEC: 'Secure', AT_ANX: 'Anxious-Preoccupied', AT_AVO: 'Fearful-Avoidant', AT_DIS: 'Dismissive-Avoidant'
   };
@@ -215,12 +227,13 @@
     grid.style.display = '';
     grid.innerHTML = blocks.map(function (b) {
       var metrics = b.metrics.map(function (m) {
-        return '<span class="insight-metric"><strong>' + m[0] + '</strong>' + m[1] + '</span>';
+        return '<span class="insight-metric"><strong>' + esc(m[0]) + '</strong>' + esc(m[1]) + '</span>';
       }).join('');
+      var body = esc(b.body).replace(/&lt;strong&gt;/g, '<strong style="color:var(--white);font-weight:500">').replace(/&lt;\/strong&gt;/g, '</strong>');
       return '<article class="insight-block">' +
-        '<div class="insight-kicker">' + b.kicker + '</div>' +
-        '<div class="insight-title">' + b.title + '</div>' +
-        '<div class="insight-body">' + b.body.replace(/<strong>/g, '<strong style="color:var(--white);font-weight:500">') + '</div>' +
+        '<div class="insight-kicker">' + esc(b.kicker) + '</div>' +
+        '<div class="insight-title">' + esc(b.title) + '</div>' +
+        '<div class="insight-body">' + body + '</div>' +
         '<div class="insight-metrics">' + metrics + '</div>' +
         '</article>';
     }).join('');
@@ -258,7 +271,7 @@
 
     var leads = {
       panelCognitionLead: snap.mbti
-        ? narr(p.subj + ' process the world primarily through <strong>' + (topKey(snap.cog) || '—') + '</strong>. The scores below rank all eight functions — higher bars mean more natural, reliable access.')
+        ? narr(p.subj + ' process the world primarily through <strong>' + esc(topKey(snap.cog) || '—') + '</strong>. The scores below rank all eight functions — higher bars mean more natural, reliable access.')
         : '',
       panelPersonalityLead: snap.ennType
         ? narr('Enneagram scores show relative intensity across all nine types — not just ' + p.possL + ' core type. Peaks reveal motivation, fear, and adaptive strategy.')

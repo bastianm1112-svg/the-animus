@@ -270,6 +270,9 @@
     if (snap.similarParties) snap.similarParties = sanitizeStringArray(snap.similarParties, 500, 8);
     if (snap.similarCountries) snap.similarCountries = sanitizeStringArray(snap.similarCountries, 500, 8);
     if (snap.figures) snap.figures = sanitizeFigures(snap.figures);
+    ['mbti', 'mbtiName', 'ennType', 'ennWing', 'ennTritype', 'att', 'phi', 'instStack', 'socionics', 'keirsey'].forEach(function (k) {
+      if (snap[k] != null) snap[k] = sanitizePlainText(snap[k], k === 'ennTritype' ? 16 : 32);
+    });
     return snap;
   }
 

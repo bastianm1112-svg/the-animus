@@ -58,7 +58,9 @@ service cloud.firestore {
     function incomingFriendRequest(userId) {
       return signedIn()
         && request.auth.uid != userId
-        && friendKeysOnly();
+        && friendKeysOnly()
+        && request.auth.uid in request.resource.data.get('friendRequests', {}).get('received', [])
+        && !(request.auth.uid in resource.data.get('friendRequests', {}).get('received', []));
     }
 
     function activityFeedKeysValid() {
@@ -80,11 +82,14 @@ service cloud.firestore {
         );
     }
 
-    // Another user accepts a request on this user's sent list / friends.
+    // Accepter adds themselves to the requester's friends list (must have been in sent).
     function peerAcceptFriend(userId) {
       return signedIn()
         && request.auth.uid != userId
-        && friendKeysAndFriends();
+        && friendKeysAndFriends()
+        && request.auth.uid in request.resource.data.get('friends', [])
+        && !(request.auth.uid in resource.data.get('friends', []))
+        && request.auth.uid in resource.data.get('friendRequests', {}).get('sent', []);
     }
 
     function ownerProfileUpdate(userId) {

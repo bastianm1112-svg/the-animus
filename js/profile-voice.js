@@ -23,6 +23,7 @@
       .replace(/\b Yourself\b/g, ' Themself')
       .replace(/\b yourself\b/g, ' themself');
     if (name) {
+      name = escapeHTML(name);
       out = out.replace(/\bThis person\b/gi, name);
       out = out.replace(/\bthis person\b/g, name);
     }
@@ -30,7 +31,8 @@
   }
 
   function applyProfileVoice(isOwner, displayName) {
-    var name = (displayName || '').trim() || 'This person';
+    var rawName = (displayName || '').trim();
+    var name = rawName ? escapeHTML(rawName) : 'This person';
     var subj = isOwner ? 'YOU' : name;
     var they = isOwner ? 'you' : 'they';
     var their = isOwner ? 'your' : 'their';
@@ -44,7 +46,7 @@
         banner.textContent = '';
       } else {
         banner.style.display = 'block';
-        banner.textContent = 'Viewing ' + name + "'s profile — results describe them, not you.";
+        banner.textContent = 'Viewing ' + rawName + "'s profile — results describe them, not you.";
       }
     }
 

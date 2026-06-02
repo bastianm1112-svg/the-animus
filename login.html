@@ -351,10 +351,18 @@ function finishSetup(){
 }
 
 function saveDoc(user, displayName, username){
+  var cleaned =
+    typeof AnimusShared !== 'undefined' && AnimusShared.sanitizeUserProfileFields
+      ? AnimusShared.sanitizeUserProfileFields({
+          displayName: displayName || user.displayName || '',
+          username: username,
+          email: user.email || ''
+        })
+      : { displayName: displayName || '', username: username, email: user.email || '' };
   var userData = {
-    displayName: displayName||user.displayName||'',
-    username: username,
-    email: user.email||'',
+    displayName: cleaned.displayName || user.displayName || 'User',
+    username: cleaned.username || username,
+    email: cleaned.email || user.email || '',
     photoURL: user.photoURL||'',
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     friends: [],

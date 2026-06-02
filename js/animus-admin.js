@@ -217,7 +217,9 @@
   function updateTargetMeta() {
     var meta = document.getElementById('adminTargetMeta');
     if (!meta || !targetUser) return;
-    var un = targetUser.username ? '@' + targetUser.username : '';
+    var un = targetUser.username
+      ? '@' + (g.AnimusShared ? g.AnimusShared.escapeHTML(targetUser.username) : targetUser.username)
+      : '';
     var name = g.AnimusShared
       ? g.AnimusShared.escapeHTML(targetUser.displayName || 'User')
       : String(targetUser.displayName || 'User');
