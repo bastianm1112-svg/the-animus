@@ -147,6 +147,9 @@
     initGlobalErrorFallback();
     initPageReveal();
     initSeoAndPerf();
+    if (typeof g.AnimusPageShell !== 'undefined' && g.AnimusPageShell.boot) {
+      g.AnimusPageShell.boot();
+    }
     if (typeof g.AnimusShared !== 'undefined') {
       g.AnimusShared.bindNavAuth('navAvatar');
     }

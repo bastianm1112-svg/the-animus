@@ -92,9 +92,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-unified.css">
 <link rel="stylesheet" href="/css/animus-release.css">
-<link rel="stylesheet" href="/css/animus-premium.css">
+<link rel="stylesheet" href="/css/animus-premium.css?v=20260608">
+<link rel="stylesheet" href="/css/animus-app-shell.css?v=20260608">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
+<script src="/js/animus-page-shell.js?v=20260608"></script>
 <script src="/js/animus-app.js" defer></script>
 </head>
 <body class="has-app-nav">
@@ -104,10 +106,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <div id="appNavMount"></div>
 
 <div class="page" id="main-content">
-  <div class="page-header">
-    <h1 class="page-title">TYPE<br><span>REFERENCE</span></h1>
-    <p class="page-sub">Every personality system ANIMUS measures — explained in full.</p>
-  </div>
+  <header class="page-header app-page-head animus-reveal">
+    <p class="animus-page-eyebrow">Library</p>
+    <h1 class="page-title app-page-title">TYPE<br><span>REFERENCE</span></h1>
+    <p class="page-sub app-page-sub">Every personality system ANIMUS measures — explained in full.</p>
+  </header>
 
   <div class="type-tabs">
     <button class="type-tab active" data-panel="mbti">Cognitive type / Functions</button>
@@ -523,6 +526,7 @@ document.querySelectorAll('.type-tab').forEach(function(tab){
 <script>
 AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 </script>
+<div id="appFooterMount"></div>
 <div id="appBottomMount"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/animus-social.js"></script>

@@ -35,7 +35,8 @@ var db = firebase.firestore();
 <link rel="stylesheet" href="/css/animus-shop.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-type-accents.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-motion.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-premium.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-premium.css?v=20260608">
+<link rel="stylesheet" href="/css/animus-app-shell.css?v=20260608">
 <style>
   @media (max-width: 559px) {
     .activity-estimator-actions {
@@ -53,6 +54,7 @@ var db = firebase.firestore();
 </style>
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
+<script src="/js/animus-page-shell.js?v=20260608"></script>
 <script src="/js/animus-app.js" defer></script>
 </head>
 <body class="has-app-nav">
@@ -62,9 +64,10 @@ var db = firebase.firestore();
 <div id="appNavMount"></div>
 
 <main class="member-home friends-page app-page" id="main-content">
-  <header class="home-header animus-reveal">
-    <h1 class="home-greeting friends-page-title">Activity</h1>
-    <p class="home-date friends-page-sub">Friends, requests, and what&apos;s happening.</p>
+  <header class="home-header app-page-head animus-reveal">
+    <p class="animus-page-eyebrow">Social</p>
+    <h1 class="app-page-title friends-page-title">Activity</h1>
+    <p class="app-page-sub friends-page-sub">Friends, requests, and what&apos;s happening.</p>
   </header>
 
   <section id="activity-requests" class="app-section animus-reveal animus-reveal-delay-1">
@@ -108,6 +111,7 @@ var db = firebase.firestore();
 </div>
 <div class="toast" id="toast"></div>
 
+<div id="appFooterMount"></div>
 <div id="appBottomMount"></div>
 <script src="/js/animus-type-ui.js"></script>
 <script src="/js/animus-pull-refresh.js"></script>

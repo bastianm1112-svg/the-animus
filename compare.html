@@ -36,10 +36,12 @@
 <link rel="stylesheet" href="/css/animus-release.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-compare.css?v=20260607">
 <link rel="stylesheet" href="/css/animus-plus.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-premium.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-motion.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-premium.css?v=20260608">
+<link rel="stylesheet" href="/css/animus-app-shell.css?v=20260608">
+<link rel="stylesheet" href="/css/animus-motion.css?v=20260608">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
+<script src="/js/animus-page-shell.js?v=20260608"></script>
 <script src="/js/animus-app.js" defer></script>
 </head>
 <body class="page-compare has-app-nav">
@@ -57,9 +59,10 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
 <div id="appNavMount"></div>
 
 <div class="compare-page-wrap">
-  <header class="compare-page-head">
-    <h1 class="compare-page-title">Compare personalities</h1>
-    <p class="compare-page-sub">Side-by-side compatibility across cognition, values, and more.</p>
+  <header class="compare-page-head app-page-head animus-reveal">
+    <p class="animus-page-eyebrow">Compatibility</p>
+    <h1 class="app-page-title compare-page-title">Compare personalities</h1>
+    <p class="app-page-sub compare-page-sub">Side-by-side compatibility across cognition, values, and more.</p>
   </header>
 
   <div class="compare-picker-card" id="friendsPickerBar">
@@ -503,6 +506,7 @@ function showToast(msg){
 </script>
 
 
+<div id="appFooterMount"></div>
 <div id="appBottomMount"></div>
 <script src="/js/animus-social.js"></script>
 <script src="/js/animus-nav.js"></script>

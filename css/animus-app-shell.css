@@ -1,0 +1,241 @@
+/**
+ * ANIMUS — unified signed-in app layout (headers, dashboard, footer, loading).
+ */
+
+/* ── Page header (all app routes) ── */
+.app-page-head {
+  margin-bottom: 20px;
+  max-width: 100%;
+}
+
+.animus-page-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold2, #8a6f3e);
+  margin: 0 0 8px;
+}
+
+.app-page-title,
+.friends-page-title,
+.shop-title,
+.notifications-title,
+.compare-page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 5vw, 36px);
+  font-weight: 700;
+  color: var(--white, #f0ece4);
+  margin: 0 0 8px;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+}
+
+.app-page-sub,
+.friends-page-sub,
+.shop-sub,
+.notifications-sub,
+.compare-page-sub {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--muted2, #888);
+  margin: 0 0 0;
+  max-width: 36rem;
+}
+
+.app-page-title::after,
+.friends-page-title::after,
+.shop-title::after,
+.compare-page-title::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 2px;
+  margin-top: 12px;
+  background: linear-gradient(90deg, var(--gold2, #8a6f3e), transparent);
+}
+
+/* Shop title was Bebas — align with app typography */
+.shop-page .shop-title {
+  font-family: 'Playfair Display', serif;
+}
+
+.home-header .home-greeting {
+  font-size: clamp(22px, 4.5vw, 30px);
+  margin-bottom: 4px;
+}
+
+.home-header .animus-page-eyebrow {
+  margin-bottom: 6px;
+}
+
+/* ── Home dashboard layout ── */
+.home-profile-mount {
+  margin-bottom: 16px;
+}
+
+.home-profile-mount:not(:empty) + .onboarding-banner {
+  margin-top: 0;
+}
+
+.home-primary-strip {
+  margin-bottom: 14px;
+}
+
+.home-primary-strip .home-action-card.primary {
+  min-height: 72px;
+  padding: 16px 18px;
+}
+
+.home-secondary .home-quick-head {
+  margin-bottom: 10px;
+}
+
+.home-actions--secondary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.home-actions--secondary .home-action-card {
+  min-height: 64px;
+}
+
+.home-actions--secondary .home-action-desc {
+  display: block;
+  font-size: 10px;
+  color: var(--muted2, #888);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+@media (min-width: 560px) {
+  .home-actions--secondary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ── Loading blocks ── */
+.app-loading-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 18px;
+  border: 1px dashed var(--border2, #2a2a2a);
+  background: var(--surface, #111);
+  text-align: center;
+  min-height: 72px;
+  justify-content: center;
+}
+
+.app-loading-block--inline {
+  text-align: left;
+  min-height: 0;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.app-loading-block-title {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold2, #8a6f3e);
+}
+
+.app-loading-block-sub {
+  font-size: 12px;
+  color: var(--muted2, #888);
+}
+
+.shop-plus-status.app-loading-block--inline .app-loading-block-sub {
+  display: block;
+}
+
+.notif-page-empty.app-loading-block {
+  border-style: dashed;
+}
+
+/* ── App footer ── */
+.app-site-footer-wrap {
+  max-width: 720px;
+  margin: 24px auto 0;
+  padding: 0 max(16px, env(safe-area-inset-left)) 8px max(16px, env(safe-area-inset-right));
+}
+
+.app-site-footer-wrap .site-legal-footer {
+  padding: 28px 0 12px;
+  border-top: 1px solid var(--border, #1e1e1e);
+}
+
+body.has-app-nav .app-site-footer-wrap + #appBottomMount,
+body.has-app-nav #appFooterMount {
+  margin-bottom: 0;
+}
+
+.shop-page.app-page--wide .app-site-footer-wrap,
+.compare-page-wrap .app-site-footer-wrap {
+  max-width: 920px;
+}
+
+.settings-footer-mount {
+  grid-column: 1 / -1;
+  max-width: 100%;
+  padding: 0 20px 12px;
+}
+
+.settings-footer-mount .app-site-footer-wrap {
+  max-width: none;
+  margin-top: 8px;
+}
+
+/* ── Estimations note ── */
+.estimations-note {
+  font-size: 12px;
+  color: var(--muted2, #888);
+  margin: 10px 0 0;
+}
+
+.estimations-note a {
+  color: var(--gold, #c8a96e);
+  text-decoration: none;
+}
+
+.estimations-note a:hover {
+  text-decoration: underline;
+}
+
+/* ── Notifications page width ── */
+.notifications-page.app-page {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 16px max(16px, env(safe-area-inset-left)) 24px max(16px, env(safe-area-inset-right));
+  padding-bottom: calc(var(--mbn-h, 60px) + var(--safe-bottom, 0px) + 24px);
+}
+
+/* ── Compare head alignment ── */
+.compare-page-head.app-page-head {
+  padding: 0 max(20px, env(safe-area-inset-left)) 0 max(20px, env(safe-area-inset-right));
+  max-width: 1040px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 480px) {
+  .app-page-sub,
+  .friends-page-sub {
+    margin-bottom: 20px;
+  }
+
+  .home-actions--secondary .home-action-title {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+}
+
+@media (max-width: 400px) {
+  .member-home .home-actions.home-actions--secondary {
+    grid-template-columns: 1fr;
+  }
+}

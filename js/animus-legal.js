@@ -110,16 +110,28 @@
   }
 
   function buildFooterHtml() {
+    return buildAppFooterHtml(false);
+  }
+
+  function buildAppFooterHtml(signedIn) {
+    var links = signedIn
+      ? '<a href="/">Home</a>' +
+        '<a href="/test">Assessment</a>' +
+        '<a href="/profile">Profile</a>' +
+        '<a href="/shop">Upgrades</a>' +
+        '<a href="/about">About</a>' +
+        '<a href="/about#terms">Terms</a>'
+      : '<a href="/about">About</a>' +
+        '<a href="/about#disclaimer">Disclaimer</a>' +
+        '<a href="/about#terms">Terms</a>' +
+        '<a href="/test">Test</a>' +
+        '<a href="/login">Sign In</a>';
     return (
       '<footer class="site-legal-footer">' +
       '<a href="/" class="footer-logo">ANI<span>MUS</span></a>' +
       '<div class="footer-copy">&copy; 2026 ANIMUS &mdash; Know thyself completely</div>' +
       '<div class="footer-links">' +
-      '<a href="/about">About</a>' +
-      '<a href="/about#disclaimer">Disclaimer</a>' +
-      '<a href="/about#terms">Terms</a>' +
-      '<a href="/test">Test</a>' +
-      '<a href="/login">Sign In</a>' +
+      links +
       '</div>' +
       '<p class="footer-legal-note">Independent personality atlas. Not affiliated with MBTI&reg; or Myers-Briggs&reg; publishers. ' +
       '<a href="/about#disclaimer">Legal notice</a></p>' +
@@ -127,9 +139,14 @@
     );
   }
 
-  function mountFooter(rootId) {
+  function mountFooter(rootId, signedIn) {
     var root = document.getElementById(rootId);
-    if (root) root.innerHTML = buildFooterHtml();
+    if (!root) return;
+    if (signedIn && typeof buildAppFooterHtml === 'function') {
+      root.innerHTML = '<div class="app-site-footer-wrap">' + buildAppFooterHtml(true) + '</div>';
+      return;
+    }
+    root.innerHTML = buildFooterHtml();
   }
 
   function initLogin() {
@@ -156,6 +173,7 @@
     markAcceptedLocally: markAcceptedLocally,
     hasAcceptedLocally: hasAcceptedLocally,
     buildFooterHtml: buildFooterHtml,
+    buildAppFooterHtml: buildAppFooterHtml,
     mountFooter: mountFooter,
     initLogin: initLogin,
     updateSignupControls: updateSignupControls,

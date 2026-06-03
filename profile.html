@@ -213,9 +213,11 @@ var auth=firebase.auth(); var db=firebase.firestore();
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-release.css">
 <link rel="stylesheet" href="/css/animus-plus.css">
-<link rel="stylesheet" href="/css/animus-premium.css">
+<link rel="stylesheet" href="/css/animus-premium.css?v=20260608">
+<link rel="stylesheet" href="/css/animus-app-shell.css?v=20260608">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
+<script src="/js/animus-page-shell.js?v=20260608"></script>
 <script src="/js/animus-app.js" defer></script>
 </head>
 <body class="has-app-nav page-profile">
@@ -704,6 +706,7 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
   <div class="career-guide-sheet" id="careerGuideSheet"></div>
 </div>
 
+<div id="appFooterMount"></div>
 <div id="appBottomMount"></div>
 <script src="/js/animus-career-guide.js"></script>
 <script src="/js/animus-social.js"></script>

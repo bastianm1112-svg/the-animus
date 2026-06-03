@@ -721,10 +721,12 @@ var db = firebase.firestore();
 <link rel="stylesheet" href="/css/animus-home.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-type-accents.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-motion.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-legal.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-premium.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-legal.css?v=20260608">
+<link rel="stylesheet" href="/css/animus-premium.css?v=20260608">
+<link rel="stylesheet" href="/css/animus-app-shell.css?v=20260608">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
+<script src="/js/animus-page-shell.js?v=20260608"></script>
 <script src="/js/animus-app.js" defer></script>
 </head>
 <body class="guest-mode">
@@ -736,55 +738,64 @@ var db = firebase.firestore();
 <div id="memberApp" class="member-app">
 <div id="memberNavMount"></div>
 <main class="member-home app-page" id="member-home">
-  <header class="home-header animus-reveal">
+  <header class="home-header app-page-head animus-reveal">
+    <p class="animus-page-eyebrow">Dashboard</p>
     <p class="home-greeting" id="homeGreeting" role="heading" aria-level="1">Good morning</p>
     <p class="home-date" id="homeDate"></p>
   </header>
+  <div id="homeProfileMount" class="home-profile-mount"></div>
   <div class="onboarding-banner app-section" id="onboardingBanner">
     <p>Take the assessment to unlock your full profile and daily insights.</p>
     <a href="/test">Begin assessment</a>
   </div>
-  <div id="homeProfileMount" class="home-profile-mount"></div>
-  <section class="home-quick app-section animus-reveal animus-reveal-delay-1" aria-labelledby="homeQuickLabel">
-    <div class="home-section-head home-quick-head">
-      <h2 class="home-section-title" id="homeQuickLabel">Quick actions</h2>
-    </div>
-    <div class="home-actions" role="navigation" aria-label="Quick actions">
+  <section class="home-primary-strip app-section animus-reveal animus-reveal-delay-1" aria-label="Primary">
     <a href="/test" class="home-action-card primary animus-pressable">
       <span class="home-action-copy">
-        <span class="home-action-title">Main test</span>
-        <span class="home-action-desc">Your core personality assessment</span>
+        <span class="home-action-title">Main assessment</span>
+        <span class="home-action-desc">Your core personality map across 14 dimensions</span>
       </span>
       <span class="home-action-arrow" aria-hidden="true">→</span>
     </a>
+  </section>
+  <section class="home-secondary app-section animus-reveal animus-reveal-delay-2" aria-labelledby="homeQuickLabel">
+    <div class="home-section-head home-quick-head">
+      <h2 class="home-section-title" id="homeQuickLabel">Explore</h2>
+    </div>
+    <div class="home-actions home-actions--secondary" role="navigation" aria-label="Explore">
     <a href="/activity" class="home-action-card animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Activity</span>
-        <span class="home-action-desc">Friends, requests, and updates</span>
+        <span class="home-action-desc">Friends &amp; requests</span>
       </span>
     </a>
     <a href="/shop" class="home-action-card animus-pressable">
       <span class="home-action-copy">
-        <span class="home-action-title">Shop</span>
-        <span class="home-action-desc">Detailed test, estimator, and Plus</span>
+        <span class="home-action-title">Upgrades</span>
+        <span class="home-action-desc">Depth &amp; Plus</span>
       </span>
     </a>
     <a href="/compare" class="home-action-card animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Compare</span>
-        <span class="home-action-desc">See how you match with others</span>
+        <span class="home-action-desc">Compatibility</span>
       </span>
     </a>
     <a href="/types" class="home-action-card animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Types</span>
-        <span class="home-action-desc">Reference library</span>
+        <span class="home-action-desc">Reference</span>
       </span>
     </a>
     <a href="/settings" class="home-action-card animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Settings</span>
-        <span class="home-action-desc">Account and appearance</span>
+        <span class="home-action-desc">Account</span>
+      </span>
+    </a>
+    <a href="/estimations" class="home-action-card animus-pressable">
+      <span class="home-action-copy">
+        <span class="home-action-title">Estimations</span>
+        <span class="home-action-desc">Observe &amp; guess</span>
       </span>
     </a>
     </div>
@@ -796,7 +807,7 @@ var db = firebase.firestore();
         <div class="daily-fact-label" id="dailyFactLabel">Daily insight</div>
         <span class="daily-fact-xp-badge" id="dailyXpBadge" hidden></span>
       </div>
-      <p class="daily-fact-text" id="dailyFactText">Loading…</p>
+      <p class="daily-fact-text" id="dailyFactText" aria-busy="true"></p>
     </div>
   </section>
   <div class="home-daily-cards" id="homeDailyCards" hidden></div>
@@ -1131,7 +1142,7 @@ var db = firebase.firestore();
 document.addEventListener('DOMContentLoaded', function () {
   if (typeof AnimusLegal !== 'undefined') {
     AnimusLegal.mountFooter('guestLegalFooter');
-    AnimusLegal.mountFooter('memberLegalFooter');
+    AnimusLegal.mountFooter('memberLegalFooter', true);
   }
   if (typeof AnimusHome !== 'undefined') AnimusHome.boot(auth, db);
 });

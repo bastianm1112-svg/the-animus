@@ -91,10 +91,12 @@
     if (g.AnimusDailyFacts && factEl) {
       var fact = g.AnimusDailyFacts.pickDailyFact(profile, user.uid);
       factEl.classList.remove('animus-skeleton');
+      factEl.removeAttribute('aria-busy');
       factEl.textContent = fact.text || 'Complete your assessment to unlock personalized insights.';
       if (factLabel) factLabel.textContent = 'Daily insight · ' + fact.label;
     } else if (factEl) {
       factEl.classList.remove('animus-skeleton');
+      factEl.removeAttribute('aria-busy');
       factEl.textContent = 'Complete your assessment to unlock personalized insights.';
     }
 

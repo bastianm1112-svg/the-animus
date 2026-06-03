@@ -582,3 +582,22 @@ body.light-mode .mbn-item.active svg {
 body.light-mode .xp-card {
   background: linear-gradient(180deg, rgba(200, 169, 110, 0.08) 0%, transparent 100%);
 }
+
+/* Minimal standalone pages (404, redirects) */
+a.btn-home,
+a.btn-back,
+button.btn-back {
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a.btn-home:hover,
+  a.btn-back:hover,
+  button.btn-back:hover {
+    transform: translateY(-1px);
+  }
+}
