@@ -109,7 +109,8 @@ service cloud.firestore {
       return request.resource.data.diff(resource.data).affectedKeys()
         .hasOnly([
           'compareUsage', 'xp', 'lastXpReason', 'lastXpAt', 'lastDailyInsight',
-          'dailyStreak', 'dailyMood', 'dailyReflection'
+          'dailyStreak', 'dailyMood', 'dailyReflection', 'moodHistory', 'reflectionHistory',
+          'dailyArchive', 'streakUnlocks'
         ]);
     }
 

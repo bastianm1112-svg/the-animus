@@ -200,21 +200,88 @@ body.member-mode #guestApp {
   line-height: 1.75;
 }
 
-.home-daily-extras {
-  border-top: 1px solid var(--border);
+.home-daily-cards {
+  margin-bottom: 36px;
 }
 
-.home-daily-extras[hidden] {
+.home-daily-cards[hidden] {
   display: none;
 }
 
-.daily-row {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
+.home-daily-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.daily-row:last-child {
-  border-bottom: none;
+.daily-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 16px 18px;
+}
+
+.daily-card--hero {
+  border-color: var(--gold2);
+  background: linear-gradient(180deg, rgba(200, 169, 110, 0.07) 0%, var(--surface) 100%);
+}
+
+.daily-card--echo {
+  border-left: 3px solid var(--border2);
+}
+
+.daily-card-label {
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.daily-card-lead {
+  font-size: 15px;
+  color: var(--white);
+  margin: 0 0 8px;
+  line-height: 1.45;
+}
+
+.daily-card-lead strong {
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.daily-card-text {
+  font-size: 13px;
+  color: var(--muted2);
+  line-height: 1.65;
+  margin: 0 0 8px;
+}
+
+.daily-card-text:last-child {
+  margin-bottom: 0;
+}
+
+.daily-card-text-muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.daily-card-tag {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold2);
+}
+
+.daily-echo-line {
+  padding-left: 10px;
+  border-left: 2px solid var(--border2);
+}
+
+.daily-streak-inline {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .daily-row-label {
@@ -241,15 +308,9 @@ body.member-mode #guestApp {
   color: var(--muted);
 }
 
-.daily-streak-stat {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
 .daily-streak-count {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 36px;
+  font-size: 32px;
   letter-spacing: 0.06em;
   color: var(--gold);
   line-height: 1;
@@ -259,6 +320,56 @@ body.member-mode #guestApp {
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  color: var(--muted2);
+}
+
+.mood-week-strip {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+  justify-content: space-between;
+}
+
+.mood-strip-day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mood-strip-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border2);
+  border: 1px solid var(--border);
+}
+
+.mood-strip-day.has-energized .mood-strip-dot {
+  background: var(--gold);
+  border-color: var(--gold2);
+}
+
+.mood-strip-day.has-neutral .mood-strip-dot {
+  background: var(--muted2);
+}
+
+.mood-strip-day.has-drained .mood-strip-dot {
+  background: #5a6a7a;
+  border-color: var(--border2);
+}
+
+.mood-strip-lbl {
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.daily-row-cta-secondary {
+  margin-left: 8px;
+  border-color: var(--border2);
   color: var(--muted2);
 }
 

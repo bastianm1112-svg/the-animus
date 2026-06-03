@@ -77,7 +77,8 @@
       }
       updateDailyXpBadge(fresh);
       if (g.AnimusDaily) {
-        g.AnimusDaily.render(db, user.uid, fresh, profile, refreshRetention);
+        var dailyRefresh = g.AnimusDaily.refresh || g.AnimusDaily.render;
+        dailyRefresh(db, user.uid, fresh, profile, refreshRetention);
       }
     }
 
