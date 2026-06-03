@@ -384,28 +384,21 @@ function updateQuizModeSwitch() {
 
 function refreshIntroModeUI() {
   var es = lang === 'es';
-  var label = document.getElementById('introModeLabel');
-  var meta = document.getElementById('introModeMeta');
-  var upsell = document.getElementById('introDetailedUpsell');
   var hint = document.getElementById('introShopHint');
-  var tabs = document.querySelectorAll('#testModeTabs .test-mode-tab');
+  var durationEl = document.getElementById('introMetaDuration');
+  var tabs = document.querySelectorAll('#testModeTabs .intro-mode-btn');
   tabs.forEach(function (tab) {
     var on = tab.getAttribute('data-mode') === (testMode === 'full' ? 'full' : 'short');
     tab.classList.toggle('active', on);
     tab.setAttribute('aria-selected', on ? 'true' : 'false');
   });
-  if (testMode === 'full') {
-    if (label) label.textContent = es ? 'Test Detallado' : 'Detailed Test';
-    if (meta) meta.innerHTML = '<div class="intro-meta-item"><strong>14</strong><span>' + (es ? 'Dimensiones' : 'Dimensions') + '</span></div>'
-      + '<div class="intro-meta-item"><strong>~45</strong><span>' + (es ? 'Minutos' : 'Minutes') + '</span></div>';
-    if (hint) hint.style.display = 'none';
-  } else {
-    if (label) label.textContent = es ? 'Test Principal' : 'Main Test';
-    if (meta) meta.innerHTML = '<div class="intro-meta-item"><strong>14</strong><span>' + (es ? 'Dimensiones' : 'Dimensions') + '</span></div>'
-      + '<div class="intro-meta-item"><strong>~20</strong><span>' + (es ? 'Minutos' : 'Minutes') + '</span></div>';
-    if (hint) hint.style.display = '';
+  if (durationEl) durationEl.textContent = testMode === 'full' ? '~45' : '~20';
+  if (hint) {
+    hint.style.display = testMode === 'full' ? 'none' : '';
+    hint.innerHTML = es
+      ? 'Para un resultado más preciso, desbloqueá el <a href="/shop">Test Detallado</a> en la Tienda.'
+      : 'For a more accurate result, unlock the <a href="/shop">Detailed Test</a> in the Shop.';
   }
-  if (upsell) upsell.style.display = testMode === 'full' ? 'none' : 'block';
   showResumePromptIfNeeded();
 }
 
@@ -1735,10 +1728,10 @@ function insertDetailedTestUpsell() {
     banner.id = 'detailedTestUpsell';
     banner.className = 'detailed-test-upsell';
     banner.innerHTML = es
-      ? 'Para un resultado más preciso, considerá comprar el <a href="/shop">Test Detallado</a> en la Tienda.'
-      : 'For a more accurate result, you should purchase the <a href="/shop">Detailed Test</a> in the Shop.';
-    var tabs = document.querySelector('#results .tabs-wrap');
-    if (tabs && tabs.parentNode) tabs.parentNode.insertBefore(banner, tabs);
+      ? 'Para mayor precisión, considerá el <a href="/shop">Test Detallado</a>.'
+      : 'For greater accuracy, consider the <a href="/shop">Detailed Test</a>.';
+    var hero = document.getElementById('resHero');
+    if (hero) hero.appendChild(banner);
   }
   var user = typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser;
   if (user && typeof AnimusEntitlements !== 'undefined') {

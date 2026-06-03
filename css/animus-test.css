@@ -350,16 +350,18 @@ body.light-mode #quiz .qhdr {
   appearance: none;
   -webkit-appearance: none;
   background: none;
-  border: 1px solid var(--border2);
+  border: none;
   color: var(--gold2);
   font-family: 'DM Sans', sans-serif;
-  font-size: 9px;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 6px 10px;
+  padding: 0;
   cursor: pointer;
   flex-shrink: 0;
-  transition: border-color 0.2s, color 0.2s;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
 }
 
 #quiz .qhdr-mode-switch:hover {
@@ -445,66 +447,104 @@ body.page-test.phase-results .test-action-bar.is-visible {
   z-index: 150;
 }
 
-.detailed-test-upsell,
-.intro-detailed-upsell {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 14px 24px;
+.detailed-test-upsell {
+  margin-top: 20px;
+  padding: 0;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
   font-size: 13px;
-  line-height: 1.55;
+  line-height: 1.6;
   color: var(--muted2);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface2);
+  text-align: center;
+  border: none;
+  background: transparent;
 }
 
 .detailed-test-upsell a,
-.intro-detailed-upsell a {
+.intro-shop-hint a {
   color: var(--gold);
   text-decoration: none;
+  border-bottom: 1px solid var(--gold2);
 }
 
-.detailed-test-upsell a:hover,
-.intro-detailed-upsell a:hover {
-  text-decoration: underline;
-}
-
-.test-mode-tabs {
+.intro-mode-toggle {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 0;
+  margin-bottom: 20px;
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  overflow: hidden;
 }
 
-.test-mode-tab {
+.intro-mode-btn {
   appearance: none;
   -webkit-appearance: none;
-  min-height: 44px;
-  padding: 10px 12px;
-  border: 1px solid var(--border2);
-  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 64px;
+  padding: 12px 10px;
+  border: none;
+  border-right: 1px solid var(--border2);
   background: var(--bg);
   color: var(--muted2);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
-.test-mode-tab.active {
-  border-color: var(--gold);
+.intro-mode-btn:last-child {
+  border-right: none;
+}
+
+.intro-mode-btn.active {
+  background: rgba(200, 169, 110, 0.1);
+  color: var(--text);
+}
+
+.intro-mode-btn .mode-label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold2);
+}
+
+.intro-mode-btn.active .mode-label {
   color: var(--gold);
-  background: rgba(200, 169, 110, 0.08);
+}
+
+.intro-mode-btn .mode-sub {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.test-continue-link {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  margin: 0;
+  padding: 6px 0;
+  border: none;
+  background: none;
+  color: var(--gold2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.test-continue-link--alt {
+  color: var(--muted2);
 }
 
 .test-other-resume-wrap {
-  margin-top: 8px;
-}
-
-.test-other-resume-btn {
-  font-size: 12px;
-  opacity: 0.9;
+  margin-top: -4px;
 }
 
 #results .tab {

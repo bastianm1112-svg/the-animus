@@ -83,7 +83,7 @@
   function bindModeTabs() {
     var tabs = el('testModeTabs');
     if (!tabs) return;
-    tabs.querySelectorAll('.test-mode-tab').forEach(function (tab) {
+    tabs.querySelectorAll('.intro-mode-btn').forEach(function (tab) {
       tab.addEventListener('click', function () {
         var mode = tab.getAttribute('data-mode');
         if (!mode || !g.AnimusPsyche) return;
