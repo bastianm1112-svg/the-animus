@@ -236,6 +236,12 @@ select:focus-visible {
     padding: 14px max(16px, env(safe-area-inset-right)) 14px max(16px, env(safe-area-inset-left));
   }
 
+  .save-bar.visible {
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
+
   .theme-toggle-btn,
   .admin-btn-primary,
   .admin-btn-secondary,
