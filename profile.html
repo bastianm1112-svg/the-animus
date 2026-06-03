@@ -445,20 +445,27 @@ function bootProfilePage(currentUser) {
   }
 
   if (route.kind === 'username') {
-    db.collection('usernames')
-      .doc(route.username)
-      .get()
-      .then(function (doc) {
-        if (!doc.exists) {
-          document.getElementById('profileName').textContent = 'Profile not found';
-          return;
-        }
-        var targetUid = doc.data().uid;
+    var resolvePromise =
+      typeof AnimusShared !== 'undefined' && AnimusShared.resolveUsernameToUid
+        ? AnimusShared.resolveUsernameToUid(db, route.username)
+        : db
+            .collection('usernames')
+            .doc(route.username)
+            .get()
+            .then(function (doc) {
+              if (!doc.exists || !doc.data().uid) throw new Error('not found');
+              return doc.data().uid;
+            });
+    resolvePromise
+      .then(function (targetUid) {
         loadProfileData(
           targetUid,
           !!(currentUser && currentUser.uid === targetUid),
           currentUser
         );
+      })
+      .catch(function () {
+        document.getElementById('profileName').textContent = 'Profile not found';
       });
     return;
   }

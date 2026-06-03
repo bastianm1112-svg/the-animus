@@ -64,10 +64,33 @@ var db = firebase.firestore();
           <label for="adminUid">Or UID</label>
           <input type="text" id="adminUid" placeholder="Firebase user id" autocomplete="off" />
         </div>
-        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadProfile()">Load</button>
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadAccount()">Load account</button>
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadProfile()">Load + profile editor</button>
         <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadMyProfile()">My profile</button>
       </div>
       <div class="admin-status" id="adminStatus"></div>
+    </div>
+
+    <div id="adminModerationPanel" class="admin-card" style="display:none">
+      <div class="admin-card-title">Account moderation</div>
+      <p class="admin-hint">Ban blocks sign-in and writes. Username change updates <code>users.username</code> and the <code>usernames</code> index (search by UID if an old handle still appears).</p>
+      <p class="admin-meta" id="adminModerationStatus">Load a user above.</p>
+      <p class="admin-meta" id="adminModerationLinks"></p>
+      <div class="admin-row" style="margin-top:12px">
+        <div class="admin-field" style="flex:1">
+          <label for="adminNewUsername">New username</label>
+          <input type="text" id="adminNewUsername" placeholder="new_username" autocomplete="off" maxlength="32" />
+        </div>
+        <button type="button" class="admin-btn-primary" onclick="AnimusAdmin.changeUsername()">Change username</button>
+      </div>
+      <div class="admin-field" style="margin-top:12px">
+        <label for="adminBanReason">Ban reason (optional)</label>
+        <input type="text" id="adminBanReason" placeholder="Spam, harassment, impersonation…" maxlength="200" />
+      </div>
+      <div class="admin-actions admin-actions-danger" style="margin-top:12px">
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.banUser()">Ban user</button>
+        <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.unbanUser()">Unban user</button>
+      </div>
     </div>
 
     <div id="adminEditor" style="display:none">
@@ -104,29 +127,6 @@ var db = firebase.firestore();
           <a href="/" class="admin-btn-secondary admin-btn-link">Done</a>
         </div>
       </div>
-
-      <details class="admin-advanced" open>
-        <summary>Account moderation</summary>
-        <div class="admin-card admin-card-nested">
-          <p class="admin-hint">Ban blocks sign-in and Firestore writes. Username changes update the public profile URL.</p>
-          <p class="admin-meta" id="adminModerationStatus">Load a user to moderate.</p>
-          <div class="admin-row" style="margin-top:12px">
-            <div class="admin-field" style="flex:1">
-              <label for="adminNewUsername">Username</label>
-              <input type="text" id="adminNewUsername" placeholder="new_username" autocomplete="off" maxlength="32" />
-            </div>
-            <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.changeUsername()">Change username</button>
-          </div>
-          <div class="admin-field" style="margin-top:12px">
-            <label for="adminBanReason">Ban reason (optional, stored on account)</label>
-            <input type="text" id="adminBanReason" placeholder="Spam, harassment, impersonation…" maxlength="200" />
-          </div>
-          <div class="admin-actions admin-actions-danger" style="margin-top:12px">
-            <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.banUser()">Ban user</button>
-            <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.unbanUser()">Unban user</button>
-          </div>
-        </div>
-      </details>
 
       <details class="admin-advanced" open>
         <summary>Entitlements · Shop access</summary>

@@ -57,8 +57,14 @@
     return un;
   }
 
+  function showModerationPanel(show) {
+    var panel = document.getElementById('adminModerationPanel');
+    if (panel) panel.style.display = show ? 'block' : 'none';
+  }
+
   function loadModerationIntoForm() {
     var status = document.getElementById('adminModerationStatus');
+    var links = document.getElementById('adminModerationLinks');
     var unInput = document.getElementById('adminNewUsername');
     var reasonInput = document.getElementById('adminBanReason');
     if (!status || !targetUser) return;
@@ -75,7 +81,48 @@
       (targetUser.banReason ? ' · ' + targetUser.banReason : '');
     status.className = 'admin-meta' + (banned ? ' admin-meta-banned' : '');
     if (unInput) unInput.value = targetUser.username || '';
-    if (reasonInput && !reasonInput.value) reasonInput.value = targetUser.banReason || '';
+    if (reasonInput) reasonInput.value = targetUser.banReason || '';
+    if (links && g.AnimusShared) {
+      var path = targetUser.username
+        ? g.AnimusShared.profilePathForUsername(targetUser.username)
+        : '/profile?uid=' + encodeURIComponent(targetUid);
+      links.innerHTML =
+        'Profile: <a href="' +
+        path +
+        '" target="_blank" rel="noopener">' +
+        (g.AnimusShared.escapeHTML ? g.AnimusShared.escapeHTML(path) : path) +
+        '</a> · UID lookup always works';
+    }
+    showModerationPanel(true);
+  }
+
+  function loadAccount() {
+    setStatus('Loading account…');
+    setDirty(false);
+    return resolveTargetUid()
+      .then(function (uid) {
+        targetUid = uid;
+        if (document.getElementById('adminUid')) {
+          document.getElementById('adminUid').value = uid;
+        }
+        return db.collection('users').doc(uid).get();
+      })
+      .then(function (uDoc) {
+        if (!uDoc.exists) throw new Error('User document not found');
+        targetUser = uDoc.data();
+        if (targetUser.username && document.getElementById('adminUsername')) {
+          document.getElementById('adminUsername').value = targetUser.username;
+        }
+        loadModerationIntoForm();
+        setStatus(
+          'Loaded @' + (targetUser.username || '(none)') + '. Use moderation below or Load + profile editor.',
+          'ok'
+        );
+      })
+      .catch(function (e) {
+        showModerationPanel(false);
+        setStatus(e.message || 'Load failed', 'err');
+      });
   }
 
   function banUser() {
@@ -166,19 +213,45 @@
           throw new Error('@' + newUsername + ' is already taken.');
         }
         var batch = db.batch();
-        batch.set(db.collection('users').doc(targetUid), { username: newUsername }, { merge: true });
+        var userPatch = { username: newUsername };
+        if (oldUsername) {
+          userPatch.previousUsernames = firebase.firestore.FieldValue.arrayUnion(oldUsername);
+        }
+        batch.set(db.collection('users').doc(targetUid), userPatch, { merge: true });
         batch.set(db.collection('usernames').doc(newUsername), { uid: targetUid });
-        if (oldUsername) batch.delete(db.collection('usernames').doc(oldUsername));
+        if (oldUsername && oldUsername !== newUsername) {
+          batch.delete(db.collection('usernames').doc(oldUsername));
+        }
         return batch.commit();
       })
       .then(function () {
+        return db.collection('users').doc(targetUid).get();
+      })
+      .then(function (doc) {
+        if (doc.exists) targetUser = doc.data();
         targetUser.username = newUsername;
         if (document.getElementById('adminUsername')) {
           document.getElementById('adminUsername').value = newUsername;
         }
+        if (document.getElementById('adminUid')) {
+          document.getElementById('adminUid').value = targetUid;
+        }
         updateTargetMeta();
         loadModerationIntoForm();
-        setStatus('Username updated to @' + newUsername + '.', 'ok');
+        var profilePath =
+          g.AnimusShared && g.AnimusShared.profilePathForUsername
+            ? g.AnimusShared.profilePathForUsername(newUsername)
+            : '/' + encodeURIComponent(newUsername);
+        setStatus(
+          'Username updated to @' +
+            newUsername +
+            '. Profile URL: ' +
+            profilePath +
+            ' (old @' +
+            oldUsername +
+            ' no longer works).',
+          'ok'
+        );
       })
       .catch(function (e) {
         setStatus(e.message || 'Username change failed', 'err');
@@ -196,6 +269,9 @@
     if (uid) return Promise.resolve(uid);
     if (!username) return Promise.reject(new Error('Enter a username or UID'));
 
+    if (g.AnimusShared && g.AnimusShared.resolveUsernameToUid) {
+      return g.AnimusShared.resolveUsernameToUid(db, username);
+    }
     return db
       .collection('usernames')
       .doc(username)
@@ -366,9 +442,10 @@
       ? g.AnimusShared.escapeHTML(targetUser.displayName || 'User')
       : String(targetUser.displayName || 'User');
     var safeUid = g.AnimusShared ? g.AnimusShared.escapeHTML(targetUid) : targetUid;
-    var profileLink = targetUser.username
-      ? '/profile/' + encodeURIComponent(targetUser.username)
-      : '/profile?uid=' + encodeURIComponent(targetUid);
+    var profileLink =
+      g.AnimusShared && targetUser.username
+        ? g.AnimusShared.profilePathForUsername(targetUser.username)
+        : '/profile?uid=' + encodeURIComponent(targetUid);
     meta.innerHTML =
       'Editing <strong>' +
       name +
@@ -405,12 +482,11 @@
   function loadProfile() {
     setStatus('Loading…');
     setDirty(false);
-    return resolveTargetUid()
-      .then(function (uid) {
-        targetUid = uid;
+    return loadAccount()
+      .then(function () {
         return Promise.all([
-          db.collection('users').doc(uid).get(),
-          db.collection('profiles').doc(uid).get()
+          db.collection('users').doc(targetUid).get(),
+          db.collection('profiles').doc(targetUid).get()
         ]);
       })
       .then(function (res) {
@@ -805,6 +881,7 @@
 
   g.AnimusAdmin = {
     boot: boot,
+    loadAccount: loadAccount,
     loadProfile: loadProfile,
     loadMyProfile: loadMyProfile,
     updatePreview: updatePreview,

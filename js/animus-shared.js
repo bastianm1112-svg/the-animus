@@ -571,6 +571,43 @@
     return { kind: 'self' };
   }
 
+  /**
+   * Resolve a handle to Firebase uid: usernames index first, then users.username field.
+   */
+  function resolveUsernameToUid(db, rawUsername) {
+    if (!db) return Promise.reject(new Error('Database unavailable'));
+    var username = normalizeUsername(rawUsername);
+    if (!username) return Promise.reject(new Error('Invalid username'));
+    return db
+      .collection('usernames')
+      .doc(username)
+      .get()
+      .then(function (doc) {
+        if (doc.exists && doc.data() && doc.data().uid) {
+          return doc.data().uid;
+        }
+        return db
+          .collection('users')
+          .where('username', '==', username)
+          .limit(1)
+          .get()
+          .then(function (snap) {
+            if (!snap.empty) {
+              var hit = snap.docs[0];
+              var uid = hit.id;
+              var data = hit.data() || {};
+              if (data.username === username) {
+                return db.collection('usernames').doc(username).set({ uid: uid }).then(function () {
+                  return uid;
+                });
+              }
+              return uid;
+            }
+            throw new Error('Username not found');
+          });
+      });
+  }
+
   function profilePathForUsername(username) {
     var u = normalizeUsername(username);
     return u ? '/' + encodeURIComponent(u) : '/profile';
@@ -1451,6 +1488,7 @@
     getSavedTestMode: getSavedTestMode,
     setSavedTestMode: setSavedTestMode,
     validateUsername: validateUsername,
-    enforceBannedSession: enforceBannedSession
+    enforceBannedSession: enforceBannedSession,
+    resolveUsernameToUid: resolveUsernameToUid
   };
 })(typeof window !== 'undefined' ? window : this);
