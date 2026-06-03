@@ -55,12 +55,118 @@ body.member-mode #guestApp {
   margin-bottom: 28px;
 }
 
-.daily-fact-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--gold);
-  padding: 20px 22px;
+/* Today hub — XP + daily insight (home only) */
+.home-daily-hub {
   margin-bottom: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+#homeXpMount:empty {
+  display: none;
+}
+
+.xp-card {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(200, 169, 110, 0.05) 0%, transparent 100%);
+}
+
+.xp-card-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.xp-level-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--gold2);
+  background: rgba(200, 169, 110, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.xp-level-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.xp-card-copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.xp-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--white);
+  letter-spacing: 0.04em;
+}
+
+.xp-card-sub {
+  font-size: 11px;
+  color: var(--muted2);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xp-total-badge {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--border2);
+  background: var(--bg);
+}
+
+.xp-bar-track {
+  height: 5px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold2) 0%, var(--gold) 55%, var(--gold3) 100%);
+  transition: width 0.45s ease;
+  box-shadow: 0 0 12px rgba(200, 169, 110, 0.35);
+}
+
+.daily-fact-card {
+  padding: 18px 20px 20px;
+  margin-bottom: 0;
+  border: none;
+  border-left: none;
+  background: transparent;
+}
+
+.daily-fact-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .daily-fact-label {
@@ -68,13 +174,182 @@ body.member-mode #guestApp {
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--gold2);
-  margin-bottom: 10px;
+  margin-bottom: 0;
+}
+
+.daily-fact-xp-badge {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 4px 8px;
+  border: 1px solid var(--gold2);
+  background: rgba(200, 169, 110, 0.08);
+  flex-shrink: 0;
+}
+
+.daily-fact-xp-badge.is-claimed {
+  color: var(--muted);
+  border-color: var(--border2);
+  background: transparent;
 }
 
 .daily-fact-text {
   font-size: 14px;
   color: var(--muted2);
   line-height: 1.75;
+}
+
+.home-daily-extras {
+  border-top: 1px solid var(--border);
+}
+
+.home-daily-extras[hidden] {
+  display: none;
+}
+
+.daily-row {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.daily-row:last-child {
+  border-bottom: none;
+}
+
+.daily-row-label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.daily-row-text,
+.daily-prompt-text,
+.daily-row-hint {
+  font-size: 13px;
+  color: var(--muted2);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.daily-row-hint {
+  font-size: 11px;
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.daily-streak-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.daily-streak-count {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.daily-streak-unit {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted2);
+}
+
+.mood-btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mood-btn {
+  flex: 1;
+  min-width: 88px;
+  padding: 10px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.mood-btn:hover {
+  border-color: var(--gold2);
+  color: var(--text);
+}
+
+.mood-btn.is-active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(200, 169, 110, 0.1);
+}
+
+.mood-btn-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.mood-btn-label {
+  letter-spacing: 0.06em;
+}
+
+.daily-reflection-input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 72px;
+  outline: none;
+}
+
+.daily-reflection-input:focus {
+  border-color: var(--gold2);
+}
+
+.daily-reflection-save,
+.daily-row-cta {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid var(--gold2);
+  color: var(--gold);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, color 0.2s;
+}
+
+.daily-reflection-save:hover,
+.daily-row-cta:hover {
+  background: rgba(200, 169, 110, 0.12);
+  color: var(--gold3);
+}
+
+.daily-compare-empty .daily-row-cta {
+  border-color: var(--border2);
+  color: var(--muted2);
 }
 
 .home-prompt {

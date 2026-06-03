@@ -107,7 +107,10 @@ service cloud.firestore {
 
     function retentionKeysOnly() {
       return request.resource.data.diff(resource.data).affectedKeys()
-        .hasOnly(['compareUsage', 'xp', 'lastXpReason', 'lastXpAt', 'lastDailyInsight']);
+        .hasOnly([
+          'compareUsage', 'xp', 'lastXpReason', 'lastXpAt', 'lastDailyInsight',
+          'dailyStreak', 'dailyMood', 'dailyReflection'
+        ]);
     }
 
     function compareUsageIncrementValid() {

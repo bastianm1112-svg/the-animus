@@ -8,6 +8,11 @@
 
   var XP_AWARDS = {
     daily_insight: 5,
+    streak_day: 3,
+    streak_milestone_7: 15,
+    streak_milestone_30: 50,
+    mood_checkin: 5,
+    reflection_note: 8,
     compare: 15,
     test_complete: 40,
     estimator_complete: 25,
@@ -64,11 +69,25 @@
   function renderXpBar(rootEl, userData) {
     if (!rootEl) return;
     var prog = xpProgress(normalizeXp(userData).total);
+    var toNext = Math.max(0, prog.ceiling - prog.total);
+    var atMax = prog.level >= LEVEL_THRESHOLDS.length;
+    var sub =
+      atMax
+        ? prog.total + ' XP · max level'
+        : prog.total + ' / ' + prog.ceiling + ' XP · ' + toNext + ' to level ' + (prog.level + 1);
     rootEl.innerHTML =
-      '<div class="xp-bar-wrap">' +
-      '<div class="xp-bar-meta"><span class="xp-level">Level ' + prog.level + '</span>' +
-      '<span class="xp-points">' + prog.total + ' XP</span></div>' +
-      '<div class="xp-bar-track"><div class="xp-bar-fill" style="width:' + prog.pct + '%"></div></div>' +
+      '<div class="xp-card">' +
+      '<div class="xp-card-head">' +
+      '<div class="xp-level-ring" aria-hidden="true"><span class="xp-level-num">' + prog.level + '</span></div>' +
+      '<div class="xp-card-copy">' +
+      '<span class="xp-card-title">Level ' + prog.level + '</span>' +
+      '<span class="xp-card-sub">' + sub + '</span>' +
+      '</div>' +
+      '<span class="xp-total-badge">' + prog.total + ' XP</span>' +
+      '</div>' +
+      '<div class="xp-bar-track" role="progressbar" aria-valuenow="' + prog.pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="Progress to next level">' +
+      '<div class="xp-bar-fill" style="width:' + prog.pct + '%"></div>' +
+      '</div>' +
       '</div>';
   }
 

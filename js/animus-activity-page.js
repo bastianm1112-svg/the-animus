@@ -1,5 +1,5 @@
 /**
- * Combined Activity page — requests, friends, feed, estimator, XP.
+ * Combined Activity page — requests, friends, feed, estimator.
  */
 (function (g) {
   'use strict';
@@ -58,9 +58,6 @@
         .get()
         .then(function (doc) {
           var data = doc.exists ? doc.data() : {};
-          if (g.AnimusXp) {
-            g.AnimusXp.renderXpBar(document.getElementById('activityXpMount'), data);
-          }
           var entitled =
             g.AnimusEntitlements && g.AnimusEntitlements.hasEntitlement(data, 'testEstimator');
           renderEstimator(entitled);

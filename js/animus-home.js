@@ -1,5 +1,5 @@
 /**
- * Logged-in home on index — greeting, daily fact, quick actions.
+ * Logged-in home on index — greeting, XP, daily insight, quick actions.
  */
 (function (g) {
   'use strict';
@@ -29,11 +29,70 @@
     return days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
   }
 
+  function todayKey() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
   function setMemberMode(on) {
     if (on) {
       document.body.classList.add('member-mode');
     } else {
       document.body.classList.remove('member-mode');
+    }
+  }
+
+  function updateDailyXpBadge(userData) {
+    var badge = document.getElementById('dailyXpBadge');
+    if (!badge || !g.AnimusXp) return;
+    var claimed = userData && userData.lastDailyInsight === todayKey();
+    if (claimed) {
+      badge.textContent = 'Claimed today';
+      badge.classList.add('is-claimed');
+      badge.hidden = false;
+    } else {
+      badge.textContent = '+' + (g.AnimusXp.XP_AWARDS.daily_insight || 5) + ' XP';
+      badge.classList.remove('is-claimed');
+      badge.hidden = false;
+    }
+  }
+
+  function renderHomeRetention(userData, profile, user, db) {
+    if (g.AnimusXp) {
+      g.AnimusXp.renderXpBar(document.getElementById('homeXpMount'), userData);
+    }
+    updateDailyXpBadge(userData);
+
+    var factEl = document.getElementById('dailyFactText');
+    var factLabel = document.getElementById('dailyFactLabel');
+    if (g.AnimusDailyFacts && factEl) {
+      var fact = g.AnimusDailyFacts.pickDailyFact(profile, user.uid);
+      factEl.textContent = fact.text;
+      if (factLabel) factLabel.textContent = 'Daily insight · ' + fact.label;
+    }
+
+    function refreshRetention(fresh) {
+      window.__animusHomeUserData = fresh;
+      if (g.AnimusXp) {
+        g.AnimusXp.renderXpBar(document.getElementById('homeXpMount'), fresh);
+      }
+      updateDailyXpBadge(fresh);
+      if (g.AnimusDaily) {
+        g.AnimusDaily.render(db, user.uid, fresh, profile, refreshRetention);
+      }
+    }
+
+    if (g.AnimusXp && profile && profile.mbti) {
+      g.AnimusXp.awardDailyInsightIfNew(db, user.uid, userData).then(function () {
+        return db.collection('users').doc(user.uid).get();
+      }).then(function (doc) {
+        refreshRetention(doc.exists ? doc.data() : userData);
+      }).catch(function () {});
+    }
+
+    if (g.AnimusDaily && profile && profile.mbti) {
+      g.AnimusDaily.boot(db, user.uid, userData, profile, refreshRetention).then(function (fresh) {
+        if (fresh) refreshRetention(fresh);
+      }).catch(function () {});
     }
   }
 
@@ -62,11 +121,12 @@
       var greetEl = document.getElementById('homeGreeting');
       var displayName = escapeHTML(user.displayName || user.email.split('@')[0]);
 
-      db.collection('users')
+      var userPromise = db.collection('users')
         .doc(user.uid)
         .get()
         .then(function (doc) {
           var userData = doc.exists ? doc.data() : {};
+          window.__animusHomeUserData = userData;
           if (userData.displayName) {
             displayName = escapeHTML(userData.displayName);
           }
@@ -107,10 +167,7 @@
               })
               .catch(function () {});
           }
-          if (g.AnimusXp) {
-            g.AnimusXp.renderXpBar(document.getElementById('homeXpMount'), userData);
-          }
-          window.__animusHomeUserData = userData;
+          return userData;
         });
 
       var profilePromise =
@@ -124,30 +181,34 @@
                 return pdoc.exists && pdoc.data().latest ? pdoc.data().latest : null;
               });
 
-      profilePromise.then(function (profile) {
-          var factEl = document.getElementById('dailyFactText');
-          var factLabel = document.getElementById('dailyFactLabel');
-          if (g.AnimusDailyFacts && factEl) {
-            var fact = g.AnimusDailyFacts.pickDailyFact(profile, user.uid);
-            factEl.textContent = fact.text;
-            if (factLabel) factLabel.textContent = 'Daily insight · ' + fact.label;
-            if (g.AnimusXp && window.__animusHomeUserData) {
-              g.AnimusXp.awardDailyInsightIfNew(db, user.uid, window.__animusHomeUserData);
+      Promise.all([userPromise, profilePromise]).then(function (results) {
+        var userData = results[0];
+        var profile = results[1];
+        renderHomeRetention(userData, profile, user, db);
+
+        var factEl = document.getElementById('dailyFactText');
+        if (!profile || !profile.mbti) {
+          if (factEl) {
+            factEl.textContent =
+              'Complete your assessment to unlock a personalized insight each day.';
+          }
+          var badge = document.getElementById('dailyXpBadge');
+          if (badge) badge.hidden = true;
+        }
+
+        var banner = document.getElementById('onboardingBanner');
+        if (banner) {
+          if (profile && profile.mbti) {
+            banner.classList.remove('show');
+          } else {
+            banner.classList.add('show');
+            if (typeof g.AnimusShared !== 'undefined') {
+              g.AnimusShared.trySyncLocalResultToFirestore(user).then(function (synced) {
+                if (synced) g.location.reload();
+              });
             }
           }
-          var banner = document.getElementById('onboardingBanner');
-          if (banner) {
-            if (profile && profile.mbti) {
-              banner.classList.remove('show');
-            } else {
-              banner.classList.add('show');
-              if (typeof g.AnimusShared !== 'undefined') {
-                g.AnimusShared.trySyncLocalResultToFirestore(user).then(function (synced) {
-                  if (synced) g.location.reload();
-                });
-              }
-            }
-          }
+        }
       });
 
       if (typeof g.AnimusSocial !== 'undefined') {

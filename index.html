@@ -691,11 +691,17 @@ var db = firebase.firestore();
     <p>Take the assessment to unlock your full profile and daily insights.</p>
     <a href="/test">Begin assessment</a>
   </div>
-  <div id="homeXpMount"></div>
-  <div class="daily-fact-card" id="dailyFactCard">
-    <div class="daily-fact-label" id="dailyFactLabel">Daily insight</div>
-    <p class="daily-fact-text" id="dailyFactText">Loading?</p>
-  </div>
+  <section class="home-daily-hub" id="homeDailyHub" aria-label="Today">
+    <div id="homeXpMount"></div>
+    <div class="daily-fact-card" id="dailyFactCard">
+      <div class="daily-fact-head">
+        <div class="daily-fact-label" id="dailyFactLabel">Daily insight</div>
+        <span class="daily-fact-xp-badge" id="dailyXpBadge" hidden></span>
+      </div>
+      <p class="daily-fact-text" id="dailyFactText">Loading…</p>
+    </div>
+    <div class="home-daily-extras" id="homeDailyExtras" hidden></div>
+  </section>
   <h2 class="home-prompt">What would you like to do today?</h2>
   <div class="home-actions">
     <a href="/test" class="home-action-card primary">
@@ -1052,6 +1058,7 @@ var db = firebase.firestore();
 </div>
 
 <script src="/js/daily-facts.js"></script>
+<script src="/js/animus-daily.js"></script>
 <script src="/js/animus-social.js"></script>
 <script src="/js/animus-nav.js"></script>
 <script src="/js/animus-home.js"></script>
