@@ -1,18 +1,28 @@
 /* Logged-in home (index) */
 
 .member-app {
-  display: none;
+  display: none !important;
+  visibility: hidden;
   min-height: 100vh;
   padding-top: var(--nav-h);
   padding-bottom: calc(var(--mbn-h) + var(--safe-bottom) + 16px);
 }
 
 body.member-mode .member-app {
+  display: block !important;
+  visibility: visible;
+}
+
+body.guest-mode #guestApp {
   display: block;
 }
 
 body.member-mode #guestApp {
   display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
 }
 
 .member-home {

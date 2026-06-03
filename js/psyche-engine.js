@@ -25,6 +25,10 @@ function setTestPhase(phase) {
   else if (g.AnimusApp && g.AnimusApp.setPagePhase) g.AnimusApp.setPagePhase(phase);
 }
 
+function isQuizPhase() {
+  return document.body && document.body.classList.contains('phase-quiz');
+}
+
 function profileLinkField() {
   return document.getElementById('profileLinkInput') || document.getElementById('importInput');
 }
@@ -109,7 +113,7 @@ function refreshAnimusLang() {
     refreshAnimusLang();
     updateIntroLang();
     var quiz = document.getElementById('quiz');
-    if (quiz && quiz.style.display !== 'none' && typeof renderQ === 'function') {
+    if (isQuizPhase() && typeof renderQ === 'function') {
       renderQ();
     }
   });
@@ -118,7 +122,7 @@ function refreshAnimusLang() {
       refreshAnimusLang();
       updateIntroLang();
       var quizEl = document.getElementById('quiz');
-      if (quizEl && quizEl.style.display !== 'none' && typeof renderQ === 'function') {
+      if (isQuizPhase() && typeof renderQ === 'function') {
         renderQ();
       }
     }
@@ -309,8 +313,6 @@ function resumeTestFromStorage() {
     answers = data.answers.slice();
     _choiceIx = (data.choiceIx && data.choiceIx.length === TOTAL) ? data.choiceIx.slice() : new Array(TOTAL).fill(-1);
     cur = Math.min(data.cur, TOTAL - 1);
-    document.getElementById('intro').style.display = 'none';
-    document.getElementById('quiz').style.display = 'block';
     setTestPhase('quiz');
     if(observerMode && observerSubjectName){
       document.querySelector('.qhdr-logo').innerHTML = 'ANI<span>MUS</span> <span class="qhdr-est">ESTIMATOR</span>';
@@ -430,8 +432,6 @@ function startTest() {
     cur = 0;
     _explainCache = {};
     clearTestProgress();
-    document.getElementById('intro').style.display='none';
-    document.getElementById('quiz').style.display='block';
     setTestPhase('quiz');
     if(observerMode && observerSubjectName){
       var logo = document.querySelector('.qhdr-logo');
@@ -557,7 +557,6 @@ function doImportFromProfile(profile) {
   };
   var fnsSorted = Object.keys(syntheticData.cog).sort(function(a,b){ return syntheticData.cog[b]-syntheticData.cog[a]; });
 
-  document.getElementById('intro').style.display='none';
   setTestPhase('results');
   showResults(syntheticData, profile.mbti, syntheticEnn, profile.att||'AT_AVO',
     profile.phi||'PH_NIE', profile.instStack||'', fnsSorted, syntheticAI, true);
@@ -570,11 +569,9 @@ function doImportFromProfile(profile) {
     if(bar){
       bar.innerHTML = '<button class="btn-action" id="btnBackHome">&#8592; BACK TO HOME</button>'
         +'<button class="btn-action" id="btnPDFImport"><span class="btn-action-icon">&#9113;</span> DOWNLOAD PDF</button>';
-      bar.style.display = 'flex';
+      bar.classList.add('is-visible');
       document.getElementById('btnBackHome').addEventListener('click', function(){
-        document.getElementById('results').style.display='none';
-        bar.style.display='none';
-        document.getElementById('intro').style.display='flex';
+        bar.classList.remove('is-visible');
         setTestPhase('intro');
         var inp = profileLinkField();
         if (inp) inp.value = '';
@@ -670,8 +667,7 @@ function showResultsFromStoredSnapshot(snap, subjectName) {
     shadowDesc: snap.shadowDesc || '',
     big5: snap.big5 || {}
   };
-  document.getElementById('intro').style.display = 'none';
-  document.getElementById('quiz').style.display = 'none';
+  setTestPhase('results');
   showResults(
     data,
     snap.mbti,
@@ -694,7 +690,7 @@ function showResultsFromStoredSnapshot(snap, subjectName) {
       '</strong> — Based on observed behavior only. <a href="/estimations" style="color:var(--accent)">← Estimations</a>';
     heroEl.insertBefore(banner, heroEl.firstChild);
   }
-  document.getElementById('actionBar').style.display = 'none';
+  document.getElementById('actionBar').classList.remove('is-visible');
 }
 
 function tryLoadEstimationView() {
@@ -777,8 +773,6 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
   var fillAnswers = new Array(filteredQ.length).fill(null);
   var fillCur = 0;
 
-  document.getElementById('intro').style.display = 'none';
-  document.getElementById('quiz').style.display = 'block';
   setTestPhase('quiz');
 
   var missingLabel = missingDims.length + ' missing dimension' + (missingDims.length > 1 ? 's' : '');
@@ -876,8 +870,7 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
 }
 
 function finishFill(filteredQ, fillAnswers, baseProfile){
-  document.getElementById('quiz').style.display = 'none';
-  document.getElementById('loading').style.display = 'flex';
+  setTestPhase('loading');
 
   // Score just the answered questions
   var newScores = {};
@@ -952,12 +945,10 @@ function finishFill(filteredQ, fillAnswers, baseProfile){
 
   callAIWithRetry(prompt, 3, function(aiRes){
     clearInterval(iv2);
-    document.getElementById('loading').style.display='none';
     showResults(mergedData, mbti, enn, baseProfile.att||'AT_AVO', baseProfile.phi||'PH_NIE',
       baseProfile.instStack||'', fnsSorted, aiRes, false);
   }, function(){
     clearInterval(iv2);
-    document.getElementById('loading').style.display='none';
     var fallback = buildFallbackNarrative(mbti, enn, baseProfile.att||'AT_AVO', baseProfile.phi||'PH_NIE', mergedData);
     showResults(mergedData, mbti, enn, baseProfile.att||'AT_AVO', baseProfile.phi||'PH_NIE',
       baseProfile.instStack||'', fnsSorted, fallback, true);
@@ -1086,8 +1077,6 @@ function renderQ(){
 // ── FINISH QUIZ (called when user completes last question) ──
 function finishQuiz(){
   clearTestProgress();
-  document.getElementById('quiz').style.display='none';
-  document.getElementById('loading').style.display='flex';
   setTestPhase('loading');
   document.getElementById('loadStatus').textContent='Scoring your responses...';
 
@@ -1103,10 +1092,8 @@ function finishQuiz(){
   var prompt = buildPrompt(data);
 
   callAIWithRetry(prompt, 3, function(aiRes){
-    document.getElementById('loading').style.display='none';
     showResults(data, mbti, enn, att, phi, instStack, fnsSorted, aiRes, false);
   }, function(){
-    document.getElementById('loading').style.display='none';
     var fallback = buildFallbackNarrative(mbti, enn, att, phi, data);
     showResults(data, mbti, enn, att, phi, instStack, fnsSorted, fallback, true);
   });
@@ -1609,7 +1596,6 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   refreshAnimusLang();
   var es = lang === 'es';
   var res=document.getElementById('results');
-  res.style.display='block';
   setTestPhase('results');
   window.scrollTo(0,0);
 
@@ -2053,8 +2039,6 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     cur=0;
     window._activeQ = null;
     TOTAL = Q.length;
-    res.style.display='none';
-    document.getElementById('intro').style.display='flex';
     setTestPhase('intro');
     window.scrollTo(0,0);
   });
@@ -2071,7 +2055,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   },200);
 
   // Show action bar and wire buttons
-  document.getElementById('actionBar').style.display='flex';
+  document.getElementById('actionBar').classList.add('is-visible');
 
   // Build shareable snapshot — full data so imports are complete
   var snapshot={
@@ -2621,8 +2605,9 @@ function showComparison(you, them){
     try{
       var shared=safeAtob(encoded);
       if(!shared) throw new Error('invalid');
-      // Show a prompt to compare — they loaded someone's profile link
-      document.getElementById('intro').style.display='none';
+      ['intro','quiz','loading','results','compare'].forEach(function(p){
+        document.body.classList.remove('phase-' + p);
+      });
       // Show shared profile read-only summary then prompt to take test for comparison
       var notice=document.createElement('div');
       notice.style.cssText='min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;';
@@ -2640,12 +2625,12 @@ function showComparison(you, them){
         shuffle(Q);
         answers=new Array(TOTAL).fill(null);
         cur=0;
-        document.getElementById('quiz').style.display='block';
+        setTestPhase('quiz');
         renderQ();
       });
     } catch(e){
       // Bad hash, just load normally
-      document.getElementById('intro').style.display='flex';
+      setTestPhase('intro');
     }
   }
 })();

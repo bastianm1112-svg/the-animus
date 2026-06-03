@@ -23,17 +23,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/animus-shell.css">
-<link rel="stylesheet" href="/style.css">
-<link rel="stylesheet" href="/css/animus-unified.css">
-<link rel="stylesheet" href="/css/animus-release.css">
-<link rel="stylesheet" href="/css/animus-shop.css">
-<link rel="stylesheet" href="/css/animus-premium.css">
-<link rel="stylesheet" href="/css/animus-motion.css">
-<link rel="stylesheet" href="/css/animus-test.css">
+<link rel="stylesheet" href="/css/animus-shell.css?v=20260603">
+<link rel="stylesheet" href="/style.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-unified.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-release.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-shop.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-premium.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-motion.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-test.css?v=20260603">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
-<script src="/js/animus-app.js" defer></script>
+<script src="/js/animus-app.js?v=20260603" defer></script>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -47,7 +47,57 @@
     });
     AnimusShared.guardTestPageAuth(auth);
   </script>
-  <style>
+  <style id="test-page-critical">
+    /* Phase visibility — must win over legacy JS inline display */
+    body.page-test #intro,
+    body.page-test #quiz,
+    body.page-test #loading,
+    body.page-test #results,
+    body.page-test #compareView,
+    body.page-test #actionBar { display: none !important; }
+    body.page-test.phase-intro #intro { display: block !important; }
+    body.page-test.phase-quiz #quiz { display: block !important; }
+    body.page-test.phase-loading #loading {
+      display: flex !important;
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 400 !important;
+      background: var(--bg, #080808) !important;
+      min-height: 100dvh !important;
+      margin: 0 !important;
+      padding: 40px 24px !important;
+    }
+    body.page-test.phase-results #results { display: block !important; }
+    body.page-test.phase-results #actionBar.is-visible { display: flex !important; }
+    body.page-test.phase-compare #compareView { display: block !important; }
+    /* Quiz answer chrome — themed even if external CSS is stale */
+    body.page-test #quiz { background: var(--bg, #080808); color: var(--text, #e2e2e2); min-height: 100dvh; }
+    body.page-test #quiz button {
+      appearance: none; -webkit-appearance: none; border-radius: 0;
+      font-family: 'DM Sans', sans-serif; box-sizing: border-box;
+    }
+    body.page-test #quiz .q-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 4vw, 30px);
+      line-height: 1.3;
+      color: var(--white, #f0ece4);
+    }
+    body.page-test #quiz .mc-choice,
+    body.page-test #quiz .agree-btn,
+    body.page-test #quiz .scale-btn {
+      background: var(--surface, #0f0f0f);
+      border: 1px solid var(--border, #1e1e1e);
+      color: var(--text, #e2e2e2);
+    }
+    body.page-test #quiz .mc-choice.selected,
+    body.page-test #quiz .agree-btn.sel,
+    body.page-test #quiz .scale-btn.sel {
+      border-color: var(--gold, #c8a96e);
+      background: rgba(200, 169, 110, 0.1);
+      color: var(--text, #e2e2e2);
+    }
+    body.page-test #quiz .btn-next { background: var(--gold, #c8a96e); color: #000; border: none; }
+    body.page-test #quiz .btn-sec { background: none; border: 1px solid var(--border, #1e1e1e); color: var(--muted2, #888); }
     body.page-test.test-auth-pending #appNavMount,
     body.page-test.test-auth-pending #intro,
     body.page-test.test-auth-pending #quiz,
@@ -57,7 +107,7 @@
     body.page-test.test-auth-pending #appBottomMount,
     body.page-test.test-auth-pending .skip-link { visibility: hidden; pointer-events: none; }
     body.page-test.test-auth-pending::after {
-      content: 'Checking sign-in?';
+      content: 'Checking sign-in…';
       position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
       font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted2);
       background: var(--bg); z-index: 9999;
@@ -159,7 +209,7 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <script src="/js/psyche-cross.js"></script>
 <script src="/js/profile-narrative-depth.js"></script>
 <script src="/js/profile-narratives.js"></script>
-<script src="/js/psyche-engine.js"></script>
+<script src="/js/psyche-engine.js?v=20260603"></script>
 <script src="/js/psyche-intro.js"></script>
 
 <div id="appBottomMount"></div>

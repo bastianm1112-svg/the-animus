@@ -27,15 +27,30 @@ AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 var auth = firebase.auth();
 var db = firebase.firestore();
 </script>
-<link rel="stylesheet" href="/css/animus-shell.css">
-<link rel="stylesheet" href="/style.css">
-<link rel="stylesheet" href="/css/animus-release.css">
-<link rel="stylesheet" href="/css/animus-home.css">
-<link rel="stylesheet" href="/css/animus-notifications.css">
-<link rel="stylesheet" href="/css/animus-shop.css">
-<link rel="stylesheet" href="/css/animus-type-accents.css">
-<link rel="stylesheet" href="/css/animus-motion.css">
-<link rel="stylesheet" href="/css/animus-premium.css">
+<link rel="stylesheet" href="/css/animus-shell.css?v=20260603">
+<link rel="stylesheet" href="/style.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-release.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-home.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-notifications.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-shop.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-type-accents.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-motion.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-premium.css?v=20260603">
+<style>
+  @media (max-width: 559px) {
+    .activity-estimator-actions {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+    .activity-estimator-cta {
+      width: auto !important;
+      max-width: calc(100% - 12px);
+      margin: 0 auto;
+      justify-content: center;
+    }
+  }
+</style>
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
 <script src="/js/animus-app.js" defer></script>
@@ -98,7 +113,7 @@ var db = firebase.firestore();
 <script src="/js/animus-pull-refresh.js"></script>
 <script src="/js/animus-social.js"></script>
 <script src="/js/animus-nav.js"></script>
-<script src="/js/animus-activity-page.js"></script>
+<script src="/js/animus-activity-page.js?v=20260603"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   AnimusNav.mountTop('appNavMount', 'activity');

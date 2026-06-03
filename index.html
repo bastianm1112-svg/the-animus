@@ -121,7 +121,7 @@ body {
 }
 
 /* Radial glow */
-.hero-glow {
+#guestApp .hero-glow {
   position: absolute;
   width: 800px; height: 800px;
   border-radius: 50%;
@@ -131,7 +131,7 @@ body {
 }
 
 /* Vertical text decoration */
-.hero-vert {
+#guestApp .hero-vert {
   position: absolute;
   right: 40px; top: 50%;
   transform: translateY(-50%) rotate(90deg);
@@ -143,9 +143,9 @@ body {
   white-space: nowrap;
 }
 
-.hero-content { position: relative; z-index: 2; max-width: 900px; }
+#guestApp .hero-content { position: relative; z-index: 2; max-width: 900px; }
 
-.hero-eyebrow {
+#guestApp .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 12px;
   font-size: 11px;
   letter-spacing: 0.35em;
@@ -155,14 +155,14 @@ body {
   opacity: 0;
   animation: fadeUp 0.8s forwards 0.2s;
 }
-.hero-eyebrow::before {
+#guestApp .hero-eyebrow::before {
   content: '';
   display: block;
   width: 32px; height: 1px;
   background: var(--gold);
 }
 
-.hero-title {
+#guestApp .hero-title {
   font-family: 'Bebas Neue', sans-serif;
   font-size: clamp(80px, 14vw, 180px);
   line-height: 0.88;
@@ -172,13 +172,13 @@ body {
   opacity: 0;
   animation: fadeUp 0.8s forwards 0.4s;
 }
-.hero-title .gold { color: var(--gold); }
-.hero-title .outline {
+#guestApp .hero-title .gold { color: var(--gold); }
+#guestApp .hero-title .outline {
   -webkit-text-stroke: 1px rgba(200,169,110,0.4);
   color: transparent;
 }
 
-.hero-subtitle {
+#guestApp .hero-subtitle {
   font-family: 'Playfair Display', serif;
   font-size: clamp(18px, 2.5vw, 28px);
   font-style: italic;
@@ -190,7 +190,7 @@ body {
   animation: fadeUp 0.8s forwards 0.6s;
 }
 
-.hero-actions {
+#guestApp .hero-actions {
   display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
   opacity: 0;
   animation: fadeUp 0.8s forwards 0.8s;
@@ -234,7 +234,7 @@ body {
 }
 .btn-hero-secondary:hover { color: var(--text); border-color: var(--muted2); }
 
-.hero-stats {
+#guestApp .hero-stats {
   position: absolute;
   bottom: 48px; left: 40px;
   display: flex; gap: 48px;
@@ -242,7 +242,7 @@ body {
   opacity: 0;
   animation: fadeUp 0.8s forwards 1.0s;
 }
-.hero-stat strong {
+#guestApp .hero-stat strong {
   display: block;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 36px;
@@ -251,7 +251,7 @@ body {
   line-height: 1;
   margin-bottom: 4px;
 }
-.hero-stat span {
+#guestApp .hero-stat span {
   font-size: 10px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -259,7 +259,7 @@ body {
 }
 
 /* Scroll indicator */
-.scroll-indicator {
+#guestApp .scroll-indicator {
   position: absolute;
   bottom: 48px; right: 40px;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -267,12 +267,12 @@ body {
   opacity: 0;
   animation: fadeUp 0.8s forwards 1.2s;
 }
-.scroll-line {
+#guestApp .scroll-line {
   width: 1px; height: 48px;
   background: linear-gradient(to bottom, var(--gold), transparent);
   animation: scrollPulse 2s ease-in-out infinite;
 }
-.scroll-indicator span {
+#guestApp .scroll-indicator span {
   font-size: 9px;
   letter-spacing: 0.3em;
   color: var(--muted);
@@ -706,19 +706,28 @@ AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 var auth = firebase.auth();
 var db = firebase.firestore();
 </script>
-<link rel="stylesheet" href="/css/animus-shell.css">
-<link rel="stylesheet" href="/style.css">
-<link rel="stylesheet" href="/css/animus-release.css">
-<link rel="stylesheet" href="/css/animus-home.css">
-<link rel="stylesheet" href="/css/animus-type-accents.css">
-<link rel="stylesheet" href="/css/animus-motion.css">
-<link rel="stylesheet" href="/css/animus-legal.css">
-<link rel="stylesheet" href="/css/animus-premium.css">
+<style id="home-mode-critical">
+  /* Signed-out: never flash member shell over guest landing */
+  #memberApp { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; }
+  body.member-mode #memberApp { display: block !important; visibility: visible !important; height: auto !important; overflow: visible !important; pointer-events: auto !important; }
+  body.member-mode #guestApp { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; }
+  #guestApp .hero-eyebrow { font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: 0.28em; }
+  #guestApp .hero-subtitle { font-family: 'Playfair Display', serif; }
+  #guestApp .hero-title { font-family: 'Bebas Neue', sans-serif; }
+</style>
+<link rel="stylesheet" href="/css/animus-shell.css?v=20260603">
+<link rel="stylesheet" href="/style.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-release.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-home.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-type-accents.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-motion.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-legal.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-premium.css?v=20260603">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
 <script src="/js/animus-app.js" defer></script>
 </head>
-<body>
+<body class="guest-mode">
 <a href="#guestApp" class="skip-link">Skip to content</a>
 <script>
 (function(){try{var _st=localStorage.getItem('animus_theme');if(_st==='light')document.body.classList.add('light-mode');}catch(e){}})();
@@ -1120,8 +1129,6 @@ var db = firebase.firestore();
 <script src="/js/animus-home.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  AnimusNav.mountTop('memberNavMount', 'home');
-  AnimusNav.mountBottom('memberBottomMount', 'home');
   if (typeof AnimusLegal !== 'undefined') {
     AnimusLegal.mountFooter('guestLegalFooter');
     AnimusLegal.mountFooter('memberLegalFooter');

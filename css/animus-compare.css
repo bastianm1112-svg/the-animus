@@ -19,7 +19,7 @@ body.page-compare {
 }
 
 .compare-page-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', serif !important;
   font-size: clamp(28px, 4vw, 36px);
   font-weight: 700;
   color: var(--white);

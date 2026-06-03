@@ -28,11 +28,25 @@
   function setMemberMode(on) {
     if (on) {
       document.body.classList.add('member-mode');
+      document.body.classList.remove('guest-mode');
     } else {
       document.body.classList.remove('member-mode');
+      document.body.classList.add('guest-mode');
     }
     var guest = document.getElementById('guestApp');
+    var member = document.getElementById('memberApp');
     if (guest) guest.setAttribute('aria-hidden', on ? 'true' : 'false');
+    if (member) member.setAttribute('aria-hidden', on ? 'false' : 'true');
+    if (on && typeof g.AnimusNav !== 'undefined') {
+      var topMount = document.getElementById('memberNavMount');
+      var bottomMount = document.getElementById('memberBottomMount');
+      if (topMount && !topMount.innerHTML.trim()) {
+        g.AnimusNav.mountTop('memberNavMount', 'home');
+      }
+      if (bottomMount && !bottomMount.innerHTML.trim()) {
+        g.AnimusNav.mountBottom('memberBottomMount', 'home');
+      }
+    }
   }
 
   function updateDailyXpBadge(userData) {

@@ -412,13 +412,18 @@ body.light-mode #quiz .qhdr {
 }
 
 .test-action-bar {
-  display: flex;
+  display: none;
   justify-content: center;
   gap: 10px;
   padding: 16px 24px 0;
   flex-wrap: wrap;
   max-width: 1000px;
   margin: 0 auto;
+}
+
+body.page-test.phase-results #actionBar.is-visible,
+body.page-test.phase-results .test-action-bar.is-visible {
+  display: flex !important;
 }
 
 .test-action-bar .btn-action-profile {
