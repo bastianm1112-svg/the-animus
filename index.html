@@ -57,8 +57,8 @@ body {
 
 
 
-/* -- NAV -- */
-nav {
+/* -- NAV (guest landing only — never target member-app nav) -- */
+#guestApp nav {
   position: fixed; top: 0; left: 0; right: 0;
   height: 60px;
   display: flex; align-items: center; justify-content: space-between;
@@ -68,21 +68,21 @@ nav {
   transition: background 0.4s, border-color 0.4s;
   border-bottom: 1px solid transparent;
 }
-nav.scrolled {
+#guestApp nav.scrolled {
   background: rgba(8,8,8,0.92);
   backdrop-filter: blur(16px);
   border-bottom-color: var(--border);
 }
-.nav-logo {
+#guestApp .nav-logo {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 26px;
   letter-spacing: 0.12em;
   color: var(--white);
   text-decoration: none;
 }
-.nav-logo span { color: var(--gold); }
-.nav-links { display: flex; align-items: center; gap: 32px; }
-.nav-links a {
+#guestApp .nav-logo span { color: var(--gold); }
+#guestApp .nav-links { display: flex; align-items: center; gap: 32px; }
+#guestApp .nav-links a {
   font-size: 12px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -90,8 +90,8 @@ nav.scrolled {
   text-decoration: none;
   transition: color 0.2s;
 }
-.nav-links a:hover { color: var(--text); }
-.nav-cta {
+#guestApp .nav-links a:hover { color: var(--text); }
+#guestApp .nav-cta {
   background: var(--gold) !important;
   color: #000 !important;
   padding: 8px 22px;
@@ -99,10 +99,10 @@ nav.scrolled {
   letter-spacing: 0.1em !important;
   transition: background 0.2s !important;
 }
-.nav-cta:hover { background: var(--gold3) !important; }
+#guestApp .nav-cta:hover { background: var(--gold3) !important; }
 
 /* -- HERO -- */
-.hero {
+#guestApp .hero {
   min-height: 100vh;
   display: flex; flex-direction: column;
   justify-content: center; align-items: flex-start;
@@ -112,7 +112,7 @@ nav.scrolled {
 }
 
 /* Grain texture overlay */
-.hero::before {
+#guestApp .hero::before {
   content: '';
   position: absolute; inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
@@ -281,9 +281,9 @@ nav.scrolled {
 }
 @keyframes scrollPulse { 0%,100%{opacity:0.3;} 50%{opacity:1;} }
 
-/* -- SECTION SHARED -- */
-section { padding: 120px 40px; }
-.section-label {
+/* -- SECTION SHARED (guest landing only) -- */
+#guestApp section { padding: 120px 40px; }
+#guestApp .section-label {
   font-size: 10px;
   letter-spacing: 0.4em;
   text-transform: uppercase;
@@ -685,13 +685,13 @@ footer {
 .reveal-delay-4 { transition-delay: 0.4s; }
 
 @media(max-width:768px){
-  nav { padding: 0 20px; }
-  .nav-links { gap: 16px; }
-  .hero { padding: 100px 20px 80px; }
-  .hero-stats { left: 20px; }
-  .hero-vert { display: none; }
-  section { padding: 80px 20px; }
-  footer { padding: 32px 20px; flex-direction: column; text-align: center; }
+  #guestApp nav { padding: 0 20px; }
+  #guestApp .nav-links { gap: 16px; }
+  #guestApp .hero { padding: 100px 20px 80px; }
+  #guestApp .hero-stats { left: 20px; }
+  #guestApp .hero-vert { display: none; }
+  #guestApp section { padding: 80px 20px; }
+  #guestApp footer { padding: 32px 20px; flex-direction: column; text-align: center; }
 }
 </style>
 <!-- FIREBASE SDK -->
@@ -735,21 +735,12 @@ var db = firebase.firestore();
     <p>Take the assessment to unlock your full profile and daily insights.</p>
     <a href="/test">Begin assessment</a>
   </div>
-  <div id="homeProfileMount" class="app-section home-profile-mount"></div>
-  <section class="home-daily-hub app-section animus-reveal animus-reveal-delay-1" id="homeDailyHub" aria-label="Today">
-    <div id="homeXpMount"></div>
-    <div class="daily-fact-card" id="dailyFactCard">
-      <div class="daily-fact-head">
-        <div class="daily-fact-label" id="dailyFactLabel">Daily insight</div>
-        <span class="daily-fact-xp-badge" id="dailyXpBadge" hidden></span>
-      </div>
-      <p class="daily-fact-text" id="dailyFactText">Loading…</p>
+  <div id="homeProfileMount" class="home-profile-mount"></div>
+  <section class="home-quick app-section animus-reveal animus-reveal-delay-1" aria-labelledby="homeQuickLabel">
+    <div class="home-section-head home-quick-head">
+      <h2 class="home-section-title" id="homeQuickLabel">Quick actions</h2>
     </div>
-  </section>
-  <div class="home-daily-cards" id="homeDailyCards" hidden></div>
-  <section class="home-quick app-section animus-reveal animus-reveal-delay-2" aria-labelledby="homeQuickLabel">
-    <h2 class="home-quick-label" id="homeQuickLabel">Quick actions</h2>
-    <nav class="home-actions" aria-label="Quick actions">
+    <div class="home-actions" role="navigation" aria-label="Quick actions">
     <a href="/test" class="home-action-card primary animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Main test</span>
@@ -787,8 +778,19 @@ var db = firebase.firestore();
         <span class="home-action-desc">Account and appearance</span>
       </span>
     </a>
-    </nav>
+    </div>
   </section>
+  <section class="home-daily-hub app-section animus-reveal animus-reveal-delay-2" id="homeDailyHub" aria-label="Today">
+    <div id="homeXpMount"></div>
+    <div class="daily-fact-card" id="dailyFactCard">
+      <div class="daily-fact-head">
+        <div class="daily-fact-label" id="dailyFactLabel">Daily insight</div>
+        <span class="daily-fact-xp-badge" id="dailyXpBadge" hidden></span>
+      </div>
+      <p class="daily-fact-text" id="dailyFactText">Loading…</p>
+    </div>
+  </section>
+  <div class="home-daily-cards" id="homeDailyCards" hidden></div>
 </main>
 <div class="member-site-footer-wrap" id="memberLegalFooter"></div>
 <div id="memberBottomMount"></div>

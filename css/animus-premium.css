@@ -313,17 +313,22 @@ body.light-mode .friend-card:hover {
   display: block;
 }
 
-/* ── Home action stagger ── */
+/* ── Home action stagger — opacity only (avoid layout/transform conflicts) ── */
 @media (prefers-reduced-motion: no-preference) {
   .home-actions .home-action-card {
-    animation: animus-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: animus-fade-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
-  .home-actions .home-action-card:nth-child(1) { animation-delay: 0.04s; }
-  .home-actions .home-action-card:nth-child(2) { animation-delay: 0.08s; }
-  .home-actions .home-action-card:nth-child(3) { animation-delay: 0.12s; }
-  .home-actions .home-action-card:nth-child(4) { animation-delay: 0.16s; }
-  .home-actions .home-action-card:nth-child(5) { animation-delay: 0.2s; }
-  .home-actions .home-action-card:nth-child(6) { animation-delay: 0.24s; }
+  .home-actions .home-action-card:nth-child(1) { animation-delay: 0.03s; }
+  .home-actions .home-action-card:nth-child(2) { animation-delay: 0.06s; }
+  .home-actions .home-action-card:nth-child(3) { animation-delay: 0.09s; }
+  .home-actions .home-action-card:nth-child(4) { animation-delay: 0.12s; }
+  .home-actions .home-action-card:nth-child(5) { animation-delay: 0.15s; }
+  .home-actions .home-action-card:nth-child(6) { animation-delay: 0.18s; }
+}
+
+@keyframes animus-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ── Guest landing (index #guestApp) ── */

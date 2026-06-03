@@ -18,11 +18,142 @@ body.member-mode #guestApp {
 .member-home {
   max-width: 720px;
   margin: 0 auto;
-  padding: 32px 24px 48px;
+  padding: 16px max(16px, env(safe-area-inset-left)) 24px max(16px, env(safe-area-inset-right));
+}
+
+/* Guest landing CSS must never affect logged-in sections */
+.member-home section {
+  padding: 0;
+}
+
+.member-home .app-section {
+  margin-bottom: 14px;
 }
 
 .home-header {
-  margin-bottom: 24px;
+  margin-bottom: 12px;
+}
+
+.home-profile-mount {
+  margin-bottom: 12px;
+}
+
+.home-profile-mount:not(:empty) {
+  display: block;
+}
+
+.home-quick {
+  margin-bottom: 12px;
+}
+
+.home-quick-head {
+  margin-bottom: 8px;
+}
+
+.home-quick-head .home-section-title {
+  margin-bottom: 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold2);
+}
+
+.home-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 0;
+  position: static;
+  top: auto;
+  left: auto;
+  right: auto;
+  height: auto;
+  padding: 0;
+  z-index: auto;
+  background: none;
+  border: none;
+  backdrop-filter: none;
+}
+
+.home-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+  min-height: 72px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.home-action-card.primary {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  border-color: var(--gold2);
+  background: linear-gradient(135deg, rgba(200, 169, 110, 0.1) 0%, var(--surface) 55%);
+}
+
+.home-action-desc {
+  display: none;
+}
+
+.home-action-card.primary .home-action-desc {
+  display: block;
+  font-size: 11px;
+}
+
+.home-action-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.home-action-card.primary .home-action-title {
+  font-size: 11px;
+}
+
+.home-daily-hub {
+  margin-bottom: 16px;
+}
+
+.xp-card {
+  padding: 14px 16px 12px;
+}
+
+.daily-fact-card {
+  padding: 14px 16px 16px;
+}
+
+.home-daily-cards {
+  margin-bottom: 0;
+}
+
+.home-daily-cards:not([hidden]) {
+  margin-bottom: 8px;
+}
+
+.home-daily-cards-stack {
+  gap: 8px;
+}
+
+.daily-card {
+  padding: 14px 16px;
 }
 
 .home-header .home-date,
@@ -48,10 +179,10 @@ body.member-mode #guestApp {
 
 .home-greeting {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(28px, 5vw, 40px);
+  font-size: clamp(24px, 5vw, 34px);
   font-weight: 700;
   color: var(--white);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   line-height: 1.15;
 }
 
@@ -61,10 +192,10 @@ body.member-mode #guestApp {
 }
 
 .home-date {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
   letter-spacing: 0.06em;
-  margin-bottom: 28px;
+  margin-bottom: 0;
 }
 
 /* Today hub — XP + daily insight (home only) */
@@ -499,44 +630,13 @@ body.light-mode .home-daily-hub {
   color: var(--muted2);
 }
 
-.home-prompt,
-.home-quick-label {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 14px;
+.home-action-card:hover {
+  border-color: var(--gold2);
 }
 
-.home-quick {
-  margin-bottom: 0;
-}
-
-.home-actions {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
-  margin-bottom: 0;
-}
-
-.home-action-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 18px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  text-decoration: none;
-  color: var(--text);
-  transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
-  min-height: 64px;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
+.home-action-card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .home-action-copy {
@@ -559,35 +659,6 @@ body.light-mode .home-daily-hub {
 .home-action-card:hover .home-action-arrow {
   transform: translateX(3px);
   opacity: 1;
-}
-
-.home-action-card:hover {
-  border-color: var(--gold2);
-}
-
-.home-action-card:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.home-action-card.primary {
-  border-color: var(--gold2);
-  background: linear-gradient(135deg, rgba(200, 169, 110, 0.1) 0%, var(--surface) 55%);
-  min-height: 72px;
-}
-
-.home-action-title {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-
-.home-action-desc {
-  font-size: 12px;
-  color: var(--muted2);
-  line-height: 1.45;
-  overflow-wrap: anywhere;
 }
 
 .home-section-head {
@@ -780,8 +851,8 @@ body.light-mode .home-daily-hub {
 .home-profile-snapshot {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 20px;
+  gap: 12px;
+  padding: 14px 16px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 2px;
@@ -1288,24 +1359,19 @@ body.light-mode .home-daily-hub {
     font-size: 16px;
   }
 
-  .home-prompt,
-  .home-quick-label {
-    letter-spacing: 0.22em;
-    margin-bottom: 12px;
-  }
-
   .home-actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 
-  .home-action-card.primary {
-    grid-column: 1 / -1;
+  .home-action-card {
+    min-height: 56px;
+    padding: 10px 12px;
   }
 
-  .home-action-card {
+  .home-action-card.primary {
+    grid-column: 1 / -1;
     min-height: 60px;
-    padding: 14px 14px;
   }
 
   .mood-week-strip {
@@ -1361,7 +1427,7 @@ body.light-mode .home-daily-hub {
   }
 
   .home-actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .home-action-card.primary {
