@@ -532,6 +532,58 @@ body:has(.mobile-bottom-nav) .toast {
   }
 }
 
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: 1000;
+  padding: 12px 20px;
+  background: var(--gold);
+  color: #000;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: max(12px, env(safe-area-inset-left));
+  top: max(12px, env(safe-area-inset-top));
+  width: auto;
+  height: auto;
+  overflow: visible;
+}
+
+/* Premium typography rhythm */
+h1, h2, h3, .home-greeting, .shop-title, .friends-page-title {
+  text-wrap: balance;
+}
+
+p, .shop-sub, .friends-page-sub {
+  text-wrap: pretty;
+}
+
+/* Nav polish */
+.navbar {
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.nav-item,
+.nav-mobile-item,
+.mbn-item {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-item:active,
+.mbn-item:active {
+  transform: scale(0.98);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -541,5 +593,10 @@ body:has(.mobile-bottom-nav) .toast {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .nav-item:active,
+  .mbn-item:active {
+    transform: none;
   }
 }

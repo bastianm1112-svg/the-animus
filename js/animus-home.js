@@ -4,15 +4,7 @@
 (function (g) {
   'use strict';
 
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
   function greetingForHour(h) {
     if (h < 12) return 'Good morning';
@@ -39,6 +31,8 @@
     } else {
       document.body.classList.remove('member-mode');
     }
+    var guest = document.getElementById('guestApp');
+    if (guest) guest.setAttribute('aria-hidden', on ? 'true' : 'false');
   }
 
   function updateDailyXpBadge(userData) {

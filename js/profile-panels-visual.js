@@ -25,11 +25,7 @@
   var TMP_LABELS = { TMP_MEL: 'Melancholic', TMP_CHO: 'Choleric', TMP_PHL: 'Phlegmatic', TMP_SAN: 'Sanguine' };
   var ENN_ORDER = ['E1', 'E6', 'E5', 'E8', 'E2', 'E3', 'E4', 'E7', 'E9'];
 
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
   function pron(isOwner) {
     return {

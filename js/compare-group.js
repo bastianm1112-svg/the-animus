@@ -9,11 +9,7 @@
   var _userData = null;
   var _hasPlus = false;
 
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
   function showToast(m) {
     var t = document.getElementById('toast');

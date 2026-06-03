@@ -1,9 +1,21 @@
-const { assertQuestion, assertLang, setApiHeaders, rejectForeignOrigin } = require('./_lib');
+const {
+  assertQuestion,
+  assertLang,
+  setApiHeaders,
+  rejectForeignOrigin,
+  rejectBodyTooLarge,
+  sendApiError
+} = require('./_lib');
+const { requireAuth } = require('./_auth');
 
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
   if (req.method !== 'POST') return res.status(405).end();
+  if (rejectBodyTooLarge(req, res)) return;
   if (rejectForeignOrigin(req, res)) return;
+
+  const user = await requireAuth(req, res);
+  if (!user) return;
 
   const checked = assertQuestion(req.body || {});
   if (checked.error) return res.status(checked.status).json({ error: checked.error });
@@ -52,6 +64,6 @@ module.exports = async function handler(req, res) {
     res.json({ simplified: text });
   } catch (e) {
     console.error('Simplify error:', e);
-    res.status(500).json({ error: 'Internal error' });
+    sendApiError(res, 500, 'Internal error');
   }
 };

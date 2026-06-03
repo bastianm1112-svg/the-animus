@@ -42,14 +42,7 @@
     return list[dayHash(uid, salt) % list.length];
   }
 
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
   function truncate(s, n) {
     s = String(s || '').trim();

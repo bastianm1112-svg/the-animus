@@ -1,4 +1,10 @@
-const { setApiHeaders, rejectForeignOrigin } = require('./_lib');
+const {
+  setApiHeaders,
+  rejectForeignOrigin,
+  rejectBodyTooLarge,
+  assertStringField,
+  stripControlChars
+} = require('./_lib');
 const { requireAuth } = require('./_auth');
 const {
   getUserDocument,
@@ -77,6 +83,7 @@ function parseGuideJson(text) {
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
   if (req.method !== 'POST') return res.status(405).end();
+  if (rejectBodyTooLarge(req, res)) return;
   if (rejectForeignOrigin(req, res)) return;
 
   const user = await requireAuth(req, res);
@@ -117,10 +124,11 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
-  const displayName =
-    (req.body && typeof req.body.displayName === 'string' && req.body.displayName.trim().substring(0, 48)) ||
-    doc.displayName ||
-    'Member';
+  var displayName = stripControlChars(String(doc.displayName || 'Member')).trim().substring(0, 48) || 'Member';
+  if (req.body && typeof req.body.displayName === 'string' && req.body.displayName.trim()) {
+    const nameChecked = assertStringField(req.body.displayName, 48, 'displayName');
+    if (!nameChecked.error) displayName = nameChecked.value;
+  }
 
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {

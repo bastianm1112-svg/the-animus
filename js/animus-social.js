@@ -6,16 +6,7 @@
 
   var auth = null;
   var db = null;
-
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
   function init(a, d) {
     auth = a;
@@ -25,7 +16,11 @@
   function showToast(msg) {
     var t = document.getElementById('toast');
     if (!t) return;
-    t.textContent = msg;
+    var safe =
+      typeof g.AnimusSafe !== 'undefined' && g.AnimusSafe.safeText
+        ? g.AnimusSafe.safeText(msg, 240)
+        : String(msg == null ? '' : msg);
+    t.textContent = safe;
     t.classList.add('show');
     clearTimeout(t._timer);
     t._timer = setTimeout(function () {
@@ -161,7 +156,7 @@
           var a = doc.data();
           var item = document.createElement('div');
           item.className = 'feed-item';
-          var timeAgo = a.timestamp ? getTimeAgo(a.timestamp.toDate()) : '';
+          var timeAgo = escapeHTML(a.timestamp ? getTimeAgo(a.timestamp.toDate()) : '');
           var txt = a.text || '';
           var iconSVG =
             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
@@ -488,7 +483,7 @@
           btn.textContent = 'Request Sent ✓';
           btn.classList.add('added');
         }
-        showToast('Friend request sent to ' + escapeHTML(toName));
+        showToast('Friend request sent to ' + (toName || 'them'));
       })
       .catch(function (e) {
         if (btn) {
@@ -522,7 +517,7 @@
         );
       })
       .then(function () {
-        showToast('You and ' + escapeHTML(fromName) + ' are now friends!');
+        showToast('You and ' + (fromName || 'them') + ' are now friends!');
         if (typeof g.AnimusXp !== 'undefined') {
           g.AnimusXp.awardXp(db, user.uid, 'friend_accept');
         }

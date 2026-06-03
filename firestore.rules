@@ -203,10 +203,35 @@ service cloud.firestore {
       allow delete: if ownsUsernameDoc() || isAdmin();
     }
 
+    function profileWriteKeysOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['latest', 'history', 'updatedAt', 'adminEditedAt']);
+    }
+
+    function profileCreateValid() {
+      return request.resource.data.keys().hasAll(['latest']);
+    }
+
+    function profileNoPrivilegeEscalation() {
+      return !('isAdmin' in request.resource.data)
+        && !('entitlements' in request.resource.data)
+        && !('banned' in request.resource.data);
+    }
+
+    function ownerProfileWrite(userId) {
+      return isOwner(userId)
+        && isNotBanned()
+        && profileNoPrivilegeEscalation()
+        && (!('adminEditedAt' in request.resource.data)
+          || request.resource.data.adminEditedAt == resource.data.get('adminEditedAt', null))
+        && profileWriteKeysOnly();
+    }
+
     match /profiles/{userId} {
       allow read: if true;
-      allow create: if isOwner(userId) || isAdmin();
-      allow update: if isAdmin() || (isOwner(userId) && isNotBanned());
+      allow create: if (isOwner(userId) && isNotBanned() && profileCreateValid() && profileNoPrivilegeEscalation())
+        || isAdmin();
+      allow update: if isAdmin() || ownerProfileWrite(userId);
       allow delete: if isOwner(userId) || isAdmin();
     }
 

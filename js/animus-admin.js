@@ -424,7 +424,10 @@
     el.hidden = false;
     var lock =
       latest._typesLocked || latest.adminEditedAt || (g.AnimusShared && g.AnimusShared.profileHasAdminLock(profileDoc));
-    var enn = (latest.ennType || '?') + 'w' + (latest.ennWing || '?');
+    var enn =
+      (g.AnimusShared ? g.AnimusShared.escapeHTML(String(latest.ennType || '?')) : String(latest.ennType || '?')) +
+      'w' +
+      (g.AnimusShared ? g.AnimusShared.escapeHTML(String(latest.ennWing || '?')) : String(latest.ennWing || '?'));
     var edited = latest.adminEditedAt ? String(latest.adminEditedAt).slice(0, 19) : '—';
     el.innerHTML =
       '<span class="admin-published-label">Live on site</span> ' +

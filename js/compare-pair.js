@@ -6,11 +6,7 @@
   var Normalize = g.AnimusCompareNormalize;
   var _cache = { my: null, them: null, myName: '', themName: '' };
 
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
   function setDualById(youId, themId, youNumId, themNumId, youVal, themVal) {
     var yb = document.getElementById(youId);
@@ -242,11 +238,12 @@
       '.' +
       ' Return JSON with keys: {"whereAlign":"2 paragraphs on natural connection","whereClash":"2 paragraphs on friction","dynamic":"1 paragraph on social interaction","mutualEffect":"1 paragraph on what each brings out in the other"}. Raw JSON only.';
 
-    fetch('/api/compare', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt })
-    })
+    var compareFetch =
+      typeof AnimusShared !== 'undefined' && AnimusShared.fetchApiPost
+        ? AnimusShared.fetchApiPost('/api/compare', { prompt: prompt })
+        : Promise.reject(new Error('auth_required'));
+
+    compareFetch
       .then(function (r) {
         if (!r.ok) throw new Error(String(r.status));
         return r.json();

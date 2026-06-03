@@ -10,7 +10,6 @@ module.exports = async function handler(req, res) {
 
   return res.status(200).json({
     checkoutReady: missing.length === 0,
-    missing: missing,
     webhookConfigured: !webhookMissing
   });
 };

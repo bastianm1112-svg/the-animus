@@ -1,4 +1,4 @@
-const { setApiHeaders, rejectForeignOrigin } = require('./_lib');
+const { setApiHeaders, rejectForeignOrigin, rejectBodyTooLarge } = require('./_lib');
 const { requireAuth } = require('./_auth');
 const { getUserDocument, getPaymentsConfigMissing } = require('./_firestore');
 const { getStripe, createCheckoutSession, isValidProductId, productAlreadyOwned } = require('./_stripe');
@@ -7,6 +7,7 @@ const { PRODUCTS } = require('./_entitlements');
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
   if (req.method !== 'POST') return res.status(405).end();
+  if (rejectBodyTooLarge(req, res)) return;
   if (rejectForeignOrigin(req, res)) return;
 
   const user = await requireAuth(req, res);
@@ -58,6 +59,6 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ url: session.url, sessionId: session.id });
   } catch (e) {
     console.error('create-checkout-session error:', e);
-    return res.status(500).json({ error: e.message || 'Could not start checkout.' });
+    return res.status(500).json({ error: 'Could not start checkout.' });
   }
 };

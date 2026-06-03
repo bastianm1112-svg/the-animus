@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANIMUS — Page Not Found</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080808">
+<meta name="description" content="Page not found on ANIMUS.">
+<meta property="og:title" content="ANIMUS - Page Not Found">
+<meta property="og:description" content="This page or profile does not exist.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://animustest.com/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://animustest.com/404">
+<title>ANIMUS - Page Not Found</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080808;--surface:#0f0f0f;--border:#1e1e1e;--text:#e2e2e2;--muted:#555;--muted2:#888;--gold:#c8a96e;--gold2:#8a6f3e;--gold3:#f0d090;--white:#f0ece4;}
@@ -23,17 +33,18 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 </style>
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-release.css">
-<meta name="theme-color" content="#080808">
+<script src="/js/animus-safe.js"></script>
+<script src="/js/animus-seo.js"></script>
 </head>
 <body>
 <script>(function(){if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');})();</script>
 <a href="/" class="logo">ANI<span>MUS</span></a>
-<div class="num">404</div>
-<div class="title">Nothing here.</div>
+<div class="num" aria-hidden="true">404</div>
+<h1 class="title">Nothing here.</h1>
 <p class="sub">The page you're looking for doesn't exist, or the profile hasn't been created yet.</p>
 <div class="links">
-  <a href="/" class="btn-home">Go Home ?</a>
-  <button onclick="history.back()" class="btn-back">? Go Back</button>
+  <a href="/" class="btn-home">Go Home</a>
+  <button type="button" onclick="history.back()" class="btn-back">Go Back</button>
 </div>
 </body>
 </html>

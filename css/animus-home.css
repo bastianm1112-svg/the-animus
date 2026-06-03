@@ -64,6 +64,12 @@ body.member-mode #guestApp {
   border: 1px solid var(--border);
   background: var(--surface);
   overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+body.light-mode .home-daily-hub {
+  box-shadow: 0 4px 20px rgba(26, 23, 20, 0.06);
 }
 
 #homeXpMount:empty {
@@ -504,13 +510,18 @@ body.member-mode #guestApp {
   border: 1px solid var(--border);
   text-decoration: none;
   color: var(--text);
-  transition: border-color 0.2s, transform 0.15s;
+  transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
   min-height: 100px;
+  min-width: 0;
 }
 
 .home-action-card:hover {
   border-color: var(--gold2);
-  transform: translateY(-2px);
+}
+
+.home-action-card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .home-action-card.primary {

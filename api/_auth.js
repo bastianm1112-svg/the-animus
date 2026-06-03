@@ -25,7 +25,7 @@ async function verifyFirebaseIdToken(idToken) {
     }
   );
   if (!r.ok) {
-    console.error('Firebase token lookup failed:', r.status, await r.text());
+    console.error('Firebase token lookup failed:', r.status);
     return null;
   }
   const data = await r.json();

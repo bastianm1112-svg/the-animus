@@ -1,4 +1,4 @@
-const { setApiHeaders, rejectForeignOrigin } = require('./_lib');
+const { setApiHeaders, rejectForeignOrigin, rejectBodyTooLarge } = require('./_lib');
 const { requireAuth } = require('./_auth');
 const { getStripe } = require('./_stripe');
 const { fulfillPurchase } = require('./_fulfillment');
@@ -7,6 +7,7 @@ const { hasServiceAccount } = require('./_firestore');
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
   if (req.method !== 'POST') return res.status(405).end();
+  if (rejectBodyTooLarge(req, res)) return;
   if (rejectForeignOrigin(req, res)) return;
 
   const user = await requireAuth(req, res);
@@ -73,6 +74,6 @@ module.exports = async function handler(req, res) {
     return res.json({ ok: true, productId: productId, duplicate: !!result.duplicate });
   } catch (e) {
     console.error('fulfill-checkout error:', e);
-    return res.status(500).json({ error: e.message || 'Could not verify checkout.' });
+    return res.status(500).json({ error: 'Could not verify checkout.' });
   }
 };

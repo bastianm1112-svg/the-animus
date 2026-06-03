@@ -4,14 +4,7 @@
 (function (g) {
   'use strict';
 
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
   function toast(msg, durationMs) {
     var el = document.getElementById('toast');
@@ -287,6 +280,7 @@
   function renderPlusStatus(userData) {
     var el = document.getElementById('shopPlusStatus');
     if (!el) return;
+    el.classList.remove('is-loading', 'animus-skeleton');
     var plus = g.AnimusEntitlements.hasAnimusPlus(userData);
     var remaining = g.AnimusEntitlements.getCompareRemaining(userData);
     if (plus) {
@@ -311,7 +305,10 @@
       if (!user) {
         renderProducts(g.AnimusEntitlements.defaultEntitlements(), null);
         var status = document.getElementById('shopPlusStatus');
-        if (status) status.textContent = 'Sign in to see your plan and compare allowance.';
+        if (status) {
+          status.classList.remove('is-loading', 'animus-skeleton');
+          status.textContent = 'Sign in to see your plan and compare allowance.';
+        }
         return;
       }
       db.collection('users')

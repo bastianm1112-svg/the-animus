@@ -11,27 +11,14 @@
   if (Cross.applyChoicePatches) Cross.applyChoicePatches(Q);
 
   var _choiceIx = [];
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
-
-// ── SECURITY UTILITIES ──
-function escapeHTML(str){
-  if(str===null||str===undefined) return '';
-  return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#39;')
-    .replace(/`/g,'&#96;');
-}
-
-function sanitizeText(str,maxLen){
-  maxLen = maxLen||500;
-  if(!str) return '';
-  // Strip any HTML tags from AI-generated text
-  var cleaned = String(str).replace(/<[^>]*>/g,'').replace(/&[a-z]+;/gi,'').trim();
-  return cleaned.substring(0,maxLen);
-}
+  function sanitizeText(str, maxLen) {
+    maxLen = maxLen || 500;
+    if (!str) return '';
+    var cleaned = String(str).replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, '').trim();
+    return cleaned.substring(0, maxLen);
+  }
 
 function setTestPhase(phase) {
   if (typeof g.setPagePhase === 'function') g.setPagePhase(phase);
@@ -1055,11 +1042,10 @@ function renderQ(){
       if(open && !_explainCache[cur] && !bubbleEl.textContent.trim()){
         bubbleEl.textContent = lang==='es' ? 'Simplificando...' : 'Simplifying...';
         var qText2 = (window._activeQ||Q)[cur].t;
-        fetch('/api/simplify',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({question:qText2, lang:lang})
-        }).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+        var simplifyFetch = (typeof AnimusShared !== 'undefined' && AnimusShared.fetchApiPost)
+          ? AnimusShared.fetchApiPost('/api/simplify', { question: qText2, lang: lang })
+          : Promise.reject(new Error('auth_required'));
+        simplifyFetch.then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
         .then(function(d){
           var txt=(d.simplified||'').trim().replace(/^["']|["']$/g,'');
           if(txt){ _explainCache[cur]=txt; bubbleEl.textContent=txt; }
@@ -1538,11 +1524,11 @@ function callAIWithRetry(prompt,retriesLeft,onSuccess,onFail){
   var attempt=4-retriesLeft;
   if(attempt>0) retryEl.textContent='Retry '+attempt+' of 3...';
 
-  fetch('/api/score',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({prompt:prompt})
-  })
+  var scoreFetch = (typeof AnimusShared !== 'undefined' && AnimusShared.fetchApiPost)
+    ? AnimusShared.fetchApiPost('/api/score', { prompt: prompt })
+    : Promise.reject(new Error('auth_required'));
+
+  scoreFetch
   .then(function(r){
     if(!r.ok) throw new Error('API error '+r.status);
     return r.json();
@@ -1555,6 +1541,11 @@ function callAIWithRetry(prompt,retriesLeft,onSuccess,onFail){
   })
   .catch(function(e){
     console.warn('AI attempt failed:',e.message);
+    if(e.message === 'auth_required' || e.message === 'Sign in required'){
+      retryEl.textContent='';
+      onFail();
+      return;
+    }
     // If CORS/network error, go straight to fallback (no point retrying)
     var isCORS = e.message && (e.message.indexOf('Failed to fetch')>=0 || e.message.indexOf('NetworkError')>=0 || e.message.indexOf('CORS')>=0);
     if(!isCORS && retriesLeft>1){

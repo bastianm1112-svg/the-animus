@@ -9,14 +9,7 @@
   var _snap = null;
   var _displayName = '';
 
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
   function toast(msg) {
     if (typeof g.showToast === 'function') g.showToast(msg);

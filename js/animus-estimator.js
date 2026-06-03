@@ -69,14 +69,7 @@
     TMP_PHL: 1
   };
 
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
   function questionBlob(q) {
     var parts = [q.t || ''];

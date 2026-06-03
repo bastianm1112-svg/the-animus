@@ -107,15 +107,7 @@
     return { narrativeForViewer: narr, subj: subj, they: they, their: their, Your: Your, You: You, name: name, isOwner: isOwner };
   }
 
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
+  var escapeHTML = g.AnimusShared.escapeHTML;
 
   g.AnimusProfileVoice = {
     applyProfileVoice: applyProfileVoice,

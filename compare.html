@@ -8,9 +8,13 @@
 <meta property="og:title" content="ANIMUS — Compare">
 <meta property="og:description" content="Compatibility across cognition, politics, values, and more.">
 <meta property="og:type" content="website">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://animustest.com/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://animustest.com/compare">
 <title>ANIMUS — Compare</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -185,6 +189,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .insight-value{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);letter-spacing:0.04em;line-height:1.1;}
 .insight-sub{font-size:10px;color:var(--muted);margin-top:4px;}
 .group-page-header{padding:28px 28px 0;border-bottom:1px solid var(--border);background:var(--surface);}
+.seo-page-title{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .group-page-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:0.06em;color:var(--white);line-height:1;}
 .group-page-sub{font-size:13px;color:var(--muted2);margin-top:4px;padding-bottom:20px;}
 
@@ -312,7 +317,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 (function(){
   var _st=localStorage.getItem('animus_theme'); if(_st==='light') document.body.classList.add('light-mode');
 })();
-function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
 
 </script>
 
@@ -328,6 +333,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
   </div>
 
 <div class="compare-mode-bar" id="compare-main">
+  <h1 class="seo-page-title">Compare personalities</h1>
   <button type="button" class="compare-mode-btn active" data-mode="pair">1-on-1</button>
   <button type="button" class="compare-mode-btn" data-mode="group">Group</button>
 </div>
@@ -619,7 +625,7 @@ function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;')
 
 <div id="compareModeGroup" class="compare-mode-group">
   <div class="group-page-header">
-    <div class="group-page-title">GROUP COMPARE</div>
+    <h2 class="group-page-title">GROUP COMPARE</h2>
     <div class="group-page-sub">Select friends and see compatibility across the whole group.</div>
   </div>
   <div class="selector-section">

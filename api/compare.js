@@ -1,9 +1,22 @@
-const { assertPrompt, setApiHeaders, rejectForeignOrigin, LIMITS } = require('./_lib');
+const {
+  assertPrompt,
+  setApiHeaders,
+  rejectForeignOrigin,
+  rejectBodyTooLarge,
+  sanitizeAnthropicPayload,
+  sendApiError,
+  LIMITS
+} = require('./_lib');
+const { requireAuth } = require('./_auth');
 
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
   if (req.method !== 'POST') return res.status(405).end();
+  if (rejectBodyTooLarge(req, res)) return;
   if (rejectForeignOrigin(req, res)) return;
+
+  const user = await requireAuth(req, res);
+  if (!user) return;
 
   const checked = assertPrompt(req.body || {}, LIMITS.compare);
   if (checked.error) return res.status(checked.status).json({ error: checked.error });
@@ -34,9 +47,9 @@ module.exports = async function handler(req, res) {
     }
 
     const data = await r.json();
-    res.json(data);
+    res.json(sanitizeAnthropicPayload(data));
   } catch (e) {
     console.error('Compare handler error:', e);
-    res.status(500).json({ error: 'Internal error' });
+    sendApiError(res, 500, 'Internal error');
   }
 };

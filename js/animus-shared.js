@@ -29,7 +29,8 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+      .replace(/'/g, '&#39;')
+      .replace(/`/g, '&#96;');
   }
 
   function sanitizePlainText(str, maxLen) {
@@ -1488,22 +1489,43 @@
     });
   }
 
+  function getFirebaseIdToken() {
+    var auth = typeof firebase !== 'undefined' && firebase.auth && firebase.auth();
+    var user = auth && auth.currentUser;
+    if (!user || typeof user.getIdToken !== 'function') {
+      return Promise.reject(new Error('Sign in required'));
+    }
+    return user.getIdToken();
+  }
+
+  /** POST JSON to ANIMUS API routes with Firebase Bearer auth. */
+  function fetchApiPost(path, body) {
+    return getFirebaseIdToken().then(function (token) {
+      return fetch(path, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token
+        },
+        body: JSON.stringify(body || {})
+      });
+    });
+  }
+
   global.toggleThemeGlobal = toggleThemeGlobal;
 
-  global.AnimusSafe = global.AnimusSafe || {
-    stripControlChars: function (s) {
-      return String(s || '').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '');
-    },
-    safeText: sanitizePlainText,
-    showUserError: function (msg) {
+  if (global.AnimusSafe) {
+    global.AnimusSafe.escapeHTML = escapeHTML;
+    global.AnimusSafe.safeText = global.AnimusSafe.safeText || sanitizePlainText;
+    global.AnimusSafe.showUserError = global.AnimusSafe.showUserError || function (msg) {
       var toast = document.getElementById('toast');
       if (toast) {
         toast.textContent = sanitizePlainText(msg, 240) || 'Something went wrong.';
         toast.classList.add('show');
         setTimeout(function () { toast.classList.remove('show'); }, 4200);
       }
-    }
-  };
+    };
+  }
 
   global.AnimusShared = {
     KEYS: KEYS,
@@ -1567,6 +1589,8 @@
     validateUsername: validateUsername,
     enforceBannedSession: enforceBannedSession,
     resolveUsernameToUid: resolveUsernameToUid,
-    repairUsernameIndexForUser: repairUsernameIndexForUser
+    repairUsernameIndexForUser: repairUsernameIndexForUser,
+    getFirebaseIdToken: getFirebaseIdToken,
+    fetchApiPost: fetchApiPost
   };
 })(typeof window !== 'undefined' ? window : this);

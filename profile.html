@@ -17,8 +17,12 @@
 <meta property="og:title" content="ANIMUS — My Personality Profile">
 <meta property="og:description" content="Complete personality mapping: cognitive functions, Enneagram, philosophy, political compass, attachment style and more.">
 <meta property="og:type" content="profile">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://animustest.com/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://animustest.com/profile">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -135,13 +139,6 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .is-owner .owner-only { display: flex; }
 .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface); border: 1px solid var(--gold2); color: var(--text); padding: 10px 24px; font-size: 12px; z-index: 600; opacity: 0; transition: all 0.3s; pointer-events: none; letter-spacing: 0.05em; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.nav-hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--text);align-items:center;justify-content:center;}
-.nav-mobile-menu{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:199;padding:8px 0;}
-.nav-mobile-menu.open{display:block;}
-.nav-mobile-item{display:flex;align-items:center;gap:10px;padding:13px 24px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;transition:color 0.15s;}
-.nav-mobile-item.active,.nav-mobile-item:hover{color:var(--gold);}
-@media(max-width:768px){.nav-items{display:none!important;}.nav-hamburger{display:flex!important;}}
-
 /* ── SHARE CARD MODAL ── */
 .sc-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);z-index:900;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;padding:20px;}
 .sc-modal-overlay.open{display:flex;}
@@ -233,7 +230,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
       <div class="profile-photo" id="profilePhoto">?</div>
       <div class="hero-info">
         <div class="profile-name-row" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">
-          <div class="profile-name" id="profileName">Loading...</div>
+          <h1 class="profile-name" id="profileName">Loading...</h1>
           <span class="plus-badge" id="profilePlusBadge" aria-hidden="true">Plus</span>
         </div>
         <div class="profile-username" id="profileUsername">@...</div>
@@ -277,13 +274,12 @@ var auth=firebase.auth(); var db=firebase.firestore();
         <button class="btn-full btn-full-outline" onclick="downloadPDF()">&#9113; Download PDF</button>
       </div>
       <div id="careerGuideMount" class="owner-only"></div>
-      <div id="careerGuideMount" class="owner-only"></div>
       <div class="side-card owner-only"><div class="side-card-title">Retake History</div><div id="historyList"><div style="color:var(--muted);font-size:12px;padding:8px 0">No assessments yet</div></div><div id="historyChartWrap" class="history-chart" style="margin-top:12px"></div></div>
       <div class="side-card"><div class="side-card-title">Quick Stats</div><div style="display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted2)">Political</span><span id="statPolitical" style="color:var(--text)">&#8212;</span></div>
         <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted2)">Ethics</span><span id="statEthics" style="color:var(--text)">&#8212;</span></div>
         <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted2)">Temperament</span><span id="statTemp" style="color:var(--text)">&#8212;</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0"><span style="color:var(--muted2)">Temperament</span><span id="statKeirsey" style="color:var(--text)">&#8212;</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0"><span style="color:var(--muted2)">Keirsey</span><span id="statKeirsey" style="color:var(--text)">&#8212;</span></div>
       </div></div>
     </div>
   </div>
@@ -324,7 +320,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
 <div class="toast" id="toast"></div>
 
 <script>
-function escapeHTML(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
 
 document.getElementById('profileTabs').querySelectorAll('.profile-tab').forEach(function(tab){
   tab.addEventListener('click', function(){

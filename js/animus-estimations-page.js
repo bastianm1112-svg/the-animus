@@ -48,7 +48,7 @@
         var status = d.status || 'draft';
         var sum = d.summary || {};
         var hl = highlightId === id ? ' estimations-card-highlight' : '';
-        html += '<article class="estimations-card' + hl + '" data-id="' + id + '">';
+        html += '<article class="estimations-card' + hl + '" data-id="' + AnimusEstimator.escapeHTML(id) + '">';
         html += '<div class="estimations-card-head">';
         html += '<h2 class="estimations-card-name">' + AnimusEstimator.escapeHTML(name) + '</h2>';
         html += '<span class="estimations-card-status estimations-status-' + status + '">' + status + '</span>';
