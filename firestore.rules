@@ -92,8 +92,13 @@ service cloud.firestore {
         && request.auth.uid in resource.data.get('friendRequests', {}).get('sent', []);
     }
 
+    function isNotBanned() {
+      return resource.data.get('banned', false) != true;
+    }
+
     function ownerProfileUpdate(userId) {
       return isOwner(userId)
+        && isNotBanned()
         && isAdminFlagUnchanged()
         && (!profileFieldsChanged() || userTextFieldsValid());
     }
@@ -125,6 +130,7 @@ service cloud.firestore {
 
     function ownerRetentionUpdate(userId) {
       return isOwner(userId)
+        && isNotBanned()
         && retentionKeysOnly()
         && compareUsageIncrementValid();
     }
@@ -141,6 +147,7 @@ service cloud.firestore {
       allow read: if signedIn();
       allow create: if isOwner(userId)
         && userTextFieldsValid()
+        && request.resource.data.get('banned', false) != true
         && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false);
       allow update: if signedIn()
         && (
@@ -157,20 +164,33 @@ service cloud.firestore {
       return signedIn() && resource.data.uid == request.auth.uid;
     }
 
+    function usernameDocValid() {
+      return request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid is string
+        && request.resource.data.uid.size() > 0
+        && request.resource.data.uid.size() <= 128;
+    }
+
     match /usernames/{username} {
       allow read: if true;
       allow create: if signedIn()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.keys().hasOnly(['uid']);
-      allow update: if ownsUsernameDoc()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.keys().hasOnly(['uid']);
-      allow delete: if ownsUsernameDoc();
+        && usernameDocValid()
+        && (
+          request.resource.data.uid == request.auth.uid
+          || isAdmin()
+        );
+      allow update: if usernameDocValid()
+        && (
+          (ownsUsernameDoc() && request.resource.data.uid == request.auth.uid)
+          || isAdmin()
+        );
+      allow delete: if ownsUsernameDoc() || isAdmin();
     }
 
     match /profiles/{userId} {
       allow read: if true;
-      allow create, update: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) || isAdmin();
+      allow update: if isAdmin() || (isOwner(userId) && isNotBanned());
       allow delete: if isOwner(userId) || isAdmin();
     }
 

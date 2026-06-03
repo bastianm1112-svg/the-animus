@@ -35,12 +35,154 @@
   }
 
   function normalizeUsername(raw) {
+    if (g.AnimusUsernamePolicy && g.AnimusUsernamePolicy.sanitize) {
+      return g.AnimusUsernamePolicy.sanitize(raw);
+    }
     return String(raw || '')
       .trim()
       .replace(/^@/, '')
       .replace(/[^a-zA-Z0-9_\-]/g, '')
       .substring(0, 32)
       .toLowerCase();
+  }
+
+  function validateUsernameOrThrow(raw) {
+    if (g.AnimusShared && g.AnimusShared.validateUsername) {
+      var verdict = g.AnimusShared.validateUsername(raw);
+      if (!verdict.ok) throw new Error(verdict.message || 'Invalid username');
+      return verdict.username;
+    }
+    var un = normalizeUsername(raw);
+    if (un.length < 3) throw new Error('Username must be at least 3 characters.');
+    return un;
+  }
+
+  function loadModerationIntoForm() {
+    var status = document.getElementById('adminModerationStatus');
+    var unInput = document.getElementById('adminNewUsername');
+    var reasonInput = document.getElementById('adminBanReason');
+    if (!status || !targetUser) return;
+    var banned = targetUser.banned === true;
+    var un = targetUser.username ? '@' + targetUser.username : '(no username)';
+    var edited = targetUser.bannedAt
+      ? ' · banned ' + String(targetUser.bannedAt).slice(0, 19)
+      : '';
+    status.textContent =
+      (banned ? 'Status: BANNED' : 'Status: active') +
+      ' · ' +
+      un +
+      edited +
+      (targetUser.banReason ? ' · ' + targetUser.banReason : '');
+    status.className = 'admin-meta' + (banned ? ' admin-meta-banned' : '');
+    if (unInput) unInput.value = targetUser.username || '';
+    if (reasonInput && !reasonInput.value) reasonInput.value = targetUser.banReason || '';
+  }
+
+  function banUser() {
+    if (!targetUid) {
+      setStatus('Load a user first', 'err');
+      return;
+    }
+    if (targetUid === adminUid) {
+      setStatus('You cannot ban your own admin account.', 'err');
+      return;
+    }
+    var reasonEl = document.getElementById('adminBanReason');
+    var reason = reasonEl && reasonEl.value ? reasonEl.value.trim().substring(0, 200) : '';
+    if (!g.confirm('Ban this user? They will be signed out and cannot use the app.')) return;
+    db.collection('users')
+      .doc(targetUid)
+      .set(
+        {
+          banned: true,
+          bannedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          bannedBy: adminUid || 'admin',
+          banReason: reason
+        },
+        { merge: true }
+      )
+      .then(function () {
+        targetUser.banned = true;
+        targetUser.banReason = reason;
+        loadModerationIntoForm();
+        setStatus('User banned. They will be blocked on next request.', 'ok');
+      })
+      .catch(function (e) {
+        setStatus(e.message || 'Ban failed', 'err');
+      });
+  }
+
+  function unbanUser() {
+    if (!targetUid) {
+      setStatus('Load a user first', 'err');
+      return;
+    }
+    db.collection('users')
+      .doc(targetUid)
+      .set(
+        {
+          banned: false,
+          unbannedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          unbannedBy: adminUid || 'admin'
+        },
+        { merge: true }
+      )
+      .then(function () {
+        targetUser.banned = false;
+        loadModerationIntoForm();
+        setStatus('User unbanned.', 'ok');
+      })
+      .catch(function (e) {
+        setStatus(e.message || 'Unban failed', 'err');
+      });
+  }
+
+  function changeUsername() {
+    if (!targetUid || !targetUser) {
+      setStatus('Load a user first', 'err');
+      return;
+    }
+    var raw = document.getElementById('adminNewUsername') && document.getElementById('adminNewUsername').value;
+    var newUsername;
+    try {
+      newUsername = validateUsernameOrThrow(raw);
+    } catch (e) {
+      setStatus(e.message || 'Invalid username', 'err');
+      return;
+    }
+    var oldUsername = (targetUser.username || '').toLowerCase();
+    if (newUsername === oldUsername) {
+      setStatus('Username unchanged.', 'ok');
+      return;
+    }
+    if (!g.confirm('Change @' + oldUsername + ' → @' + newUsername + '?')) return;
+
+    setStatus('Updating username…');
+    db.collection('usernames')
+      .doc(newUsername)
+      .get()
+      .then(function (doc) {
+        if (doc.exists && doc.data().uid && doc.data().uid !== targetUid) {
+          throw new Error('@' + newUsername + ' is already taken.');
+        }
+        var batch = db.batch();
+        batch.set(db.collection('users').doc(targetUid), { username: newUsername }, { merge: true });
+        batch.set(db.collection('usernames').doc(newUsername), { uid: targetUid });
+        if (oldUsername) batch.delete(db.collection('usernames').doc(oldUsername));
+        return batch.commit();
+      })
+      .then(function () {
+        targetUser.username = newUsername;
+        if (document.getElementById('adminUsername')) {
+          document.getElementById('adminUsername').value = newUsername;
+        }
+        updateTargetMeta();
+        loadModerationIntoForm();
+        setStatus('Username updated to @' + newUsername + '.', 'ok');
+      })
+      .catch(function (e) {
+        setStatus(e.message || 'Username change failed', 'err');
+      });
   }
 
   function resolveTargetUid() {
@@ -315,6 +457,7 @@
         }
         loadTestSessionsForTarget();
         loadEntitlementsIntoForm();
+        loadModerationIntoForm();
       })
       .catch(function (e) {
         setStatus(e.message || 'Load failed', 'err');
@@ -668,6 +811,9 @@
     saveProfile: saveProfile,
     reconcileFromCog: reconcileFromCog,
     unlockTypes: unlockTypes,
-    saveEntitlements: saveEntitlements
+    saveEntitlements: saveEntitlements,
+    banUser: banUser,
+    unbanUser: unbanUser,
+    changeUsername: changeUsername
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -357,6 +357,10 @@
     test: 1,
     compare: 1,
     friends: 1,
+    activity: 1,
+    notifications: 1,
+    shop: 1,
+    about: 1,
     admin: 1,
     types: 1,
     profile: 1,
@@ -368,6 +372,42 @@
     '404': 1,
     landing: 1
   };
+
+  function validateUsername(raw) {
+    if (g.AnimusUsernamePolicy && g.AnimusUsernamePolicy.validate) {
+      return g.AnimusUsernamePolicy.validate(raw);
+    }
+    var username = normalizeUsername(raw);
+    if (username.length < 3) {
+      return { ok: false, code: 'short', message: 'Username must be at least 3 characters.' };
+    }
+    if (PROFILE_ROUTE_RESERVED[username]) {
+      return { ok: false, code: 'reserved', message: '@' + username + ' is reserved.' };
+    }
+    return { ok: true, username: username };
+  }
+
+  function enforceBannedSession(auth, db, user) {
+    if (!user || !db || !auth) return Promise.resolve(false);
+    return db
+      .collection('users')
+      .doc(user.uid)
+      .get()
+      .then(function (doc) {
+        if (!doc.exists || doc.data().banned !== true) return false;
+        return auth.signOut().then(function () {
+          try {
+            g.location.href = '/login?banned=1';
+          } catch (e) {
+            g.location.href = '/login?banned=1';
+          }
+          return true;
+        });
+      })
+      .catch(function () {
+        return false;
+      });
+  }
 
   function normalizeUsername(username) {
     return String(username || '')
@@ -653,6 +693,18 @@
     if (!el || typeof firebase === 'undefined' || !firebase.auth) return;
 
     firebase.auth().onAuthStateChanged(function (user) {
+      if (!user) {
+        applyNavAvatarForSession(el, null);
+        return;
+      }
+      var dbRef =
+        typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null;
+      if (dbRef) {
+        enforceBannedSession(firebase.auth(), dbRef, user).then(function (signedOut) {
+          if (!signedOut) applyNavAvatarForSession(el, user);
+        });
+        return;
+      }
       applyNavAvatarForSession(el, user);
     });
   }
@@ -1397,6 +1449,8 @@
     getResolvedLang: getResolvedLang,
     setResolvedLang: setResolvedLang,
     getSavedTestMode: getSavedTestMode,
-    setSavedTestMode: setSavedTestMode
+    setSavedTestMode: setSavedTestMode,
+    validateUsername: validateUsername,
+    enforceBannedSession: enforceBannedSession
   };
 })(typeof window !== 'undefined' ? window : this);

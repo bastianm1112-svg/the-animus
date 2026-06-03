@@ -113,6 +113,18 @@
         setMemberMode(false);
         return;
       }
+      if (g.AnimusShared && g.AnimusShared.enforceBannedSession) {
+        g.AnimusShared.enforceBannedSession(auth, db, user).then(function (signedOut) {
+          if (signedOut) return;
+          bootMemberHome(user, db, greet);
+        });
+        return;
+      }
+      bootMemberHome(user, db, greet);
+    });
+  }
+
+  function bootMemberHome(user, db, greet) {
       setMemberMode(true);
       if (location.hash === '#friends') {
         g.location.replace('/activity');
@@ -215,7 +227,6 @@
       if (typeof g.AnimusSocial !== 'undefined') {
         g.AnimusSocial.refreshNotifBadge(user.uid);
       }
-    });
   }
 
   g.AnimusHome = { boot: boot };

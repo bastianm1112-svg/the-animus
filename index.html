@@ -699,6 +699,7 @@ var db = firebase.firestore();
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-release.css">
 <link rel="stylesheet" href="/css/animus-home.css">
+<link rel="stylesheet" href="/css/animus-legal.css">
 <script src="/js/animus-app.js" defer></script>
 </head>
 <body>
@@ -754,6 +755,7 @@ var db = firebase.firestore();
     </a>
   </div>
 </main>
+<div class="member-site-footer-wrap" id="memberLegalFooter"></div>
 <div id="memberBottomMount"></div>
 </div>
 
@@ -1052,14 +1054,7 @@ var db = firebase.firestore();
 </section>
 
 <!-- FOOTER -->
-<footer>
-  <a href="/" class="footer-logo">ANI<span>MUS</span></a>
-  <div class="footer-copy">? 2026 ANIMUS ? Know thyself completely</div>
-  <div class="footer-links">
-    <a href="/test">Test</a>
-    <a href="/login">Sign In</a>
-  </div>
-</footer>
+<div id="guestLegalFooter"></div>
 </div>
 
 <script src="/js/daily-facts.js"></script>
@@ -1067,11 +1062,16 @@ var db = firebase.firestore();
 <script src="/js/animus-daily.js"></script>
 <script src="/js/animus-social.js"></script>
 <script src="/js/animus-nav.js"></script>
+<script src="/js/animus-legal.js"></script>
 <script src="/js/animus-home.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   AnimusNav.mountTop('memberNavMount', 'home');
   AnimusNav.mountBottom('memberBottomMount', 'home');
+  if (typeof AnimusLegal !== 'undefined') {
+    AnimusLegal.mountFooter('guestLegalFooter');
+    AnimusLegal.mountFooter('memberLegalFooter');
+  }
   if (typeof AnimusHome !== 'undefined') AnimusHome.boot(auth, db);
 });
 </script>

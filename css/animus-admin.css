@@ -1,3 +1,7 @@
+.admin-meta-banned {
+  color: var(--red, #c0392b);
+}
+
 .admin-ent-grid {
   display: flex;
   flex-direction: column;

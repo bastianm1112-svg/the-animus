@@ -26,9 +26,10 @@
     {"source": "/shop", "destination": "/shop.html"},
     {"source": "/admin", "destination": "/admin.html"},
     {"source": "/types", "destination": "/types.html"},
+    {"source": "/about", "destination": "/about.html"},
     {"source": "/profile", "destination": "/profile.html"},
     {"source": "/404", "destination": "/404.html"},
-    {"source": "/:username((?!dashboard|login|settings|test|compare|friends|activity|notifications|shop|admin|types|profile|group|api|_vercel|favicon|index|404|landing).*)", "destination": "/profile.html?u=:username"}
+    {"source": "/:username((?!dashboard|login|settings|test|compare|friends|activity|notifications|shop|admin|types|profile|group|about|api|_vercel|favicon|index|404|landing).*)", "destination": "/profile.html?u=:username"}
   ],
   "redirects": [
     {"source": "/dashboard", "destination": "/", "permanent": true},

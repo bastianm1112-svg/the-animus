@@ -9,7 +9,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="/js/animus-username-policy.js"></script>
 <script src="/js/animus-shared.js"></script>
+<script src="/js/animus-legal.js"></script>
 <script>
 AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 var auth = firebase.auth();
@@ -88,6 +90,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 </style>
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-release.css">
+<link rel="stylesheet" href="/css/animus-legal.css">
 <meta name="theme-color" content="#080808">
 <meta name="description" content="Sign in to ANIMUS — your personality atlas across cognitive type, Enneagram, philosophy, politics, and more.">
 </head>
@@ -118,6 +121,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="auth-eyebrow" id="eyebrow">Welcome back</div>
     <h1 class="auth-title" id="title">Sign in to ANIMUS</h1>
     <p class="auth-sub" id="sub">Access your profile, compare with friends, track how you change.</p>
+    <div class="auth-err show" id="bannedNotice" style="display:none;margin-bottom:12px"></div>
 
     <div class="auth-toggle">
       <button class="toggle-btn active" id="tabSignin" onclick="setMode('signin')">Sign In</button>
@@ -163,6 +167,17 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div id="forgotRow" style="text-align:right">
         <a class="forgot-link" onclick="doForgot()">Forgot password?</a>
       </div>
+      <div class="legal-accept-row signup-only" id="legalAcceptMainWrap" hidden>
+        <input type="checkbox" id="legalAcceptMain" aria-describedby="legalAcceptMainLabel"/>
+        <label id="legalAcceptMainLabel" for="legalAcceptMain">
+          I have read and agree to the
+          <a href="/about#terms" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a>
+          and
+          <a href="/about#disclaimer" target="_blank" rel="noopener noreferrer">Trademark Disclaimer</a>.
+          I understand my email and assessment data are stored in ANIMUS databases and accept the
+          liability limitations described there.
+        </label>
+      </div>
       <button type="submit" class="btn-submit" id="btnSubmit">Sign In</button>
     </form>
 
@@ -182,7 +197,15 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         maxlength="30" oninput="checkSetupUN(this.value)" autocomplete="off"/>
     </div>
     <div class="un-status" id="setupSt"></div>
-    <button class="btn-submit" style="margin-top:20px" onclick="finishSetup()">Finish ?</button>
+    <div class="legal-accept-row" id="legalAcceptSetupWrap">
+      <input type="checkbox" id="legalAcceptSetup" aria-describedby="legalAcceptSetupLabel"/>
+      <label id="legalAcceptSetupLabel" for="legalAcceptSetup">
+        I accept the
+        <a href="/about#terms" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a>
+        (including data storage, security incident limitations, and dispute terms).
+      </label>
+    </div>
+    <button class="btn-submit" style="margin-top:20px" onclick="finishSetup()" disabled>Finish ?</button>
   </div>
 
   <div id="screenSuccess" class="screen">
@@ -203,6 +226,12 @@ var busy = false;
 auth.onAuthStateChanged(function(user){
   if(busy) return;
   if(!user) return;
+  if(typeof AnimusShared !== 'undefined' && AnimusShared.enforceBannedSession){
+    AnimusShared.enforceBannedSession(auth, db, user).then(function(signedOut){
+      if(!signedOut) goToDashboard();
+    });
+    return;
+  }
   goToDashboard();
 });
 
@@ -211,6 +240,7 @@ auth.getRedirectResult()
   .catch(function(e){ if(e.code && e.code!=='auth/no-redirect-operation') showErr(e); });
 
 document.getElementById('btnGoogle').addEventListener('click', function(){
+  if(typeof AnimusLegal !== 'undefined' && !AnimusLegal.requireMainAccept()) return;
   busy = true;
   var btn = this;
   btn.disabled = true;
@@ -265,9 +295,14 @@ function doSubmit(e){
   if(!pw)   { return showErr({message:'Please enter your password.'}); }
 
   if(mode==='signup'){
+    if(typeof AnimusLegal !== 'undefined' && !AnimusLegal.requireMainAccept()) return;
     var name = v('iName'), un = v('iUser'), confirm = v('iConfirm');
     if(!name)       return showErr({message:'Please enter your display name.'});
-    if(un.length<3) return showErr({message:'Username must be at least 3 characters.'});
+    var unCheck = typeof AnimusShared !== 'undefined' && AnimusShared.validateUsername
+      ? AnimusShared.validateUsername(un)
+      : { ok: un.length >= 3, message: 'Username must be at least 3 characters.' };
+    if(!unCheck.ok) return showErr({message: unCheck.message || 'Invalid username.'});
+    un = unCheck.username || un;
     if(pw.length<6) return showErr({message:'Password must be at least 6 characters.'});
     if(pw!==confirm)return showErr({message:'Passwords do not match.'});
 
@@ -311,7 +346,14 @@ function checkSetupUN(val){
   var st = document.getElementById('setupSt');
   clearTimeout(setupTimer);
   if(val.length<3){ st.className='un-status'; st.textContent=''; return; }
-  if(reservedUsernames.indexOf(val)>-1){ st.className='un-status bad'; st.textContent='@'+val+' is reserved'; return; }
+  var setupVerdict = typeof AnimusShared !== 'undefined' && AnimusShared.validateUsername
+    ? AnimusShared.validateUsername(val)
+    : { ok: true };
+  if(!setupVerdict.ok){
+    st.className='un-status bad';
+    st.textContent=setupVerdict.message || 'Not allowed';
+    return;
+  }
   st.className='un-status'; st.textContent='Checking...';
   setupTimer = setTimeout(function(){
     db.collection('usernames').doc(val).get()
@@ -322,13 +364,20 @@ function checkSetupUN(val){
   }, 500);
 }
 
-var reservedUsernamesSetup = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare','friends','notifications','group','types','landing','index','404','about'];
 function finishSetup(){
+  if(typeof AnimusLegal !== 'undefined' && !AnimusLegal.requireSetupAccept()) return;
   var un = document.getElementById('setupUN').value.trim().toLowerCase();
   var errEl = document.getElementById('setupErr');
   errEl.classList.remove('show');
-  if(un.length<3){ errEl.textContent='Username must be at least 3 characters.'; errEl.classList.add('show'); return; }
-  if(reservedUsernamesSetup.indexOf(un)>-1){ errEl.textContent='@'+un+' is a reserved name. Please choose another.'; errEl.classList.add('show'); return; }
+  var unVerdict = typeof AnimusShared !== 'undefined' && AnimusShared.validateUsername
+    ? AnimusShared.validateUsername(un)
+    : { ok: un.length >= 3, message: 'Username must be at least 3 characters.' };
+  if(!unVerdict.ok){
+    errEl.textContent = unVerdict.message || 'Invalid username.';
+    errEl.classList.add('show');
+    return;
+  }
+  un = unVerdict.username || un;
   if(!googleUser){ goToDashboard(); return; }
 
   var btn = document.querySelector('#screenSetup .btn-submit');
@@ -369,6 +418,10 @@ function saveDoc(user, displayName, username){
     friendRequests: {sent:[], received:[]},
     language: localStorage.getItem('animus_lang')||'en'
   };
+  if(typeof AnimusLegal !== 'undefined'){
+    AnimusLegal.applyToUserData(userData, googleUser ? 'google-signup' : 'email-signup');
+    AnimusLegal.markAcceptedLocally();
+  }
   var batch = db.batch();
   batch.set(db.collection('users').doc(user.uid), userData);
   batch.set(db.collection('usernames').doc(username), {uid: user.uid});
@@ -392,14 +445,20 @@ function saveDoc(user, displayName, username){
   });
 }
 
-var reservedUsernames = ['admin','animus','test','api','support','help','login','dashboard','settings','profile','compare','friends','notifications','group','types','landing','index','404','about'];
 function checkUN(val){
   val = val.toLowerCase().replace(/[^a-z0-9_]/g,'');
   document.getElementById('iUser').value = val;
   var st = document.getElementById('unSt');
   clearTimeout(unTimer);
   if(val.length<3){ st.className='un-status'; st.textContent=''; return; }
-  if(reservedUsernames.indexOf(val)>-1){ st.className='un-status bad'; st.textContent='@'+val+' is reserved'; return; }
+  var verdict = typeof AnimusShared !== 'undefined' && AnimusShared.validateUsername
+    ? AnimusShared.validateUsername(val)
+    : { ok: true };
+  if(!verdict.ok){
+    st.className='un-status bad';
+    st.textContent=verdict.message || 'Not allowed';
+    return;
+  }
   st.className='un-status'; st.textContent='Checking...';
   unTimer = setTimeout(function(){
     db.collection('usernames').doc(val).get()
@@ -426,6 +485,7 @@ function setMode(m){
     : "Don't have an account? <a onclick=\"setMode('signup')\">Create one ?</a>";
   document.getElementById('iPw').setAttribute('autocomplete', up?'new-password':'current-password');
   clearMsgs();
+  if(typeof AnimusLegal !== 'undefined') AnimusLegal.updateSignupControls(m);
 }
 
 function doForgot(){
@@ -454,6 +514,9 @@ function showScreen(id){
   ['screenMain','screenSetup','screenSuccess'].forEach(function(s){
     document.getElementById(s).classList.toggle('show', s===id);
   });
+  if(id==='screenSetup' && typeof AnimusLegal !== 'undefined'){
+    AnimusLegal.updateSetupControls();
+  }
 }
 function v(id){ return document.getElementById(id).value.trim(); }
 function setBtn(loading, txt){
@@ -485,6 +548,22 @@ function clearMsgs(){
   document.getElementById('errBox').classList.remove('show');
   document.getElementById('okBox').classList.remove('show');
 }
+
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    if(new URLSearchParams(window.location.search).get('banned') === '1'){
+      var bn = document.getElementById('bannedNotice');
+      if(bn){
+        bn.style.display = 'block';
+        bn.textContent = 'This account has been suspended. Contact support if you believe this is a mistake.';
+      }
+    }
+  } catch(e) {}
+  if(typeof AnimusLegal !== 'undefined'){
+    AnimusLegal.initLogin();
+    AnimusLegal.updateSignupControls(mode);
+  }
+});
 </script>
 </body>
 </html>

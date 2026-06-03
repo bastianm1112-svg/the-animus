@@ -398,6 +398,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="/js/animus-username-policy.js"></script>
   <script src="/js/animus-shared.js"></script>
   <script>
     AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
@@ -923,7 +924,6 @@ var formBaseline = null;
 var photoDirty = false;
 var pendingAction = null;
 var usernameTimer = null;
-var reservedUsernames = ['admin', 'animus', 'test', 'api', 'support', 'help', 'login', 'dashboard', 'settings', 'profile', 'compare', 'friends'];
 
 function snapshotFormState() {
   var modeEl = document.getElementById('defaultMode');
@@ -1082,7 +1082,11 @@ function saveChanges() {
   var rawName = document.getElementById('displayName').value.trim().substring(0,48);
   var un = document.getElementById('username').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'').substring(0,32);
   document.getElementById('username').value = un;
-  if(un.length < 3) { showToast('Username must be at least 3 characters'); return; }
+  var unVerdict = typeof AnimusShared !== 'undefined' && AnimusShared.validateUsername
+    ? AnimusShared.validateUsername(un)
+    : { ok: un.length >= 3, message: 'Username must be at least 3 characters' };
+  if(!unVerdict.ok) { showToast(unVerdict.message || 'Invalid username'); return; }
+  un = unVerdict.username || un;
 
   // Validate password if entered
   var newPw = document.getElementById('newPw') ? document.getElementById('newPw').value : '';
@@ -1218,8 +1222,12 @@ function checkUsername(val) {
   if(!val || val.length < 3) { status.textContent = ''; status.className = 'username-status'; return; }
   status.textContent = 'Checking...'; status.className = 'username-status checking';
   usernameTimer = setTimeout(function(){
-    if(reservedUsernames.indexOf(val) > -1) {
-      status.textContent = '@' + val + ' is reserved'; status.className = 'username-status err';
+    var verdict = typeof AnimusShared !== 'undefined' && AnimusShared.validateUsername
+      ? AnimusShared.validateUsername(val)
+      : { ok: true };
+    if(!verdict.ok) {
+      status.textContent = verdict.message || 'Not allowed';
+      status.className = 'username-status err';
       return;
     }
     var currentUid = auth.currentUser ? auth.currentUser.uid : null;
