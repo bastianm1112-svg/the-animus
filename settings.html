@@ -55,6 +55,24 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
     padding: 20px 16px 96px;
     box-sizing: border-box;
   }
+  .field-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .field-control {
+    min-width: 0;
+    width: 100%;
+  }
+  .settings-signout-btn {
+    width: 100%;
+    min-height: 44px;
+    color: var(--red);
+    border-color: rgba(192, 57, 43, 0.5);
+  }
+  .settings-signout-btn:hover {
+    border-color: var(--red);
+    color: #e74c3c;
+  }
   .settings-section.active {
     display: block !important;
     opacity: 1 !important;
@@ -93,6 +111,16 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   border-color: var(--gold2);
   background: rgba(200,169,110,0.08);
 }
+.settings-mobile-nav-signout {
+  color: var(--red);
+  border-color: rgba(192, 57, 43, 0.45);
+  background: rgba(192, 57, 43, 0.08);
+}
+.settings-mobile-nav-signout:hover,
+.settings-mobile-nav-signout:focus {
+  color: #e74c3c;
+  border-color: var(--red);
+}
 
 /* ── SETTINGS NAV ── */
 .settings-nav {
@@ -118,6 +146,8 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .settings-nav-item svg { opacity: 0.5; flex-shrink: 0; }
 .settings-nav-item.active svg { opacity: 1; }
 .settings-nav-divider { height: 1px; background: var(--border); margin: 12px 0; }
+.settings-nav-item[style*="color:var(--red)"] { color: var(--red) !important; }
+.settings-nav-item[style*="color:var(--red)"]:hover { color: #e74c3c !important; background: rgba(192, 57, 43, 0.08); }
 
 /* ── MAIN ── */
 .settings-main { padding: 40px 48px; max-width: 700px; }
@@ -387,6 +417,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
     <button type="button" class="settings-mobile-nav-item" data-section="notifications" onclick="showSection('notifications', this)">Alerts</button>
     <button type="button" class="settings-mobile-nav-item" data-section="privacy" onclick="showSection('privacy', this)">Privacy</button>
     <button type="button" class="settings-mobile-nav-item" data-section="data" onclick="showSection('data', this)">Data</button>
+    <button type="button" class="settings-mobile-nav-item settings-mobile-nav-signout" onclick="confirmSignOut()">Sign Out</button>
   </div>
 
   <!-- SETTINGS NAV -->
@@ -559,6 +590,19 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
             <div class="connected-sub" id="googleEmail">—</div>
           </div>
           <div class="connected-status" id="googleStatus">Not connected</div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Session</div>
+        <div class="field-row" style="border:none">
+          <div class="field-info">
+            <div class="field-label">Sign out</div>
+            <div class="field-desc">End this session on this device. You can sign back in anytime.</div>
+          </div>
+          <div class="field-control">
+            <button type="button" class="btn-secondary settings-signout-btn" onclick="confirmSignOut()">Sign Out</button>
+          </div>
         </div>
       </div>
 
@@ -1174,9 +1218,17 @@ function closeModal() {
   document.getElementById('confirmModal').classList.remove('open');
   pendingAction = null;
 }
+
+function signOutNow() {
+  return firebase.auth().signOut().then(function () {
+    try { localStorage.removeItem('animus_pending_doc'); } catch (e) {}
+    window.location.href = '/login';
+  });
+}
 function executeConfirmed() {
+  var action = pendingAction;
   closeModal();
-  if(pendingAction === 'delete') {
+  if(action === 'delete') {
     var user = firebase.auth().currentUser;
     if(!user){ showToast('Not signed in'); return; }
     user.delete().then(function(){
@@ -1189,14 +1241,13 @@ function executeConfirmed() {
         showToast(e.message || 'Error deleting account');
       }
     });
-  } else if(pendingAction === 'signout' || pendingAction === 'signout-all') {
-    firebase.auth().signOut().then(function(){
-      window.location.href='/login';
+  } else if(action === 'signout' || action === 'signout-all') {
+    signOutNow().catch(function(e){
+      showToast(e.message || 'Sign out failed');
     });
-  } else if(pendingAction === 'delete-assessment') {
+  } else if(action === 'delete-assessment') {
     showToast('Assessment deleted');
   }
-  pendingAction = null;
 }
 function confirmSignOut() {
   confirmAction('signout', 'Sign out?', 'You\'ll need to sign in again to access your profile. Unsaved changes will be lost.');
