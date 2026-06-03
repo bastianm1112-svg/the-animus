@@ -126,7 +126,7 @@
       document.querySelector('main');
     if (!main || main.classList.contains('animus-reveal')) return;
     main.classList.add('animus-reveal');
-    main.querySelectorAll('section, .home-actions, .activity-estimator').forEach(function (el, i) {
+    main.querySelectorAll('section, .app-section, .home-actions, .home-action-card, .activity-estimator').forEach(function (el, i) {
       if (i < 4) el.classList.add('animus-reveal', 'animus-reveal-delay-' + (i + 1));
     });
   }

@@ -35,6 +35,11 @@
   }
   function applyPageSeo(opts) {
     opts = opts || {};
+    var robots = metaContent('name', 'robots');
+    if (/noindex/i.test(robots)) {
+      initLazyImages();
+      return;
+    }
     var path = g.location.pathname || '/';
     if (path.endsWith('.html')) path = path.replace(/\.html$/i, '') || '/';
     var url = SITE_ORIGIN + (path === '/index' ? '/' : path);
