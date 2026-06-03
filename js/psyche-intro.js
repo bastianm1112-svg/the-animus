@@ -1,5 +1,5 @@
 /**
- * ANIMUS test page intro — main test only (100-question short mode).
+ * ANIMUS test page intro — respects estimator/detailed route modes.
  */
 (function (g) {
   'use strict';
@@ -10,7 +10,37 @@
     return document.getElementById(id);
   }
 
+  function routeMode() {
+    try {
+      var p = new URLSearchParams(g.location.search);
+      return p.get('mode');
+    } catch (e) {
+      return null;
+    }
+  }
+
   function setMainMode() {
+    var mode = routeMode();
+    if (mode === 'estimator') {
+      try {
+        localStorage.setItem('animus_test_mode', 'estimator');
+      } catch (e) {}
+      g.__animusTestMode = 'estimator';
+      if (g.AnimusPsyche && typeof g.AnimusPsyche.setTestMode === 'function') {
+        g.AnimusPsyche.setTestMode('estimator');
+      }
+      return;
+    }
+    if (mode === 'detailed') {
+      try {
+        localStorage.setItem('animus_test_mode', 'full');
+      } catch (e) {}
+      g.__animusTestMode = 'full';
+      if (g.AnimusPsyche && typeof g.AnimusPsyche.setTestMode === 'function') {
+        g.AnimusPsyche.setTestMode('full');
+      }
+      return;
+    }
     try {
       localStorage.setItem('animus_test_mode', 'short');
     } catch (e) {}
@@ -23,6 +53,7 @@
   function showResume() {
     var wrap = el('resumeTestWrap');
     if (!wrap) return;
+    if (routeMode() === 'estimator') return;
     try {
       var raw = sessionStorage.getItem(KEY_PROGRESS);
       if (!raw) return;

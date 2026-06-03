@@ -143,6 +143,22 @@ service cloud.firestore {
       return isAdmin();
     }
 
+    function estimationRecordValid() {
+      return request.resource.data.subjectName is string
+        && request.resource.data.subjectName.size() > 0
+        && request.resource.data.subjectName.size() <= 64
+        && (!('status' in request.resource.data)
+          || (request.resource.data.status is string
+            && request.resource.data.status in ['draft', 'complete']));
+    }
+
+    match /users/{userId}/estimations/{estId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && estimationRecordValid();
+      allow update: if isOwner(userId) && estimationRecordValid();
+      allow delete: if isOwner(userId);
+    }
+
     match /users/{userId} {
       allow read: if signedIn();
       allow create: if isOwner(userId)

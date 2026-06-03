@@ -192,6 +192,117 @@
 .activity-estimator-locked {
   opacity: 0.7;
 }
+
+.activity-estimations-section {
+  margin-bottom: 28px;
+}
+
+.estimations-note {
+  font-size: 12px;
+  color: var(--muted2, #888);
+  margin: -8px 0 20px;
+}
+.estimations-note a {
+  color: var(--gold, #c8a96e);
+}
+
+.estimations-toolbar {
+  margin-bottom: 16px;
+}
+
+.estimations-empty {
+  padding: 24px 18px;
+  border: 1px dashed var(--border2, #2a2a2a);
+  color: var(--muted2, #888);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.estimations-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.estimations-card {
+  border: 1px solid var(--border2, #2a2a2a);
+  background: var(--surface, #111);
+  padding: 16px 18px;
+}
+
+.estimations-card-highlight {
+  border-color: var(--gold, #c8a96e);
+  box-shadow: 0 0 0 1px rgba(200, 169, 110, 0.25);
+}
+
+.estimations-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.estimations-card-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.estimations-card-status {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted2, #888);
+}
+
+.estimations-status-complete {
+  color: var(--gold, #c8a96e);
+}
+
+.estimations-card-type {
+  font-size: 14px;
+  color: var(--text, #e2e2e2);
+  margin: 0 0 6px;
+}
+
+.estimations-card-tag {
+  font-size: 12px;
+  color: var(--muted2, #888);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.estimations-card-date {
+  font-size: 11px;
+  color: var(--muted, #555);
+  margin: 0 0 12px;
+}
+
+.estimations-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.estimations-card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--gold, #c8a96e);
+  color: var(--gold, #c8a96e);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.estimations-card-btn-sec {
+  border-color: var(--border2, #2a2a2a);
+  color: var(--muted2, #888);
+}
 .shop-open-link {
   display: inline-flex;
   align-items: center;

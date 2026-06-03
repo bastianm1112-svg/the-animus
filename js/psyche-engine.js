@@ -201,6 +201,10 @@ function applyRouteTestMode() {
       observerMode = true;
       observerSubjectName = decodeURIComponent(name).substring(0, 64);
     }
+    var estId = params.get('estimation');
+    if (estId) {
+      window._estimationId = String(estId).replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 128);
+    }
   }
   return mode;
 }
@@ -228,9 +232,19 @@ function configureIntroForMode() {
     if (label) label.textContent = 'Detailed Test';
     if (hint) hint.style.display = 'none';
   } else if (mode === 'estimator') {
-    if (title) title.textContent = 'Profile Estimator';
-    if (label) label.textContent = 'Estimator';
+    if (title) title.textContent = 'What are they likely to do?';
+    if (label) label.textContent = 'Behavioral Estimator';
     if (hint) hint.style.display = 'none';
+    var desc = intro.querySelector('.intro-desc');
+    if (desc) {
+      var who = observerSubjectName || 'this person';
+      desc.textContent =
+        'Answer from what you have actually seen ' +
+        who +
+        ' do in real situations — not private thoughts you cannot know. Results are saved under Estimations, separate from your friends list.';
+    }
+    var meta = intro.querySelector('.intro-meta');
+    if (meta) meta.style.display = 'none';
   }
 }
 
@@ -340,6 +354,13 @@ function takeUniqueQuestions(pool, n, used, qKey) {
     var q = pool[i];
     var k = qKey(q);
     if (used[k]) continue;
+    if (
+      testMode === 'estimator' &&
+      typeof AnimusEstimator !== 'undefined' &&
+      !AnimusEstimator.isObservableQuestion(q)
+    ) {
+      continue;
+    }
     used[k] = true;
     out.push(q);
   }
@@ -410,8 +431,6 @@ var ESTIMATOR_ALLOC = {
   Ni: 3, Ne: 3, Ti: 3, Te: 3, Fi: 3, Fe: 3, Si: 2, Se: 2,
   E1: 1, E2: 1, E3: 1, E4: 1, E5: 1, E6: 1, E7: 1, E8: 1, E9: 1,
   PC_ECON_R: 2, PC_ECON_L: 2, PC_AUTH: 2, PC_LIB: 2,
-  PH_NIE: 1, PH_STO: 1, PH_KAN: 1, PH_ARI: 1,
-  ET_VIR: 1, ET_CON: 1,
   AT_SEC: 2, AT_ANX: 2, AT_AVO: 2, AT_DIS: 2,
   IV_SP: 1, IV_SOC: 1,
   TMP_CHO: 1, TMP_MEL: 1
@@ -609,6 +628,131 @@ if (applyRouteTestMode() === 'estimator' && observerSubjectName) {
   window._observerMode = true;
   window._observerName = observerSubjectName;
 }
+
+function showResultsFromStoredSnapshot(snap, subjectName) {
+  if (!snap || !snap.mbti) return;
+  observerMode = true;
+  window._observerMode = true;
+  window._observerName = subjectName || snap.subjectName || '';
+  var data = {
+    cog: snap.cog || {},
+    ennScores: snap.enn || {},
+    attScores: snap.att2 || {},
+    tmp: snap.tmp || {},
+    iv: snap.iv || {},
+    mf: snap.mf || {},
+    eth: snap.eth || {},
+    ep: snap.ep || {},
+    phiScores: snap.phiS || {},
+    soc: snap.soc || {},
+    alone: snap.alone || {},
+    polX: snap.polX || 0,
+    polY: snap.polY || 0
+  };
+  var enn = {
+    type: snap.ennType || '5',
+    wing: snap.ennWing || '6',
+    tritype: snap.ennTritype || '',
+    scores: snap.enn || {}
+  };
+  var fnsSorted = Object.keys(data.cog).sort(function (a, b) {
+    return (data.cog[b] || 0) - (data.cog[a] || 0);
+  });
+  var ai = {
+    mbtiName: snap.mbtiName || '',
+    tagline: snap.tagline || '',
+    socionics: snap.socionics || '',
+    keirsey: snap.keirsey || '',
+    values: snap.values || [],
+    figures: snap.figures || [],
+    cogNarrative: snap.cogNarrative || '',
+    ennNarrative: snap.ennNarrative || '',
+    attNarrative: snap.attNarrative || '',
+    phiNarrative: snap.phiNarrative || '',
+    politicalNarrative: snap.politicalNarrative || '',
+    politicalIdeology: snap.politicalIdeology || '',
+    politicalIdeologyDesc: snap.politicalIdeologyDesc || '',
+    politicalStrengths: snap.politicalStrengths || '',
+    politicalWeaknesses: snap.politicalWeaknesses || '',
+    politicalThinkers: snap.politicalThinkers || [],
+    similarPoliticians: snap.similarPoliticians || [],
+    similarParties: snap.similarParties || [],
+    similarCountries: snap.similarCountries || [],
+    aloneDesc: snap.aloneDesc || '',
+    socialDesc: snap.socialDesc || '',
+    shadowDesc: snap.shadowDesc || '',
+    big5: snap.big5 || {}
+  };
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('quiz').style.display = 'none';
+  showResults(
+    data,
+    snap.mbti,
+    enn,
+    snap.att || 'AT_AVO',
+    snap.phi || 'PH_NIE',
+    snap.instStack || '',
+    fnsSorted,
+    ai,
+    false
+  );
+  var heroEl = document.getElementById('resHero');
+  if (heroEl && window._observerMode) {
+    var banner = document.createElement('div');
+    banner.style.cssText =
+      'background:rgba(200,169,110,0.08);border:1px solid var(--accent2);padding:12px 20px;margin-bottom:16px;font-size:12px;color:var(--muted2);letter-spacing:0.05em;';
+    banner.innerHTML =
+      '◎ ESTIMATED PROFILE — <strong style="color:var(--text)">' +
+      escapeHTML(window._observerName || 'Unknown') +
+      '</strong> — Based on observed behavior only. <a href="/estimations" style="color:var(--accent)">← Estimations</a>';
+    heroEl.insertBefore(banner, heroEl.firstChild);
+  }
+  document.getElementById('actionBar').style.display = 'none';
+}
+
+function tryLoadEstimationView() {
+  var params;
+  try {
+    params = new URLSearchParams(window.location.search);
+  } catch (e) {
+    return;
+  }
+  if (params.get('mode') !== 'estimator' || params.get('view') !== '1') return;
+  var estId = window._estimationId || params.get('estimation');
+  if (!estId) return;
+  if (typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore) return;
+
+  function loadForUser(user) {
+    if (!user) {
+      window.location.replace('/login?next=' + encodeURIComponent(window.location.pathname + window.location.search));
+      return;
+    }
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(user.uid)
+      .collection('estimations')
+      .doc(estId)
+      .get()
+      .then(function (doc) {
+        if (!doc.exists || !doc.data().snapshot) {
+          showToast('Estimation not found.');
+          return;
+        }
+        var d = doc.data();
+        showResultsFromStoredSnapshot(d.snapshot, d.subjectName);
+      })
+      .catch(function () {
+        showToast('Could not load estimation.');
+      });
+  }
+
+  var cur = firebase.auth().currentUser;
+  if (cur) loadForUser(cur);
+  else firebase.auth().onAuthStateChanged(loadForUser);
+}
+
+tryLoadEstimationView();
 
 // Which fn codes belong to which dimension
 var DIM_FNS = {
@@ -837,6 +981,9 @@ function renderQ(){
   refreshAnimusLang();
   var q=(window._activeQ||Q)[cur];
   var loc = localizedForQuestion(q, cur);
+  if (observerMode && observerSubjectName && typeof AnimusEstimator !== 'undefined') {
+    loc = AnimusEstimator.localizeObserver(loc, q, observerSubjectName);
+  }
   var qSection = document.getElementById('qSection');
   if(qSection && !observerMode && testMode !== 'full'){
     qSection.textContent = (qSection.textContent.indexOf('Main') > -1 ? 'Main Test' : qSection.textContent) || loc.sec || '';
@@ -1962,7 +2109,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
   function persistProfileSnapshot(redirectAfter) {
     var meta = {
-      testMode: TOTAL <= 100 ? 'short' : 'full',
+      testMode: observerMode ? 'estimator' : TOTAL <= 100 ? 'short' : 'full',
       answerCount: Object.keys(answers || {}).length,
       completedAt: new Date().toISOString()
     };
@@ -1970,7 +2117,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     snapshot.testMode = meta.testMode;
     snapshot.answerCount = meta.answerCount;
 
-    if (typeof AnimusShared !== 'undefined') {
+    if (!observerMode && typeof AnimusShared !== 'undefined') {
       AnimusShared.saveLastResultLocal(
         AnimusShared.enrichProfileSnapshot(snapshot, data, meta)
       );
@@ -1992,6 +2139,54 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
     function doSave(user) {
       if (!user || typeof AnimusShared === 'undefined') return;
+
+      if (observerMode && typeof AnimusEstimator !== 'undefined') {
+        var estSnap = Object.assign({}, snapshot, {
+          subjectName: observerSubjectName || '',
+          estimationId: window._estimationId || ''
+        });
+        var saveChain = window._estimationId
+          ? Promise.resolve(window._estimationId)
+          : AnimusEstimator.createEstimation(
+              firebase.firestore(),
+              user.uid,
+              observerSubjectName || 'Someone'
+            ).then(function (newId) {
+              window._estimationId = newId;
+              return newId;
+            });
+        return saveChain
+          .then(function (estId) {
+            return AnimusEstimator.saveEstimationResult(
+              firebase.firestore(),
+              user.uid,
+              estId,
+              estSnap,
+              {
+                subjectName: observerSubjectName,
+                completedAt: meta.completedAt,
+                answerCount: meta.answerCount
+              }
+            );
+          })
+          .then(function () {
+            if (typeof AnimusXp !== 'undefined') {
+              return AnimusXp.awardXp(firebase.firestore(), user.uid, 'estimator_complete');
+            }
+          })
+          .then(function () {
+            showToast('Estimation saved — not added to your own profile ✓');
+            setTimeout(function () {
+              window.location.href =
+                '/estimations?id=' + encodeURIComponent(window._estimationId);
+            }, 1200);
+          })
+          .catch(function (e) {
+            console.error('Estimation save:', e);
+            showToast('Could not save estimation. Try Save again.');
+          });
+      }
+
       var activeQ = window._activeQ || Q;
       var choiceIx = _choiceIx ? _choiceIx.slice() : [];
       var answersCopy = answers ? answers.slice() : [];

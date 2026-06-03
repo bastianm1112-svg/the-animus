@@ -1158,6 +1158,10 @@ function saveChanges() {
           if(currentUsername) batch.delete(db.collection('usernames').doc(currentUsername));
           batch.set(db.collection('usernames').doc(newUsername), { uid: uid });
           return batch.commit();
+        }).then(function(){
+          if(typeof AnimusShared !== 'undefined' && AnimusShared.repairUsernameIndexForUser){
+            return AnimusShared.repairUsernameIndexForUser(db, uid, newUsername);
+          }
         });
       }
 

@@ -1,44 +1,30 @@
 /**
- * Combined Activity page — requests, friends, feed, estimator.
+ * Combined Activity page — requests, friends, feed, estimator teaser.
  */
 (function (g) {
   'use strict';
-
-  function escapeHTML(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
 
   function renderEstimator(entitled) {
     var mount = document.getElementById('estimatorMount');
     if (!mount) return;
     if (entitled) {
       mount.innerHTML =
+        '<section class="activity-estimations-section" aria-labelledby="estimationsTeaserTitle">' +
+        '<div class="home-section-head"><span class="home-section-title" id="estimationsTeaserTitle">Profile estimations</span></div>' +
         '<div class="activity-estimator">' +
-        '<div><div class="activity-estimator-title">Test Estimator</div>' +
-        '<p class="activity-estimator-desc">Answer based on how someone behaves — not your own self-report. Save estimated profiles for friends and family.</p></div>' +
-        '<button type="button" class="activity-estimator-cta" id="startEstimatorBtn">Start estimator</button>' +
-        '</div>';
-      var btn = document.getElementById('startEstimatorBtn');
-      if (btn) {
-        btn.onclick = function () {
-          var name = prompt('Who are you estimating? (name or nickname)');
-          if (!name || !name.trim()) return;
-          g.location.href =
-            '/test?mode=estimator&name=' + encodeURIComponent(name.trim().substring(0, 64));
-        };
-      }
+        '<div><div class="activity-estimator-title">What are they likely to do?</div>' +
+        '<p class="activity-estimator-desc">Estimate someone&apos;s type from behavior you&apos;ve actually seen — saved separately from real account friends.</p></div>' +
+        '<a href="/estimations" class="activity-estimator-cta shop-open-link">Open estimations</a>' +
+        '</div></section>';
     } else {
       mount.innerHTML =
+        '<section class="activity-estimations-section">' +
+        '<div class="home-section-head"><span class="home-section-title">Profile estimations</span></div>' +
         '<div class="activity-estimator activity-estimator-locked">' +
-        '<div><div class="activity-estimator-title">Test Estimator</div>' +
-        '<p class="activity-estimator-desc">Unlock profile estimation in the <a href="/shop">Shop</a> to guess someone&apos;s type from observed behavior.</p></div>' +
-        '<a href="/shop" class="activity-estimator-cta" style="display:inline-flex;align-items:center;text-decoration:none">View in Shop</a>' +
-        '</div>';
+        '<div><div class="activity-estimator-title">Behavioral estimator</div>' +
+        '<p class="activity-estimator-desc">Unlock profile estimation in the <a href="/shop">Shop</a> to guess types from observed behavior — not your own self-report.</p></div>' +
+        '<a href="/shop" class="activity-estimator-cta shop-open-link">View in Shop</a>' +
+        '</div></section>';
     }
   }
 

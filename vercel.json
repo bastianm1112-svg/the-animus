@@ -22,6 +22,7 @@
     {"source": "/compare", "destination": "/compare.html"},
     {"source": "/friends", "destination": "/friends.html"},
     {"source": "/activity", "destination": "/activity.html"},
+    {"source": "/estimations", "destination": "/estimations.html"},
     {"source": "/notifications", "destination": "/notifications.html"},
     {"source": "/shop", "destination": "/shop.html"},
     {"source": "/admin", "destination": "/admin.html"},
@@ -29,7 +30,7 @@
     {"source": "/about", "destination": "/about.html"},
     {"source": "/profile", "destination": "/profile.html"},
     {"source": "/404", "destination": "/404.html"},
-    {"source": "/:username((?!dashboard|login|settings|test|compare|friends|activity|notifications|shop|admin|types|profile|group|about|api|_vercel|favicon|index|404|landing).*)", "destination": "/profile.html?u=:username"}
+    {"source": "/:username((?!dashboard|login|settings|test|compare|friends|activity|estimations|notifications|shop|admin|types|profile|group|about|api|_vercel|favicon|index|404|landing).*)", "destination": "/profile.html?u=:username"}
   ],
   "redirects": [
     {"source": "/profile/:username", "destination": "/:username", "permanent": true},
