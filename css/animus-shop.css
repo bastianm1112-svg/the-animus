@@ -1,7 +1,11 @@
 .shop-page {
+  width: 100%;
   max-width: 920px;
   margin: 0 auto;
   padding: 88px 20px calc(var(--mbn-h, 64px) + var(--safe-bottom, 0px) + 32px);
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: clip;
 }
 .shop-title {
   font-family: 'Bebas Neue', sans-serif;
@@ -44,8 +48,10 @@
 }
 .shop-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
   gap: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 .shop-card {
   background: var(--surface, #111);
@@ -55,6 +61,10 @@
   flex-direction: column;
   gap: 12px;
   position: relative;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 2px;
 }
 .shop-card-featured {
   border-color: var(--gold, #c8a96e);
@@ -158,49 +168,94 @@
 }
 
 .activity-estimator {
-  margin: 0 0 28px;
-  padding: 18px;
+  margin: 0;
+  padding: 18px 20px;
   border: 1px solid var(--border2, #2a2a2a);
   background: var(--surface, #111);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
   align-items: center;
-  justify-content: space-between;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
+
+.activity-estimator-body {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .activity-estimator-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
+  font-size: clamp(20px, 4.5vw, 22px);
   letter-spacing: 0.06em;
+  line-height: 1.1;
 }
+
 .activity-estimator-desc {
   font-size: 13px;
   color: var(--muted2, #888);
-  max-width: 420px;
+  max-width: 100%;
+  margin: 8px 0 0;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
+
+.activity-estimator-desc a {
+  color: var(--gold, #c8a96e);
+}
+
 .activity-estimator-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: 1px solid var(--gold, #c8a96e);
   color: var(--gold, #c8a96e);
-  padding: 10px 16px;
-  font-size: 11px;
-  letter-spacing: 0.12em;
+  padding: 12px 16px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
   min-height: 44px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-family: inherit;
+  line-height: 1.35;
+  white-space: normal;
+  text-align: center;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
+
+.activity-estimator-cta:hover {
+  background: rgba(200, 169, 110, 0.1);
+  color: var(--gold3, #f0d090);
+}
+
 .activity-estimator-locked {
-  opacity: 0.7;
+  opacity: 0.88;
 }
 
 .activity-estimations-section {
-  margin-bottom: 28px;
+  margin-bottom: 0;
+}
+
+#estimatorMount {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .estimations-note {
   font-size: 12px;
   color: var(--muted2, #888);
-  margin: -8px 0 20px;
+  margin: 12px 0 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 .estimations-note a {
   color: var(--gold, #c8a96e);
@@ -208,6 +263,12 @@
 
 .estimations-toolbar {
   margin-bottom: 16px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.estimations-toolbar .activity-estimator-cta {
+  width: 100%;
 }
 
 .estimations-empty {
@@ -227,6 +288,10 @@
   border: 1px solid var(--border2, #2a2a2a);
   background: var(--surface, #111);
   padding: 16px 18px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 2px;
 }
 
 .estimations-card-highlight {
@@ -236,10 +301,11 @@
 
 .estimations-card-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 8px;
+  min-width: 0;
 }
 
 .estimations-card-name {
@@ -247,6 +313,9 @@
   font-size: 22px;
   letter-spacing: 0.06em;
   margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
 }
 
 .estimations-card-status {
@@ -344,5 +413,19 @@
     min-height: 44px;
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (min-width: 560px) {
+  .activity-estimator {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 20px;
+  }
+
+  .activity-estimator-cta {
+    width: auto;
+    min-width: 132px;
+    max-width: min(200px, 38vw);
+    white-space: nowrap;
   }
 }

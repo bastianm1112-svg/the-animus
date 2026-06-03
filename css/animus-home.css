@@ -21,6 +21,18 @@ body.member-mode #guestApp {
   padding: 32px 24px 48px;
 }
 
+.home-header {
+  margin-bottom: 24px;
+}
+
+.home-header .home-date,
+.home-header .friends-page-sub {
+  margin-bottom: 0;
+}
+.home-header .friends-page-title {
+  margin-bottom: 6px;
+}
+
 .friends-page {
   padding-top: 32px;
   padding-bottom: calc(var(--mbn-h) + var(--safe-bottom) + 48px);
@@ -57,13 +69,14 @@ body.member-mode #guestApp {
 
 /* Today hub — XP + daily insight (home only) */
 .home-daily-hub {
-  margin-bottom: 36px;
+  margin-bottom: 0;
   display: flex;
   flex-direction: column;
   gap: 0;
   border: 1px solid var(--border);
   background: var(--surface);
   overflow: hidden;
+  border-radius: 2px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
@@ -486,33 +499,66 @@ body.light-mode .home-daily-hub {
   color: var(--muted2);
 }
 
-.home-prompt {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  color: var(--white);
-  margin-bottom: 20px;
+.home-prompt,
+.home-quick-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.home-quick {
+  margin-bottom: 0;
 }
 
 .home-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 10px;
-  margin-bottom: 48px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  margin-bottom: 0;
 }
 
 .home-action-card {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 18px 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
   background: var(--surface);
   border: 1px solid var(--border);
+  border-radius: 2px;
   text-decoration: none;
   color: var(--text);
   transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
-  min-height: 100px;
+  min-height: 64px;
   min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.home-action-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.home-action-arrow {
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--gold);
+  opacity: 0.85;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.home-action-card:hover .home-action-arrow {
+  transform: translateX(3px);
+  opacity: 1;
 }
 
 .home-action-card:hover {
@@ -526,7 +572,8 @@ body.light-mode .home-daily-hub {
 
 .home-action-card.primary {
   border-color: var(--gold2);
-  background: rgba(200, 169, 110, 0.06);
+  background: linear-gradient(135deg, rgba(200, 169, 110, 0.1) 0%, var(--surface) 55%);
+  min-height: 72px;
 }
 
 .home-action-title {
@@ -539,14 +586,28 @@ body.light-mode .home-daily-hub {
 .home-action-desc {
   font-size: 12px;
   color: var(--muted2);
-  line-height: 1.5;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .home-section-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 14px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.home-section-head .home-section-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.home-section-head .home-section-link {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .home-section-title {
@@ -573,9 +634,10 @@ body.light-mode .home-daily-hub {
 
 .friends-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
   gap: 10px;
-  margin-bottom: 32px;
+  margin-bottom: 0;
+  min-width: 0;
 }
 
 .friend-card {
@@ -590,6 +652,10 @@ body.light-mode .home-daily-hub {
   align-items: center;
   gap: 8px;
   color: inherit;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 2px;
 }
 
 .friend-card:hover {
@@ -674,6 +740,42 @@ body.light-mode .home-daily-hub {
   gap: 14px;
   padding: 14px 0;
   border-bottom: 1px solid var(--border);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.feed-content {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.feed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.feed-action {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  text-decoration: none;
+  min-height: 36px;
+  padding: 4px 0;
+}
+
+.feed-action:hover {
+  color: var(--gold);
+}
+
+.feed-text {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .feed-icon {
@@ -689,7 +791,7 @@ body.light-mode .home-daily-hub {
   color: var(--gold);
 }
 
-.feed-text {
+.feed-items .feed-text {
   font-size: 13px;
   color: var(--text);
   line-height: 1.5;
@@ -706,8 +808,9 @@ body.light-mode .home-daily-hub {
   border: 1px solid var(--border2);
   border-left: 3px solid var(--gold);
   padding: 16px 20px;
-  margin-bottom: 28px;
+  margin-bottom: 0;
   display: none;
+  border-radius: 2px;
 }
 
 .onboarding-banner.show {
@@ -909,20 +1012,24 @@ body.light-mode .home-daily-hub {
     font-size: 16px;
   }
 
-  .home-prompt {
-    font-size: 20px;
-    margin-bottom: 16px;
+  .home-prompt,
+  .home-quick-label {
+    letter-spacing: 0.22em;
+    margin-bottom: 12px;
   }
 
   .home-actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-    margin-bottom: 32px;
+  }
+
+  .home-action-card.primary {
+    grid-column: 1 / -1;
   }
 
   .home-action-card {
-    min-height: 88px;
-    padding: 14px 12px;
+    min-height: 60px;
+    padding: 14px 14px;
   }
 
   .mood-week-strip {
@@ -967,13 +1074,21 @@ body.light-mode .home-daily-hub {
   }
 
   .home-actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 720px) {
   .member-home {
     padding-left: 28px;
     padding-right: 28px;
+  }
+
+  .home-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-action-card.primary {
+    grid-column: 1 / -1;
   }
 }

@@ -40,11 +40,13 @@ var db = firebase.firestore();
 
 <div id="appNavMount"></div>
 
-<main class="member-home friends-page" id="main-content">
-  <h1 class="home-greeting friends-page-title">Friends</h1>
-  <p class="home-date friends-page-sub">Connect with others and compare profiles.</p>
+<main class="member-home friends-page app-page" id="main-content">
+  <header class="home-header animus-reveal">
+    <h1 class="home-greeting friends-page-title">Friends</h1>
+    <p class="home-date friends-page-sub">Connect with others and compare profiles.</p>
+  </header>
 
-  <section id="member-friends">
+  <section id="member-friends" class="app-section animus-reveal animus-reveal-delay-1">
     <div class="home-section-head">
       <span class="home-section-title">Your friends</span>
       <button type="button" class="home-section-link" onclick="AnimusSocial.openAddFriend()">+ Add friend</button>
@@ -54,7 +56,7 @@ var db = firebase.firestore();
     </div>
   </section>
 
-  <section id="member-activity">
+  <section id="member-activity" class="app-section animus-reveal animus-reveal-delay-2">
     <div class="home-section-head"><span class="home-section-title">Recent activity</span></div>
     <div class="feed-items" id="feedItems">
       <div class="empty-state" style="grid-column:1/-1">Activity from friends will appear here</div>

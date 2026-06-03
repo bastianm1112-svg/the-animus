@@ -52,6 +52,32 @@ img, video, svg {
   max-width: 100%;
 }
 
+/* Unified app page containment — prevents horizontal bleed on mobile */
+.app-page {
+  width: 100%;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: clip;
+}
+
+.app-page--wide {
+  max-width: 920px;
+}
+
+.app-section,
+.app-section-mount {
+  margin-bottom: 32px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.app-section-mount:empty {
+  display: none;
+}
+
 /* Navbar */
 .navbar {
   position: fixed;
@@ -387,6 +413,17 @@ body.light-mode .nav-mobile-menu {
 .btn-add-small:hover {
   border-color: var(--gold2);
   color: var(--gold);
+}
+
+.btn-add-small--accept {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.btn-add-small--accept:hover {
+  border-color: var(--green);
+  color: var(--green);
+  filter: brightness(1.15);
 }
 
 /* Mobile bottom nav */

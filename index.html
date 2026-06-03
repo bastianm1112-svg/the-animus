@@ -724,14 +724,16 @@ var db = firebase.firestore();
 
 <div id="memberApp" class="member-app">
 <div id="memberNavMount"></div>
-<main class="member-home" id="member-home">
-  <h2 class="home-greeting animus-reveal" id="homeGreeting">Good morning</h2>
-  <p class="home-date" id="homeDate"></p>
-  <div class="onboarding-banner" id="onboardingBanner">
+<main class="member-home app-page" id="member-home">
+  <header class="home-header animus-reveal">
+    <h1 class="home-greeting" id="homeGreeting">Good morning</h1>
+    <p class="home-date" id="homeDate"></p>
+  </header>
+  <div class="onboarding-banner app-section" id="onboardingBanner">
     <p>Take the assessment to unlock your full profile and daily insights.</p>
     <a href="/test">Begin assessment</a>
   </div>
-  <section class="home-daily-hub animus-reveal animus-reveal-delay-1" id="homeDailyHub" aria-label="Today">
+  <section class="home-daily-hub app-section animus-reveal animus-reveal-delay-1" id="homeDailyHub" aria-label="Today">
     <div id="homeXpMount"></div>
     <div class="daily-fact-card" id="dailyFactCard">
       <div class="daily-fact-head">
@@ -742,33 +744,48 @@ var db = firebase.firestore();
     </div>
   </section>
   <div class="home-daily-cards" id="homeDailyCards" hidden></div>
-  <h2 class="home-prompt animus-reveal animus-reveal-delay-2">What would you like to do today?</h2>
-  <div class="home-actions animus-reveal animus-reveal-delay-3">
+  <section class="home-quick app-section animus-reveal animus-reveal-delay-2" aria-labelledby="homeQuickLabel">
+    <h2 class="home-quick-label" id="homeQuickLabel">Quick actions</h2>
+    <nav class="home-actions" aria-label="Quick actions">
     <a href="/test" class="home-action-card primary">
-      <span class="home-action-title">Main test</span>
-      <span class="home-action-desc">Your core personality assessment</span>
+      <span class="home-action-copy">
+        <span class="home-action-title">Main test</span>
+        <span class="home-action-desc">Your core personality assessment</span>
+      </span>
+      <span class="home-action-arrow" aria-hidden="true">→</span>
     </a>
     <a href="/activity" class="home-action-card">
-      <span class="home-action-title">Activity</span>
-      <span class="home-action-desc">Friends, requests, and updates</span>
+      <span class="home-action-copy">
+        <span class="home-action-title">Activity</span>
+        <span class="home-action-desc">Friends, requests, and updates</span>
+      </span>
     </a>
     <a href="/shop" class="home-action-card">
-      <span class="home-action-title">Shop</span>
-      <span class="home-action-desc">Detailed test, estimator, and Plus</span>
+      <span class="home-action-copy">
+        <span class="home-action-title">Shop</span>
+        <span class="home-action-desc">Detailed test, estimator, and Plus</span>
+      </span>
     </a>
     <a href="/compare" class="home-action-card">
-      <span class="home-action-title">Compare</span>
-      <span class="home-action-desc">See how you match with others</span>
+      <span class="home-action-copy">
+        <span class="home-action-title">Compare</span>
+        <span class="home-action-desc">See how you match with others</span>
+      </span>
     </a>
     <a href="/types" class="home-action-card">
-      <span class="home-action-title">Types</span>
-      <span class="home-action-desc">Reference library</span>
+      <span class="home-action-copy">
+        <span class="home-action-title">Types</span>
+        <span class="home-action-desc">Reference library</span>
+      </span>
     </a>
     <a href="/settings" class="home-action-card">
-      <span class="home-action-title">Settings</span>
-      <span class="home-action-desc">Account and appearance</span>
+      <span class="home-action-copy">
+        <span class="home-action-title">Settings</span>
+        <span class="home-action-desc">Account and appearance</span>
+      </span>
     </a>
-  </div>
+    </nav>
+  </section>
 </main>
 <div class="member-site-footer-wrap" id="memberLegalFooter"></div>
 <div id="memberBottomMount"></div>

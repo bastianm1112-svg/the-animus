@@ -44,20 +44,22 @@ var db = firebase.firestore();
 
 <div id="appNavMount"></div>
 
-<main class="member-home friends-page" id="main-content">
-  <h1 class="home-greeting friends-page-title animus-reveal">Activity</h1>
-  <p class="home-date friends-page-sub">Friends, requests, and what&apos;s happening.</p>
+<main class="member-home friends-page app-page" id="main-content">
+  <header class="home-header animus-reveal">
+    <h1 class="home-greeting friends-page-title">Activity</h1>
+    <p class="home-date friends-page-sub">Friends, requests, and what&apos;s happening.</p>
+  </header>
 
-  <section id="activity-requests">
+  <section id="activity-requests" class="app-section animus-reveal animus-reveal-delay-1">
     <div class="home-section-head"><span class="home-section-title">Requests</span></div>
     <div class="notif-page-list activity-requests-list" id="notifPageList">
       <div class="notif-page-empty">No pending requests</div>
     </div>
   </section>
 
-  <div id="estimatorMount"></div>
+  <div id="estimatorMount" class="app-section-mount"></div>
 
-  <section id="member-friends">
+  <section id="member-friends" class="app-section animus-reveal animus-reveal-delay-2">
     <div class="home-section-head">
       <span class="home-section-title">Your friends</span>
       <button type="button" class="home-section-link" onclick="AnimusSocial.openAddFriend()">+ Add friend</button>
@@ -67,7 +69,7 @@ var db = firebase.firestore();
     </div>
   </section>
 
-  <section id="member-activity">
+  <section id="member-activity" class="app-section animus-reveal animus-reveal-delay-3">
     <div class="home-section-head"><span class="home-section-title">Recent activity</span></div>
     <div class="feed-items" id="feedItems">
       <div class="empty-state" style="grid-column:1/-1">Activity from friends will appear here</div>

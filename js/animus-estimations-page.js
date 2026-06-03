@@ -24,8 +24,10 @@
   function renderLocked(mount) {
     mount.innerHTML =
       '<div class="activity-estimator activity-estimator-locked">' +
-      '<div><div class="activity-estimator-title">Profile Estimator</div>' +
-      '<p class="activity-estimator-desc">Unlock estimation in the <a href="/shop">Shop</a> to build behavioral guesses from what you&apos;ve observed.</p></div>' +
+      '<div class="activity-estimator-body">' +
+      '<div class="activity-estimator-title">Profile Estimator</div>' +
+      '<p class="activity-estimator-desc">Unlock estimation in the <a href="/shop">Shop</a> to build behavioral guesses from what you&apos;ve observed.</p>' +
+      '</div>' +
       '<a href="/shop" class="activity-estimator-cta shop-open-link">View in Shop</a>' +
       '</div>';
   }

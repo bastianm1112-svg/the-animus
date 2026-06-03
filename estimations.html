@@ -42,12 +42,14 @@ var db = firebase.firestore();
 
 <div id="appNavMount"></div>
 
-<main class="member-home friends-page" id="main-content">
-  <h1 class="home-greeting friends-page-title">Estimations</h1>
-  <p class="home-date friends-page-sub">Guess someone&apos;s profile from what you&apos;ve actually seen them do — not private thoughts you can&apos;t know.</p>
-  <p class="estimations-note"><a href="/activity">← Back to Activity</a> · Not linked to your friends list</p>
+<main class="member-home friends-page app-page" id="main-content">
+  <header class="home-header animus-reveal">
+    <h1 class="home-greeting friends-page-title">Estimations</h1>
+    <p class="home-date friends-page-sub">Guess someone&apos;s profile from what you&apos;ve actually seen them do — not private thoughts you can&apos;t know.</p>
+    <p class="estimations-note"><a href="/activity">← Back to Activity</a> · Not linked to your friends list</p>
+  </header>
 
-  <div id="estimationsMount"></div>
+  <div id="estimationsMount" class="app-section-mount"></div>
 </main>
 
 <div class="toast" id="toast"></div>

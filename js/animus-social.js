@@ -166,8 +166,8 @@
           var actionHtml = '';
           if (isFriendReq && a.fromUid) {
             actionHtml =
-              '<div style="display:flex;gap:8px;margin-top:8px">' +
-              '<button type="button" class="btn-add-small" style="border-color:var(--green);color:var(--green)" data-uid="' +
+              '<div class="feed-actions">' +
+              '<button type="button" class="btn-add-small btn-add-small--accept" data-uid="' +
               escapeHTML(a.fromUid) +
               '" data-name="' +
               escapeHTML(a.fromName || '') +
@@ -546,12 +546,12 @@
     return (
       '<div class="notif-page-card">' +
       '<div class="notif-dot"></div>' +
-      '<div style="flex:1">' +
+      '<div class="notif-page-body">' +
       '<div class="notif-text"><strong>' +
       escapeHTML(r.name) +
       '</strong> sent you a friend request</div>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
-      '<button type="button" class="btn-add-small" style="border-color:var(--green);color:var(--green)" data-uid="' +
+      '<div class="feed-actions">' +
+      '<button type="button" class="btn-add-small btn-add-small--accept" data-uid="' +
       escapeHTML(r.uid) +
       '" data-name="' +
       escapeHTML(r.name) +
