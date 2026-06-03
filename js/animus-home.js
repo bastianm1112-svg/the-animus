@@ -64,10 +64,15 @@
 
     var factEl = document.getElementById('dailyFactText');
     var factLabel = document.getElementById('dailyFactLabel');
+    if (factEl) factEl.classList.add('animus-skeleton');
     if (g.AnimusDailyFacts && factEl) {
       var fact = g.AnimusDailyFacts.pickDailyFact(profile, user.uid);
-      factEl.textContent = fact.text;
+      factEl.classList.remove('animus-skeleton');
+      factEl.textContent = fact.text || 'Complete your assessment to unlock personalized insights.';
       if (factLabel) factLabel.textContent = 'Daily insight · ' + fact.label;
+    } else if (factEl) {
+      factEl.classList.remove('animus-skeleton');
+      factEl.textContent = 'Complete your assessment to unlock personalized insights.';
     }
 
     function refreshRetention(fresh) {

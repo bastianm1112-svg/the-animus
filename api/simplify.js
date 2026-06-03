@@ -1,4 +1,4 @@
-const { assertQuestion, setApiHeaders, rejectForeignOrigin } = require('./_lib');
+const { assertQuestion, assertLang, setApiHeaders, rejectForeignOrigin } = require('./_lib');
 
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
@@ -8,7 +8,9 @@ module.exports = async function handler(req, res) {
   const checked = assertQuestion(req.body || {});
   if (checked.error) return res.status(checked.status).json({ error: checked.error });
   const question = checked.value;
-  const { lang } = req.body || {};
+  const langChecked = assertLang(req.body || {});
+  if (langChecked.error) return res.status(langChecked.status).json({ error: langChecked.error });
+  const lang = langChecked.value;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });

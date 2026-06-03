@@ -700,6 +700,9 @@ var db = firebase.firestore();
 <link rel="stylesheet" href="/css/animus-release.css">
 <link rel="stylesheet" href="/css/animus-home.css">
 <link rel="stylesheet" href="/css/animus-legal.css">
+<link rel="stylesheet" href="/css/animus-premium.css">
+<script src="/js/animus-safe.js"></script>
+<script src="/js/animus-seo.js"></script>
 <script src="/js/animus-app.js" defer></script>
 </head>
 <body>
@@ -710,7 +713,7 @@ var db = firebase.firestore();
 <div id="memberApp" class="member-app">
 <div id="memberNavMount"></div>
 <main class="member-home" id="member-home">
-  <h1 class="home-greeting" id="homeGreeting">Good morning</h1>
+  <p class="home-greeting" id="homeGreeting" role="heading" aria-level="1">Good morning</p>
   <p class="home-date" id="homeDate"></p>
   <div class="onboarding-banner" id="onboardingBanner">
     <p>Take the assessment to unlock your full profile and daily insights.</p>

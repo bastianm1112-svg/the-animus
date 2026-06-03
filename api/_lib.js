@@ -5,11 +5,15 @@ const LIMITS = {
   simplify: 2000
 };
 
+function stripControlChars(str) {
+  return String(str).replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '');
+}
+
 function assertStringField(value, maxLen, fieldName) {
   if (typeof value !== 'string') {
     return { error: 'Invalid ' + (fieldName || 'field'), status: 400 };
   }
-  const trimmed = value.trim();
+  const trimmed = stripControlChars(value).trim();
   if (!trimmed) {
     return { error: 'Missing ' + (fieldName || 'field'), status: 400 };
   }
@@ -17,6 +21,13 @@ function assertStringField(value, maxLen, fieldName) {
     return { error: (fieldName || 'Field') + ' too long', status: 400 };
   }
   return { value: trimmed };
+}
+
+function assertLang(body) {
+  const lang = body && body.lang;
+  if (lang === undefined || lang === null || lang === '') return { value: 'en' };
+  if (lang === 'en' || lang === 'es') return { value: lang };
+  return { error: 'Invalid lang', status: 400 };
 }
 
 function assertPrompt(body, maxLen) {
@@ -38,6 +49,8 @@ const ALLOWED_HOSTS = new Set([
 function setApiHeaders(res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 }
 
 /** Soft same-site guard — blocks casual cross-origin browser abuse, not server-side attacks. */
@@ -61,6 +74,8 @@ module.exports = {
   LIMITS,
   assertPrompt,
   assertQuestion,
+  assertLang,
+  stripControlChars,
   setApiHeaders,
   rejectForeignOrigin
 };

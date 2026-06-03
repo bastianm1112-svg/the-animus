@@ -78,9 +78,66 @@
     if (phase) document.body.classList.add('phase-' + phase);
   }
 
+  function initGlobalErrorFallback() {
+    if (g.__animusErrorsBound) return;
+    g.__animusErrorsBound = true;
+    var strip = document.getElementById('animusErrorStrip');
+    if (!strip) {
+      strip = document.createElement('div');
+      strip.id = 'animusErrorStrip';
+      strip.className = 'animus-error-strip';
+      strip.setAttribute('role', 'alert');
+      document.body.appendChild(strip);
+    }
+    function showStrip(msg) {
+      strip.textContent = msg;
+      strip.classList.add('visible');
+      setTimeout(function () {
+        strip.classList.remove('visible');
+      }, 6000);
+    }
+    g.addEventListener('error', function () {
+      if (typeof g.AnimusSafe !== 'undefined') {
+        g.AnimusSafe.showUserError('Something went wrong loading this page.');
+      } else {
+        showStrip('Something went wrong. Please refresh.');
+      }
+    });
+    g.addEventListener('unhandledrejection', function () {
+      if (typeof g.AnimusSafe !== 'undefined') {
+        g.AnimusSafe.showUserError('A network request failed. Check your connection.');
+      }
+    });
+  }
+
+  function initPageReveal() {
+    var main =
+      document.getElementById('main-content') ||
+      document.querySelector('.member-home') ||
+      document.querySelector('main');
+    if (!main || main.classList.contains('animus-reveal')) return;
+    main.classList.add('animus-reveal');
+    main.querySelectorAll('section, .home-actions, .activity-estimator').forEach(function (el, i) {
+      if (i < 4) el.classList.add('animus-reveal', 'animus-reveal-delay-' + (i + 1));
+    });
+  }
+
+  function initSeoAndPerf() {
+    if (typeof g.AnimusSeo !== 'undefined') {
+      g.AnimusSeo.initLazyImages();
+      var desc = document.querySelector('meta[name="description"]');
+      g.AnimusSeo.applyPageSeo({
+        description: desc ? desc.getAttribute('content') : ''
+      });
+    }
+  }
+
   function boot() {
     initTheme();
     initMobileNav();
+    initGlobalErrorFallback();
+    initPageReveal();
+    initSeoAndPerf();
     if (typeof g.AnimusShared !== 'undefined') {
       g.AnimusShared.bindNavAuth('navAvatar');
     }

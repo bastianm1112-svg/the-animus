@@ -1490,6 +1490,21 @@
 
   global.toggleThemeGlobal = toggleThemeGlobal;
 
+  global.AnimusSafe = global.AnimusSafe || {
+    stripControlChars: function (s) {
+      return String(s || '').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '');
+    },
+    safeText: sanitizePlainText,
+    showUserError: function (msg) {
+      var toast = document.getElementById('toast');
+      if (toast) {
+        toast.textContent = sanitizePlainText(msg, 240) || 'Something went wrong.';
+        toast.classList.add('show');
+        setTimeout(function () { toast.classList.remove('show'); }, 4200);
+      }
+    }
+  };
+
   global.AnimusShared = {
     KEYS: KEYS,
     FIREBASE_CONFIG: FIREBASE_CONFIG,

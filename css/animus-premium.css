@@ -1,0 +1,202 @@
+/**
+ * ANIMUS premium shell — motion, spacing, micro-interactions, mobile polish.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .animus-reveal {
+    animation: animus-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animus-reveal-delay-1 {
+    animation-delay: 0.06s;
+  }
+  .animus-reveal-delay-2 {
+    animation-delay: 0.12s;
+  }
+  .animus-reveal-delay-3 {
+    animation-delay: 0.18s;
+  }
+}
+
+@keyframes animus-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animus-reveal,
+  .animus-reveal-delay-1,
+  .animus-reveal-delay-2,
+  .animus-reveal-delay-3 {
+    animation: none !important;
+  }
+}
+
+/* Page shells */
+.member-home,
+.friends-page,
+.shop-page,
+.compare-page-inner,
+.estimations-page {
+  padding-bottom: calc(var(--mbn-h, 60px) + var(--safe-bottom, 0px) + 24px);
+}
+
+.home-greeting,
+.friends-page-title,
+.shop-title {
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+
+.home-date,
+.friends-page-sub,
+.shop-sub {
+  margin-top: 6px;
+  margin-bottom: 28px;
+  max-width: 42rem;
+}
+
+/* Cards & CTAs */
+.home-action-card,
+.activity-estimator,
+.estimations-card,
+.shop-card,
+.friend-card {
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-action-card:hover,
+  .activity-estimator:hover,
+  .estimations-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+  }
+}
+
+body.light-mode .home-action-card:hover,
+body.light-mode .activity-estimator:hover,
+body.light-mode .estimations-card:hover {
+  box-shadow: 0 8px 24px rgba(26, 23, 20, 0.08);
+}
+
+.home-action-card:focus-visible,
+.activity-estimator-cta:focus-visible,
+.estimations-card-btn:focus-visible,
+.btn-primary:focus-visible,
+.nav-item:focus-visible {
+  outline: 2px solid var(--gold, #c8a96e);
+  outline-offset: 3px;
+}
+
+/* Loading skeleton */
+.animus-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface2, #141414) 0%,
+    var(--border2, #2a2a2a) 50%,
+    var(--surface2, #141414) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: 4px;
+  min-height: 1em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animus-skeleton {
+    animation: animus-shimmer 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes animus-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.daily-fact-text.animus-skeleton {
+  min-height: 3.2em;
+  width: 100%;
+}
+
+/* Mobile overflow guard */
+.home-actions,
+.friends-grid,
+.estimations-grid,
+.feed-items,
+.shop-grid {
+  min-width: 0;
+}
+
+.home-action-card,
+.estimations-card-name,
+.activity-estimator-desc {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 480px) {
+  .activity-estimator {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .activity-estimator-cta,
+  .estimations-toolbar .activity-estimator-cta {
+    width: 100%;
+    justify-content: center;
+  }
+  .home-greeting,
+  .friends-page-title {
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
+  }
+}
+
+/* Toast polish */
+.toast.show {
+  animation: animus-toast-in 0.28s ease-out;
+}
+
+@keyframes animus-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Global error strip (Agent 1 fallback) */
+.animus-error-strip {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--mbn-h, 60px) + var(--safe-bottom, 0px) + 12px);
+  transform: translateX(-50%);
+  max-width: min(92vw, 420px);
+  padding: 10px 16px;
+  background: rgba(139, 32, 32, 0.92);
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-align: center;
+  border-radius: 4px;
+  z-index: 500;
+  display: none;
+}
+
+.animus-error-strip.visible {
+  display: block;
+}
