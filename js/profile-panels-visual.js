@@ -145,7 +145,7 @@
 
     root.innerHTML = ''
       + '<div class="overview-hero-stats">'
-      + '<div class="oh-stat"><span class="oh-big">' + escapeHTML(snap.mbti) + '</span><span class="oh-lbl">MBTI</span></div>'
+      + '<div class="oh-stat"><span class="oh-big">' + escapeHTML(snap.mbti) + '</span><span class="oh-lbl">Type</span></div>'
       + '<div class="oh-stat"><span class="oh-big">' + escapeHTML((snap.ennType || '—') + 'w' + (snap.ennWing || '')) + '</span><span class="oh-lbl">Enneagram</span></div>'
       + '<div class="oh-stat"><span class="oh-big">' + escapeHTML(domFn) + '</span><span class="oh-lbl">Dominant Fn</span></div>'
       + '</div>'

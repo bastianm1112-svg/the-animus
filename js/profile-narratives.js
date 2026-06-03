@@ -4,7 +4,7 @@
 
 var mbtiMeta={
   INTJ:{n:'The Strategic Visionary',t:'A mind built to see through the noise and reshape reality according to an internal standard nothing outside can compromise.'},
-  INTP:{n:'The Analytical Architect',t:'A pure thinking engine that will not rest until every assumption has been examined and every model refined to precision.'},
+  INTP:{n:'The Theoretical Analyst',t:'A pure thinking engine that will not rest until every assumption has been examined and every model refined to precision.'},
   ENTJ:{n:'The Commanding Strategist',t:'A natural force of organization and will — you move systems, people, and history toward clearly defined ends.'},
   ENTP:{n:'The Dialectical Provocateur',t:'A restless intellect that finds certainty suspicious and contradiction generative.'},
   INFJ:{n:'The Prophetic Empath',t:'A rare synthesis of deep human understanding and long-range symbolic vision.'},
@@ -134,7 +134,7 @@ function buildFallbackNarrative(mbti,enn,att,phi,data){
   var polIdeology = (polX>50&&polY<-30)?'Paleolibertarian / Classical Liberal':(polX>30&&polY<-10)?'Classical Liberal / Libertarian':(polX>10&&polY<-5)?'Centre-Right / Fusionist':(polX>30&&polY>20)?'National Conservative':(polX>10&&polY>10)?'Neoconservative':(polX<-50&&polY<-20)?'Left-Libertarian / Libertarian Socialist':(polX<-30&&polY<-10)?'Progressive Libertarian':(polX<-50&&polY>20)?'Democratic Socialist / Marxist':(polX<-20&&polY>10)?'Social Democrat':(polX<-10)?'Centre-Left':(polX>10)?'Centre-Right':'Centrist';
 
   var socionicsByMBTI = {INTJ:'LII',INTP:'ILI',ENTJ:'LSE',ENTP:'ILE',INFJ:'EII',INFP:'IEI',ENFJ:'ESE',ENFP:'IEE',ISTJ:'LSI',ISFJ:'ESI',ESTJ:'SLE',ESFJ:'SEE',ISTP:'SLI',ISFP:'SEI',ESTP:'LSE',ESFP:'SEE'};
-  var keirseyByMBTI = {INTJ:'Rational',INTP:'Rational',ENTJ:'Rational',ENTP:'Rational',INFJ:'Idealist',INFP:'Idealist',ENFJ:'Idealist',ENFP:'Idealist',ISTJ:'Guardian',ISFJ:'Guardian',ESTJ:'Guardian',ESFJ:'Guardian',ISTP:'Artisan',ISFP:'Artisan',ESTP:'Artisan',ESFP:'Artisan'};
+  var keirseyByMBTI = {INTJ:'Analyst',INTP:'Analyst',ENTJ:'Analyst',ENTP:'Analyst',INFJ:'Visionary',INFP:'Visionary',ENFJ:'Visionary',ENFP:'Visionary',ISTJ:'Steward',ISFJ:'Steward',ESTJ:'Steward',ESFJ:'Steward',ISTP:'Operator',ISFP:'Operator',ESTP:'Operator',ESFP:'Operator'};
 
   return {
     mbtiName: mm.n,
@@ -174,7 +174,7 @@ function buildFallbackNarrative(mbti,enn,att,phi,data){
     similarPoliticians: polCompare.similarPoliticians || ['Politician comparisons are derived from your economic and social axes.'],
     similarParties: polCompare.similarParties || ['Party comparisons are derived from your economic and social axes.'],
     socionics: socionicsByMBTI[mbti] || '—',
-    keirsey: keirseyByMBTI[mbti] || 'Rational'
+    keirsey: keirseyByMBTI[mbti] || 'Analyst'
   };
 }
 

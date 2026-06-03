@@ -769,22 +769,22 @@
   }
 
   var MBTI_BASICS = {
-    INTJ: { mbtiName: 'The Strategic Visionary', socionics: 'LII', keirsey: 'Rational' },
-    INTP: { mbtiName: 'The Analytical Architect', socionics: 'ILI', keirsey: 'Rational' },
-    ENTJ: { mbtiName: 'The Commanding Strategist', socionics: 'LSE', keirsey: 'Rational' },
-    ENTP: { mbtiName: 'The Dialectical Provocateur', socionics: 'ILE', keirsey: 'Rational' },
-    INFJ: { mbtiName: 'The Prophetic Empath', socionics: 'EII', keirsey: 'Idealist' },
-    INFP: { mbtiName: 'The Idealistic Visionary', socionics: 'IEI', keirsey: 'Idealist' },
-    ENFJ: { mbtiName: 'The Transformative Catalyst', socionics: 'ESE', keirsey: 'Idealist' },
-    ENFP: { mbtiName: 'The Radically Human', socionics: 'IEE', keirsey: 'Idealist' },
-    ISTJ: { mbtiName: 'The Reliable Pillar', socionics: 'LSI', keirsey: 'Guardian' },
-    ISFJ: { mbtiName: 'The Devoted Protector', socionics: 'ESI', keirsey: 'Guardian' },
-    ESTJ: { mbtiName: 'The Structural Authority', socionics: 'SLE', keirsey: 'Guardian' },
-    ESFJ: { mbtiName: 'The Social Architect', socionics: 'SEE', keirsey: 'Guardian' },
-    ISTP: { mbtiName: 'The Tactical Craftsman', socionics: 'SLI', keirsey: 'Artisan' },
-    ISFP: { mbtiName: 'The Quiet Composer', socionics: 'SEI', keirsey: 'Artisan' },
-    ESTP: { mbtiName: 'The Electric Operator', socionics: 'LSE', keirsey: 'Artisan' },
-    ESFP: { mbtiName: 'The Radiant Presence', socionics: 'SEE', keirsey: 'Artisan' }
+    INTJ: { mbtiName: 'The Strategic Visionary', socionics: 'LII', keirsey: 'Analyst' },
+    INTP: { mbtiName: 'The Theoretical Analyst', socionics: 'ILI', keirsey: 'Analyst' },
+    ENTJ: { mbtiName: 'The Commanding Strategist', socionics: 'LSE', keirsey: 'Analyst' },
+    ENTP: { mbtiName: 'The Dialectical Provocateur', socionics: 'ILE', keirsey: 'Analyst' },
+    INFJ: { mbtiName: 'The Prophetic Empath', socionics: 'EII', keirsey: 'Visionary' },
+    INFP: { mbtiName: 'The Idealistic Visionary', socionics: 'IEI', keirsey: 'Visionary' },
+    ENFJ: { mbtiName: 'The Transformative Catalyst', socionics: 'ESE', keirsey: 'Visionary' },
+    ENFP: { mbtiName: 'The Radically Human', socionics: 'IEE', keirsey: 'Visionary' },
+    ISTJ: { mbtiName: 'The Reliable Pillar', socionics: 'LSI', keirsey: 'Steward' },
+    ISFJ: { mbtiName: 'The Devoted Protector', socionics: 'ESI', keirsey: 'Steward' },
+    ESTJ: { mbtiName: 'The Structural Authority', socionics: 'SLE', keirsey: 'Steward' },
+    ESFJ: { mbtiName: 'The Social Architect', socionics: 'SEE', keirsey: 'Steward' },
+    ISTP: { mbtiName: 'The Tactical Craftsman', socionics: 'SLI', keirsey: 'Operator' },
+    ISFP: { mbtiName: 'The Quiet Composer', socionics: 'SEI', keirsey: 'Operator' },
+    ESTP: { mbtiName: 'The Electric Operator', socionics: 'LSE', keirsey: 'Operator' },
+    ESFP: { mbtiName: 'The Radiant Presence', socionics: 'SEE', keirsey: 'Operator' }
   };
 
   function cogScoreSum(obj) {

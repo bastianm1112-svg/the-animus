@@ -7,55 +7,55 @@
 
   var ENN_CORE = {
     '1': {
-      name: 'The Reformer',
+      name: 'The Standard-bearer',
       fear: 'being corrupt, defective, or morally wrong',
       desire: 'to be good, balanced, and have integrity',
       drive: 'an inner critic that constantly measures reality against an ideal standard'
     },
     '2': {
-      name: 'The Helper',
+      name: 'The Ally',
       fear: 'being unwanted or unloved for who you are',
       desire: 'to feel needed and appreciated',
       drive: 'attunement to others\' needs — often before your own register on the radar'
     },
     '3': {
-      name: 'The Achiever',
+      name: 'The Striver',
       fear: 'being worthless without success or admiration',
       desire: 'to feel valuable and worthwhile through accomplishment',
       drive: 'efficiency in self-presentation and a focus on goals that earn recognition'
     },
     '4': {
-      name: 'The Individualist',
+      name: 'The Seeker',
       fear: 'having no identity or significance',
       desire: 'to find yourself and be understood in your depth',
       drive: 'emotional honesty and a pull toward what feels authentic, even when painful'
     },
     '5': {
-      name: 'The Investigator',
+      name: 'The Sage',
       fear: 'being useless, incapable, or overwhelmed',
       desire: 'to be competent and understand the world',
       drive: 'conservation of energy and attention — you gather knowledge before you spend yourself'
     },
     '6': {
-      name: 'The Loyalist',
+      name: 'The Sentinel',
       fear: 'being without support or guidance',
       desire: 'to have security and trustworthy structure',
       drive: 'scanning for risk and building alliances with people and systems you can rely on'
     },
     '7': {
-      name: 'The Enthusiast',
+      name: 'The Spark',
       fear: 'being trapped in pain or deprivation',
       desire: 'to be satisfied and experience life fully',
       drive: 'rapid reframing toward possibility — your mind moves away from limitation toward options'
     },
     '8': {
-      name: 'The Challenger',
+      name: 'The Vanguard',
       fear: 'being controlled or violated',
       desire: 'to protect yourself and determine your own path',
       drive: 'directness about power — you test strength and resist being managed'
     },
     '9': {
-      name: 'The Peacemaker',
+      name: 'The Harmonizer',
       fear: 'loss of connection and fragmentation',
       desire: 'to have inner stability and peace of mind',
       drive: 'merging with comfort and harmony — conflict feels costly, so you often accommodate first'

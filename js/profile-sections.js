@@ -120,7 +120,7 @@
           ', which shapes how ' + p.subjL + ' frame problems, learn, and make decisions under pressure.'
         ),
         metrics: [
-          ['MBTI', snap.mbti],
+          ['Cognitive type', snap.mbti],
           ['Dom', domFn],
           ['Socionics', snap.socionics || '—']
         ]

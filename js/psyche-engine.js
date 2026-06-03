@@ -1379,7 +1379,7 @@ function buildPrompt(data){
     +'"values":["6 core values as short noun phrases for '+mbti+' type '+enn.type+'"],\n'
     +'"big5":{"Openness":0-100,"Conscientiousness":0-100,"Extraversion":0-100,"Agreeableness":0-100,"Neuroticism":0-100},\n'
     +'"socionics":"socionics type for '+mbti+'",\n'
-    +'"keirsey":"one of: Rational/Idealist/Guardian/Artisan"\n'
+    +'"keirsey":"one of: Analyst/Visionary/Steward/Operator"\n'
     +'}\n'
     +'Respond ONLY with raw JSON. No markdown, no explanation, no fences.';
 }
@@ -1484,7 +1484,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'<div class="res-archetype">'+(sanitizeText(ai.mbtiName,2000)||'')+'</div>'
     +'<p class="res-tagline">'+(sanitizeText(ai.tagline,2000)||'')+'</p>'
     +'<div class="res-chips">'
-    +'<div class="chip"><strong>MBTI</strong>'+mbti+'</div>'
+    +'<div class="chip"><strong>Type</strong>'+mbti+'</div>'
     +'<div class="chip"><strong>Enn</strong>'+enn.type+'w'+enn.wing+'</div>'
     +'<div class="chip"><strong>Tritype</strong>'+enn.tritype+'</div>'
     +'<div class="chip"><strong>Attachment</strong>'+attNames[att]+'</div>'
@@ -1492,7 +1492,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'<div class="chip"><strong>Political</strong>'+(sanitizeText(ai.politicalIdeology,2000)||polLabel)+'</div>'
     +'<div class="chip"><strong>Instinct</strong>'+instStack+'</div>'
     +'<div class="chip"><strong>Socionics</strong>'+(sanitizeText(ai.socionics,2000)||'')+'</div>'
-    +'<div class="chip"><strong>Keirsey</strong>'+(sanitizeText(ai.keirsey,2000)||'')+'</div>'
+    +'<div class="chip"><strong>Temperament</strong>'+(sanitizeText(ai.keirsey,2000)||'')+'</div>'
     +'</div>';
 
   // Build tabs
@@ -1515,7 +1515,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'<p class="panel-sub">A complete summary of who you are across every dimension measured.</p>'
 
     +'<div class="stat-grid">'
-    +'<div class="stat-cell"><span class="stat-big">'+mbti+'</span><span class="stat-lbl">MBTI Type</span></div>'
+    +'<div class="stat-cell"><span class="stat-big">'+mbti+'</span><span class="stat-lbl">Cognitive type</span></div>'
     +'<div class="stat-cell"><span class="stat-big">'+enn.type+'w'+enn.wing+'</span><span class="stat-lbl">Enneagram</span></div>'
     +'<div class="stat-cell"><span class="stat-big">'+fnsSorted[0]+'</span><span class="stat-lbl">Dominant Fn</span></div>'
     +'</div>'
@@ -1563,12 +1563,12 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'</div>'
     +'<div class="grid2" style="margin-top:12px">'
     +'<div class="card2"><div class="card-title">Socionics Type</div><p style="font-family:\'Cormorant Garamond\',serif;font-size:36px;font-weight:300;color:var(--text);">'+(sanitizeText(ai.socionics,2000)||'—')+'</p></div>'
-    +'<div class="card2"><div class="card-title">Keirsey Temperament</div><p style="font-family:\'Cormorant Garamond\',serif;font-size:36px;font-weight:300;color:var(--text);">'+(sanitizeText(ai.keirsey,2000)||'—')+'</p></div>'
+    +'<div class="card2"><div class="card-title">Temperament cluster</div><p style="font-family:\'Cormorant Garamond\',serif;font-size:36px;font-weight:300;color:var(--text);">'+(sanitizeText(ai.keirsey,2000)||'—')+'</p></div>'
     +'</div>'
     +'</div>';
 
   // ── PERSONALITY PANEL ──
-  var ennNames={1:'The Perfectionist',2:'The Helper',3:'The Achiever',4:'The Individualist',5:'The Investigator',6:'The Loyalist',7:'The Enthusiast',8:'The Challenger',9:'The Peacemaker'};
+  var ennNames={1:'The Standard-bearer',2:'The Ally',3:'The Striver',4:'The Seeker',5:'The Sage',6:'The Sentinel',7:'The Spark',8:'The Vanguard',9:'The Harmonizer'};
   var tmpNames={TMP_CHO:'Choleric',TMP_MEL:'Melancholic',TMP_SAN:'Sanguine',TMP_PHL:'Phlegmatic'};
   var sortedTmp=Object.keys(data.tmp).sort(function(a,b){return data.tmp[b]-data.tmp[a];});
   var sortedEnn=Object.keys(data.ennScores||{}).sort(function(a,b){return data.ennScores[b]-data.ennScores[a];});
@@ -1709,7 +1709,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   }
 
   panels+='<div class="panel" id="panel-political">'
-    +'<div class="panel-title">Political Compass</div>'
+    +'<div class="panel-title">Political spectrum</div>'
     +'<p class="panel-sub">Up = Authoritarian &nbsp;|&nbsp; Down = Libertarian &nbsp;|&nbsp; Right = Economic Freedom &nbsp;|&nbsp; Left = State Control</p>'
 
     // Compass + axis cards
@@ -2208,7 +2208,7 @@ function downloadPDF(snap, data, mbti, enn, att, phi, instStack, ai){
     +'<div class="archetype">'+(sanitizeText(ai.mbtiName,2000)||'')+'</div>'
     +'<p class="tagline">'+(sanitizeText(ai.tagline,2000)||'')+'</p>'
     +'<div class="chips">'
-    +'<div class="chip"><strong>MBTI</strong>'+mbti+'</div>'
+    +'<div class="chip"><strong>Type</strong>'+mbti+'</div>'
     +'<div class="chip"><strong>Enneagram</strong>'+enn.type+'w'+enn.wing+'</div>'
     +'<div class="chip"><strong>Tritype</strong>'+enn.tritype+'</div>'
     +'<div class="chip"><strong>Attachment</strong>'+(attNames[att]||att)+'</div>'
@@ -2221,7 +2221,7 @@ function downloadPDF(snap, data, mbti, enn, att, phi, instStack, ai){
 
     // STAT STRIP
     +'<div class="stat-grid">'
-    +'<div class="stat-cell"><span class="stat-big">'+mbti+'</span><span class="stat-lbl">MBTI Type</span></div>'
+    +'<div class="stat-cell"><span class="stat-big">'+mbti+'</span><span class="stat-lbl">Cognitive type</span></div>'
     +'<div class="stat-cell"><span class="stat-big">'+enn.type+'w'+enn.wing+'</span><span class="stat-lbl">Enneagram</span></div>'
     +'<div class="stat-cell"><span class="stat-big">'+sortedFns[0]+'</span><span class="stat-lbl">Dominant Function</span></div>'
     +'</div>'
@@ -2255,7 +2255,7 @@ function downloadPDF(snap, data, mbti, enn, att, phi, instStack, ai){
     +'</div>'
 
     // POLITICAL
-    +'<h2>Political Compass</h2>'
+    +'<h2>Political spectrum</h2>'
     +'<div class="card">'
     +'<div style="display:flex;gap:24px;margin-bottom:12px">'
     +'<div><span style="font-size:9px;color:#8a7048;letter-spacing:0.2em;text-transform:uppercase;display:block;margin-bottom:4px">Economic</span>'
@@ -2370,7 +2370,7 @@ function showComparison(you, them){
     +'<div class="compare-row"><span class="compare-lbl">Instinct</span><span class="compare-val">'+you.instStack+'</span></div>'
     +'<div class="compare-row"><span class="compare-lbl">Political</span><span class="compare-val">'+polQuadLabel(you.polX,you.polY)+'</span></div>'
     +'<div class="compare-row"><span class="compare-lbl">Socionics</span><span class="compare-val">'+(you.socionics||'—')+'</span></div>'
-    +'<div class="compare-row"><span class="compare-lbl">Keirsey</span><span class="compare-val">'+(you.keirsey||'—')+'</span></div>'
+    +'<div class="compare-row"><span class="compare-lbl">Temperament</span><span class="compare-val">'+(you.keirsey||'—')+'</span></div>'
     +'<div class="compare-section-title">Cognitive Functions</div>'+fnBarsCompare(you.cog,them.cog)
     +'<div class="compare-section-title">Big Five</div>'+b5Keys.map(function(k){return b5Row(k,youB5[k],themB5[k]);}).join('')
     +'</div>'
@@ -2382,7 +2382,7 @@ function showComparison(you, them){
     +'<div class="compare-row"><span class="compare-lbl">Instinct</span><span class="compare-val">'+(them.instStack||'—')+'</span></div>'
     +'<div class="compare-row"><span class="compare-lbl">Political</span><span class="compare-val">'+polQuadLabel(them.polX||0,them.polY||0)+'</span></div>'
     +'<div class="compare-row"><span class="compare-lbl">Socionics</span><span class="compare-val">'+(them.socionics||'—')+'</span></div>'
-    +'<div class="compare-row"><span class="compare-lbl">Keirsey</span><span class="compare-val">'+(them.keirsey||'—')+'</span></div>'
+    +'<div class="compare-row"><span class="compare-lbl">Temperament</span><span class="compare-val">'+(them.keirsey||'—')+'</span></div>'
     +'<div class="compare-section-title">Cognitive Functions</div>'+fnBarsCompare(them.cog,you.cog)
     +'<div class="compare-section-title">Big Five</div>'+b5Keys.map(function(k){return b5Row(k,themB5[k],youB5[k]);}).join('')
     +'</div></div>'
