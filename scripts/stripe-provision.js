@@ -124,7 +124,7 @@ async function main() {
   }
 
   console.log('\n--- Paste into Vercel (Project → Settings → Environment Variables) ---\n');
-  console.log('STRIPE_SECRET_KEY=' + key);
+  console.log('STRIPE_SECRET_KEY=' + key.slice(0, 12) + '… (set in Vercel, not printed in full)');
   console.log('SITE_URL=' + SITE_URL);
   rows.forEach(function (r) {
     console.log(r.envKey + '=' + r.priceId);
