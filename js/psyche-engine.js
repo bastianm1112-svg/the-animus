@@ -185,7 +185,7 @@ function applyRouteTestMode() {
   var mode = params.get('mode');
   if (mode === 'detailed') testMode = 'full';
   else if (mode === 'estimator') testMode = 'estimator';
-  else testMode = 'short';
+  else if (mode === 'main' || mode === 'short') testMode = 'short';
   if (mode === 'estimator') {
     var name = params.get('name');
     if (name) {
@@ -214,6 +214,8 @@ function entitlementGateForMode(userData) {
 function configureIntroForMode() {
   var mode = applyRouteTestMode();
   var intro = document.getElementById('intro');
+  var modeTabs = document.getElementById('testModeTabs');
+  if (modeTabs) modeTabs.style.display = mode === 'estimator' ? 'none' : '';
   if (!intro || !mode || mode === 'short') return;
   var title = intro.querySelector('.intro-subtitle');
   var label = intro.querySelector('.intro-main-label');
@@ -246,11 +248,52 @@ function setTestMode(mode) {
   try { localStorage.setItem(AnimusShared.KEYS.testMode, testMode); } catch(e){}
 }
 
+function progressStorageKey(mode) {
+  var m = mode || testMode;
+  if (m === 'full' || m === 'detailed') return AnimusShared.KEYS.testProgress + '_full';
+  if (m === 'estimator') return AnimusShared.KEYS.testProgress + '_estimator';
+  return AnimusShared.KEYS.testProgress + '_short';
+}
+
+function migrateLegacyProgress() {
+  try {
+    var legacy = sessionStorage.getItem(AnimusShared.KEYS.testProgress);
+    if (!legacy) return;
+    var data = JSON.parse(legacy);
+    var key = progressStorageKey(data.testMode || 'short');
+    if (!sessionStorage.getItem(key)) sessionStorage.setItem(key, legacy);
+    sessionStorage.removeItem(AnimusShared.KEYS.testProgress);
+  } catch (e) {}
+}
+
+function readProgressForMode(mode) {
+  migrateLegacyProgress();
+  try {
+    var raw = sessionStorage.getItem(progressStorageKey(mode));
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+function localSimplifyQuestion(text) {
+  if (!text) return '';
+  var t = String(text).replace(/\s+/g, ' ').trim();
+  t = t.replace(/\([^)]{24,}\)/g, '').trim();
+  if (t.length > 140) {
+    var parts = t.split(/(?<=[.!?])\s+/);
+    if (parts[0] && parts[0].length > 20) t = parts[0];
+    else t = t.substring(0, 140).replace(/\s+\S*$/, '') + '…';
+  }
+  return t || String(text).trim();
+}
+
 function saveTestProgress() {
   if(!window._activeQ || !answers) return;
   var qKey = Cross.qKey || function (q) { return (q.fn || '') + '|' + (q.t || ''); };
   try {
-    sessionStorage.setItem(AnimusShared.KEYS.testProgress, JSON.stringify({
+    sessionStorage.setItem(progressStorageKey(), JSON.stringify({
       testMode: testMode,
       cur: cur,
       total: TOTAL,
@@ -264,8 +307,8 @@ function saveTestProgress() {
   } catch(e){}
 }
 
-function clearTestProgress() {
-  try { sessionStorage.removeItem(AnimusShared.KEYS.testProgress); } catch(e){}
+function clearTestProgress(mode) {
+  try { sessionStorage.removeItem(progressStorageKey(mode)); } catch(e){}
 }
 
 function loadSavedTestMode() {
@@ -280,23 +323,107 @@ function loadSavedTestMode() {
 function showResumePromptIfNeeded() {
   var wrap = document.getElementById('resumeTestWrap');
   if(!wrap) return;
-  try {
-    var raw = sessionStorage.getItem(AnimusShared.KEYS.testProgress);
-    if(!raw) return;
-    var data = JSON.parse(raw);
-    if(!data || !data.answers || data.cur < 1) return;
-    wrap.style.display = 'block';
-  } catch(e){}
+  var data = readProgressForMode(testMode);
+  if(!data || !data.answers || data.cur < 1) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  refreshOtherModeResumeLink();
+  updateQuizModeSwitch();
 }
 
-function resumeTestFromStorage() {
-  var raw;
-  try { raw = sessionStorage.getItem(AnimusShared.KEYS.testProgress); } catch(e){ return; }
-  if(!raw) return;
-  var data;
-  try { data = JSON.parse(raw); } catch(e){ return; }
+function otherTestMode() {
+  if (testMode === 'full') return 'short';
+  if (testMode === 'short') return 'full';
+  return null;
+}
+
+function refreshOtherModeResumeLink() {
+  var wrap = document.getElementById('otherModeResumeWrap');
+  var btn = document.getElementById('otherModeResumeBtn');
+  if (!wrap || !btn) return;
+  var other = otherTestMode();
+  if (!other || testMode === 'estimator') {
+    wrap.style.display = 'none';
+    return;
+  }
+  var data = readProgressForMode(other);
+  if (!data || !data.answers || data.cur < 1) {
+    wrap.style.display = 'none';
+    return;
+  }
+  var es = lang === 'es';
+  var label = other === 'full'
+    ? (es ? 'También podés continuar el Test Detallado →' : 'You may also continue the Detailed Test →')
+    : (es ? 'También podés continuar el Test Principal →' : 'You may also continue the Main Test →');
+  btn.textContent = label;
+  wrap.style.display = 'block';
+}
+
+function updateQuizModeSwitch() {
+  var btn = document.getElementById('quizModeSwitch');
+  if (!btn || !isQuizPhase()) return;
+  var other = otherTestMode();
+  if (!other) {
+    btn.style.display = 'none';
+    return;
+  }
+  var data = readProgressForMode(other);
+  var es = lang === 'es';
+  if (data && data.answers && data.cur >= 1) {
+    btn.textContent = other === 'full'
+      ? (es ? 'Test Detallado' : 'Detailed Test')
+      : (es ? 'Test Principal' : 'Main Test');
+    btn.style.display = 'inline-flex';
+    btn.onclick = function () { switchTestMode(other, true); };
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+function refreshIntroModeUI() {
+  var es = lang === 'es';
+  var label = document.getElementById('introModeLabel');
+  var meta = document.getElementById('introModeMeta');
+  var upsell = document.getElementById('introDetailedUpsell');
+  var hint = document.getElementById('introShopHint');
+  var tabs = document.querySelectorAll('#testModeTabs .test-mode-tab');
+  tabs.forEach(function (tab) {
+    var on = tab.getAttribute('data-mode') === (testMode === 'full' ? 'full' : 'short');
+    tab.classList.toggle('active', on);
+    tab.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  if (testMode === 'full') {
+    if (label) label.textContent = es ? 'Test Detallado' : 'Detailed Test';
+    if (meta) meta.innerHTML = '<div class="intro-meta-item"><strong>14</strong><span>' + (es ? 'Dimensiones' : 'Dimensions') + '</span></div>'
+      + '<div class="intro-meta-item"><strong>~45</strong><span>' + (es ? 'Minutos' : 'Minutes') + '</span></div>';
+    if (hint) hint.style.display = 'none';
+  } else {
+    if (label) label.textContent = es ? 'Test Principal' : 'Main Test';
+    if (meta) meta.innerHTML = '<div class="intro-meta-item"><strong>14</strong><span>' + (es ? 'Dimensiones' : 'Dimensions') + '</span></div>'
+      + '<div class="intro-meta-item"><strong>~20</strong><span>' + (es ? 'Minutos' : 'Minutes') + '</span></div>';
+    if (hint) hint.style.display = '';
+  }
+  if (upsell) upsell.style.display = testMode === 'full' ? 'none' : 'block';
+  showResumePromptIfNeeded();
+}
+
+function switchTestMode(newMode, resumeOther) {
+  if (newMode === testMode) return;
+  if (isQuizPhase()) saveTestProgress();
+  setTestMode(newMode);
+  if (resumeOther) {
+    resumeTestFromStorage(newMode);
+    return;
+  }
+  refreshIntroModeUI();
+}
+
+function resumeTestFromStorage(forceMode) {
+  var data = readProgressForMode(forceMode || testMode);
   if(!data || !data.answers) return;
-  setTestMode(data.testMode || 'full');
+  setTestMode(forceMode || data.testMode || 'short');
   observerMode = !!data.observerMode;
   observerSubjectName = data.observerSubjectName || '';
   var qKey = Cross.qKey || function (q) { return (q.fn || '') + '|' + (q.t || ''); };
@@ -319,6 +446,7 @@ function resumeTestFromStorage() {
       document.getElementById('qSection').textContent = 'Estimating: ' + observerSubjectName;
     }
     renderQ();
+    updateQuizModeSwitch();
   }
 }
 
@@ -780,12 +908,6 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
 
   function renderFill(){
     var q = filteredQ[fillCur];
-    var pct = Math.round((fillCur / filteredQ.length) * 100);
-    var pct = Math.round((fillCur / filteredQ.length) * 100);
-    var pbar = document.getElementById('pbarFill');
-    var qNum = document.getElementById('qNum');
-    if (pbar) pbar.style.width = pct + '%';
-    if (qNum) qNum.textContent = (fillCur + 1) + ' / ' + filteredQ.length + ' (' + missingLabel + ')';
 
     var loc = localizedForQuestion(q, q._qIdx != null ? q._qIdx : Q.indexOf(q));
     var qText = loc.text;
@@ -965,18 +1087,12 @@ function renderQ(){
   var qSection = document.getElementById('qSection');
   if(qSection && !observerMode && testMode !== 'full'){
     qSection.textContent = (qSection.textContent.indexOf('Main') > -1 ? 'Main Test' : qSection.textContent) || loc.sec || '';
-  } else if(qSection && loc.sec && !observerMode && testMode === 'full'){
-    qSection.textContent = 'Detailed Test';
+  } else if(qSection && !observerMode && testMode === 'full'){
+    qSection.textContent = lang === 'es' ? 'Test Detallado' : 'Detailed Test';
   }
 
-  var pct = TOTAL > 0 ? Math.round((cur / TOTAL) * 100) : 0;
-  var pbar = document.getElementById('pbarFill');
-  var qNumEl = document.getElementById('qNum');
-  if (pbar) pbar.style.width = pct + '%';
-  if (qNumEl) qNumEl.textContent = (cur + 1) + ' / ' + TOTAL;
-
   var qText = loc.text;
-  var explainText = loc.explain || (lang==='es' ? '' : (_explainCache[cur] || ''));
+  var explainText = _explainCache[cur] || loc.explain || q.e || '';
   var lbl = scaleLabels[lang]||scaleLabels['en'];
 
   var h = '<div class="q-header-row"><div class="q-text">'+escapeHTML(qText)+'</div></div>';
@@ -1035,23 +1151,38 @@ function renderQ(){
     btnEx.addEventListener('click', function(){
       var open = bubbleEl.classList.toggle('open');
       btnEx.innerHTML = (open?'&times; ':'&#9711; ')+(lang==='es'?(open?'Cerrar':'Simplificar pregunta'):(open?'Close':'Simplify question'));
-      // If opening and no cached explanation, call Anthropic directly
-      if(open && !_explainCache[cur] && !bubbleEl.textContent.trim()){
-        bubbleEl.textContent = lang==='es' ? 'Simplificando...' : 'Simplifying...';
-        var qText2 = (window._activeQ||Q)[cur].t;
-        var simplifyFetch = (typeof AnimusShared !== 'undefined' && AnimusShared.fetchApiPost)
-          ? AnimusShared.fetchApiPost('/api/simplify', { question: qText2, lang: lang })
-          : Promise.reject(new Error('auth_required'));
-        simplifyFetch.then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
-        .then(function(d){
-          var txt=(d.simplified||'').trim().replace(/^["']|["']$/g,'');
-          if(txt){ _explainCache[cur]=txt; bubbleEl.textContent=txt; }
-          else { bubbleEl.textContent=lang==='es'?'No disponible':'Unavailable'; }
-        }).catch(function(e){
-          console.warn('Simplify failed:',e);
-          bubbleEl.textContent=lang==='es'?'No disponible':'Simplification unavailable';
-        });
+      if(!open) return;
+      var cached = _explainCache[cur];
+      var baked = (loc.explain || q.e || '').trim();
+      if(cached){
+        bubbleEl.textContent = cached;
+        return;
       }
+      if(baked){
+        _explainCache[cur] = baked;
+        bubbleEl.textContent = baked;
+        return;
+      }
+      var qText2 = loc.text || q.t;
+      var fallback = localSimplifyQuestion(qText2);
+      bubbleEl.textContent = fallback;
+      _explainCache[cur] = fallback;
+      if(typeof AnimusShared === 'undefined' || !AnimusShared.fetchApiPost) return;
+      bubbleEl.textContent = lang==='es' ? 'Simplificando...' : 'Simplifying...';
+      AnimusShared.fetchApiPost('/api/simplify', { question: qText2, lang: lang })
+        .then(function(r){ if(!r.ok) throw new Error(String(r.status)); return r.json(); })
+        .then(function(d){
+          var txt = (d.simplified || '').trim().replace(/^["']|["']$/g, '');
+          if(txt){
+            _explainCache[cur] = txt;
+            bubbleEl.textContent = txt;
+          } else {
+            bubbleEl.textContent = fallback;
+          }
+        })
+        .catch(function(){
+          bubbleEl.textContent = fallback;
+        });
     });
   }
 
@@ -1072,6 +1203,7 @@ function renderQ(){
   });
 
   saveTestProgress();
+  updateQuizModeSwitch();
 }
 
 // ── FINISH QUIZ (called when user completes last question) ──
@@ -1592,6 +1724,33 @@ var TABS=[
   {id:'figures',label:'Figures'}
 ];
 
+function insertDetailedTestUpsell() {
+  var existing = document.getElementById('detailedTestUpsell');
+  if (existing) existing.remove();
+  if (testMode !== 'short') return;
+  var es = lang === 'es';
+  function renderBanner(skip) {
+    if (skip) return;
+    var banner = document.createElement('div');
+    banner.id = 'detailedTestUpsell';
+    banner.className = 'detailed-test-upsell';
+    banner.innerHTML = es
+      ? 'Para un resultado más preciso, considerá comprar el <a href="/shop">Test Detallado</a> en la Tienda.'
+      : 'For a more accurate result, you should purchase the <a href="/shop">Detailed Test</a> in the Shop.';
+    var tabs = document.querySelector('#results .tabs-wrap');
+    if (tabs && tabs.parentNode) tabs.parentNode.insertBefore(banner, tabs);
+  }
+  var user = typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser;
+  if (user && typeof AnimusEntitlements !== 'undefined') {
+    firebase.firestore().collection('users').doc(user.uid).get().then(function (doc) {
+      var data = doc.exists ? doc.data() : {};
+      renderBanner(AnimusEntitlements.hasEntitlement(data, 'detailedTest'));
+    }).catch(function () { renderBanner(false); });
+  } else {
+    renderBanner(false);
+  }
+}
+
 function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   refreshAnimusLang();
   var es = lang === 'es';
@@ -1624,6 +1783,8 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'<div class="chip"><strong>Socionics</strong>'+(sanitizeText(ai.socionics,2000)||'')+'</div>'
     +'<div class="chip"><strong>Temperament</strong>'+(sanitizeText(ai.keirsey,2000)||'')+'</div>'
     +'</div>';
+
+  insertDetailedTestUpsell();
 
   // Build tabs
   var tabLbl = function (en, esKey) {
@@ -2671,10 +2832,17 @@ showResults=function(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     startTest: startTest,
     resumeTest: resumeTestFromStorage,
     setTestMode: setTestMode,
-    loadSavedTestMode: loadSavedTestMode
+    loadSavedTestMode: loadSavedTestMode,
+    switchTestMode: switchTestMode,
+    refreshIntroModeUI: refreshIntroModeUI,
+    readProgressForMode: readProgressForMode
   };
   function syncIntro() {
-    try { setTestMode(loadSavedTestMode()); showResumePromptIfNeeded(); } catch (e) {}
+    try {
+      migrateLegacyProgress();
+      setTestMode(loadSavedTestMode());
+      refreshIntroModeUI();
+    } catch (e) {}
     if (g.AnimusIntro && g.AnimusIntro.onEngineReady) g.AnimusIntro.onEngineReady();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncIntro);

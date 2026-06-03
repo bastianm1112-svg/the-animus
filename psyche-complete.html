@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="/css/animus-shop.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-premium.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-motion.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-test.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-test.css?v=20260604">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
 <script src="/js/animus-app.js?v=20260603" defer></script>
@@ -131,16 +131,24 @@ if(window.top!==window.self){window.top.location=window.self.location;}
   <div class="intro-rule"></div>
   <p class="intro-desc" data-en="Map your cognitive architecture, philosophical orientation, political geometry, attachment patterns, and moral foundations — the core of who you are." data-es="Mapea tu arquitectura cognitiva, orientación filosófica, geometría política, patrones de apego y fundamentos morales — el núcleo de quién eres.">Map your cognitive architecture, philosophical orientation, political geometry, attachment patterns, and moral foundations — the core of who you are.</p>
   <div class="test-intro-card intro-actions">
-  <div class="intro-main-label">Main Test</div>
-  <div class="intro-meta intro-meta-compact">
+  <div class="test-mode-tabs" id="testModeTabs" role="tablist" aria-label="Test type">
+    <button type="button" class="test-mode-tab active" data-mode="short" role="tab" aria-selected="true">Main Test</button>
+    <button type="button" class="test-mode-tab" data-mode="full" role="tab" aria-selected="false">Detailed Test</button>
+  </div>
+  <div class="intro-main-label" id="introModeLabel">Main Test</div>
+  <div class="intro-meta intro-meta-compact" id="introModeMeta">
     <div class="intro-meta-item"><strong>14</strong><span data-en="Dimensions" data-es="Dimensiones">Dimensions</span></div>
     <div class="intro-meta-item"><strong>~20</strong><span data-en="Minutes" data-es="Minutos">Minutes</span></div>
   </div>
+  <p class="intro-detailed-upsell" id="introDetailedUpsell" style="display:none">For a more accurate result, purchase the <a href="/shop">Detailed Test</a> in the Shop.</p>
   <button type="button" class="btn-primary btn-primary--wide" id="startBtn" data-intro-action="start" data-en="BEGIN ASSESSMENT" data-es="COMENZAR">BEGIN ASSESSMENT</button>
   <p id="resumeTestWrap" class="test-resume-wrap" style="display:none">
     <button type="button" id="resumeTestBtn" class="intro-import-btn test-resume-btn">Resume where you left off →</button>
   </p>
-  <p class="intro-shop-hint">Want more depth? Unlock the <a href="/shop">Detailed Test</a> in the Shop.</p>
+  <p id="otherModeResumeWrap" class="test-other-resume-wrap" style="display:none">
+    <button type="button" id="otherModeResumeBtn" class="intro-import-btn test-other-resume-btn"></button>
+  </p>
+  <p class="intro-shop-hint" id="introShopHint">Want more depth? Unlock the <a href="/shop">Detailed Test</a> in the Shop.</p>
   </div>
   </div>
 </div>
@@ -151,10 +159,9 @@ if(window.top!==window.self){window.top.location=window.self.location;}
     <a href="/" class="qhdr-logo">ANI<span>MUS</span></a>
     <div class="qhdr-right">
       <span class="qhdr-section" id="qSection">Main Test</span>
-      <span class="qhdr-num" id="qNum"></span>
+      <button type="button" class="qhdr-mode-switch" id="quizModeSwitch" style="display:none"></button>
     </div>
   </div>
-  <div class="pbar-wrap" aria-hidden="true"><div class="pbar-fill" id="pbarFill"></div></div>
   <div class="qbody" id="qBody"></div>
 </div>
 
@@ -209,8 +216,8 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <script src="/js/psyche-cross.js"></script>
 <script src="/js/profile-narrative-depth.js"></script>
 <script src="/js/profile-narratives.js"></script>
-<script src="/js/psyche-engine.js?v=20260603"></script>
-<script src="/js/psyche-intro.js"></script>
+<script src="/js/psyche-engine.js?v=20260604"></script>
+<script src="/js/psyche-intro.js?v=20260604"></script>
 
 <div id="appBottomMount"></div>
 <script src="/js/animus-social.js"></script>

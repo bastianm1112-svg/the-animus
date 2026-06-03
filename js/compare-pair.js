@@ -184,6 +184,24 @@
     var aiContent = document.getElementById('aiAnalysisContent');
     if (!aiContent) return;
 
+    function parseAnalysisPayload(text) {
+      if (!text) return null;
+      var cleaned = text.replace(/```json|```/g, '').trim();
+      try {
+        return JSON.parse(cleaned);
+      } catch (e) {
+        var match = cleaned.match(/\{[\s\S]*\}/);
+        if (match) {
+          try {
+            return JSON.parse(match[0]);
+          } catch (e2) {
+            return null;
+          }
+        }
+      }
+      return null;
+    }
+
     function showOffline(note) {
       var ai =
         Normalize && Normalize.buildOfflineAnalysis
@@ -197,8 +215,7 @@
       aiContent.innerHTML = renderAnalysisHtml(ai, note);
     }
 
-    aiContent.innerHTML =
-      '<div class="compare-ai-loading">Generating analysis…</div>';
+    showOffline(null);
 
     var prompt =
       'You are an expert in MBTI and Enneagram. Analyze compatibility between two people.' +
@@ -254,15 +271,14 @@
             return b.type === 'text' ? b.text : '';
           })
           .join('')
-          .replace(/```json|```/g, '')
           .trim();
-        var ai = JSON.parse(text);
-        aiContent.innerHTML = renderAnalysisHtml(ai, null);
+        var ai = parseAnalysisPayload(text);
+        if (ai && ai.whereAlign) {
+          aiContent.innerHTML = renderAnalysisHtml(ai, null);
+        }
       })
       .catch(function () {
-        showOffline(
-          'Live AI is unavailable — showing an on-device summary from your stored assessment data.'
-        );
+        /* offline analysis already visible */
       });
   }
 

@@ -1,10 +1,8 @@
 /**
- * ANIMUS test page intro — respects estimator/detailed route modes.
+ * ANIMUS test page intro — mode tabs, resume, cross-mode continue.
  */
 (function (g) {
   'use strict';
-
-  var KEY_PROGRESS = 'animus_test_progress';
 
   function el(id) {
     return document.getElementById(id);
@@ -41,25 +39,19 @@
       }
       return;
     }
-    try {
-      localStorage.setItem('animus_test_mode', 'short');
-    } catch (e) {}
-    g.__animusTestMode = 'short';
+    var saved = g.AnimusPsyche && g.AnimusPsyche.loadSavedTestMode
+      ? g.AnimusPsyche.loadSavedTestMode()
+      : 'short';
+    g.__animusTestMode = saved;
     if (g.AnimusPsyche && typeof g.AnimusPsyche.setTestMode === 'function') {
-      g.AnimusPsyche.setTestMode('short');
+      g.AnimusPsyche.setTestMode(saved);
     }
   }
 
-  function showResume() {
-    var wrap = el('resumeTestWrap');
-    if (!wrap) return;
-    if (routeMode() === 'estimator') return;
-    try {
-      var raw = sessionStorage.getItem(KEY_PROGRESS);
-      if (!raw) return;
-      var data = JSON.parse(raw);
-      if (data && data.answers && data.cur >= 1) wrap.style.display = 'block';
-    } catch (e) {}
+  function refreshIntro() {
+    if (g.AnimusPsyche && typeof g.AnimusPsyche.refreshIntroModeUI === 'function') {
+      g.AnimusPsyche.refreshIntroModeUI();
+    }
   }
 
   function startTest() {
@@ -88,12 +80,31 @@
     startTest();
   }
 
+  function bindModeTabs() {
+    var tabs = el('testModeTabs');
+    if (!tabs) return;
+    tabs.querySelectorAll('.test-mode-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var mode = tab.getAttribute('data-mode');
+        if (!mode || !g.AnimusPsyche) return;
+        if (mode === 'full') {
+          g.AnimusPsyche.setTestMode('full');
+        } else {
+          g.AnimusPsyche.setTestMode('short');
+        }
+        refreshIntro();
+      });
+    });
+  }
+
   function bindIntro() {
     setMainMode();
-    showResume();
+    bindModeTabs();
+    refreshIntro();
 
     var startBtn = el('startBtn');
     var resumeBtn = el('resumeTestBtn');
+    var otherBtn = el('otherModeResumeBtn');
     if (startBtn) {
       startBtn.onclick = function (e) {
         e.preventDefault();
@@ -108,6 +119,18 @@
         resumeTest();
       };
     }
+    if (otherBtn) {
+      otherBtn.onclick = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!g.AnimusPsyche || !g.AnimusPsyche.switchTestMode) return;
+        var current = g.AnimusPsyche.loadSavedTestMode
+          ? g.AnimusPsyche.loadSavedTestMode()
+          : 'short';
+        var target = current === 'full' ? 'short' : 'full';
+        g.AnimusPsyche.switchTestMode(target, true);
+      };
+    }
 
     var intro = el('intro');
     if (intro) {
@@ -119,11 +142,11 @@
   g.AnimusIntro = {
     refresh: function () {
       setMainMode();
-      showResume();
+      refreshIntro();
     },
     onEngineReady: function () {
       setMainMode();
-      showResume();
+      refreshIntro();
     }
   };
 

@@ -199,7 +199,10 @@ body.page-compare {
   padding: 14px 14px 0;
   border: 1px solid var(--border);
   border-top: none;
-  background: linear-gradient(180deg, var(--surface2) 0%, var(--surface) 100%);
+  background: var(--surface);
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 120;
 }
 
 .compare-results.is-pending .compare-content .c-panel {
@@ -212,9 +215,8 @@ body.page-compare {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   padding: 0 0 14px;
-  position: sticky;
-  top: var(--nav-h);
-  z-index: 50;
+  position: relative;
+  z-index: 1;
   background: transparent;
   -webkit-overflow-scrolling: touch;
 }
@@ -240,7 +242,7 @@ body.page-compare {
     transform 0.15s,
     box-shadow 0.2s;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .compare-tab::before {
@@ -549,12 +551,55 @@ body.page-compare {
 }
 
 .compare-share-bar {
-  margin-bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.btn-share-comp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  min-height: 44px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  box-sizing: border-box;
 }
 
 .compare-share-bar .btn-share-comp {
   border-radius: 8px;
   min-height: 44px;
+}
+
+.btn-share-comp.btn-gold {
+  background: var(--gold);
+  color: #000;
+}
+
+.btn-share-comp.btn-gold:hover {
+  background: var(--gold3, #d4b87a);
+  color: #000;
+}
+
+.btn-share-comp.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text);
+}
+
+.btn-share-comp.btn-outline:hover {
+  border-color: var(--gold2);
+  color: var(--gold);
 }
 
 .compare-panel-empty {
