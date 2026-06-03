@@ -6,6 +6,8 @@
   var _selected = [];
   var _db = null;
   var _auth = null;
+  var _userData = null;
+  var _hasPlus = false;
 
   function escapeHTML(s) {
     if (!s) return '';
@@ -57,9 +59,36 @@
     return n >= 75 ? 'compat-high' : n >= 55 ? 'compat-mid' : 'compat-low';
   }
 
+  function renderPlusGate() {
+    var grid = document.getElementById('selectorGrid');
+    var hint = document.getElementById('selectorHint');
+    var content = document.getElementById('groupContent');
+    if (hint) hint.textContent = '';
+    if (content) {
+      content.innerHTML =
+        '<div class="group-plus-gate">' +
+        '<div class="group-plus-gate-title">Group compare is a Plus feature</div>' +
+        '<p class="group-plus-gate-desc">Compare 2–6 friends at once with compatibility matrices and group insights. Unlimited 1-on-1 compares are still free (10/month).</p>' +
+        '<a href="/shop" class="shop-open-link">Get Animus Plus</a>' +
+        '</div>';
+    }
+    if (grid) {
+      grid.innerHTML =
+        '<div class="group-plus-gate" style="margin:0">' +
+        '<div class="group-plus-gate-title">Animus Plus required</div>' +
+        '<p class="group-plus-gate-desc">Unlock group compare on the Shop.</p>' +
+        '<a href="/shop" class="shop-open-link">View Plus</a>' +
+        '</div>';
+    }
+  }
+
   function renderSelector() {
     var grid = document.getElementById('selectorGrid');
     if (!grid) return;
+    if (!_hasPlus) {
+      renderPlusGate();
+      return;
+    }
     var allPeople = Object.values(_people).sort(function (a, b) {
       return a.isYou ? -1 : b.isYou ? 1 : 0;
     });
@@ -86,11 +115,19 @@
   }
 
   function togglePerson(uid) {
+    if (!_hasPlus) {
+      showToast('Group compare requires Animus Plus');
+      return;
+    }
+    var max =
+      g.AnimusEntitlements && g.AnimusEntitlements.PLUS_GROUP_MAX_PEOPLE
+        ? g.AnimusEntitlements.PLUS_GROUP_MAX_PEOPLE
+        : 6;
     var idx = _selected.indexOf(uid);
     if (idx > -1) _selected.splice(idx, 1);
     else {
-      if (_selected.length >= 6) {
-        showToast('Max 6 people at once');
+      if (_selected.length >= max) {
+        showToast('Max ' + max + ' people at once');
         return;
       }
       _selected.push(uid);
@@ -103,6 +140,10 @@
     var content = document.getElementById('groupContent');
     var hint = document.getElementById('selectorHint');
     if (!content || !hint) return;
+    if (!_hasPlus) {
+      renderPlusGate();
+      return;
+    }
     if (_selected.length < 2) {
       hint.textContent = _selected.length === 0
         ? 'Select 2–6 people to see group comparison'
@@ -241,6 +282,11 @@
             email: user.email || '',
             friends: []
           };
+          _userData = uData;
+          _hasPlus =
+            g.AnimusEntitlements && g.AnimusEntitlements.canUseGroupCompare
+              ? g.AnimusEntitlements.canUseGroupCompare(uData)
+              : false;
           var snap = res[1].exists ? (res[1].data().latest || {}) : {};
           _people[user.uid] = buildPerson(user.uid, uData, snap, true);
           if (_selected.indexOf(user.uid) === -1) _selected.push(user.uid);
@@ -281,5 +327,26 @@
     });
   }
 
-  g.AnimusCompareGroup = { init: init, setModeVisible: function () { renderSelector(); } };
+  function setUserData(userData) {
+    _userData = userData || {};
+    _hasPlus =
+      g.AnimusEntitlements && g.AnimusEntitlements.canUseGroupCompare
+        ? g.AnimusEntitlements.canUseGroupCompare(_userData)
+        : false;
+    renderSelector();
+    renderGroup();
+  }
+
+  function hasGroupAccess() {
+    return _hasPlus;
+  }
+
+  g.AnimusCompareGroup = {
+    init: init,
+    setModeVisible: function () {
+      renderSelector();
+    },
+    setUserData: setUserData,
+    hasGroupAccess: hasGroupAccess
+  };
 })(typeof window !== 'undefined' ? window : globalThis);

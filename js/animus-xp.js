@@ -57,6 +57,11 @@
     return db.runTransaction(function (tx) {
       return tx.get(ref).then(function (doc) {
         var data = doc.exists ? doc.data() : {};
+        var mult =
+          g.AnimusEntitlements && g.AnimusEntitlements.getXpMultiplier
+            ? g.AnimusEntitlements.getXpMultiplier(data)
+            : 1;
+        amount = Math.max(1, Math.round(amount * mult));
         var xp = normalizeXp(data);
         var nextTotal = xp.total + amount;
         var next = { total: nextTotal, level: levelFromTotal(nextTotal) };
@@ -71,10 +76,15 @@
     var prog = xpProgress(normalizeXp(userData).total);
     var toNext = Math.max(0, prog.ceiling - prog.total);
     var atMax = prog.level >= LEVEL_THRESHOLDS.length;
+    var plusBoost =
+      g.AnimusEntitlements &&
+      g.AnimusEntitlements.hasAnimusPlus(userData) &&
+      g.AnimusEntitlements.PLUS_XP_MULTIPLIER > 1;
     var sub =
       atMax
         ? prog.total + ' XP · max level'
         : prog.total + ' / ' + prog.ceiling + ' XP · ' + toNext + ' to level ' + (prog.level + 1);
+    if (plusBoost) sub += ' · Plus 1.25× XP';
     rootEl.innerHTML =
       '<div class="xp-card">' +
       '<div class="xp-card-head">' +

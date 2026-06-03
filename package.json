@@ -1,0 +1,7 @@
+{
+  "name": "the-animus",
+  "private": true,
+  "dependencies": {
+    "google-auth-library": "^9.15.1"
+  }
+}

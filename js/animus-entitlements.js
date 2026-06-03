@@ -6,6 +6,19 @@
   'use strict';
 
   var FREE_COMPARES_PER_MONTH = 10;
+  var PLUS_XP_MULTIPLIER = 1.25;
+  var PLUS_SHOP_DISCOUNT = 0.2;
+  var PLUS_CAREER_PDF_PER_MONTH = 3;
+  var PLUS_GROUP_MAX_PEOPLE = 6;
+
+  var PLUS_PERKS = [
+    'Unlimited compares each month',
+    'Group compare (up to 6 people)',
+    '1.25× XP on all activities',
+    '20% off assessment packs in the Shop',
+    'AI Career & Lifestyle Guide PDF (3 per month)',
+    'Plus badge on your profile'
+  ];
 
   var PRODUCTS = {
     detailedTest: {
@@ -38,7 +51,9 @@
       price: 5,
       type: 'subscription',
       interval: 'month',
-      description: 'Unlimited compares each month. More Plus features coming soon.'
+      badge: 'Membership',
+      description:
+        'Unlimited compares, group compare, 1.25× XP, 20% Shop discount, Plus badge, and 3 AI Career & Lifestyle PDFs per month.'
     }
   };
 
@@ -58,6 +73,55 @@
 
   function defaultCompareUsage() {
     return { monthKey: monthKey(), count: 0 };
+  }
+
+  function defaultCareerPdfUsage() {
+    return { monthKey: monthKey(), count: 0 };
+  }
+
+  function getCareerPdfUsage(userData) {
+    var u = (userData && userData.careerPdfUsage) || defaultCareerPdfUsage();
+    var mk = monthKey();
+    if (u.monthKey !== mk) return { monthKey: mk, count: 0 };
+    return { monthKey: u.monthKey, count: u.count || 0 };
+  }
+
+  function getCareerPdfRemaining(userData) {
+    if (!hasAnimusPlus(userData)) return 0;
+    var usage = getCareerPdfUsage(userData);
+    return Math.max(0, PLUS_CAREER_PDF_PER_MONTH - usage.count);
+  }
+
+  function canGenerateCareerPdf(userData) {
+    return hasAnimusPlus(userData) && getCareerPdfRemaining(userData) > 0;
+  }
+
+  function getDiscountedPrice(price, userData) {
+    var n = Number(price);
+    if (!n || n <= 0) return price;
+    if (!hasAnimusPlus(userData)) return n;
+    return Math.max(1, Math.round(n * (1 - PLUS_SHOP_DISCOUNT) * 100) / 100);
+  }
+
+  function formatMoney(amount) {
+    var n = Number(amount);
+    if (n % 1 === 0) return String(Math.round(n));
+    return n.toFixed(2);
+  }
+
+  function getProductPrice(productId, userData) {
+    var p = PRODUCTS[productId];
+    if (!p) return 0;
+    if (p.type === 'subscription') return p.price;
+    return getDiscountedPrice(p.price, userData);
+  }
+
+  function canUseGroupCompare(userData) {
+    return hasAnimusPlus(userData);
+  }
+
+  function getXpMultiplier(userData) {
+    return hasAnimusPlus(userData) ? PLUS_XP_MULTIPLIER : 1;
   }
 
   function defaultXp() {
@@ -205,9 +269,15 @@
 
   g.AnimusEntitlements = {
     PRODUCTS: PRODUCTS,
+    PLUS_PERKS: PLUS_PERKS,
     FREE_COMPARES_PER_MONTH: FREE_COMPARES_PER_MONTH,
+    PLUS_XP_MULTIPLIER: PLUS_XP_MULTIPLIER,
+    PLUS_SHOP_DISCOUNT: PLUS_SHOP_DISCOUNT,
+    PLUS_CAREER_PDF_PER_MONTH: PLUS_CAREER_PDF_PER_MONTH,
+    PLUS_GROUP_MAX_PEOPLE: PLUS_GROUP_MAX_PEOPLE,
     defaultEntitlements: defaultEntitlements,
     defaultCompareUsage: defaultCompareUsage,
+    defaultCareerPdfUsage: defaultCareerPdfUsage,
     defaultXp: defaultXp,
     normalizeUserEntitlements: normalizeUserEntitlements,
     hasEntitlement: hasEntitlement,
@@ -215,6 +285,14 @@
     getCompareUsage: getCompareUsage,
     getCompareRemaining: getCompareRemaining,
     canCompare: canCompare,
+    getCareerPdfUsage: getCareerPdfUsage,
+    getCareerPdfRemaining: getCareerPdfRemaining,
+    canGenerateCareerPdf: canGenerateCareerPdf,
+    getDiscountedPrice: getDiscountedPrice,
+    getProductPrice: getProductPrice,
+    formatMoney: formatMoney,
+    canUseGroupCompare: canUseGroupCompare,
+    getXpMultiplier: getXpMultiplier,
     entitlementsFromProduct: entitlementsFromProduct,
     mergeEntitlements: mergeEntitlements,
     recordCompareUsage: recordCompareUsage,

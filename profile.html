@@ -195,6 +195,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script src="/js/profile-narratives.js"></script>
 <script src="/js/animus-i18n.js"></script>
 <script src="/js/compare-normalize.js"></script>
+<script src="/js/animus-entitlements.js"></script>
 <script src="/js/animus-shared.js"></script>
 <script>
 AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
@@ -206,6 +207,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
 <script src="/js/profile-visuals.js"></script>
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-release.css">
+<link rel="stylesheet" href="/css/animus-plus.css">
 <script src="/js/animus-app.js" defer></script>
 </head>
 <body class="has-app-nav page-profile">
@@ -219,7 +221,10 @@ var auth=firebase.auth(); var db=firebase.firestore();
     <div class="hero-top">
       <div class="profile-photo" id="profilePhoto">?</div>
       <div class="hero-info">
-        <div class="profile-name" id="profileName">Loading...</div>
+        <div class="profile-name-row" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">
+          <div class="profile-name" id="profileName">Loading...</div>
+          <span class="plus-badge" id="profilePlusBadge" hidden>Plus</span>
+        </div>
         <div class="profile-username" id="profileUsername">@...</div>
         <div class="profile-bio" id="profileBio"></div>
         <div class="profile-meta">
@@ -260,6 +265,8 @@ var auth=firebase.auth(); var db=firebase.firestore();
         <a href="/compare" class="btn-full btn-full-outline">&#8652; Compare with Someone</a>
         <button class="btn-full btn-full-outline" onclick="downloadPDF()">&#9113; Download PDF</button>
       </div>
+      <div id="careerGuideMount" class="owner-only"></div>
+      <div id="careerGuideMount" class="owner-only"></div>
       <div class="side-card owner-only"><div class="side-card-title">Retake History</div><div id="historyList"><div style="color:var(--muted);font-size:12px;padding:8px 0">No assessments yet</div></div><div id="historyChartWrap" class="history-chart" style="margin-top:12px"></div></div>
       <div class="side-card"><div class="side-card-title">Quick Stats</div><div style="display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted2)">Political</span><span id="statPolitical" style="color:var(--text)">&#8212;</span></div>
@@ -532,6 +539,12 @@ function loadProfileData(uid, isOwner, currentUser){
     }
 
     document.getElementById('profileName').textContent=u.displayName||'&#8212;';
+    var plusBadge = document.getElementById('profilePlusBadge');
+    if (plusBadge) {
+      var showPlus =
+        typeof AnimusEntitlements !== 'undefined' && AnimusEntitlements.hasAnimusPlus(u);
+      plusBadge.hidden = !showPlus;
+    }
     document.getElementById('profileUsername').textContent='@'+(u.username||'&#8212;');
     document.getElementById('profileBio').textContent=u.bio||'';
     if(u.createdAt) document.getElementById('joinedDate').textContent='Joined '+new Date(u.createdAt.toDate()).toLocaleDateString('en-US',{month:'long',year:'numeric'});
@@ -548,6 +561,10 @@ function loadProfileData(uid, isOwner, currentUser){
     if(snap.eth){ var ethTop=Object.keys(snap.eth).sort(function(a,b){return snap.eth[b]-snap.eth[a];})[0]; var ethN={ET_VIR:'Virtue',ET_CON:'Consequentialist',ET_DEO:'Deontological',ET_EGO:'Egoist'}; var seEl=document.getElementById('statEthics'); if(seEl) seEl.textContent=ethN[ethTop]||ethTop||'--'; }
     if(snap.tmp){ var tmpTop=Object.keys(snap.tmp).sort(function(a,b){return snap.tmp[b]-snap.tmp[a];})[0]; var tmpN={TMP_CHO:'Choleric',TMP_MEL:'Melancholic',TMP_SAN:'Sanguine',TMP_PHL:'Phlegmatic'}; var stEl=document.getElementById('statTemp'); if(stEl) stEl.textContent=tmpN[tmpTop]||tmpTop||'--'; }
     if(snap.keirsey){ var skEl=document.getElementById('statKeirsey'); if(skEl) skEl.textContent=snap.keirsey; }
+
+    if (isOwner && typeof AnimusCareerGuide !== 'undefined') {
+      AnimusCareerGuide.mount(auth, u, snap, u.displayName || '');
+    }
 
     if(isOwner && p.history && p.history.length){
       var hist=document.getElementById('historyList');
@@ -664,7 +681,16 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
   </div>
 </div>
 
+<div class="career-guide-modal" id="careerGuideModal" aria-hidden="true">
+  <div class="career-guide-modal-actions">
+    <button type="button" id="careerGuideClose">Close</button>
+    <button type="button" class="career-guide-print" id="careerGuidePrint">Save as PDF</button>
+  </div>
+  <div class="career-guide-sheet" id="careerGuideSheet"></div>
+</div>
+
 <div id="appBottomMount"></div>
+<script src="/js/animus-career-guide.js"></script>
 <script src="/js/animus-social.js"></script>
 <script src="/js/animus-nav.js"></script>
 <script>
