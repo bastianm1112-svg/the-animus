@@ -206,6 +206,13 @@
   color: var(--gold, #c8a96e);
 }
 
+.activity-estimator-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+
 .activity-estimator-cta {
   display: inline-flex;
   align-items: center;
@@ -213,13 +220,13 @@
   background: transparent;
   border: 1px solid var(--gold, #c8a96e);
   color: var(--gold, #c8a96e);
-  padding: 12px 16px;
+  padding: 12px 20px;
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
   min-height: 44px;
-  width: 100%;
+  width: auto;
   max-width: 100%;
   box-sizing: border-box;
   text-decoration: none;
@@ -227,6 +234,7 @@
   line-height: 1.35;
   white-space: normal;
   text-align: center;
+  margin: 0 auto;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -523,12 +531,19 @@
   .activity-estimator {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 20px;
+    align-items: center;
+  }
+
+  .activity-estimator-actions {
+    justify-content: flex-end;
+    width: auto;
   }
 
   .activity-estimator-cta {
     width: auto;
     min-width: 132px;
-    max-width: min(200px, 38vw);
+    max-width: min(220px, 38vw);
     white-space: nowrap;
+    margin: 0;
   }
 }

@@ -57,6 +57,11 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
 <div id="appNavMount"></div>
 
 <div class="compare-page-wrap">
+  <header class="compare-page-head">
+    <h1 class="compare-page-title">Compare personalities</h1>
+    <p class="compare-page-sub">Side-by-side compatibility across cognition, values, and more.</p>
+  </header>
+
   <div class="compare-picker-card" id="friendsPickerBar">
     <div class="compare-picker-label">Compare with a friend</div>
     <div class="compare-friend-chips" id="compareFriendChips"></div>
@@ -65,7 +70,6 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
   </div>
 
 <div class="compare-mode-bar" id="compare-main">
-  <h1 class="seo-page-title">Compare personalities</h1>
   <button type="button" class="compare-mode-btn active" data-mode="pair">1-on-1</button>
   <button type="button" class="compare-mode-btn" data-mode="group">Group</button>
 </div>

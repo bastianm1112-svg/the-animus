@@ -827,7 +827,7 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
       for(var j=0;j<lbl.opts.length;j++){
         var v = j+1;
         var c2 = fillAnswers[fillCur]===v ? 'agree-btn sel' : 'agree-btn';
-        html += '<button class="'+c2+'" data-v="'+v+'"><span class="agree-lbl">'+String.fromCharCode(65+j)+'</span>'+lbl.opts[j]+'</button>';
+        html += '<button class="'+c2+'" data-v="'+v+'"><span class="agree-letter">'+String.fromCharCode(65+j)+'</span><span class="agree-label">'+lbl.opts[j]+'</span></button>';
       }
       html += '</div>';
     }
@@ -2502,8 +2502,7 @@ function showToast(msg){
 
 // ── COMPARISON VIEW ──
 function showComparison(you, them){
-  document.getElementById('results').style.display='none';
-  document.getElementById('compareView').style.display='block';
+  setTestPhase('compare');
   window.scrollTo(0,0);
 
   var fnOrder=['Ni','Ne','Ti','Te','Fi','Fe','Si','Se'];
@@ -2595,8 +2594,7 @@ function showComparison(you, them){
   document.getElementById('compareView').innerHTML=html;
 
   document.getElementById('backToResults').addEventListener('click',function(){
-    document.getElementById('compareView').style.display='none';
-    document.getElementById('results').style.display='block';
+    setTestPhase('results');
   if(window._observerMode){
     var heroEl = document.getElementById('resHero');
     var banner = document.createElement('div');

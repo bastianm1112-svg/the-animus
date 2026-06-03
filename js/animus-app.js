@@ -76,6 +76,13 @@
       document.body.classList.remove('phase-' + p);
     });
     if (phase) document.body.classList.add('phase-' + phase);
+    /* Clear legacy inline display toggles — CSS phase classes own visibility */
+    ['intro', 'quiz', 'loading', 'results', 'compareView'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = '';
+    });
+    var actionBar = document.getElementById('actionBar');
+    if (actionBar && phase !== 'results') actionBar.style.display = '';
   }
 
   function initGlobalErrorFallback() {

@@ -22,7 +22,7 @@
         'What are they likely to do?' +
         bodyEnd +
         'Estimate someone&apos;s type from behavior you&apos;ve actually seen — saved separately from real account friends.</p></div>' +
-        '<a href="/estimations" class="activity-estimator-cta shop-open-link animus-pressable">Open estimations</a>' +
+        '<div class="activity-estimator-actions"><a href="/estimations" class="activity-estimator-cta shop-open-link animus-pressable">Open estimations</a></div>' +
         '</div></section>';
     } else {
       mount.innerHTML =
@@ -33,7 +33,7 @@
         'Behavioral estimator' +
         bodyEnd +
         'Unlock profile estimation in the <a href="/shop">Shop</a> to guess types from observed behavior — not your own self-report.</p></div>' +
-        '<a href="/shop" class="activity-estimator-cta shop-open-link animus-pressable">View in Shop</a>' +
+        '<div class="activity-estimator-actions"><a href="/shop" class="activity-estimator-cta shop-open-link animus-pressable">View in Shop</a></div>' +
         '</div></section>';
     }
   }

@@ -189,11 +189,20 @@ select:focus-visible {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .activity-estimator-actions {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
   .activity-estimator-cta,
   .activity-estimator .shop-open-link {
-    width: 100%;
-    max-width: 100%;
+    width: auto;
+    max-width: calc(100% - 8px);
+    margin: 0 auto;
     justify-content: center;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .friends-page,

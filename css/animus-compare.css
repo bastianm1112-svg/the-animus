@@ -11,15 +11,20 @@ body.page-compare {
 }
 
 .compare-page-head {
-  padding-top: calc(var(--nav-h) + 20px);
-  margin-bottom: 24px;
+  padding-top: calc(var(--nav-h) + 16px);
+  margin-bottom: 20px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .compare-page-title {
   font-family: 'Playfair Display', serif;
   font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
   color: var(--white);
-  margin-bottom: 6px;
+  margin: 0 0 6px;
+  line-height: 1.15;
 }
 
 .compare-page-sub {
@@ -27,6 +32,7 @@ body.page-compare {
   color: var(--muted2);
   max-width: 520px;
   line-height: 1.6;
+  margin: 0;
 }
 
 .compare-mode-bar {

@@ -256,8 +256,9 @@ body.light-mode .friend-card:hover {
   }
   .activity-estimator-cta,
   .estimations-toolbar .activity-estimator-cta {
-    width: 100%;
-    max-width: 100%;
+    width: auto;
+    max-width: calc(100% - 8px);
+    margin: 0 auto;
     justify-content: center;
   }
   .home-greeting,
