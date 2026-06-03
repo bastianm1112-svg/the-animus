@@ -128,6 +128,21 @@
     });
   }
 
+  function reloadUserProducts() {
+    var user = g.auth && g.auth.currentUser;
+    if (!user || !g.db) return Promise.resolve();
+    return g.db
+      .collection('users')
+      .doc(user.uid)
+      .get()
+      .then(function (doc) {
+        var data = doc.exists ? doc.data() : {};
+        var ent = g.AnimusEntitlements.normalizeUserEntitlements(data);
+        renderProducts(ent, data);
+        renderPlusStatus(data);
+      });
+  }
+
   function requestPurchase(productId) {
     var user = g.auth && g.auth.currentUser;
     if (!user) {
@@ -136,31 +151,103 @@
     }
     var p = g.AnimusEntitlements.PRODUCTS[productId];
     if (!p) return;
-    if (!g.db) {
-      toast('Secure checkout coming soon.');
-      return;
-    }
-    return g.db
-      .collection('users')
-      .doc(user.uid)
-      .get()
-      .then(function (doc) {
-        userData = doc.exists ? doc.data() : {};
-        var price =
-          p.type === 'subscription'
-            ? p.price
-            : g.AnimusEntitlements.getProductPrice(productId, userData);
-        var label = g.AnimusEntitlements.formatMoney(price);
-        toast(
-          'Secure checkout (Stripe) coming soon. Plus members pay $' +
-            label +
-            ' for this item. Ask an admin to enable ' +
-            p.name +
-            ' meanwhile.'
-        );
+
+    toast('Opening secure checkout…');
+
+    user
+      .getIdToken()
+      .then(function (token) {
+        return fetch('/api/create-checkout-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token
+          },
+          body: JSON.stringify({ productId: productId })
+        });
+      })
+      .then(function (r) {
+        return r.json().then(function (data) {
+          return { ok: r.ok, data: data };
+        });
+      })
+      .then(function (res) {
+        if (res.ok && res.data && res.data.url) {
+          g.location.href = res.data.url;
+          return;
+        }
+        toast((res.data && res.data.error) || 'Could not start checkout.');
       })
       .catch(function () {
-        toast('Secure checkout coming soon. Contact support or ask an admin to enable ' + p.name + '.');
+        toast('Checkout unavailable. Try again or contact support.');
+      });
+  }
+
+  function handleCheckoutReturn() {
+    var params;
+    try {
+      params = new URLSearchParams(g.location.search);
+    } catch (e) {
+      return;
+    }
+    var status = params.get('checkout');
+    if (!status) return;
+
+    if (status === 'cancelled') {
+      toast('Checkout cancelled.');
+      try {
+        g.history.replaceState(null, '', '/shop');
+      } catch (e) {}
+      return;
+    }
+
+    if (status !== 'success') return;
+
+    var sessionId = params.get('session_id');
+    var user = g.auth && g.auth.currentUser;
+    if (!user || !sessionId) {
+      toast('Payment received — refresh in a moment if items are not unlocked.');
+      try {
+        g.history.replaceState(null, '', '/shop');
+      } catch (e) {}
+      reloadUserProducts();
+      return;
+    }
+
+    toast('Confirming your purchase…');
+
+    user
+      .getIdToken()
+      .then(function (token) {
+        return fetch('/api/fulfill-checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token
+          },
+          body: JSON.stringify({ sessionId: sessionId })
+        });
+      })
+      .then(function (r) {
+        return r.json().then(function (data) {
+          return { ok: r.ok, data: data };
+        });
+      })
+      .then(function (res) {
+        try {
+          g.history.replaceState(null, '', '/shop');
+        } catch (e) {}
+        if (res.ok && res.data && res.data.ok) {
+          toast('Purchase complete — thank you!');
+          reloadUserProducts();
+          return;
+        }
+        toast((res.data && res.data.error) || 'Payment pending — refresh shortly.');
+        reloadUserProducts();
+      })
+      .catch(function () {
+        toast('Payment received — refresh if your unlock is not visible yet.');
+        reloadUserProducts();
       });
   }
 
@@ -205,5 +292,10 @@
     });
   }
 
-  g.AnimusShop = { boot: boot, requestPurchase: requestPurchase };
+  g.AnimusShop = {
+    boot: boot,
+    requestPurchase: requestPurchase,
+    handleCheckoutReturn: handleCheckoutReturn,
+    reloadUserProducts: reloadUserProducts
+  };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -20,6 +20,6 @@ Requires:
 
 The server verifies the user's Firebase ID token, checks Plus status and monthly quota in Firestore, calls Claude Haiku, increments `users/{uid}.careerPdfUsage`, and returns JSON for the client print/PDF flow.
 
-## Stripe (planned)
+## Stripe
 
-Shop buttons show discounted Plus pricing client-side; checkout will use the same `entitlements` fields once Stripe webhooks are wired.
+See [STRIPE.md](./STRIPE.md) for webhook setup and environment variables. Checkout grants the same `entitlements` fields as the admin panel.

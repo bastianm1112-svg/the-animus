@@ -2,6 +2,7 @@
   "name": "the-animus",
   "private": true,
   "dependencies": {
-    "google-auth-library": "^9.15.1"
+    "google-auth-library": "^9.15.1",
+    "stripe": "^17.7.0"
   }
 }

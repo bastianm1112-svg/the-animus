@@ -35,6 +35,7 @@ var db = firebase.firestore();
   <h1 class="shop-title">Shop</h1>
   <p class="shop-sub">Unlock deeper assessments, profile estimation, and Animus Plus — unlimited compares, group compare, XP boost, career guides, and more.</p>
   <p class="shop-plus-status" id="shopPlusStatus">Loading your plan…</p>
+  <p class="shop-checkout-banner" id="shopCheckoutBanner" hidden></p>
   <div class="shop-grid" id="shopGrid"></div>
 </main>
 
@@ -47,7 +48,12 @@ var db = firebase.firestore();
 document.addEventListener('DOMContentLoaded', function () {
   AnimusNav.mountTop('appNavMount', 'shop');
   AnimusNav.mountBottom('appBottomMount', 'shop');
-  if (typeof AnimusShop !== 'undefined') AnimusShop.boot(auth, db);
+  if (typeof AnimusShop !== 'undefined') {
+    AnimusShop.boot(auth, db);
+    auth.onAuthStateChanged(function (u) {
+      if (u && AnimusShop.handleCheckoutReturn) AnimusShop.handleCheckoutReturn();
+    });
+  }
 });
 </script>
 </body>

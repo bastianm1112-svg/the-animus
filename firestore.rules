@@ -192,6 +192,11 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Stripe idempotency — server (service account) only.
+    match /stripe_processed/{docId} {
+      allow read, write: if false;
+    }
+
     // Legacy collection — unused by app; deny all client access.
     match /notifications/{notifId} {
       allow read, write: if false;
