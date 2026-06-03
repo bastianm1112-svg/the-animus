@@ -306,41 +306,18 @@ nav.scrolled {
   text-shadow: 0 0 16px rgba(200,169,110,0.15);
 }
 
-/* ── TEST PAGE ISOLATION — prevent global styles from bleeding into test ── */
-/* The test uses its own design tokens (--accent, --accent2) — don't override them */
-#intro button,
-#intro .intro-mode-btn,
-#intro .btn-primary,
-#intro .intro-import-btn,
-#intro .observer-btn {
+/* ── TEST PAGE — scoped so global polish does not break /test ── */
+body.page-test #intro button,
+body.page-test #intro .intro-mode-btn,
+body.page-test #intro .btn-primary,
+body.page-test #intro .intro-import-btn,
+body.page-test #intro .observer-btn {
   pointer-events: auto !important;
   position: relative;
   z-index: 5;
 }
 
-#intro *, #quiz *, .q-wrap *, .mc-choices *, .scale-wrap *,
-.agree-grid *, .result-wrap *, #results * {
-  background-image: none;
-}
-#intro .bar-fill, #quiz .bar-fill, #result .bar-fill,
-.pbar-fill { background: linear-gradient(to right, #6b4d1e, #b8955a) !important; }
-
-/* Test answer letters — make them look intentional as styled badges */
-.mc-letter, .agree-letter {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 10px !important;
-  letter-spacing: 0.15em !important;
-  color: #4a4a4a !important;
-  font-weight: 400 !important;
-  text-transform: uppercase;
-}
-.mc-choice:hover .mc-letter,
-.agree-btn:hover .agree-letter { color: #b8955a !important; }
-.mc-choice.selected .mc-letter,
-.agree-btn.sel .agree-letter { color: #b8955a !important; }
-
-/* Fix body background on test page — test has its own bg */
-body:has(#intro), body:has(#quiz), body:has(#results) {
+body.page-test {
   background-image: none !important;
 }
 
@@ -390,14 +367,14 @@ body.light-mode .card, body.light-mode .side-card {
 .nav-items { gap: 2px !important; }
 .nav-right { gap: 10px !important; }
 
-/* Cleaner stat cells */
-.stat-cell {
+/* Cleaner stat cells (not on test results — animus-test.css owns those) */
+body:not(.page-test) .stat-cell {
   background: var(--surface) !important;
 }
-.stat-big {
+body:not(.page-test) .stat-big {
   font-size: 32px !important;
 }
-.stat-lbl {
+body:not(.page-test) .stat-lbl {
   font-size: 9px !important;
   letter-spacing: 0.18em !important;
 }

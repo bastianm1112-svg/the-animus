@@ -165,8 +165,25 @@ body.member-mode #guestApp {
 }
 
 .friends-page {
-  padding-top: 32px;
+  padding-top: 12px;
   padding-bottom: calc(var(--mbn-h) + var(--safe-bottom) + 48px);
+}
+
+.friends-page .app-section {
+  margin-bottom: 20px;
+}
+
+.friends-page .home-section-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold2);
+}
+
+.friends-page .home-section-head {
+  margin-bottom: 10px;
 }
 
 .friends-page-title {

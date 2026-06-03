@@ -64,7 +64,7 @@
     }
   </style>
 </head>
-<body class="page-test phase-intro test-auth-pending">
+<body class="page-test has-app-nav phase-intro test-auth-pending">
 <script>
 (function(){try{var _t=localStorage.getItem('animus_theme');if(_t==='light')document.body.classList.add('light-mode');}catch(e){}})();
 if(window.top!==window.self){window.top.location=window.self.location;}
@@ -73,22 +73,25 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <div id="appNavMount"></div>
 
 <!-- INTRO -->
-<div id="intro">
+<div id="intro" class="test-intro">
+  <div class="test-intro-shell animus-reveal">
   <div class="intro-eyebrow" data-en="Complete Personality Atlas" data-es="Atlas Completo de Personalidad">Complete Personality Atlas</div>
   <h1 class="intro-title">ANI<em>MUS</em></h1>
-  <div class="intro-subtitle" data-en="Know thyself completely" data-es="Con?cete completamente">Know thyself completely</div>
+  <div class="intro-subtitle" data-en="Know thyself completely" data-es="Conócete completamente">Know thyself completely</div>
   <div class="intro-rule"></div>
   <p class="intro-desc" data-en="Map your cognitive architecture, philosophical orientation, political geometry, attachment patterns, and moral foundations — the core of who you are." data-es="Mapea tu arquitectura cognitiva, orientación filosófica, geometría política, patrones de apego y fundamentos morales — el núcleo de quién eres.">Map your cognitive architecture, philosophical orientation, political geometry, attachment patterns, and moral foundations — the core of who you are.</p>
-  <div class="intro-actions">
+  <div class="test-intro-card intro-actions">
   <div class="intro-main-label">Main Test</div>
   <div class="intro-meta intro-meta-compact">
     <div class="intro-meta-item"><strong>14</strong><span data-en="Dimensions" data-es="Dimensiones">Dimensions</span></div>
+    <div class="intro-meta-item"><strong>~20</strong><span data-en="Minutes" data-es="Minutos">Minutes</span></div>
   </div>
-  <button type="button" class="btn-primary" id="startBtn" data-intro-action="start" data-en="BEGIN" data-es="COMENZAR">BEGIN</button>
-  <p id="resumeTestWrap" style="display:none;font-size:10px;color:var(--muted2);letter-spacing:0.08em;">
-    <button type="button" id="resumeTestBtn" class="intro-import-btn" style="margin-top:8px;width:auto;padding:8px 16px;">RESUME WHERE YOU LEFT OFF →</button>
+  <button type="button" class="btn-primary btn-primary--wide" id="startBtn" data-intro-action="start" data-en="BEGIN ASSESSMENT" data-es="COMENZAR">BEGIN ASSESSMENT</button>
+  <p id="resumeTestWrap" class="test-resume-wrap" style="display:none">
+    <button type="button" id="resumeTestBtn" class="intro-import-btn test-resume-btn">Resume where you left off →</button>
   </p>
   <p class="intro-shop-hint">Want more depth? Unlock the <a href="/shop">Detailed Test</a> in the Shop.</p>
+  </div>
   </div>
 </div>
 
@@ -97,9 +100,11 @@ if(window.top!==window.self){window.top.location=window.self.location;}
   <div class="qhdr">
     <a href="/" class="qhdr-logo">ANI<span>MUS</span></a>
     <div class="qhdr-right">
-      <span class="qhdr-section" id="qSection"></span>
+      <span class="qhdr-section" id="qSection">Main Test</span>
+      <span class="qhdr-num" id="qNum"></span>
     </div>
   </div>
+  <div class="pbar-wrap" aria-hidden="true"><div class="pbar-fill" id="pbarFill"></div></div>
   <div class="qbody" id="qBody"></div>
 </div>
 
@@ -130,7 +135,7 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <!-- SHARE MODAL -->
 <div class="modal-overlay" id="shareModal">
   <div class="modal-box">
-    <button class="modal-close" id="closeShareModal">?</button>
+    <button class="modal-close" id="closeShareModal" type="button" aria-label="Close">×</button>
     <div class="modal-title">Share Your Profile</div>
     <p class="modal-sub">Copy the link below and send it to anyone. They can paste it into the Compare mode to see how your profiles stack up.</p>
     <div class="share-url-wrap">

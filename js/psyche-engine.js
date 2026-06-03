@@ -978,6 +978,12 @@ function renderQ(){
     qSection.textContent = 'Detailed Test';
   }
 
+  var pct = TOTAL > 0 ? Math.round((cur / TOTAL) * 100) : 0;
+  var pbar = document.getElementById('pbarFill');
+  var qNumEl = document.getElementById('qNum');
+  if (pbar) pbar.style.width = pct + '%';
+  if (qNumEl) qNumEl.textContent = (cur + 1) + ' / ' + TOTAL;
+
   var qText = loc.text;
   var explainText = loc.explain || (lang==='es' ? '' : (_explainCache[cur] || ''));
   var lbl = scaleLabels[lang]||scaleLabels['en'];

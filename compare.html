@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -16,289 +16,20 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #080808; --surface: #0f0f0f; --surface2: #141414;
-  --border: #1e1e1e; --border2: #2a2a2a;
-  --text: #e2e2e2; --muted: #555; --muted2: #888;
-  --gold: #c8a96e; --gold2: #8a6f3e; --gold3: #f0d090;
-  --white: #f0ece4; --green: #4a9e6a; --green2: #2d6b47;
-}
-body.light-mode {
-  --bg: #f4f1ec; --surface: #ffffff; --surface2: #f8f5f0;
-  --border: #e0dbd4; --border2: #cdc7bf;
-  --text: #1a1714; --muted: #9a9189; --muted2: #6b6259;
-  --white: #1a1714;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6; }
-
-/* ── NAV ── */
-.navbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; z-index: 200; }
-.nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.1em; color: var(--white); text-decoration: none; margin-right: 40px; }
-.nav-logo span { color: var(--gold); }
-.nav-items { display: flex; align-items: center; gap: 4px; flex: 1; }
-.nav-item { display: flex; align-items: center; gap: 7px; padding: 7px 14px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted2); text-decoration: none; transition: all 0.15s; }
-.nav-item:hover { color: var(--text); background: var(--surface); }
-.nav-item.active { color: var(--gold); background: rgba(200,169,110,0.06); }
-.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
-.nav-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--gold); text-decoration: none; }
-
-/* ── COMPARE HEADER ── */
-.compare-hero {
-  padding-top: 0;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  position: relative; overflow: hidden;
-}
-.compare-hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 0%, rgba(200,169,110,0.04) 0%, transparent 60%);
-  pointer-events: none;
-}
-.compare-hero-inner { max-width: 1000px; margin: 0 auto; padding: 36px 28px 0; position: relative; z-index: 1; }
-
-/* Two profiles side by side */
-.profiles-strip {
-  display: grid; grid-template-columns: 1fr auto 1fr; gap: 0;
-  align-items: center; margin-bottom: 0;
-}
-.profile-half { display: flex; align-items: center; gap: 16px; padding: 20px 0; }
-.profile-half.right { flex-direction: row-reverse; text-align: right; }
-.ph-avatar {
-  width: 56px; height: 56px; border-radius: 50%;
-  border: 2px solid var(--border2);
-  background: var(--surface2);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--gold);
-  flex-shrink: 0; overflow: hidden;
-}
-.ph-info {}
-.ph-name { font-size: 15px; font-weight: 500; color: var(--white); }
-.ph-username { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-.ph-type { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); letter-spacing: 0.06em; line-height: 1; }
-.ph-enn { font-size: 11px; color: var(--muted2); }
-
-.vs-circle {
-  width: 56px; height: 56px; border-radius: 50%;
-  border: 1px solid var(--border2);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Bebas Neue', sans-serif; font-size: 16px;
-  color: var(--muted); letter-spacing: 0.1em;
-  background: var(--bg); flex-shrink: 0;
-}
-
-/* Compatibility score bar */
-.compat-bar-wrap {
-  padding: 24px 0;
-  border-top: 1px solid var(--border);
-}
-.compat-label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; text-align: center; }
-.compat-score-row { display: flex; align-items: center; gap: 16px; }
-.compat-pct {
-  font-family: 'Bebas Neue', sans-serif; font-size: 48px;
-  color: var(--white); letter-spacing: 0.04em; line-height: 1;
-  min-width: 90px;
-}
-.compat-pct span { font-size: 24px; color: var(--muted2); }
-.compat-track { flex: 1; height: 6px; background: var(--border); }
-.compat-fill { height: 100%; background: linear-gradient(to right, var(--gold2), var(--gold)); transition: width 1.2s ease; width: 0%; }
-.compat-verdict {
-  font-family: 'Playfair Display', serif; font-style: italic;
-  font-size: 14px; color: var(--muted2); min-width: 200px; line-height: 1.5;
-}
-
-/* Dimension rings */
-.compat-rings {
-  display: flex; gap: 24px; flex-wrap: wrap;
-  padding: 0 0 24px;
-}
-.ring-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.ring-svg { width: 56px; height: 56px; }
-.ring-label { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; text-align: center; }
-.ring-score { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: var(--gold); }
-
-/* Compare tabs — see animus-compare.css */
-
-/* ── CONTENT ── */
-.compare-content { max-width: 1000px; margin: 0 auto; padding: 32px 28px; }
-@media(max-width:600px) { .compare-content { padding: 20px 16px; } }
-
-.compare-mode-bar {
-  display: flex; gap: 0; padding-top: 8px;
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  max-width: 1000px; margin: 0 auto;
-}
-.compare-mode-btn {
-  flex: 1; padding: 14px 16px; font-size: 11px; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--muted2); background: none; border: none;
-  border-bottom: 2px solid transparent; cursor: pointer; font-family: 'DM Sans', sans-serif;
-}
-.compare-mode-btn:hover { color: var(--text); }
-.compare-mode-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
-.compare-mode-pair .compare-hero { padding-top: 0; }
-.compare-mode-group { display: none; max-width: 1100px; margin: 0 auto; padding-bottom: 80px; }
-.compare-mode-group.active { display: block; }
-.compare-mode-pair.hidden { display: none; }
-.selector-section{padding:24px 28px;border-bottom:1px solid var(--border);}
-.selector-label{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold2);margin-bottom:14px;}
-.selector-grid{display:flex;flex-wrap:wrap;gap:10px;}
-.person-chip{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 10px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all 0.18s;user-select:none;}
-.person-chip:hover{border-color:var(--gold2);}
-.person-chip.selected{border-color:var(--gold);background:rgba(200,169,110,0.08);}
-.person-chip.you{border-color:var(--green2);background:rgba(74,158,106,0.06);}
-.person-chip.you.selected{border-color:var(--green);background:rgba(74,158,106,0.12);}
-.chip-avatar{width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);flex-shrink:0;}
-.chip-info{line-height:1.3;}
-.chip-name{font-size:13px;color:var(--text);}
-.chip-type{font-size:10px;color:var(--muted);}
-.chip-check{width:16px;height:16px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-left:4px;}
-.person-chip.selected .chip-check{background:var(--gold);border-color:var(--gold);color:#000;}
-.person-chip.you.selected .chip-check{background:var(--green);border-color:var(--green);color:#000;}
-.selector-hint{font-size:11px;color:var(--muted);margin-top:12px;}
-.group-content{padding:28px;}
-.group-placeholder{text-align:center;padding:60px 20px;color:var(--muted);font-size:13px;}
-.group-placeholder-title{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--border2);margin-bottom:8px;letter-spacing:0.1em;}
-.profiles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:32px;}
-.profile-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;}
-.profile-card.is-you{border-color:var(--green2);}
-.pc-you-badge{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);border:1px solid var(--green2);padding:2px 6px;}
-.pc-avatar{width:48px;height:48px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);margin-bottom:12px;}
-.pc-name{font-size:14px;font-weight:500;color:var(--white);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pc-username{font-size:11px;color:var(--muted);margin-bottom:12px;}
-.pc-mbti{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--gold);letter-spacing:0.04em;line-height:1;}
-.pc-enn{font-size:11px;color:var(--muted2);margin-top:2px;}
-.pc-no-data{font-size:11px;color:var(--muted);font-style:italic;margin-top:8px;}
-.matrix-section{margin-bottom:32px;}
-.section-title{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold2);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
-.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
-.matrix-wrap{overflow-x:auto;}
-.matrix-table{border-collapse:collapse;min-width:100%;}
-.matrix-table th,.matrix-table td{padding:10px 14px;border:1px solid var(--border);text-align:center;font-size:12px;white-space:nowrap;}
-.matrix-table th{background:var(--surface2);color:var(--muted2);font-weight:400;font-size:11px;}
-.matrix-table td.matrix-name{text-align:left;color:var(--text);background:var(--surface2);font-weight:500;}
-.matrix-table td.self{background:var(--surface);color:var(--muted);}
-.matrix-pct{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;}
-.compat-high{color:var(--green);}
-.compat-mid{color:var(--gold);}
-.compat-low{color:var(--muted2);}
-.insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
-.insight-card{background:var(--surface);border:1px solid var(--border);padding:16px;}
-.insight-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.insight-value{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);letter-spacing:0.04em;line-height:1.1;}
-.insight-sub{font-size:10px;color:var(--muted);margin-top:4px;}
-.group-page-header{padding:28px 28px 0;border-bottom:1px solid var(--border);background:var(--surface);}
-.seo-page-title{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
-.group-page-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:0.06em;color:var(--white);line-height:1;}
-.group-page-sub{font-size:13px;color:var(--muted2);margin-top:4px;padding-bottom:20px;}
-
-/* Panel display */
-.c-panel { display: none; }
-.c-panel.active { display: block; }
-
-/* AI Analysis */
-.ai-section { margin-bottom: 28px; }
-.ai-section-title {
-  font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
-  color: var(--gold2); margin-bottom: 12px;
-  display: flex; align-items: center; gap: 10px;
-}
-.ai-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-.ai-block {
-  border-left: 2px solid var(--gold2); padding: 16px 20px;
-  background: var(--surface); margin-bottom: 10px;
-}
-.ai-block-title { font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: var(--gold); margin-bottom: 8px; }
-.ai-block-text { font-size: 12px; color: var(--muted2); line-height: 1.9; }
-
-/* Side by side bars */
-.dual-section { margin-bottom: 28px; }
-.dual-section-title { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.dual-section-title::before { content: ''; width: 16px; height: 1px; background: var(--gold2); }
-
-.dual-legend { display: flex; gap: 20px; margin-bottom: 14px; }
-.dual-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted2); }
-.legend-dot { width: 8px; height: 8px; border-radius: 1px; }
-.legend-you { background: var(--gold); }
-.legend-them { background: var(--green); }
-
-.dual-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.dual-label { font-size: 11px; color: var(--muted2); min-width: 72px; }
-.dual-label strong { display: block; color: var(--text); }
-.dual-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
-.dual-bar-wrap { height: 8px; background: var(--border); flex: 1; border-radius: 2px; overflow: hidden; }
-.dual-bar-you { height: 100%; background: var(--gold); transition: width 1s ease; width: 0%; }
-.dual-bar-them { height: 100%; background: var(--green); transition: width 1s ease; width: 0%; }
-.dual-nums { display: flex; flex-direction: column; gap: 3px; min-width: 48px; text-align: right; }
-.dual-num { font-size: 10px; color: var(--muted); line-height: 1.4; }
-
-/* Summary table */
-.summary-table { width: 100%; border-collapse: collapse; }
-.summary-table th { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
-.summary-table th:last-child { text-align: center; }
-.summary-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 12px; }
-.summary-table tr:last-child td { border-bottom: none; }
-.summary-table .dim-name { color: var(--muted2); }
-.summary-table .val-you { color: var(--gold); font-weight: 500; }
-.summary-table .val-them { color: var(--green); font-weight: 500; }
-.gap-pill { display: inline-block; padding: 2px 8px; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
-.gap-low { background: rgba(74,158,106,0.12); color: var(--green); border: 1px solid rgba(74,158,106,0.25); }
-.gap-med { background: rgba(200,169,110,0.12); color: var(--gold); border: 1px solid rgba(200,169,110,0.25); }
-.gap-high { background: rgba(192,57,43,0.1); color: #c0392b; border: 1px solid rgba(192,57,43,0.2); }
-
-/* Friends picker */
-.friends-picker-bar { display: flex; align-items: center; gap: 12px; margin: 64px auto 12px; max-width: 1000px; padding: 0 28px; flex-wrap: wrap; }
-.friends-picker-bar .friends-picker-select { flex: 1; min-width: 200px; background: var(--surface2); border: 1px solid var(--border2); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 10px 12px; border-radius: 4px; cursor: pointer; }
-.friends-picker-inner { display: flex; align-items: center; gap: 12px; flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
-.friends-picker-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted2); white-space: nowrap; }
-.friends-picker-select { flex: 1; background: var(--surface2); border: 1px solid var(--border2); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 12px; border-radius: 4px; cursor: pointer; max-width: 320px; }
-.friends-picker-select:focus { outline: none; border-color: var(--gold2); }
-.friends-picker-select option { background: var(--surface2); color: var(--text); }
-
-/* Share button */
-.compare-share-bar { display: flex; gap: 10px; margin-bottom: 32px; }
-.btn-share-comp { display: flex; align-items: center; gap: 7px; padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: none; }
-.btn-gold { background: var(--gold); color: #000; }
-.btn-gold:hover { background: var(--gold3); }
-.btn-outline { background: none; border: 1px solid var(--border2); color: var(--muted2); }
-.btn-outline:hover { border-color: var(--gold2); color: var(--gold); }
-
-/* Toast */
-.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface); border: 1px solid var(--gold2); color: var(--text); padding: 10px 24px; font-size: 12px; z-index: 600; opacity: 0; transition: all 0.3s; pointer-events: none; }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-@media(max-width:600px) {
-  .profiles-strip { grid-template-columns: 1fr auto 1fr; gap: 4px; }
-  .ph-avatar { width: 40px; height: 40px; font-size: 16px; }
-  .ph-type { font-size: 22px; }
-  .compat-rings { gap: 12px; }
-  .compare-hero-inner { padding: 20px 16px 0; }
-}
-</style>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="/js/psyche-cross.js"></script>
-  <script src="/js/profile-narrative-depth.js"></script>
-  <script src="/js/profile-narratives.js"></script>
-  <script src="/js/animus-entitlements.js"></script>
-  <script src="/js/animus-xp.js"></script>
-  <script src="/js/animus-shared.js"></script>
-  <script>
-    AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
-    var auth = firebase.auth();
-    var db = firebase.firestore();
-  </script>
-<style>
-.nav-hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--text);align-items:center;justify-content:center;}
-.nav-mobile-menu{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:199;padding:8px 0;}
-.nav-mobile-menu.open{display:block;}
-.nav-mobile-item{display:flex;align-items:center;gap:10px;padding:13px 24px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;transition:color 0.15s;}
-.nav-mobile-item.active,.nav-mobile-item:hover{color:var(--gold);}
-@media(max-width:768px){.nav-items{display:none!important;}.nav-hamburger{display:flex!important;}}
-</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="/js/psyche-cross.js"></script>
+<script src="/js/profile-narrative-depth.js"></script>
+<script src="/js/profile-narratives.js"></script>
+<script src="/js/animus-entitlements.js"></script>
+<script src="/js/animus-xp.js"></script>
+<script src="/js/animus-shared.js"></script>
+<script>
+  AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
+  var auth = firebase.auth();
+  var db = firebase.firestore();
+</script>
 <link rel="stylesheet" href="/css/animus-shell.css">
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-unified.css">
@@ -306,6 +37,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <link rel="stylesheet" href="/css/animus-compare.css">
 <link rel="stylesheet" href="/css/animus-plus.css">
 <link rel="stylesheet" href="/css/animus-premium.css">
+<link rel="stylesheet" href="/css/animus-motion.css">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
 <script src="/js/animus-app.js" defer></script>
@@ -352,18 +84,18 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
         <div class="ph-info">
           <div class="ph-name" id="youName">You</div>
           <div class="ph-username" id="youUsername">@...</div>
-          <div class="ph-type" id="youType">—</div>
-          <div class="ph-enn" id="youEnn">—</div>
+          <div class="ph-type" id="youType">â€”</div>
+          <div class="ph-enn" id="youEnn">â€”</div>
         </div>
       </div>
       <div class="vs-circle">VS</div>
       <div class="profile-half right">
         <div class="ph-avatar" id="themAvatar" style="border-color:var(--green2);color:var(--green)">?</div>
         <div class="ph-info">
-          <div class="ph-name" id="themName">—</div>
+          <div class="ph-name" id="themName">â€”</div>
           <div class="ph-username" id="themUsername">@...</div>
-          <div class="ph-type" id="themType" style="color:var(--green)">—</div>
-          <div class="ph-enn" id="themEnn">—</div>
+          <div class="ph-type" id="themType" style="color:var(--green)">â€”</div>
+          <div class="ph-enn" id="themEnn">â€”</div>
         </div>
       </div>
     </div>
@@ -375,7 +107,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
     <div class="compat-bar-wrap">
       <div class="compat-label">Overall Compatibility</div>
       <div class="compat-score-row">
-        <div class="compat-pct">—<span>%</span></div>
+        <div class="compat-pct">â€”<span>%</span></div>
         <div class="compat-track"><div class="compat-fill" data-w="0"></div></div>
         <div class="compat-verdict"><span id="compatVerdict">Choose a friend above to compare</span></div>
       </div>
@@ -389,7 +121,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">â€”</text>
         </svg>
         <div class="ring-label">Cognitive</div>
       </div>
@@ -399,7 +131,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">â€”</text>
         </svg>
         <div class="ring-label">Values</div>
       </div>
@@ -409,7 +141,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">â€”</text>
         </svg>
         <div class="ring-label">Philosophy</div>
       </div>
@@ -419,7 +151,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">â€”</text>
         </svg>
         <div class="ring-label">Political</div>
       </div>
@@ -429,7 +161,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">â€”</text>
         </svg>
         <div class="ring-label">Attachment</div>
       </div>
@@ -439,7 +171,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">â€”</text>
         </svg>
         <div class="ring-label">Social</div>
       </div>
@@ -480,10 +212,10 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
   <!-- Share bar -->
   <div class="compare-share-bar">
     <button type="button" class="btn-share-comp btn-gold" onclick="shareComparison()">Share This Comparison</button>
-    <a href="/profile" class="btn-share-comp btn-outline" id="viewThemBtn">View Their Profile →</a>
+    <a href="/profile" class="btn-share-comp btn-outline" id="viewThemBtn">View Their Profile â†’</a>
   </div>
 
-  <!-- ── AI ANALYSIS ── -->
+  <!-- â”€â”€ AI ANALYSIS â”€â”€ -->
   <div class="c-panel compare-panel-card active" id="c-panel-ai">
     <div class="compare-panel-head">
       <h2 class="compare-panel-title">AI Analysis</h2>
@@ -498,7 +230,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
     </div>
   </div>
 
-  <!-- ── COGNITION ── -->
+  <!-- â”€â”€ COGNITION â”€â”€ -->
   <div class="c-panel compare-panel-card" id="c-panel-cognition">
     <div class="compare-panel-head">
       <h2 class="compare-panel-title">Cognition</h2>
@@ -510,26 +242,26 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
     </div>
     <div class="dual-section">
       <div class="dual-section-title">Cognitive Functions</div>
-      <div class="dual-row"><div class="dual-label"><strong>Ni</strong><span style="font-size:10px;color:var(--muted)">Int. Intuition</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Ni"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Ni"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Ni">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Ni">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Ne</strong><span style="font-size:10px;color:var(--muted)">Ext. Intuition</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Ne"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Ne"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Ne">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Ne">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Ti</strong><span style="font-size:10px;color:var(--muted)">Int. Thinking</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Ti"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Ti"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Ti">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Ti">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Te</strong><span style="font-size:10px;color:var(--muted)">Ext. Thinking</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Te"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Te"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Te">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Te">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Fi</strong><span style="font-size:10px;color:var(--muted)">Int. Feeling</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Fi"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Fi"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Fi">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Fi">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Fe</strong><span style="font-size:10px;color:var(--muted)">Ext. Feeling</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Fe"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Fe"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Fe">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Fe">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Si</strong><span style="font-size:10px;color:var(--muted)">Int. Sensing</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Si"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Si"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Si">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Si">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Se</strong><span style="font-size:10px;color:var(--muted)">Ext. Sensing</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Se"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Se"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Se">—</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Se">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Ni</strong><span style="font-size:10px;color:var(--muted)">Int. Intuition</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Ni"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Ni"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Ni">â€”</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Ni">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Ne</strong><span style="font-size:10px;color:var(--muted)">Ext. Intuition</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Ne"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Ne"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Ne">â€”</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Ne">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Ti</strong><span style="font-size:10px;color:var(--muted)">Int. Thinking</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Ti"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Ti"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Ti">â€”</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Ti">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Te</strong><span style="font-size:10px;color:var(--muted)">Ext. Thinking</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Te"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Te"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Te">â€”</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Te">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Fi</strong><span style="font-size:10px;color:var(--muted)">Int. Feeling</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Fi"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Fi"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Fi">â€”</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Fi">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Fe</strong><span style="font-size:10px;color:var(--muted)">Ext. Feeling</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Fe"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Fe"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Fe">â€”</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Fe">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Si</strong><span style="font-size:10px;color:var(--muted)">Int. Sensing</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Si"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Si"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Si">â€”</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Si">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Se</strong><span style="font-size:10px;color:var(--muted)">Ext. Sensing</span></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="cog-you-Se"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="cog-them-Se"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="cogn-you-Se">â€”</div><div class="dual-num" style="color:var(--green)" id="cogn-them-Se">â€”</div></div></div>
     </div>
     <div class="dual-section">
       <div class="dual-section-title">Big Five</div>
-      <div class="dual-row"><div class="dual-label"><strong>Openness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-O"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-O"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-O">—</div><div class="dual-num" style="color:var(--green)" id="b5n-them-O">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Conscientiousness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-C"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-C"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-C">—</div><div class="dual-num" style="color:var(--green)" id="b5n-them-C">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Extraversion</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-E"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-E"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-E">—</div><div class="dual-num" style="color:var(--green)" id="b5n-them-E">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Agreeableness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-A"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-A"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-A">—</div><div class="dual-num" style="color:var(--green)" id="b5n-them-A">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Neuroticism</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-N"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-N"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-N">—</div><div class="dual-num" style="color:var(--green)" id="b5n-them-N">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Openness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-O"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-O"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-O">â€”</div><div class="dual-num" style="color:var(--green)" id="b5n-them-O">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Conscientiousness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-C"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-C"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-C">â€”</div><div class="dual-num" style="color:var(--green)" id="b5n-them-C">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Extraversion</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-E"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-E"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-E">â€”</div><div class="dual-num" style="color:var(--green)" id="b5n-them-E">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Agreeableness</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-A"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-A"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-A">â€”</div><div class="dual-num" style="color:var(--green)" id="b5n-them-A">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Neuroticism</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0" id="b5-you-N"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0" id="b5-them-N"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="b5n-you-N">â€”</div><div class="dual-num" style="color:var(--green)" id="b5n-them-N">â€”</div></div></div>
     </div>
   </div>
 
-  <!-- ── PERSONALITY ── -->
+  <!-- â”€â”€ PERSONALITY â”€â”€ -->
   <div class="c-panel compare-panel-card" id="c-panel-personality">
     <div class="compare-panel-head">
       <h2 class="compare-panel-title">Personality</h2>
@@ -541,32 +273,32 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
     </div>
     <div class="dual-section">
       <div class="dual-section-title">Enneagram Types</div>
-      <div class="dual-row"><div class="dual-label"><strong>Type 1</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Type 2</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Type 3</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Type 4</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Type 5</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Type 6</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Type 7</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Type 8</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Type 9</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Type 1</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Type 2</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Type 3</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Type 4</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Type 5</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Type 6</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Type 7</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Type 8</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Type 9</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
     </div>
     <div class="dual-section">
       <div class="dual-section-title">Instinctual Variants</div>
-      <div class="dual-row"><div class="dual-label"><strong>SP</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>SOC</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>SX</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>SP</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">â€”</div><div class="dual-num" style="color:var(--green)" id="">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>SOC</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">â€”</div><div class="dual-num" style="color:var(--green)" id="">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>SX</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">â€”</div><div class="dual-num" style="color:var(--green)" id="">â€”</div></div></div>
     </div>
     <div class="dual-section">
       <div class="dual-section-title">Attachment Style</div>
-      <div class="dual-row"><div class="dual-label"><strong>Avoidant</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Secure</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Anxious</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Disorganized</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Avoidant</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Secure</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Anxious</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Disorganized</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
     </div>
   </div>
 
-  <!-- ── PHILOSOPHY ── -->
+  <!-- â”€â”€ PHILOSOPHY â”€â”€ -->
   <div class="c-panel compare-panel-card" id="c-panel-philosophy">
     <div class="compare-panel-head">
       <h2 class="compare-panel-title">Philosophy</h2>
@@ -578,26 +310,26 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
     </div>
     <div class="dual-section">
       <div class="dual-section-title">Philosophical Schools</div>
-      <div class="dual-row"><div class="dual-label"><strong>Nietzschean</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Existentialist</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Pragmatist</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Stoic</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">—</div><div class="dual-num" style="color:var(--green)" id="">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Nietzschean</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">â€”</div><div class="dual-num" style="color:var(--green)" id="">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Existentialist</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">â€”</div><div class="dual-num" style="color:var(--green)" id="">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Pragmatist</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">â€”</div><div class="dual-num" style="color:var(--green)" id="">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Stoic</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)" id="">â€”</div><div class="dual-num" style="color:var(--green)" id="">â€”</div></div></div>
     </div>
     <div class="dual-section">
       <div class="dual-section-title">Ethics</div>
-      <div class="dual-row"><div class="dual-label"><strong>Egoist</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Consequential</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Deontological</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Virtue</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Egoist</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Consequential</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Deontological</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Virtue</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
     </div>
     <div class="dual-section">
       <div class="dual-section-title">Political spectrum</div>
-      <div class="dual-row"><div class="dual-label"><strong>Economic</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
-      <div class="dual-row"><div class="dual-label"><strong>Social</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">—</div><div class="dual-num" style="color:var(--green)">—</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Economic</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
+      <div class="dual-row"><div class="dual-label"><strong>Social</strong></div><div class="dual-bars"><div class="dual-bar-wrap"><div class="dual-bar-you" data-w="0"></div></div><div class="dual-bar-wrap"><div class="dual-bar-them" data-w="0"></div></div></div><div class="dual-nums"><div class="dual-num" style="color:var(--gold)">â€”</div><div class="dual-num" style="color:var(--green)">â€”</div></div></div>
     </div>
   </div>
 
-  <!-- ── SUMMARY ── -->
+  <!-- â”€â”€ SUMMARY â”€â”€ -->
   <div class="c-panel compare-panel-card" id="c-panel-summary">
     <div class="compare-panel-head">
       <h2 class="compare-panel-title">Summary</h2>
@@ -633,7 +365,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
     <div class="selector-grid" id="selectorGrid">
       <div style="color:var(--muted);font-size:12px">Loading friends...</div>
     </div>
-    <div class="selector-hint" id="selectorHint">Select 2–6 people to see group comparison</div>
+    <div class="selector-hint" id="selectorHint">Select 2â€“6 people to see group comparison</div>
   </div>
   <div class="group-content" id="groupContent">
     <div class="group-placeholder">
@@ -754,7 +486,7 @@ function aiSafe(str, maxLen) {
 function shareComparison(){
   var url = window.location.href;
   if(navigator.clipboard){
-    navigator.clipboard.writeText(url).then(function(){ showToast('Comparison link copied ✓'); });
+    navigator.clipboard.writeText(url).then(function(){ showToast('Comparison link copied âœ“'); });
   } else {
     showToast('Copy this URL to share: ' + url);
   }
