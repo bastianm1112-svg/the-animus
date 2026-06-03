@@ -120,8 +120,10 @@
         '<a href="/profile">Profile</a>' +
         '<a href="/shop">Upgrades</a>' +
         '<a href="/about">About</a>' +
+        '<a href="/about#contact">Contact</a>' +
         '<a href="/about#terms">Terms</a>'
       : '<a href="/about">About</a>' +
+        '<a href="/about#contact">Contact</a>' +
         '<a href="/about#disclaimer">Disclaimer</a>' +
         '<a href="/about#terms">Terms</a>' +
         '<a href="/test">Test</a>' +

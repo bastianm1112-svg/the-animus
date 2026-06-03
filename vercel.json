@@ -76,7 +76,7 @@
         {"key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload"},
         {"key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()"},
         {"key": "X-DNS-Prefetch-Control", "value": "on"},
-        {"key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://www.gstatic.com https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-src 'self' https://accounts.google.com https://animus-b3d83.firebaseapp.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"},
+        {"key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://www.gstatic.com https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://accounts.google.com https://animus-b3d83.firebaseapp.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"},
         {"key": "Cross-Origin-Opener-Policy", "value": "same-origin-allow-popups"},
         {"key": "Cross-Origin-Resource-Policy", "value": "same-site"}
       ]
@@ -103,7 +103,7 @@
     {"source": "/about", "destination": "/about.html"},
     {"source": "/profile", "destination": "/profile.html"},
     {"source": "/404", "destination": "/404.html"},
-    {"source": "/:username((?!dashboard|login|settings|test|compare|friends|activity|estimations|notifications|shop|admin|types|profile|group|about|api|_vercel|favicon|index|404|landing).*)", "destination": "/profile.html?u=:username"}
+    {"source": "/:username((?!dashboard|login|settings|test|compare|friends|activity|estimations|notifications|shop|admin|types|profile|group|about|api|_vercel|favicon|index|404|landing|robots\\.txt|sitemap\\.xml|og-image\\.svg).*)", "destination": "/profile.html?u=:username"}
   ],
   "redirects": [
     {"source": "/profile/:username", "destination": "/:username", "permanent": true},

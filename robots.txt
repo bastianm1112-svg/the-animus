@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://animustest.com/sitemap.xml

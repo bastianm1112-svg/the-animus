@@ -131,7 +131,17 @@
     });
   }
 
+  function ensureFavicon() {
+    if (document.querySelector('link[rel="icon"]')) return;
+    var link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/svg+xml';
+    link.href = '/og-image.svg';
+    document.head.appendChild(link);
+  }
+
   function initSeoAndPerf() {
+    ensureFavicon();
     if (typeof g.AnimusSeo !== 'undefined') {
       g.AnimusSeo.initLazyImages();
       var desc = document.querySelector('meta[name="description"]');
