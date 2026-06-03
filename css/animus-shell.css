@@ -419,16 +419,20 @@ body.light-mode .mobile-bottom-nav {
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding: 8px 16px;
-  min-width: 56px;
+  padding: 8px 4px;
+  min-width: 0;
+  flex: 1;
+  max-width: 80px;
   min-height: 48px;
   color: var(--muted);
   text-decoration: none;
-  font-size: 9px;
-  letter-spacing: 0.1em;
+  font-size: 8px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   transition: color 0.2s;
   position: relative;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .mbn-item.active {
@@ -460,6 +464,10 @@ body.light-mode .mobile-bottom-nav {
 }
 
 /* Toast */
+body:has(.mobile-bottom-nav) .toast {
+  bottom: calc(var(--mbn-h) + var(--safe-bottom) + 12px);
+}
+
 .toast {
   position: fixed;
   bottom: calc(28px + var(--safe-bottom));
@@ -478,10 +486,6 @@ body.light-mode .mobile-bottom-nav {
   max-width: min(92vw, 420px);
   text-align: center;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-}
-
-body:has(.mobile-bottom-nav) .toast {
-  bottom: calc(var(--mbn-h) + 20px + var(--safe-bottom));
 }
 
 .toast.show {
@@ -515,6 +519,12 @@ body:has(.mobile-bottom-nav) .toast {
 
   body:has(.mobile-bottom-nav) {
     padding-bottom: calc(var(--mbn-h) + var(--safe-bottom));
+  }
+
+  .mbn-item {
+    font-size: 7px;
+    letter-spacing: 0.06em;
+    padding: 8px 2px;
   }
 
   .nav-logo {
