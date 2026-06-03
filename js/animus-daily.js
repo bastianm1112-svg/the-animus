@@ -450,8 +450,10 @@
       ' compare' +
       (left === 1 ? '' : 's') +
       ' left — curious about someone?</p>' +
+      '<div class="daily-card-actions">' +
       '<a href="/activity" class="daily-row-cta">Add a friend</a>' +
-      ' <a href="/compare" class="daily-row-cta daily-row-cta-secondary">Compare</a>'
+      '<a href="/compare" class="daily-row-cta daily-row-cta-secondary">Compare</a>' +
+      '</div>'
     );
   }
 
@@ -564,8 +566,10 @@
         '</strong> — ' +
         escapeHTML(unlock.data.body) +
         '</p>';
-      if (!unlock.claimed) {
-        claimStreakUnlock(db, uid, unlock.milestone, userData);
+      if (!unlock.claimed && unlock.milestone) {
+        claimStreakUnlock(db, uid, unlock.milestone, userData).then(function (claimed) {
+          if (onUserDataRefresh) onUserDataRefresh(claimed);
+        });
       }
     } else if (unlock.next) {
       streakBody +=

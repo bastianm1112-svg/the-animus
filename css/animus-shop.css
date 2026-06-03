@@ -196,3 +196,21 @@
 .intro-shop-hint a {
   color: var(--accent);
 }
+
+@media (max-width: 768px) {
+  .shop-page {
+    padding-top: 72px;
+    padding-bottom: calc(var(--mbn-h, 64px) + var(--safe-bottom, 0px) + 40px);
+  }
+
+  .shop-card-foot {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .shop-buy-btn {
+    min-height: 44px;
+    width: 100%;
+    justify-content: center;
+  }
+}
