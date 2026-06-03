@@ -163,6 +163,13 @@ function getCareerPdfUsageFromDoc(doc) {
   return { monthKey: u.monthKey, count: parseInt(u.count, 10) || 0 };
 }
 
+function getCompareUsageFromDoc(doc) {
+  const mk = monthKey();
+  const u = (doc && doc.compareUsage) || {};
+  if (u.monthKey !== mk) return { monthKey: mk, count: 0 };
+  return { monthKey: u.monthKey, count: parseInt(u.count, 10) || 0 };
+}
+
 module.exports = {
   getAccessToken,
   getUserDocument,
@@ -170,6 +177,7 @@ module.exports = {
   monthKey,
   userHasPlusFromDoc,
   getCareerPdfUsageFromDoc,
+  getCompareUsageFromDoc,
   hasServiceAccount: function () {
     return !!getServiceAccountCreds();
   },

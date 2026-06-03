@@ -1335,13 +1335,19 @@ body.page-compare .friends-picker-bar {
   .compare-tabs-wrap {
     top: calc(var(--nav-h) + var(--compare-mode-h, 44px) + env(safe-area-inset-top, 0px));
   }
+
+  .compare-mode-group {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
 }
 
 /* ── Group compare mode ── */
 .compare-mode-group {
   max-width: 1000px;
   margin: 0 auto;
-  padding-bottom: 24px;
+  padding: 0 max(20px, env(safe-area-inset-right)) 24px max(20px, env(safe-area-inset-left));
+  box-sizing: border-box;
 }
 
 .group-page-header {
@@ -1700,4 +1706,38 @@ body.page-compare .friends-picker-bar {
   .group-content .insights-grid {
     grid-template-columns: 1fr;
   }
+}
+
+body.light-mode .compare-mode-bar {
+  background: rgba(244, 241, 236, 0.97);
+  border-color: var(--border);
+}
+
+body.light-mode .compare-tabs-wrap {
+  background: var(--surface);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode .compare-stack {
+  background: var(--bg);
+}
+
+body.light-mode .compare-hero,
+body.light-mode .compare-panel-card,
+body.light-mode .compare-share-bar {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+body.light-mode .compare-tab {
+  color: var(--muted);
+}
+
+body.light-mode .compare-tab.active {
+  color: var(--text);
+  border-color: var(--gold);
+}
+
+body.light-mode .dual-bar-track {
+  background: rgba(0, 0, 0, 0.06);
 }

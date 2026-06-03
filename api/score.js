@@ -9,6 +9,9 @@ const {
 } = require('./_lib');
 const { requireAuth } = require('./_auth');
 
+/** Full test narrative JSON (~10+ paragraphs + arrays); needs high output budget. */
+const SCORE_MAX_TOKENS = 8192;
+
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
   if (req.method !== 'POST') return res.status(405).end();
@@ -35,7 +38,7 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
-        max_tokens: 4096,
+        max_tokens: SCORE_MAX_TOKENS,
         messages: [{ role: 'user', content: prompt }]
       })
     });

@@ -3,6 +3,7 @@ const { requireAuth } = require('./_auth');
 const { getStripe } = require('./_stripe');
 const { fulfillPurchase } = require('./_fulfillment');
 const { hasServiceAccount } = require('./_firestore');
+const { isValidProductId } = require('./_entitlements');
 
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
@@ -39,6 +40,9 @@ module.exports = async function handler(req, res) {
     const productId = session.metadata && session.metadata.productId;
     if (uid !== user.uid) {
       return res.status(403).json({ error: 'Session does not match your account.' });
+    }
+    if (!productId || !isValidProductId(productId)) {
+      return res.status(400).json({ error: 'Checkout session is missing product metadata.' });
     }
     if (session.payment_status !== 'paid' && session.status !== 'complete') {
       return res.status(400).json({ error: 'Payment not completed yet.' });

@@ -1,6 +1,7 @@
 /** Server-side product catalog + entitlement merge (mirrors js/animus-entitlements.js). */
 
 const PLUS_SHOP_DISCOUNT = 0.2;
+const FREE_COMPARES_PER_MONTH = 10;
 
 const PRODUCTS = {
   detailedTest: {
@@ -135,6 +136,7 @@ module.exports = {
   PRODUCTS,
   PRODUCT_IDS,
   PLUS_SHOP_DISCOUNT,
+  FREE_COMPARES_PER_MONTH,
   normalizeEntitlements,
   hasAnimusPlus,
   entitlementsFromProduct,

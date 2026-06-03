@@ -474,6 +474,14 @@ body.page-test #results {
   padding-bottom: calc(var(--mbn-h) + var(--safe-bottom) + 24px);
 }
 
+@media (max-width: 768px) {
+  body.page-test.phase-results .test-action-bar.is-visible,
+  body.page-test.phase-results #actionBar.is-visible {
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+  }
+}
+
 .detailed-test-upsell {
   margin-top: 20px;
   padding: 0;

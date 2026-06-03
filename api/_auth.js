@@ -16,14 +16,20 @@ function readBearerToken(req) {
 async function verifyFirebaseIdToken(idToken) {
   if (!idToken || idToken.length > 8192) return null;
   const apiKey = getFirebaseApiKey();
-  const r = await fetch(
-    'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + encodeURIComponent(apiKey),
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken })
-    }
-  );
+  let r;
+  try {
+    r = await fetch(
+      'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + encodeURIComponent(apiKey),
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken })
+      }
+    );
+  } catch (e) {
+    console.error('Firebase token lookup network error:', e);
+    throw e;
+  }
   if (!r.ok) {
     console.error('Firebase token lookup failed:', r.status);
     return null;
@@ -43,12 +49,18 @@ async function requireAuth(req, res) {
     res.status(401).json({ error: 'Sign in required' });
     return null;
   }
-  const user = await verifyFirebaseIdToken(token);
-  if (!user) {
-    res.status(401).json({ error: 'Invalid or expired session' });
+  try {
+    const user = await verifyFirebaseIdToken(token);
+    if (!user) {
+      res.status(401).json({ error: 'Invalid or expired session' });
+      return null;
+    }
+    return user;
+  } catch (e) {
+    console.error('Auth verification error:', e);
+    res.status(503).json({ error: 'Authentication service unavailable' });
     return null;
   }
-  return user;
 }
 
 module.exports = {

@@ -3,7 +3,8 @@ const {
   normalizeEntitlements,
   entitlementsFromProduct,
   mergeEntitlements,
-  isValidProductId
+  isValidProductId,
+  productAlreadyOwned
 } = require('./_entitlements');
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID || 'animus-b3d83';
@@ -11,6 +12,29 @@ const PROJECT_ID = process.env.FIREBASE_PROJECT_ID || 'animus-b3d83';
 async function getAccessToken() {
   const { getAccessToken: getToken } = require('./_firestore');
   return getToken();
+}
+
+async function deleteProcessedKey(key) {
+  const token = await getAccessToken();
+  if (!token) return false;
+  const docId = encodeURIComponent(key);
+  const url =
+    'https://firestore.googleapis.com/v1/projects/' +
+    PROJECT_ID +
+    '/databases/(default)/documents/stripe_processed/' +
+    docId;
+  const r = await fetch(url, {
+    method: 'DELETE',
+    headers: { Authorization: 'Bearer ' + token }
+  });
+  return r.ok;
+}
+
+function processedDocIsPending(data) {
+  if (!data || !data.fields) return false;
+  const uid = data.fields.uid && data.fields.uid.stringValue;
+  const productId = data.fields.productId && data.fields.productId.stringValue;
+  return uid === 'pending' || productId === 'pending';
 }
 
 async function claimProcessedKey(key) {
@@ -24,6 +48,10 @@ async function claimProcessedKey(key) {
     docId;
   const existing = await fetch(getUrl, { headers: { Authorization: 'Bearer ' + token } });
   if (existing.status === 200) {
+    const data = await existing.json();
+    if (processedDocIsPending(data)) {
+      return { ok: true, reclaim: true };
+    }
     return { ok: false, reason: 'already_processed' };
   }
 
@@ -111,7 +139,17 @@ async function fulfillPurchase(uid, productId, opts) {
   const claimKey = opts.claimKey || 'checkout_' + (opts.sessionId || productId + '_' + uid);
   const claim = await claimProcessedKey(claimKey);
   if (!claim.ok) {
-    if (claim.reason === 'already_processed') return { ok: true, duplicate: true };
+    if (claim.reason === 'already_processed') {
+      const loadedDup = await getUserDocument(uid);
+      if (!loadedDup.error && productAlreadyOwned(productId, loadedDup.doc || {})) {
+        return { ok: true, duplicate: true };
+      }
+      if (!opts._retryStaleClaim) {
+        await deleteProcessedKey(claimKey);
+        return fulfillPurchase(uid, productId, Object.assign({}, opts, { _retryStaleClaim: true }));
+      }
+      return { ok: false, error: 'already_processed_incomplete' };
+    }
     return { ok: false, error: claim.reason || 'claim_failed' };
   }
 
@@ -143,6 +181,7 @@ async function fulfillPurchase(uid, productId, opts) {
 
   const saved = await patchUserFields(uid, userPatch, Object.keys(userPatch));
   if (!saved) {
+    await deleteProcessedKey(claimKey);
     return { ok: false, error: 'firestore_patch' };
   }
 

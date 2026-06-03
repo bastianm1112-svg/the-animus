@@ -255,7 +255,8 @@
     bindSelectorClicks();
     auth.onAuthStateChanged(function (user) {
       if (!user) {
-        window.location.href = '/login';
+        window.location.href =
+          '/login?next=' + encodeURIComponent(window.location.pathname + window.location.search);
         return;
       }
       _people = {};

@@ -38,7 +38,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="/js/animus-shared.js"></script>
+  <script src="/js/animus-shared.js?v=20260608"></script>
   <script>
     AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
     var auth = firebase.auth();
@@ -107,7 +107,7 @@
     body.page-test.test-auth-pending #appBottomMount,
     body.page-test.test-auth-pending .skip-link { visibility: hidden; pointer-events: none; }
     body.page-test.test-auth-pending::after {
-      content: 'Checking sign-in…';
+      content: 'Loading…';
       position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
       font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted2);
       background: var(--bg); z-index: 9999;
@@ -200,12 +200,12 @@ if(window.top!==window.self){window.top.location=window.self.location;}
   <div class="modal-box">
     <button class="modal-close" id="closeShareModal" type="button" aria-label="Close">×</button>
     <div class="modal-title">Share Your Profile</div>
-    <p class="modal-sub">Copy the link below and send it to anyone. They can paste it into the Compare mode to see how your profiles stack up.</p>
+    <p class="modal-sub">Copy the link below and send it to anyone. They can open it on the test page to view your profile, or sign in and use <a href="/compare" style="color:var(--gold)">Compare</a> to match side by side with friends.</p>
     <div class="share-url-wrap">
       <div class="share-url" id="shareUrlDisplay">Generating link...</div>
       <button class="btn-copy" id="btnCopyUrl">COPY</button>
     </div>
-    <p class="modal-sub" style="margin-top:12px">Use <a href="/compare" style="color:var(--gold)">Compare</a> to match profiles side by side.</p>
+    <p class="modal-sub" style="margin-top:12px">Profile links load on this page; Compare requires a free account.</p>
   </div>
 </div>
 

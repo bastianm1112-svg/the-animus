@@ -297,8 +297,16 @@
       .catch(function (err) {
         var note = 'Live AI unavailable — showing profile-based analysis from your scores.';
         if (err && err.message === '401') note = 'Sign in to refresh live AI — showing profile-based analysis.';
+        if (err && err.message === '429') {
+          note =
+            'You have used all free compares this month. Animus Plus unlocks unlimited compares — showing profile-based analysis.';
+        }
         showOffline(note);
       });
+  }
+
+  function compareLoginUrl() {
+    return '/login?next=' + encodeURIComponent(window.location.pathname + window.location.search);
   }
 
   function gapClass(a, b) {
@@ -655,9 +663,6 @@
           }
           setCompareResultsState('is-ready');
           generateComparison(myProfile, themProfile, myName, themName);
-          if (g.AnimusEntitlements) {
-            g.AnimusEntitlements.recordCompareUsage(db, currentUser.uid, myUser);
-          }
           if (g.AnimusXp) {
             g.AnimusXp.awardXp(db, currentUser.uid, 'compare');
           }
@@ -681,7 +686,7 @@
   function initPairCompare(db, auth) {
     auth.onAuthStateChanged(function (currentUser) {
       if (!currentUser) {
-        window.location.href = '/login';
+        window.location.href = compareLoginUrl();
         return;
       }
 

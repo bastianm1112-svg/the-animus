@@ -503,21 +503,20 @@
     return '/test';
   }
 
-  /** Redirect anonymous users away from the assessment (safe to call from <head>). */
+  /** Resolve auth state before showing test UI; main test is guest-accessible. */
   function guardTestPageAuth(auth) {
     if (!auth || !global || !global.document) return;
-    var returnPath = testPageReturnPath();
     var started = false;
 
-    function onAuth(user) {
-      var body = global.document.body;
+    function reveal(body, user) {
       if (!body) return;
-      if (!user) {
-        global.location.replace(buildLoginUrl(returnPath));
-        return;
-      }
       body.classList.remove('test-auth-pending');
-      body.classList.add('test-auth-ok');
+      if (user) body.classList.add('test-auth-ok');
+      else body.classList.remove('test-auth-ok');
+    }
+
+    function onAuth(user) {
+      reveal(global.document.body, user);
     }
 
     function start() {
@@ -526,6 +525,10 @@
       var body = global.document.body;
       if (body) body.classList.add('test-auth-pending');
       auth.onAuthStateChanged(onAuth);
+      setTimeout(function () {
+        var b = global.document.body;
+        if (b && b.classList.contains('test-auth-pending')) reveal(b, null);
+      }, 8000);
     }
 
     if (global.document.body) start();

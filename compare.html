@@ -24,7 +24,7 @@
 <script src="/js/profile-narratives.js"></script>
 <script src="/js/animus-entitlements.js?v=20260607"></script>
 <script src="/js/animus-xp.js"></script>
-<script src="/js/animus-shared.js"></script>
+<script src="/js/animus-shared.js?v=20260608"></script>
 <script>
   AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
   var auth = firebase.auth();
@@ -388,11 +388,9 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
 <script src="/js/compare-normalize.js?v=20260607"></script>
 <script src="/js/compare-friends.js"></script>
 <script src="/js/compare-group.js"></script>
-<script src="/js/compare-pair.js?v=20260607"></script>
-<script src="/js/compare-page.js?v=20260607"></script>
+<script src="/js/compare-pair.js?v=20260608"></script>
+<script src="/js/compare-page.js?v=20260608"></script>
 <script>
-AnimusShared.bindNavAuth('navAvatar');
-
 if (typeof AnimusComparePair !== 'undefined') {
   AnimusComparePair.clearDemoCompat();
 }
@@ -463,11 +461,6 @@ auth.onAuthStateChanged(function (user) {
     });
 });
 
-(function () {
-  var params = new URLSearchParams(window.location.search);
-  if (params.get('mode') === 'group') setCompareMode('group');
-})();
-
 if (typeof AnimusCompareGroup !== 'undefined') {
   AnimusCompareGroup.init(db, auth);
 }
@@ -478,6 +471,7 @@ if (typeof AnimusComparePair !== 'undefined') {
 
 if (typeof AnimusComparePage !== 'undefined') {
   AnimusComparePage.initTabs();
+  if (AnimusComparePage.initStickyOffsets) AnimusComparePage.initStickyOffsets();
 }
 
 function sanitizeText(str, maxLen) {
@@ -500,7 +494,9 @@ function shareComparison(){
 
 function showToast(msg){
   var t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
   clearTimeout(t._timer);
   t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
 }
@@ -514,6 +510,9 @@ function showToast(msg){
 document.addEventListener('DOMContentLoaded', function () {
   AnimusNav.mountTop('appNavMount', 'compare');
   AnimusNav.mountBottom('appBottomMount', 'compare');
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.bindNavAuth) {
+    AnimusShared.bindNavAuth('navAvatar');
+  }
   if (typeof firebase !== 'undefined' && firebase.auth && typeof AnimusSocial !== 'undefined') {
     AnimusSocial.init(firebase.auth(), firebase.firestore());
     firebase.auth().onAuthStateChanged(function (u) {

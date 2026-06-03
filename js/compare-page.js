@@ -68,10 +68,32 @@
     });
   }
 
+  function syncCompareModeBarHeight() {
+    var bar = document.querySelector('.compare-mode-bar');
+    if (!bar) return;
+    var h = Math.ceil(bar.getBoundingClientRect().height);
+    document.documentElement.style.setProperty('--compare-mode-h', h + 'px');
+  }
+
+  function initStickyOffsets() {
+    syncCompareModeBarHeight();
+    var bar = document.querySelector('.compare-mode-bar');
+    if (bar && typeof ResizeObserver !== 'undefined') {
+      var ro = new ResizeObserver(function () {
+        syncCompareModeBarHeight();
+      });
+      ro.observe(bar);
+    } else {
+      g.addEventListener('resize', syncCompareModeBarHeight);
+    }
+  }
+
   g.animateCompareBars = animateCompareBars;
   g.AnimusComparePage = {
     initTabs: initTabs,
     switchTab: switchTab,
-    animateCompareBars: animateCompareBars
+    animateCompareBars: animateCompareBars,
+    initStickyOffsets: initStickyOffsets,
+    syncCompareModeBarHeight: syncCompareModeBarHeight
   };
 })(typeof window !== 'undefined' ? window : globalThis);
