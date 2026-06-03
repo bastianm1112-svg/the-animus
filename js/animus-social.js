@@ -111,7 +111,9 @@
             var href =
               typeof g.AnimusShared !== 'undefined'
                 ? AnimusShared.profileHrefForUser(u.username, fuid)
-                : '/profile?u=' + encodeURIComponent(u.username || fuid);
+                : u.username
+                  ? '/' + encodeURIComponent(u.username)
+                  : '/profile?uid=' + encodeURIComponent(fuid);
             var card = document.createElement('a');
             card.href = href;
             card.className = 'friend-card';
@@ -224,50 +226,102 @@
         return;
       }
       var currentUser = auth && auth.currentUser;
-      db.collection('usernames')
-        .where(firebase.firestore.FieldPath.documentId(), '>=', q)
-        .where(firebase.firestore.FieldPath.documentId(), '<=', q + '\uf8ff')
-        .limit(8)
-        .get()
-        .then(function (snap) {
-          if (snap.empty) {
+      var tasks = [
+        db
+          .collection('usernames')
+          .where(firebase.firestore.FieldPath.documentId(), '>=', q)
+          .where(firebase.firestore.FieldPath.documentId(), '<=', q + '\uf8ff')
+          .limit(8)
+          .get(),
+        db
+          .collection('users')
+          .where('username', '>=', q)
+          .where('username', '<=', q + '\uf8ff')
+          .limit(8)
+          .get()
+      ];
+      if (q.length >= 3 && typeof AnimusShared !== 'undefined' && AnimusShared.resolveUsernameToUid) {
+        tasks.push(
+          AnimusShared.resolveUsernameToUid(db, q)
+            .then(function (uid) {
+              return db.collection('users').doc(uid).get();
+            })
+            .catch(function () {
+              return null;
+            })
+        );
+      }
+      Promise.all(tasks)
+        .then(function (parts) {
+          var byUid = {};
+          function addRow(uid, handle, userData) {
+            if (!uid || (currentUser && uid === currentUser.uid)) return;
+            var canonical =
+              userData && userData.username
+                ? String(userData.username).toLowerCase().replace(/[^a-z0-9_]/g, '')
+                : handle;
+            if (!canonical) canonical = handle;
+            if (!byUid[uid] || canonical === handle) {
+              byUid[uid] = {
+                uid: uid,
+                username: canonical,
+                user: userData || {}
+              };
+            }
+          }
+          var indexSnap = parts[0];
+          var usersSnap = parts[1];
+          var exactDoc = parts[2];
+          (indexSnap.docs || []).forEach(function (d) {
+            addRow(d.data().uid, d.id, null);
+          });
+          (usersSnap.docs || []).forEach(function (d) {
+            addRow(d.id, (d.data() || {}).username || d.id, d.data());
+          });
+          if (exactDoc && exactDoc.exists) {
+            addRow(exactDoc.id, (exactDoc.data() || {}).username || q, exactDoc.data());
+          }
+          var uids = Object.keys(byUid);
+          if (!uids.length) {
             res.innerHTML =
               '<div class="search-empty">No users found for @' + escapeHTML(q) + '</div>';
             return;
           }
-          var docs = snap.docs.filter(function (d) {
-            return !currentUser || d.data().uid !== currentUser.uid;
-          });
-          if (!docs.length) {
-            res.innerHTML = '<div class="search-empty">No other users found</div>';
-            return;
-          }
-          var promises = docs.map(function (d) {
-            return db
-              .collection('users')
-              .doc(d.data().uid)
-              .get()
-              .then(function (uDoc) {
-                return {
-                  username: d.id,
-                  uid: d.data().uid,
-                  user: uDoc.exists ? uDoc.data() : {}
-                };
-              });
-          });
-          return Promise.all(promises).then(function (results) {
+          return Promise.all(
+            uids.map(function (uid) {
+              if (byUid[uid].user && byUid[uid].user.displayName) return byUid[uid];
+              return db
+                .collection('users')
+                .doc(uid)
+                .get()
+                .then(function (uDoc) {
+                  var data = uDoc.exists ? uDoc.data() : byUid[uid].user;
+                  var canonical = (data && data.username) || byUid[uid].username;
+                  return { uid: uid, username: canonical, user: data || {} };
+                });
+            })
+          ).then(function (results) {
             res.innerHTML = '';
             results.forEach(function (r) {
               var n = escapeHTML(r.user.displayName || 'User');
-              var u = escapeHTML(r.username);
+              var u = escapeHTML(r.username || '');
+              var profilePath =
+                typeof AnimusShared !== 'undefined' && AnimusShared.profilePathForUsername
+                  ? AnimusShared.profilePathForUsername(u)
+                  : '/' + encodeURIComponent(u);
               var init = n.charAt(0).toUpperCase();
               res.innerHTML +=
                 '<div class="search-result-item">' +
-                '<div class="search-result-avatar">' +
+                '<a href="' +
+                profilePath +
+                '" class="search-result-avatar" style="text-decoration:none;color:inherit">' +
                 init +
-                '</div><div class="search-result-info"><div class="search-result-name">' +
+                '</a><div class="search-result-info"><div class="search-result-name">' +
+                '<a href="' +
+                profilePath +
+                '" style="color:inherit;text-decoration:none">' +
                 n +
-                ' <span style="color:var(--muted);font-weight:400">@' +
+                '</a> <span style="color:var(--muted);font-weight:400">@' +
                 u +
                 '</span></div></div>' +
                 '<button type="button" class="btn-add-small" data-uid="' +

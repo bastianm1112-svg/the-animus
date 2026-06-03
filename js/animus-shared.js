@@ -462,7 +462,7 @@
           if (uid) return '/profile?uid=' + encodeURIComponent(uid);
         }
         var un = normalizeUsername(pp.get('u'));
-        if (un) return '/profile?u=' + encodeURIComponent(un);
+        if (un) return '/' + encodeURIComponent(un);
       } catch (e) {}
       return '/profile';
     }
@@ -578,13 +578,48 @@
     if (!db) return Promise.reject(new Error('Database unavailable'));
     var username = normalizeUsername(rawUsername);
     if (!username) return Promise.reject(new Error('Invalid username'));
+
+    function finish(uid, canonical) {
+      if (!uid) return Promise.reject(new Error('Username not found'));
+      if (canonical && canonical !== username) {
+        return repairUsernameIndexForUser(db, uid, canonical).then(function () {
+          return uid;
+        });
+      }
+      if (canonical) {
+        return db
+          .collection('usernames')
+          .doc(canonical)
+          .get()
+          .then(function (doc) {
+            if (!doc.exists) {
+              return db.collection('usernames').doc(canonical).set({ uid: uid }).then(function () {
+                return uid;
+              });
+            }
+            return uid;
+          });
+      }
+      return uid;
+    }
+
     return db
       .collection('usernames')
       .doc(username)
       .get()
       .then(function (doc) {
         if (doc.exists && doc.data() && doc.data().uid) {
-          return doc.data().uid;
+          return db
+            .collection('users')
+            .doc(doc.data().uid)
+            .get()
+            .then(function (userDoc) {
+              var canonical =
+                userDoc.exists && userDoc.data() && userDoc.data().username
+                  ? normalizeUsername(userDoc.data().username)
+                  : username;
+              return finish(doc.data().uid, canonical);
+            });
         }
         return db
           .collection('users')
@@ -593,18 +628,45 @@
           .get()
           .then(function (snap) {
             if (!snap.empty) {
-              var hit = snap.docs[0];
-              var uid = hit.id;
-              var data = hit.data() || {};
-              if (data.username === username) {
-                return db.collection('usernames').doc(username).set({ uid: uid }).then(function () {
-                  return uid;
-                });
-              }
-              return uid;
+              return finish(snap.docs[0].id, username);
             }
-            throw new Error('Username not found');
+            return db
+              .collection('users')
+              .where('previousUsernames', 'array-contains', username)
+              .limit(1)
+              .get()
+              .then(function (legacy) {
+                if (!legacy.empty) {
+                  var row = legacy.docs[0];
+                  var current = normalizeUsername((row.data() || {}).username);
+                  return finish(row.id, current || username);
+                }
+                throw new Error('Username not found');
+              });
           });
+      });
+  }
+
+  /** Keep a single usernames/{handle} doc aligned with users.username. */
+  function repairUsernameIndexForUser(db, uid, canonicalUsername) {
+    if (!db || !uid || !canonicalUsername) return Promise.resolve();
+    canonicalUsername = normalizeUsername(canonicalUsername);
+    return db
+      .collection('usernames')
+      .where('uid', '==', uid)
+      .get()
+      .then(function (snap) {
+        var batch = db.batch();
+        var touched = false;
+        (snap.docs || []).forEach(function (doc) {
+          if (doc.id !== canonicalUsername) {
+            batch.delete(doc.ref);
+            touched = true;
+          }
+        });
+        batch.set(db.collection('usernames').doc(canonicalUsername), { uid: uid });
+        touched = true;
+        return touched ? batch.commit() : Promise.resolve();
       });
   }
 
@@ -1489,6 +1551,7 @@
     setSavedTestMode: setSavedTestMode,
     validateUsername: validateUsername,
     enforceBannedSession: enforceBannedSession,
-    resolveUsernameToUid: resolveUsernameToUid
+    resolveUsernameToUid: resolveUsernameToUid,
+    repairUsernameIndexForUser: repairUsernameIndexForUser
   };
 })(typeof window !== 'undefined' ? window : this);

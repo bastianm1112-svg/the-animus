@@ -460,10 +460,19 @@
       themUidPromise = Promise.resolve(uidParam.replace(/[^a-zA-Z0-9]/g, '').substring(0, 128));
     } else {
       u = u.replace(/[^a-zA-Z0-9_\-]/g, '').substring(0, 32);
-      themUidPromise = db.collection('usernames').doc(u).get().then(function (doc) {
-        if (!doc.exists) return null;
-        return doc.data().uid;
-      });
+      themUidPromise =
+        g.AnimusShared && g.AnimusShared.resolveUsernameToUid
+          ? g.AnimusShared.resolveUsernameToUid(db, u).catch(function () {
+              return null;
+            })
+          : db
+              .collection('usernames')
+              .doc(u)
+              .get()
+              .then(function (doc) {
+                if (!doc.exists) return null;
+                return doc.data().uid;
+              });
     }
 
     themUidPromise.then(function (themUid) {
@@ -530,7 +539,7 @@
         var themProfileUrl = g.AnimusShared
           ? g.AnimusShared.profileHrefForUser(themUser.username, themUid)
           : (themUser.username
-            ? '/profile?u=' + encodeURIComponent(themUser.username)
+            ? '/' + encodeURIComponent(themUser.username)
             : '/profile?uid=' + encodeURIComponent(themUid));
         var viewBtn = document.getElementById('viewThemBtn');
         if (viewBtn) {

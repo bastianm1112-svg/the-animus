@@ -225,6 +225,11 @@
         return batch.commit();
       })
       .then(function () {
+        if (g.AnimusShared && g.AnimusShared.repairUsernameIndexForUser) {
+          return g.AnimusShared.repairUsernameIndexForUser(db, targetUid, newUsername);
+        }
+      })
+      .then(function () {
         return db.collection('users').doc(targetUid).get();
       })
       .then(function (doc) {

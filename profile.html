@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+(function () {
+  var m = /^\/profile\/([a-zA-Z0-9_]{3,32})\/?$/i.exec(window.location.pathname || '');
+  if (m) {
+    window.location.replace('/' + m[1].toLowerCase() + (window.location.search || '') + (window.location.hash || ''));
+  }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#080808">
