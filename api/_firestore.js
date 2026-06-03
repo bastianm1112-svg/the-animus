@@ -152,13 +152,8 @@ function monthKey(d) {
 }
 
 function userHasPlusFromDoc(doc) {
-  const e = (doc && doc.entitlements) || {};
-  if (e.animusPlus === true) return true;
-  if (e.animusPlusUntil) {
-    const until = new Date(e.animusPlusUntil);
-    if (!isNaN(until.getTime()) && until.getTime() > Date.now()) return true;
-  }
-  return false;
+  const { hasAnimusPlus } = require('./_entitlements');
+  return hasAnimusPlus(doc || {});
 }
 
 function getCareerPdfUsageFromDoc(doc) {

@@ -1,7 +1,7 @@
 /* Animus Plus — badge, shop perks, career guide, group gate */
 
 .plus-badge {
-  display: inline-flex;
+  display: none;
   align-items: center;
   gap: 4px;
   margin-left: 10px;
@@ -14,6 +14,10 @@
   background: linear-gradient(90deg, #8a6f3e, #c8a96e);
   border-radius: 2px;
   vertical-align: middle;
+}
+
+.plus-badge.is-plus-member {
+  display: inline-flex;
 }
 
 .shop-perks-list {

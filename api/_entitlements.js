@@ -36,25 +36,28 @@ const PRODUCTS = {
 
 const PRODUCT_IDS = Object.keys(PRODUCTS);
 
+function parsePlusUntil(raw) {
+  if (raw == null || raw === '') return null;
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? null : d;
+}
+
 function normalizeEntitlements(doc) {
   doc = doc || {};
   const e = doc.entitlements || {};
   return {
-    detailedTest: !!e.detailedTest,
-    testEstimator: !!e.testEstimator,
-    animusPlus: !!e.animusPlus,
+    detailedTest: e.detailedTest === true,
+    testEstimator: e.testEstimator === true,
+    animusPlus: e.animusPlus === true,
     animusPlusUntil: e.animusPlusUntil || null
   };
 }
 
 function hasAnimusPlus(doc) {
   const e = normalizeEntitlements(doc);
-  if (e.animusPlus) return true;
-  if (e.animusPlusUntil) {
-    const until = new Date(e.animusPlusUntil);
-    if (!isNaN(until.getTime()) && until.getTime() > Date.now()) return true;
-  }
-  return false;
+  const until = parsePlusUntil(e.animusPlusUntil);
+  if (until) return until.getTime() > Date.now();
+  return e.animusPlus === true;
 }
 
 function entitlementsFromProduct(productId) {

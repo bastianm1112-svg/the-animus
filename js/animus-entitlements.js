@@ -128,25 +128,32 @@
     return { total: 0, level: 1 };
   }
 
+  function parsePlusUntil(raw) {
+    if (raw == null || raw === '') return null;
+    if (raw.toDate && typeof raw.toDate === 'function') {
+      var fromTs = raw.toDate();
+      return isNaN(fromTs.getTime()) ? null : fromTs;
+    }
+    var d = new Date(raw);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
   function normalizeUserEntitlements(userData) {
     userData = userData || {};
     var e = userData.entitlements || {};
     return {
-      detailedTest: !!e.detailedTest,
-      testEstimator: !!e.testEstimator,
-      animusPlus: !!e.animusPlus,
+      detailedTest: e.detailedTest === true,
+      testEstimator: e.testEstimator === true,
+      animusPlus: e.animusPlus === true,
       animusPlusUntil: e.animusPlusUntil || null
     };
   }
 
   function hasAnimusPlus(userData) {
     var e = normalizeUserEntitlements(userData);
-    if (e.animusPlus) return true;
-    if (e.animusPlusUntil) {
-      var until = e.animusPlusUntil.toDate ? e.animusPlusUntil.toDate() : new Date(e.animusPlusUntil);
-      if (until.getTime() > Date.now()) return true;
-    }
-    return false;
+    var until = parsePlusUntil(e.animusPlusUntil);
+    if (until) return until.getTime() > Date.now();
+    return e.animusPlus === true;
   }
 
   function hasEntitlement(userData, key) {

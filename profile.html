@@ -223,7 +223,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
       <div class="hero-info">
         <div class="profile-name-row" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">
           <div class="profile-name" id="profileName">Loading...</div>
-          <span class="plus-badge" id="profilePlusBadge" hidden>Plus</span>
+          <span class="plus-badge" id="profilePlusBadge" aria-hidden="true">Plus</span>
         </div>
         <div class="profile-username" id="profileUsername">@...</div>
         <div class="profile-bio" id="profileBio"></div>
@@ -543,7 +543,8 @@ function loadProfileData(uid, isOwner, currentUser){
     if (plusBadge) {
       var showPlus =
         typeof AnimusEntitlements !== 'undefined' && AnimusEntitlements.hasAnimusPlus(u);
-      plusBadge.hidden = !showPlus;
+      plusBadge.classList.toggle('is-plus-member', !!showPlus);
+      plusBadge.setAttribute('aria-hidden', showPlus ? 'false' : 'true');
     }
     document.getElementById('profileUsername').textContent='@'+(u.username||'&#8212;');
     document.getElementById('profileBio').textContent=u.bio||'';
