@@ -530,3 +530,49 @@ body.light-mode .guest-live-strip {
   color: var(--gold, #c8a96e);
   font-weight: 500;
 }
+
+/* Light mode parity */
+body.light-mode .home-daily-hub,
+body.light-mode .home-profile-snapshot,
+body.light-mode .daily-card,
+body.light-mode .activity-estimator,
+body.light-mode .shop-card,
+body.light-mode .shop-compare-wrap,
+body.light-mode .notif-page-card,
+body.light-mode .estimations-card {
+  box-shadow: 0 2px 16px rgba(26, 23, 20, 0.06);
+}
+
+body.light-mode .home-profile-snapshot:hover,
+body.light-mode .home-action-card:hover,
+body.light-mode .friend-card:hover {
+  box-shadow: 0 8px 28px rgba(26, 23, 20, 0.08);
+}
+
+body.light-mode .activity-estimator {
+  background: linear-gradient(135deg, var(--surface, #fff) 0%, rgba(200, 169, 110, 0.06) 100%);
+}
+
+body.light-mode .shop-compare-table thead th.shop-col-paid {
+  background: linear-gradient(180deg, rgba(200, 169, 110, 0.12) 0%, var(--surface2, #f8f5f0) 100%);
+}
+
+body.light-mode .shop-compare-foot {
+  background: rgba(200, 169, 110, 0.06);
+}
+
+body.light-mode .empty-state--personality {
+  background: var(--surface, #fff);
+}
+
+body.light-mode .pull-refresh-indicator {
+  color: var(--muted2, #6b6259);
+}
+
+body.light-mode .mbn-item.active svg {
+  filter: drop-shadow(0 0 4px rgba(138, 111, 62, 0.25));
+}
+
+body.light-mode .xp-card {
+  background: linear-gradient(180deg, rgba(200, 169, 110, 0.08) 0%, transparent 100%);
+}

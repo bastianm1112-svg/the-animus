@@ -17,28 +17,51 @@
       mount.innerHTML =
         '<section class="activity-estimations-section app-section" aria-labelledby="estimationsTeaserTitle">' +
         '<div class="home-section-head"><span class="home-section-title" id="estimationsTeaserTitle">Profile estimations</span></div>' +
-        '<div class="activity-estimator">' +
+        '<div class="activity-estimator animus-pressable">' +
         bodyStart +
         'What are they likely to do?' +
         bodyEnd +
         'Estimate someone&apos;s type from behavior you&apos;ve actually seen — saved separately from real account friends.</p></div>' +
-        '<a href="/estimations" class="activity-estimator-cta shop-open-link">Open estimations</a>' +
+        '<a href="/estimations" class="activity-estimator-cta shop-open-link animus-pressable">Open estimations</a>' +
         '</div></section>';
     } else {
       mount.innerHTML =
         '<section class="activity-estimations-section app-section">' +
         '<div class="home-section-head"><span class="home-section-title">Profile estimations</span></div>' +
-        '<div class="activity-estimator activity-estimator-locked">' +
+        '<div class="activity-estimator activity-estimator-locked animus-pressable">' +
         bodyStart +
         'Behavioral estimator' +
         bodyEnd +
         'Unlock profile estimation in the <a href="/shop">Shop</a> to guess types from observed behavior — not your own self-report.</p></div>' +
-        '<a href="/shop" class="activity-estimator-cta shop-open-link">View in Shop</a>' +
+        '<a href="/shop" class="activity-estimator-cta shop-open-link animus-pressable">View in Shop</a>' +
         '</div></section>';
     }
   }
 
+  function fetchProfile(uid) {
+    if (typeof g.AnimusShared !== 'undefined' && g.AnimusShared.fetchLatestProfile) {
+      return g.AnimusShared.fetchLatestProfile(uid);
+    }
+    return g.db
+      .collection('profiles')
+      .doc(uid)
+      .get()
+      .then(function (pdoc) {
+        return pdoc.exists && pdoc.data().latest ? pdoc.data().latest : null;
+      });
+  }
+
+  function refreshAll(uid) {
+    if (typeof g.AnimusSocial === 'undefined') return Promise.resolve();
+    g.AnimusSocial.loadNotifsPage(uid);
+    g.AnimusSocial.loadFriends(uid);
+    g.AnimusSocial.loadActivity(uid);
+    g.AnimusSocial.refreshNotifBadge(uid);
+    return Promise.resolve();
+  }
+
   function boot(auth, db) {
+    g.db = db;
     if (typeof g.AnimusSocial !== 'undefined') {
       g.AnimusSocial.init(auth, db);
     }
@@ -48,6 +71,10 @@
         g.location.replace('/login?next=' + encodeURIComponent('/activity'));
         return;
       }
+
+      fetchProfile(user.uid).then(function (profile) {
+        g.__animusUserProfile = profile;
+      });
 
       db.collection('users')
         .doc(user.uid)
@@ -59,12 +86,23 @@
           renderEstimator(entitled);
         });
 
-      g.AnimusSocial.loadNotifsPage(user.uid);
-      g.AnimusSocial.loadFriends(user.uid);
-      g.AnimusSocial.loadActivity(user.uid);
-      g.AnimusSocial.refreshNotifBadge(user.uid);
+      refreshAll(user.uid);
+
+      var main = document.getElementById('main-content');
+      if (main && g.AnimusPullRefresh) {
+        main.classList.add('pull-refresh-root');
+        g.AnimusPullRefresh.attach({
+          root: main,
+          onRefresh: function () {
+            return fetchProfile(user.uid).then(function (profile) {
+              g.__animusUserProfile = profile;
+              return refreshAll(user.uid);
+            });
+          }
+        });
+      }
     });
   }
 
-  g.AnimusActivityPage = { boot: boot };
+  g.AnimusActivityPage = { boot: boot, refreshAll: refreshAll };
 })(typeof window !== 'undefined' ? window : globalThis);

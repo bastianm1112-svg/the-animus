@@ -236,25 +236,68 @@
   }
 
   function moodStripHtml(hist) {
+    var heights = { energized: 44, neutral: 28, drained: 18 };
     var cells = [];
     for (var i = 6; i >= 0; i--) {
       var dk = dateKeyOffset(-i);
       var v = moodForDate(hist, dk);
-      var label = dk.slice(5);
+      var isToday = dk === todayKey();
+      var h = v ? heights[v] || 20 : 10;
       cells.push(
-        '<div class="mood-strip-day' +
+        '<div class="mood-heat-cell' +
         (v ? ' has-' + v : '') +
+        (isToday ? ' is-today' : '') +
         '" title="' +
         dk +
         (v ? ' — ' + v : '') +
         '">' +
-        '<span class="mood-strip-dot"></span>' +
-        '<span class="mood-strip-lbl">' +
-        label +
+        '<span class="mood-heat-bar" style="height:' +
+        h +
+        'px"></span>' +
+        '<span class="mood-heat-lbl mood-strip-lbl">' +
+        dk.slice(5) +
         '</span></div>'
       );
     }
-    return '<div class="mood-week-strip">' + cells.join('') + '</div>';
+    return '<div class="mood-heatmap" aria-label="7-day mood pattern">' + cells.join('') + '</div>';
+  }
+
+  function streakRingHtml(streakCount, unlock) {
+    var milestones = [3, 7, 30];
+    var target = unlock.next || unlock.milestone || milestones.find(function (m) {
+      return streakCount < m;
+    }) || 30;
+    var pct =
+      unlock.data && unlock.milestone
+        ? 100
+        : Math.min(100, Math.round((streakCount / target) * 100));
+    var circumference = 2 * Math.PI * 22;
+    var offset = circumference - (pct / 100) * circumference;
+    return (
+      '<div class="streak-viz">' +
+      '<div class="streak-ring" aria-hidden="true">' +
+      '<svg viewBox="0 0 52 52"><circle class="streak-ring-bg" cx="26" cy="26" r="22"></circle>' +
+      '<circle class="streak-ring-fill" cx="26" cy="26" r="22" stroke-dasharray="' +
+      circumference +
+      '" stroke-dashoffset="' +
+      offset +
+      '"></circle></svg>' +
+      '<span class="streak-ring-num">' +
+      (streakCount || 0) +
+      '</span></div>' +
+      '<div class="streak-viz-copy">' +
+      '<span class="daily-streak-unit">day streak</span>' +
+      (unlock.next
+        ? '<p class="daily-row-hint">' +
+          (unlock.next - streakCount) +
+          ' day' +
+          (unlock.next - streakCount === 1 ? '' : 's') +
+          ' to ' +
+          unlock.next +
+          '-day unlock</p>'
+        : '') +
+      '</div></div>'
+    );
   }
 
   function fetchFriendContext(db, uid, userData) {
@@ -545,13 +588,7 @@
       cards.push(cardHtml('daily-card--echo', 'Last week', echoBody, ''));
     }
 
-    var streakBody =
-      '<div class="daily-streak-inline">' +
-      '<span class="daily-streak-count">' +
-      (streak.count || 0) +
-      '</span>' +
-      '<span class="daily-streak-unit">day streak</span>' +
-      '</div>';
+    var streakBody = streakRingHtml(streak.count || 0, unlock);
     if (unlock.data) {
       streakBody +=
         '<p class="daily-card-text"><strong>' +
@@ -566,13 +603,7 @@
       }
     } else if (unlock.next) {
       streakBody +=
-        '<p class="daily-row-hint">' +
-        (unlock.next - unlock.count) +
-        ' day' +
-        (unlock.next - unlock.count === 1 ? '' : 's') +
-        ' until your next unlock (' +
-        unlock.next +
-        '-day milestone).</p>';
+        '<p class="daily-row-hint">Keep checking in — consistency unlocks deeper daily layers.</p>';
     }
     cards.push(cardHtml('daily-card--streak', 'Streak', streakBody, ''));
 

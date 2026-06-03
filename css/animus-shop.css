@@ -398,6 +398,109 @@
   color: var(--accent);
 }
 
+/* Feature comparison table */
+.shop-compare-section {
+  margin-bottom: 28px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.shop-compare-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(24px, 5vw, 32px);
+  letter-spacing: 0.08em;
+  color: var(--white, #f0ece4);
+  margin-bottom: 8px;
+}
+
+.shop-compare-lead {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted2, #888);
+  margin-bottom: 16px;
+  max-width: 42rem;
+}
+
+.shop-compare-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border, #1e1e1e);
+  border-radius: 2px;
+  background: var(--surface, #111);
+}
+
+.shop-compare-table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.shop-compare-table th,
+.shop-compare-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border, #1e1e1e);
+  text-align: left;
+  vertical-align: top;
+}
+
+.shop-compare-table thead th {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted2, #888);
+  background: var(--surface2, #141414);
+}
+
+.shop-compare-table thead th.shop-col-paid {
+  color: var(--gold, #c8a96e);
+  background: linear-gradient(180deg, rgba(200, 169, 110, 0.08) 0%, var(--surface2, #141414) 100%);
+}
+
+.shop-compare-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.shop-compare-feature {
+  color: var(--text, #e2e2e2);
+  font-weight: 500;
+  max-width: 14rem;
+}
+
+.shop-compare-note {
+  display: block;
+  font-size: 10px;
+  color: var(--muted, #555);
+  margin-top: 4px;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+.shop-compare-yes {
+  color: var(--green, #6fcf97);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.shop-compare-highlight {
+  color: var(--gold, #c8a96e);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.shop-compare-muted {
+  color: var(--muted, #555);
+}
+
+.shop-compare-foot {
+  padding: 12px 14px;
+  font-size: 11px;
+  color: var(--muted2, #888);
+  line-height: 1.55;
+  border-top: 1px solid var(--border, #1e1e1e);
+  background: rgba(200, 169, 110, 0.04);
+}
+
 @media (max-width: 768px) {
   .shop-page {
     padding-top: 72px;

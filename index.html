@@ -710,6 +710,8 @@ var db = firebase.firestore();
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-release.css">
 <link rel="stylesheet" href="/css/animus-home.css">
+<link rel="stylesheet" href="/css/animus-type-accents.css">
+<link rel="stylesheet" href="/css/animus-motion.css">
 <link rel="stylesheet" href="/css/animus-legal.css">
 <link rel="stylesheet" href="/css/animus-premium.css">
 <script src="/js/animus-safe.js"></script>
@@ -733,6 +735,7 @@ var db = firebase.firestore();
     <p>Take the assessment to unlock your full profile and daily insights.</p>
     <a href="/test">Begin assessment</a>
   </div>
+  <div id="homeProfileMount" class="app-section home-profile-mount"></div>
   <section class="home-daily-hub app-section animus-reveal animus-reveal-delay-1" id="homeDailyHub" aria-label="Today">
     <div id="homeXpMount"></div>
     <div class="daily-fact-card" id="dailyFactCard">
@@ -747,38 +750,38 @@ var db = firebase.firestore();
   <section class="home-quick app-section animus-reveal animus-reveal-delay-2" aria-labelledby="homeQuickLabel">
     <h2 class="home-quick-label" id="homeQuickLabel">Quick actions</h2>
     <nav class="home-actions" aria-label="Quick actions">
-    <a href="/test" class="home-action-card primary">
+    <a href="/test" class="home-action-card primary animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Main test</span>
         <span class="home-action-desc">Your core personality assessment</span>
       </span>
       <span class="home-action-arrow" aria-hidden="true">→</span>
     </a>
-    <a href="/activity" class="home-action-card">
+    <a href="/activity" class="home-action-card animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Activity</span>
         <span class="home-action-desc">Friends, requests, and updates</span>
       </span>
     </a>
-    <a href="/shop" class="home-action-card">
+    <a href="/shop" class="home-action-card animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Shop</span>
         <span class="home-action-desc">Detailed test, estimator, and Plus</span>
       </span>
     </a>
-    <a href="/compare" class="home-action-card">
+    <a href="/compare" class="home-action-card animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Compare</span>
         <span class="home-action-desc">See how you match with others</span>
       </span>
     </a>
-    <a href="/types" class="home-action-card">
+    <a href="/types" class="home-action-card animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Types</span>
         <span class="home-action-desc">Reference library</span>
       </span>
     </a>
-    <a href="/settings" class="home-action-card">
+    <a href="/settings" class="home-action-card animus-pressable">
       <span class="home-action-copy">
         <span class="home-action-title">Settings</span>
         <span class="home-action-desc">Account and appearance</span>
@@ -1108,6 +1111,7 @@ var db = firebase.firestore();
 <script src="/js/daily-facts.js"></script>
 <script src="/js/animus-daily-content.js"></script>
 <script src="/js/animus-daily.js"></script>
+<script src="/js/animus-type-ui.js"></script>
 <script src="/js/animus-social.js"></script>
 <script src="/js/animus-nav.js"></script>
 <script src="/js/animus-legal.js"></script>

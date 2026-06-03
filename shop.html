@@ -30,6 +30,7 @@ var db = firebase.firestore();
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-release.css">
 <link rel="stylesheet" href="/css/animus-shop.css">
+<link rel="stylesheet" href="/css/animus-motion.css">
 <link rel="stylesheet" href="/css/animus-plus.css">
 <link rel="stylesheet" href="/css/animus-premium.css">
 <script src="/js/animus-safe.js"></script>
@@ -47,6 +48,11 @@ var db = firebase.firestore();
   <p class="shop-sub">Unlock deeper assessments, profile estimation, and Animus Plus — unlimited compares, group compare, XP boost, career guides, and more.</p>
   <p class="shop-plus-status is-loading" id="shopPlusStatus">Loading your plan…</p>
   <p class="shop-checkout-banner" id="shopCheckoutBanner" hidden></p>
+  <section class="shop-compare-section animus-reveal" id="shopCompareSection" aria-labelledby="shopCompareTitle">
+    <h2 class="shop-compare-title" id="shopCompareTitle">What you unlock</h2>
+    <p class="shop-compare-lead">Start free — upgrade when you want depth, estimation power, or unlimited social insight.</p>
+    <div class="shop-compare-wrap" id="shopCompareMount"></div>
+  </section>
   <div class="shop-grid" id="shopGrid"></div>
 </main>
 

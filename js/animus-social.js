@@ -71,6 +71,10 @@
     if (inp) inp.value = '';
   }
 
+  function getProfileContext() {
+    return g.__animusUserProfile || null;
+  }
+
   function loadFriends(uid) {
     if (!db) return;
     var grid = document.getElementById('friendsGrid');
@@ -85,8 +89,12 @@
         });
         grid.innerHTML = '';
         if (!friends.length) {
+          var cta =
+            '<button type="button" class="empty-state-cta animus-pressable" onclick="AnimusSocial.openAddFriend()">+ Add friend</button>';
           grid.innerHTML =
-            '<div class="empty-state">No friends yet — add someone to get started</div>';
+            g.AnimusTypeUi && g.AnimusTypeUi.emptyStateHtml
+              ? g.AnimusTypeUi.emptyStateHtml('friends', getProfileContext(), cta)
+              : '<div class="empty-state">No friends yet — add someone to get started</div>';
         }
         var promises = friends.map(function (fuid) {
           return Promise.all([
@@ -111,7 +119,10 @@
                   : '/profile?uid=' + encodeURIComponent(fuid);
             var card = document.createElement('a');
             card.href = href;
-            card.className = 'friend-card';
+            card.className = 'friend-card animus-pressable';
+            if (g.AnimusTypeUi && p && p.mbti) {
+              card.classList.add(g.AnimusTypeUi.accentClassFor(p.mbti));
+            }
             card.innerHTML =
               '<div class="friend-avatar">' +
               init +
@@ -150,7 +161,12 @@
       .limit(20)
       .get()
       .then(function (snap) {
-        if (snap.empty) return;
+        if (snap.empty) {
+          if (g.AnimusTypeUi && g.AnimusTypeUi.emptyStateHtml) {
+            feed.innerHTML = g.AnimusTypeUi.emptyStateHtml('feed', getProfileContext(), '');
+          }
+          return;
+        }
         feed.innerHTML = '';
         snap.forEach(function (doc) {
           var a = doc.data();
@@ -590,8 +606,16 @@
         var received = (doc.data().friendRequests || {}).received || [];
         refreshNotifBadge(uid);
         if (!received.length) {
-          list.innerHTML =
-            '<div class="notif-page-empty">You\'re all caught up. Friend requests will show up here.<br><a href="/friends">Find friends</a></div>';
+          if (g.AnimusTypeUi && g.AnimusTypeUi.emptyStateHtml) {
+            list.innerHTML = g.AnimusTypeUi.emptyStateHtml(
+              'requests',
+              getProfileContext(),
+              '<button type="button" class="empty-state-cta animus-pressable" onclick="AnimusSocial.openAddFriend()">Find people</button>'
+            );
+          } else {
+            list.innerHTML =
+              '<div class="notif-page-empty">You\'re all caught up. Friend requests will show up here.<br><a href="/friends">Find friends</a></div>';
+          }
           return;
         }
         var promises = received.map(function (uid2) {

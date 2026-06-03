@@ -1,0 +1,92 @@
+/* Type quadrant accents — visual only, no trademark labels */
+
+:root {
+  --type-nt: #7b8fd4;
+  --type-nt-soft: rgba(123, 143, 212, 0.14);
+  --type-nf: #6ec4b8;
+  --type-nf-soft: rgba(110, 196, 184, 0.14);
+  --type-sj: #8fad6e;
+  --type-sj-soft: rgba(143, 173, 110, 0.14);
+  --type-sp: #d4a05a;
+  --type-sp-soft: rgba(212, 160, 90, 0.14);
+}
+
+.type-accent-nt {
+  --type-accent: var(--type-nt);
+  --type-accent-soft: var(--type-nt-soft);
+}
+
+.type-accent-nf {
+  --type-accent: var(--type-nf);
+  --type-accent-soft: var(--type-nf-soft);
+}
+
+.type-accent-sj {
+  --type-accent: var(--type-sj);
+  --type-accent-soft: var(--type-sj-soft);
+}
+
+.type-accent-sp {
+  --type-accent: var(--type-sp);
+  --type-accent-soft: var(--type-sp-soft);
+}
+
+.type-accent-default {
+  --type-accent: var(--gold);
+  --type-accent-soft: rgba(200, 169, 110, 0.12);
+}
+
+.home-profile-snapshot {
+  --type-accent: var(--gold);
+  --type-accent-soft: rgba(200, 169, 110, 0.1);
+}
+
+.home-profile-snapshot.type-accent-nt,
+.home-profile-snapshot.type-accent-nf,
+.home-profile-snapshot.type-accent-sj,
+.home-profile-snapshot.type-accent-sp {
+  border-color: color-mix(in srgb, var(--type-accent) 35%, var(--border));
+}
+
+.home-profile-snapshot-accent {
+  background: linear-gradient(180deg, var(--type-accent-soft) 0%, transparent 100%);
+}
+
+.home-profile-snapshot-type {
+  color: var(--type-accent);
+}
+
+.friend-card.type-accent-nt,
+.friend-card.type-accent-nf,
+.friend-card.type-accent-sj,
+.friend-card.type-accent-sp {
+  border-top: 2px solid var(--type-accent);
+}
+
+.friend-type {
+  color: var(--type-accent, var(--gold));
+}
+
+.empty-state--personality {
+  border-left: 3px solid var(--type-accent, var(--gold2));
+}
+
+.empty-state--nt {
+  --type-accent: var(--type-nt);
+}
+
+.empty-state--nf {
+  --type-accent: var(--type-nf);
+}
+
+.empty-state--sj {
+  --type-accent: var(--type-sj);
+}
+
+.empty-state--sp {
+  --type-accent: var(--type-sp);
+}
+
+.empty-state--default {
+  --type-accent: var(--gold2);
+}

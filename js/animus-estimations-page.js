@@ -40,7 +40,13 @@
 
     if (!docs.length) {
       html +=
-        '<div class="estimations-empty">No estimations yet. Add someone you know from the outside — coworkers, family, friends — and answer from visible behavior only.</div>';
+        (g.AnimusTypeUi && g.AnimusTypeUi.emptyStateHtml
+          ? g.AnimusTypeUi.emptyStateHtml(
+              'estimations',
+              g.__animusUserProfile || null,
+              ''
+            )
+          : '<div class="estimations-empty">No estimations yet. Add someone you know from the outside — coworkers, family, friends — and answer from visible behavior only.</div>');
     } else {
       html += '<div class="estimations-grid">';
       docs.forEach(function (doc) {
@@ -120,10 +126,21 @@
       }
       g._estimationsUid = user.uid;
 
-      db.collection('users')
-        .doc(user.uid)
-        .get()
-        .then(function (doc) {
+      var profilePromise =
+        typeof g.AnimusShared !== 'undefined' && g.AnimusShared.fetchLatestProfile
+          ? g.AnimusShared.fetchLatestProfile(user.uid)
+          : Promise.resolve(null);
+
+      Promise.all([
+        profilePromise,
+        db.collection('users')
+          .doc(user.uid)
+          .get()
+      ])
+        .then(function (results) {
+          var profile = results[0];
+          var doc = results[1];
+          g.__animusUserProfile = profile;
           var data = doc.exists ? doc.data() : {};
           var entitled =
             g.AnimusEntitlements && g.AnimusEntitlements.hasEntitlement(data, 'testEstimator');

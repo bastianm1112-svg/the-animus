@@ -50,7 +50,22 @@
     }
   }
 
+  function renderProfileSnapshot(profile, userData) {
+    var mount = document.getElementById('homeProfileMount');
+    if (!mount || !g.AnimusTypeUi) return;
+    if (!profile || !profile.mbti) {
+      mount.innerHTML = '';
+      return;
+    }
+    var username = (userData && userData.username) || '';
+    mount.innerHTML = g.AnimusTypeUi.profileSnapshotHtml(profile, username);
+    var card = mount.querySelector('.home-profile-snapshot');
+    if (card) card.classList.add('animus-pressable');
+    g.__animusUserProfile = profile;
+  }
+
   function renderHomeRetention(userData, profile, user, db) {
+    renderProfileSnapshot(profile, userData);
     if (g.AnimusXp) {
       g.AnimusXp.renderXpBar(document.getElementById('homeXpMount'), userData);
     }
@@ -196,6 +211,7 @@
       Promise.all([userPromise, profilePromise]).then(function (results) {
         var userData = results[0];
         var profile = results[1];
+        g.__animusUserProfile = profile;
         renderHomeRetention(userData, profile, user, db);
 
         var factEl = document.getElementById('dailyFactText');

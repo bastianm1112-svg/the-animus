@@ -96,7 +96,7 @@
       '<span class="xp-total-badge">' + prog.total + ' XP</span>' +
       '</div>' +
       '<div class="xp-bar-track" role="progressbar" aria-valuenow="' + prog.pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="Progress to next level">' +
-      '<div class="xp-bar-fill" style="width:' + prog.pct + '%"></div>' +
+      '<div class="xp-bar-fill animus-xp-animate" style="width:' + prog.pct + '%"></div>' +
       '</div>' +
       '</div>';
   }

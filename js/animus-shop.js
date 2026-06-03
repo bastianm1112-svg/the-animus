@@ -106,6 +106,112 @@
     return '<button type="button" class="shop-buy-btn" data-product="' + escapeHTML(productId) + '">Get</button>';
   }
 
+  function renderComparisonTable() {
+    var mount = document.getElementById('shopCompareMount');
+    if (!mount) return;
+    var freeCompares =
+      g.AnimusEntitlements && g.AnimusEntitlements.FREE_COMPARES_PER_MONTH
+        ? g.AnimusEntitlements.FREE_COMPARES_PER_MONTH
+        : 10;
+    mount.innerHTML =
+      '<table class="shop-compare-table">' +
+      '<thead><tr>' +
+      '<th scope="col">Feature</th>' +
+      '<th scope="col">Free</th>' +
+      '<th scope="col" class="shop-col-paid">Detailed</th>' +
+      '<th scope="col" class="shop-col-paid">Estimator</th>' +
+      '<th scope="col" class="shop-col-paid">Plus</th>' +
+      '</tr></thead><tbody>' +
+      row(
+        'Core assessment',
+        'Full 14-dimension map',
+        '<span class="shop-compare-highlight">Extended depth + richer AI narrative</span><span class="shop-compare-note">Every layer unpacked with precision</span>',
+        '—',
+        'Everything in Free + paid packs'
+      ) +
+      row(
+        'Dimensional analysis',
+        'Summary profile',
+        '<span class="shop-compare-highlight">Full-depth scoring across all dimensions</span>',
+        '—',
+        'Unlimited depth on your map'
+      ) +
+      row(
+        'Behavioral estimation',
+        '—',
+        '—',
+        '<span class="shop-compare-highlight">Estimate anyone from real observed behavior</span><span class="shop-compare-note">Separate from friends — built for coworkers, family, rivals</span>',
+        'Included with Estimator purchase'
+      ) +
+      row(
+        'Monthly compares',
+        freeCompares + ' compares',
+        freeCompares + ' compares',
+        freeCompares + ' compares',
+        '<span class="shop-compare-yes">Unlimited</span><span class="shop-compare-note">Compare as often as insight strikes</span>'
+      ) +
+      row(
+        'Group compare',
+        '—',
+        '—',
+        '—',
+        '<span class="shop-compare-highlight">Up to 6 people at once</span><span class="shop-compare-note">See group chemistry in one view</span>'
+      ) +
+      row(
+        'XP progression',
+        'Standard earn rate',
+        'Standard',
+        'Standard',
+        '<span class="shop-compare-yes">1.25× on all XP</span>'
+      ) +
+      row(
+        'Shop pricing',
+        '—',
+        '—',
+        '—',
+        '<span class="shop-compare-yes">20% off all packs</span>'
+      ) +
+      row(
+        'Career & lifestyle guides',
+        '—',
+        '—',
+        '—',
+        '<span class="shop-compare-highlight">3 AI PDF guides / month</span><span class="shop-compare-note">Personalized to your full profile</span>'
+      ) +
+      row(
+        'Profile badge',
+        '—',
+        '—',
+        '—',
+        '<span class="shop-compare-yes">Plus badge</span>'
+      ) +
+      '</tbody></table>' +
+      '<p class="shop-compare-foot">Free gets you a rigorous baseline. Paid packs unlock professional-grade depth, behavioral estimation, and social insight — Plus is the membership if you compare often.</p>';
+
+    function row(feature, free, detailed, estimator, plus) {
+      return (
+        '<tr class="shop-compare-row">' +
+        '<td class="shop-compare-feature">' +
+        escapeHTML(feature) +
+        '</td>' +
+        '<td>' +
+        cell(free) +
+        '</td><td>' +
+        cell(detailed) +
+        '</td><td>' +
+        cell(estimator) +
+        '</td><td>' +
+        cell(plus) +
+        '</td></tr>'
+      );
+    }
+
+    function cell(val) {
+      if (val === '—') return '<span class="shop-compare-muted">—</span>';
+      return val;
+    }
+  }
+
   function renderProducts(ent, userData) {
     var grid = document.getElementById('shopGrid');
     if (!grid || !g.AnimusEntitlements) return;
@@ -300,6 +406,7 @@
   function boot(auth, db) {
     g.auth = auth;
     g.db = db;
+    renderComparisonTable();
     loadPaymentsStatus();
     auth.onAuthStateChanged(function (user) {
       if (!user) {

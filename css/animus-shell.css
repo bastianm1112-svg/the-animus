@@ -474,14 +474,43 @@ body.light-mode .mobile-bottom-nav {
 
 .mbn-item.active {
   color: var(--gold);
+  font-weight: 500;
+}
+
+.mbn-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius: 0 0 2px 2px;
+}
+
+.mbn-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: calc(4px + var(--safe-bottom, 0px) * 0);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  opacity: 0.9;
 }
 
 .mbn-item svg {
   opacity: 0.55;
+  transition: opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease;
 }
 
 .mbn-item.active svg {
   opacity: 1;
+  transform: translateY(-1px);
+  filter: drop-shadow(0 0 6px rgba(200, 169, 110, 0.35));
 }
 
 .mbn-badge {
