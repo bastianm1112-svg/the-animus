@@ -22,10 +22,14 @@ var mbtiMeta={
 };
 
 function buildFallbackNarrative(mbti,enn,att,phi,data){
+  data = data || {};
+  if (!data.cog || typeof data.cog !== 'object') data.cog = {};
   var mm = mbtiMeta[mbti] || {n:'The Unknown Archetype', t:'A unique configuration of mind and motivation that defies easy categorization.'};
   var fnsSorted = Object.keys(data.cog).sort(function(a,b){return data.cog[b]-data.cog[a];});
   var dom = fnsSorted[0] || 'Ti';
   var aux = fnsSorted[1] || 'Ni';
+  var isIntro = 'INFJ,INTJ,INFP,INTP,ISFJ,ISTJ,ISFP,ISTP'.indexOf(mbti) >= 0;
+  var ennLabel = enn.type + 'w' + enn.wing;
 
   // Cognitive narrative — based on actual dominant function
   var cogDesc = {
@@ -40,22 +44,28 @@ function buildFallbackNarrative(mbti,enn,att,phi,data){
   };
   var cogNarr;
   if (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.buildCogNarrative) {
-    cogNarr = ProfileNarrativeDepth.buildCogNarrative(mbti, dom, aux, cogDesc);
+    cogNarr = ProfileNarrativeDepth.buildCogNarrative(mbti, dom, aux, cogDesc, data.cog);
   } else {
     cogNarr = 'As '+mbti+', your dominant function, '+dom+', '+(cogDesc[dom]||'shapes your entire cognitive architecture.')+'\n\nYour auxiliary function, '+aux+', '+(cogDesc[aux]||'provides crucial support.')+' Together these two functions create the characteristic '+mbti+' way of engaging with problems, people, and ideas that others around you likely recognize as distinctly yours.';
   }
 
-  // Social/alone — based on E/I
-  var isIntro = 'INFJ,INTJ,INFP,INTP,ISFJ,ISTJ,ISFP,ISTP'.indexOf(mbti) >= 0;
-  var isFeel  = 'Fe,Fi'.indexOf(dom) >= 0 || 'Fe,Fi'.indexOf(aux) >= 0;
-  var ennLabel = enn.type + 'w' + enn.wing;
-  var aloneD  = isIntro
-    ? 'As '+mbti+' (Enneagram '+ennLabel+'), solitude restores and clarifies you — your richest thinking happens in stillness, away from the noise of others\' demands and expectations.'
-    : 'As '+mbti+' (Enneagram '+ennLabel+'), you still need pockets of solitude to process and integrate — the social world energizes you, but reflection is where you make sense of what you have gathered.';
-  var socialD = isIntro
-    ? 'As '+mbti+' with Enneagram '+ennLabel+', you often appear more reserved than you feel internally — selective about social energy, which can read as distance while masking depth and warmth on your own terms.'
-    : 'As '+mbti+' with Enneagram '+ennLabel+', you engage the social world with natural ease — your energy draws others in, though your inner life is not fully visible from the outside.';
-  var shadowD = 'Your greatest strengths cast specific shadows. '+dom+' dominance means that your '+(dom==='Ni'?'certainty in your own vision can make you dismissive of information that does not fit your internal model':dom==='Ne'?'generative range can make follow-through and sustained commitment genuinely difficult':dom==='Ti'?'rigorous internal logic can disconnect you from the emotional intelligence that human relationships require':dom==='Te'?'drive for efficiency can override sensitivity to the human costs of optimization':dom==='Fi'?'depth of individual values can create a moral certainty that is difficult for others to engage with':dom==='Fe'?'orientation toward others\' needs can suppress your own until they resurface in unpredictable ways':dom==='Si'?'reliance on established frameworks can create resistance to change even when change is clearly necessary':'orientation toward immediate experience can make long-term strategic thinking genuinely effortful')+'.';
+  var depth = typeof ProfileNarrativeDepth !== 'undefined' ? ProfileNarrativeDepth : null;
+  var aloneD = depth && depth.buildAloneNarrative
+    ? depth.buildAloneNarrative(mbti, enn, att, data.cog)
+    : (isIntro
+      ? 'As '+mbti+' (Enneagram '+ennLabel+'), solitude restores and clarifies you — your richest thinking happens in stillness, away from the noise of others\' demands and expectations.'
+      : 'As '+mbti+' (Enneagram '+ennLabel+'), you still need pockets of solitude to process and integrate — the social world energizes you, but reflection is where you make sense of what you have gathered.');
+  var socialD = depth && depth.buildSocialNarrative
+    ? depth.buildSocialNarrative(mbti, enn, att, data.cog)
+    : (isIntro
+      ? 'As '+mbti+' with Enneagram '+ennLabel+', you often appear more reserved than you feel internally — selective about social energy, which can read as distance while masking depth and warmth on your own terms.'
+      : 'As '+mbti+' with Enneagram '+ennLabel+', you engage the social world with natural ease — your energy draws others in, though your inner life is not fully visible from the outside.');
+  var shadowD = depth && depth.buildShadowNarrative
+    ? depth.buildShadowNarrative(mbti, enn, dom, aux, data.cog)
+    : 'Your greatest strengths cast specific shadows — when ' + dom + ' overruns under stress, the same gift becomes the blind spot others experience first.';
+  var tagline = depth && depth.buildTagline
+    ? depth.buildTagline(mbti, enn, dom, aux, data.cog)
+    : mm.t;
 
   // Figures — based on MBTI type
   var figsByType = {
@@ -138,14 +148,14 @@ function buildFallbackNarrative(mbti,enn,att,phi,data){
 
   return {
     mbtiName: mm.n,
-    tagline: mm.t,
+    tagline: tagline,
     cogNarrative: cogNarr,
     ennNarrative: (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.buildEnnNarrative)
-      ? ProfileNarrativeDepth.buildEnnNarrative(mbti, enn)
+      ? ProfileNarrativeDepth.buildEnnNarrative(mbti, enn, data)
       : 'Your Enneagram type '+enn.type+'w'+enn.wing+' (alongside '+mbti+') is driven by a core fear and desire that shapes major life decisions, even when invisible. The wing adds specific texture to how this motivation shows up day to day.'
         + (enn.tritype ? '\n\nYour tritype of '+enn.tritype+' reflects how your head, heart, and gut centers each operate — a fuller map of motivation than the core type alone.' : ''),
     attNarrative: (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.buildAttNarrative)
-      ? ProfileNarrativeDepth.buildAttNarrative(att, mbti, enn)
+      ? ProfileNarrativeDepth.buildAttNarrative(att, mbti, enn, data.cog, data)
       : 'Your attachment pattern shapes how you seek and experience closeness — the invisible architecture that determines what feels safe, what feels threatening, and what you do when vulnerability is required.',
     phiNarrative: (typeof ProfileNarrativeDepth !== 'undefined' && ProfileNarrativeDepth.buildPhiNarrative)
       ? ProfileNarrativeDepth.buildPhiNarrative(phi, mbti, enn)

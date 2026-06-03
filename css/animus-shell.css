@@ -581,6 +581,11 @@ body:has(.mobile-bottom-nav) .toast {
     display: flex !important;
   }
 
+  .nav-right .nav-avatar {
+    display: flex !important;
+    flex-shrink: 0;
+  }
+
   .mobile-bottom-nav {
     display: flex;
   }

@@ -75,10 +75,10 @@
       '<button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleThemeGlobal()" title="Toggle theme">' +
       SVG_THEME +
       '</button>' +
+      '<a href="/profile" class="nav-avatar" id="navAvatar">?</a>' +
       '<button type="button" class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation">' +
       SVG_MENU +
       '</button>' +
-      '<a href="/profile" class="nav-avatar" id="navAvatar">?</a>' +
       '</div></nav>' +
       '<div class="nav-mobile-menu" id="navMobileMenu">' +
       '<a href="/" class="nav-mobile-item' +
@@ -168,6 +168,9 @@
     var root = document.getElementById(rootId);
     if (root) root.innerHTML = buildNavbar(active);
     applyNavLang();
+    if (g.AnimusShared && g.AnimusShared.syncNavAuth) {
+      g.AnimusShared.syncNavAuth('navAvatar');
+    }
   }
 
   function mountBottom(rootId, active) {

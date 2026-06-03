@@ -23,14 +23,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/animus-shell.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-shell.css?v=20260609">
 <link rel="stylesheet" href="/style.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-unified.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-release.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-shop.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-premium.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-motion.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-test.css?v=20260607">
+<link rel="stylesheet" href="/css/animus-test.css?v=20260609">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
 <script src="/js/animus-app.js?v=20260603" defer></script>
@@ -38,7 +38,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="/js/animus-shared.js?v=20260608"></script>
+  <script src="/js/animus-shared.js?v=20260609"></script>
   <script>
     AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
     var auth = firebase.auth();
@@ -220,14 +220,14 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <script src="/js/psyche-questions.js"></script>
 <script src="/js/psyche-q-es.js"></script>
 <script src="/js/psyche-cross.js"></script>
-<script src="/js/profile-narrative-depth.js"></script>
-<script src="/js/profile-narratives.js"></script>
-<script src="/js/psyche-engine.js?v=20260607"></script>
+<script src="/js/profile-narrative-depth.js?v=20260609"></script>
+<script src="/js/profile-narratives.js?v=20260609"></script>
+<script src="/js/psyche-engine.js?v=20260609"></script>
 <script src="/js/psyche-intro.js?v=20260607"></script>
 
 <div id="appBottomMount"></div>
 <script src="/js/animus-social.js"></script>
-<script src="/js/animus-nav.js"></script>
+<script src="/js/animus-nav.js?v=20260609"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   if (typeof AnimusI18n !== 'undefined' && typeof AnimusShared !== 'undefined') {
@@ -244,6 +244,9 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   AnimusNav.mountTop('appNavMount', 'test');
   AnimusNav.mountBottom('appBottomMount', 'test');
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.bindNavAuth) {
+    AnimusShared.bindNavAuth('navAvatar');
+  }
   if (typeof firebase !== 'undefined' && firebase.auth && typeof AnimusSocial !== 'undefined') {
     var a = firebase.auth();
     var d = firebase.firestore();
@@ -253,10 +256,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (typeof AnimusShared !== 'undefined') {
           AnimusShared.ensureUserDocument(d, u).catch(function () {});
           AnimusShared.trySyncLocalResultToFirestore(u).catch(function () {});
-          AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), u, null);
-          d.collection('users').doc(u.uid).get().then(function (doc) {
-            if (doc.exists) AnimusShared.applyNavAvatar(document.getElementById('navAvatar'), u, doc.data());
-          });
         }
         AnimusSocial.loadNotifs(u.uid);
       }
@@ -265,6 +264,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 </body>
-</html>
-
-
+</

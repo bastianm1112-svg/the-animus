@@ -132,7 +132,10 @@
     if (
       (snap.cogNarrative && snap.cogNarrative.length < 520) ||
       (snap.phiNarrative && snap.phiNarrative.length < 280) ||
-      (snap.politicalNarrative && snap.politicalNarrative.length < 400)
+      (snap.politicalNarrative && snap.politicalNarrative.length < 400) ||
+      (snap.aloneDesc && snap.aloneDesc.length < 220) ||
+      (snap.socialDesc && snap.socialDesc.length < 220) ||
+      (snap.aloneDesc && snap.aloneDesc.indexOf('solitude restores and clarifies') >= 0)
     ) {
       return true;
     }
@@ -233,7 +236,11 @@
     var data = {
       cog: cog,
       polX: typeof snap.polX === 'number' ? snap.polX : 0,
-      polY: typeof snap.polY === 'number' ? snap.polY : 0
+      polY: typeof snap.polY === 'number' ? snap.polY : 0,
+      ennScores: snap.ennScores || snap.ennResult && snap.ennResult.scores,
+      attScores: snap.attScores,
+      phiScores: snap.phiScores,
+      instStack: snap.instStack
     };
     var built = PN.buildFallbackNarrative(mbti, enn, att, phi, data);
 
@@ -791,25 +798,44 @@
       });
   }
 
-  function bindNavAuth(avatarId) {
-    var el = document.getElementById(avatarId || 'navAvatar');
-    if (!el || typeof firebase === 'undefined' || !firebase.auth) return;
+  var navAuthListenerBound = false;
 
-    firebase.auth().onAuthStateChanged(function (user) {
-      if (!user) {
-        applyNavAvatarForSession(el, null);
-        return;
-      }
-      var dbRef =
-        typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null;
-      if (dbRef) {
-        enforceBannedSession(firebase.auth(), dbRef, user).then(function (signedOut) {
-          if (!signedOut) applyNavAvatarForSession(el, user);
-        });
-        return;
-      }
-      applyNavAvatarForSession(el, user);
-    });
+  function syncNavAuthWithUser(avatarId, user) {
+    var el = document.getElementById(avatarId || 'navAvatar');
+    if (!el) return;
+    if (!user) {
+      applyNavAvatarForSession(el, null);
+      return;
+    }
+    var dbRef =
+      typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null;
+    if (dbRef) {
+      enforceBannedSession(firebase.auth(), dbRef, user).then(function (signedOut) {
+        if (!signedOut) {
+          applyNavAvatarForSession(document.getElementById(avatarId || 'navAvatar'), user);
+        }
+      });
+      return;
+    }
+    applyNavAvatarForSession(el, user);
+  }
+
+  function syncNavAuth(avatarId) {
+    if (typeof firebase === 'undefined' || !firebase.auth) return;
+    syncNavAuthWithUser(avatarId, firebase.auth().currentUser);
+  }
+
+  function bindNavAuth(avatarId) {
+    if (typeof firebase === 'undefined' || !firebase.auth) return;
+    avatarId = avatarId || 'navAvatar';
+
+    if (!navAuthListenerBound) {
+      navAuthListenerBound = true;
+      firebase.auth().onAuthStateChanged(function (user) {
+        syncNavAuthWithUser('navAvatar', user);
+      });
+    }
+    syncNavAuth(avatarId);
   }
 
   function initFirebaseApp(config) {
@@ -1556,6 +1582,7 @@
     applyNavAvatar: applyNavAvatar,
     applyNavAvatarForSession: applyNavAvatarForSession,
     applyProfilePhoto: applyProfilePhoto,
+    syncNavAuth: syncNavAuth,
     bindNavAuth: bindNavAuth,
     initFirebaseApp: initFirebaseApp,
     sanitizeForFirestore: sanitizeForFirestore,
