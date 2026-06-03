@@ -159,8 +159,18 @@
   function hasEntitlement(userData, key) {
     if (!userData) return false;
     if (key === 'animusPlus') return hasAnimusPlus(userData);
+    if (key === 'testDetailed') key = 'detailedTest';
     var e = normalizeUserEntitlements(userData);
     return !!e[key];
+  }
+
+  /** Detailed Test (Animus Plus shop product: detailedTest). */
+  function hasDetailedTest(userData) {
+    return hasEntitlement(userData, 'detailedTest');
+  }
+
+  function hasTestEstimator(userData) {
+    return hasEntitlement(userData, 'testEstimator');
   }
 
   function getCompareUsage(userData) {
@@ -288,6 +298,8 @@
     defaultXp: defaultXp,
     normalizeUserEntitlements: normalizeUserEntitlements,
     hasEntitlement: hasEntitlement,
+    hasDetailedTest: hasDetailedTest,
+    hasTestEstimator: hasTestEstimator,
     hasAnimusPlus: hasAnimusPlus,
     getCompareUsage: getCompareUsage,
     getCompareRemaining: getCompareRemaining,

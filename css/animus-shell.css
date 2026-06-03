@@ -14,7 +14,9 @@
   --gold3: #f0d090;
   --white: #f0ece4;
   --green: #27ae60;
+  --green2: #2d6b47;
   --red: #c0392b;
+  --compare-mode-h: 44px;
   --nav-h: 56px;
   --mbn-h: 60px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);

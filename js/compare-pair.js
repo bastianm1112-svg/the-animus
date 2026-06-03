@@ -156,19 +156,33 @@
     }
   }
 
+  function formatAiParagraphs(text) {
+    if (!text) return '';
+    return String(text)
+      .split(/\n\n+/)
+      .map(function (p) {
+        return p.trim();
+      })
+      .filter(Boolean)
+      .map(function (p) {
+        return '<p>' + escapeHTML(p) + '</p>';
+      })
+      .join('');
+  }
+
   function renderAnalysisHtml(ai, note) {
     var html =
       '<div class="ai-section"><div class="ai-section-title">Where You Align</div><div class="ai-block"><div class="ai-block-text">' +
-      escapeHTML(ai.whereAlign) +
+      formatAiParagraphs(ai.whereAlign) +
       '</div></div></div>' +
       '<div class="ai-section"><div class="ai-section-title">Where You\'ll Clash</div><div class="ai-block"><div class="ai-block-text">' +
-      escapeHTML(ai.whereClash) +
+      formatAiParagraphs(ai.whereClash) +
       '</div></div></div>' +
       '<div class="ai-section"><div class="ai-section-title">How You\'d Interact</div><div class="ai-block"><div class="ai-block-text">' +
-      escapeHTML(ai.dynamic) +
+      formatAiParagraphs(ai.dynamic) +
       '</div></div></div>' +
       '<div class="ai-section"><div class="ai-section-title">What Each Brings Out</div><div class="ai-block"><div class="ai-block-text">' +
-      escapeHTML(ai.mutualEffect) +
+      formatAiParagraphs(ai.mutualEffect) +
       '</div></div></div>';
     if (note) {
       html =
@@ -183,6 +197,32 @@
   function runCompareAnalysis(mySnap, themSnap, myName, themName, scores) {
     var aiContent = document.getElementById('aiAnalysisContent');
     if (!aiContent) return;
+
+    mySnap =
+      Normalize && Normalize.normalizeProfileForCompare
+        ? Normalize.normalizeProfileForCompare(mySnap)
+        : mySnap;
+    themSnap =
+      Normalize && Normalize.normalizeProfileForCompare
+        ? Normalize.normalizeProfileForCompare(themSnap)
+        : themSnap;
+
+    function showAnalysisLoading() {
+      var myType = (mySnap && mySnap.mbti) || '?';
+      var themType = (themSnap && themSnap.mbti) || '?';
+      aiContent.innerHTML =
+        '<div class="compare-ai-loading" role="status">' +
+        'Analyzing <strong>' +
+        escapeHTML(myName) +
+        '</strong> (' +
+        escapeHTML(myType) +
+        ') with <strong>' +
+        escapeHTML(themName) +
+        '</strong> (' +
+        escapeHTML(themType) +
+        ')…' +
+        '</div>';
+    }
 
     function parseAnalysisPayload(text) {
       if (!text) return null;
@@ -215,45 +255,20 @@
       aiContent.innerHTML = renderAnalysisHtml(ai, note);
     }
 
-    showOffline(null);
+    showAnalysisLoading();
 
     var prompt =
-      'You are an expert in MBTI and Enneagram. Analyze compatibility between two people.' +
-      ' Person 1 (' +
-      myName +
-      '): MBTI=' +
-      mySnap.mbti +
-      ', Enneagram=' +
-      (mySnap.ennType || '?') +
-      'w' +
-      (mySnap.ennWing || '?') +
-      ', Attachment=' +
-      (mySnap.att || '?') +
-      ', Philosophy=' +
-      (mySnap.phi || '?') +
-      ', Political X=' +
-      (mySnap.polX || 0) +
-      ' Y=' +
-      (mySnap.polY || 0) +
-      '.' +
-      ' Person 2 (' +
-      themName +
-      '): MBTI=' +
-      themSnap.mbti +
-      ', Enneagram=' +
-      (themSnap.ennType || '?') +
-      'w' +
-      (themSnap.ennWing || '?') +
-      ', Attachment=' +
-      (themSnap.att || '?') +
-      ', Philosophy=' +
-      (themSnap.phi || '?') +
-      ', Political X=' +
-      (themSnap.polX || 0) +
-      ' Y=' +
-      (themSnap.polY || 0) +
-      '.' +
-      ' Return JSON with keys: {"whereAlign":"2 paragraphs on natural connection","whereClash":"2 paragraphs on friction","dynamic":"1 paragraph on social interaction","mutualEffect":"1 paragraph on what each brings out in the other"}. Raw JSON only.';
+      Normalize && Normalize.buildComparePrompt
+        ? Normalize.buildComparePrompt(mySnap, themSnap, myName, themName, scores)
+        : 'Analyze compatibility between ' +
+          myName +
+          ' (' +
+          mySnap.mbti +
+          ') and ' +
+          themName +
+          ' (' +
+          themSnap.mbti +
+          '). Return JSON with keys whereAlign, whereClash, dynamic, mutualEffect.';
 
     var compareFetch =
       typeof AnimusShared !== 'undefined' && AnimusShared.fetchApiPost
@@ -275,10 +290,14 @@
         var ai = parseAnalysisPayload(text);
         if (ai && ai.whereAlign) {
           aiContent.innerHTML = renderAnalysisHtml(ai, null);
+          return;
         }
+        showOffline('AI response was incomplete — showing profile-based analysis from your scores.');
       })
-      .catch(function () {
-        /* offline analysis already visible */
+      .catch(function (err) {
+        var note = 'Live AI unavailable — showing profile-based analysis from your scores.';
+        if (err && err.message === '401') note = 'Sign in to refresh live AI — showing profile-based analysis.';
+        showOffline(note);
       });
   }
 
@@ -361,12 +380,45 @@
     if (!el) return;
     var derived =
       (my && my._compareDerivedCog) || (them && them._compareDerivedCog);
-    if (derived) {
+    var bothReal = Normalize && Normalize.hasRealCog && Normalize.hasRealCog(my) && Normalize.hasRealCog(them);
+    if (derived && !bothReal) {
       el.textContent =
-        'Charts use type-based estimates where full test scores are missing. Overall % only appears when both people have completed the full assessment.';
+        'Some charts use type-based estimates where full test scores are missing. Overall % blends all available data.';
+      el.style.display = 'block';
+    } else if (derived) {
+      el.textContent =
+        'One profile uses estimated function scores from MBTI type; bars still reflect typical patterns for that type.';
       el.style.display = 'block';
     } else {
       el.style.display = 'none';
+    }
+  }
+
+  function applyHeroProfile(side, profile, user, name) {
+    var prefix = side === 'you' ? 'you' : 'them';
+    var nameEl = document.getElementById(prefix + 'Name');
+    var userEl = document.getElementById(prefix + 'Username');
+    var typeEl = document.getElementById(prefix + 'Type');
+    var ennEl = document.getElementById(prefix + 'Enn');
+    var subEl = document.getElementById(prefix + 'MbtiName');
+    if (nameEl && name) nameEl.textContent = name;
+    if (userEl && user) userEl.textContent = '@' + escapeHTML(user.username || '—');
+    if (!profile) return;
+    var display =
+      Normalize && Normalize.normalizeProfileForDisplay
+        ? Normalize.normalizeProfileForDisplay(profile)
+        : profile;
+    if (typeEl) typeEl.textContent = display.mbti || '—';
+    if (subEl) {
+      subEl.textContent = display.mbtiName || display.tagline || '';
+      subEl.style.display = subEl.textContent ? 'block' : 'none';
+    }
+    if (ennEl) {
+      ennEl.textContent =
+        (display.ennType || '—') +
+        'w' +
+        (display.ennWing || '') +
+        (display.instStack ? ' · ' + display.instStack : '');
     }
   }
 
@@ -429,9 +481,12 @@
       var verdictEl2 = document.getElementById('compatVerdict');
       if (verdictEl2) {
         verdictEl2.textContent =
-          'Select a friend with full assessment data to see an overall compatibility score.';
+          'Complete the full assessment for both people to unlock the overall compatibility score.';
       }
     }
+
+    var emptyAi = document.querySelector('#c-panel-ai .compare-panel-empty');
+    if (emptyAi) emptyAi.style.display = 'none';
 
     runCompareAnalysis(mySnap, themSnap, myName, themName, scores || {});
 
@@ -527,21 +582,11 @@
         var themProfile = results[2];
         var themUser = results[3].exists ? results[3].data() : {};
 
-        var myName = escapeHTML(myUser.displayName || currentUser.displayName || 'You');
-        var themName = escapeHTML(themUser.displayName || themUser.username || 'Them');
+        var myName = myUser.displayName || currentUser.displayName || 'You';
+        var themName = themUser.displayName || themUser.username || 'Them';
 
-        document.getElementById('youName').textContent = myName;
-        document.getElementById('youUsername').textContent = '@' + escapeHTML(myUser.username || '');
-        if (myProfile) {
-          document.getElementById('youType').textContent = myProfile.mbti || '—';
-          document.getElementById('youEnn').textContent =
-            (myProfile.ennType || '—') + 'w' + (myProfile.ennWing || '') +
-            (myProfile.instStack ? ' · ' + myProfile.instStack : '');
-        }
-
-        document.getElementById('themName').textContent = themName;
-        document.getElementById('themUsername').textContent = '@' + escapeHTML(themUser.username || '—');
-        document.getElementById('themAvatar').textContent = themName.charAt(0).toUpperCase();
+        applyHeroProfile('you', myProfile, myUser, myName);
+        applyHeroProfile('them', themProfile, themUser, themName);
 
         if (g.AnimusShared) {
           g.AnimusShared.applyNavAvatarForSession(document.getElementById('navAvatar'), currentUser);
@@ -559,6 +604,23 @@
           viewBtn.href = themProfileUrl;
           viewBtn.textContent = 'View ' + themName + "'s Profile →";
         }
+        var themHalf = document.querySelector('.profile-half.right');
+        if (themHalf && !themHalf.dataset.profileBound) {
+          themHalf.dataset.profileBound = '1';
+          themHalf.style.cursor = 'pointer';
+          themHalf.setAttribute('role', 'link');
+          themHalf.setAttribute('tabindex', '0');
+          themHalf.addEventListener('click', function (e) {
+            if (e.target.closest('a, button')) return;
+            window.location.href = themProfileUrl;
+          });
+          themHalf.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              window.location.href = themProfileUrl;
+            }
+          });
+        }
 
         ['legendYouAI', 'legendYouCog', 'legendYou', 'legendYou2', 'legendYouPhi'].forEach(function (id) {
           var el = document.getElementById(id);
@@ -568,13 +630,6 @@
           var el = document.getElementById(id);
           if (el) el.textContent = themName;
         });
-
-        if (themProfile) {
-          document.getElementById('themType').textContent = themProfile.mbti || '—';
-          document.getElementById('themEnn').textContent =
-            (themProfile.ennType || '—') + 'w' + (themProfile.ennWing || '') +
-            (themProfile.instStack ? ' · ' + themProfile.instStack : '');
-        }
 
         var myNorm =
           Normalize && Normalize.normalizeProfileForCompare

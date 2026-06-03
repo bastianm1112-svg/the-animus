@@ -193,9 +193,37 @@
     return out;
   }
 
+  function topFn(cog) {
+    if (!cog || typeof cog !== 'object') return '—';
+    return (
+      Object.keys(cog).sort(function (a, b) {
+        return (Number(cog[b]) || 0) - (Number(cog[a]) || 0);
+      })[0] || '—'
+    );
+  }
+
+  function topFnList(cog, n) {
+    if (!cog || typeof cog !== 'object') return [];
+    return Object.keys(cog)
+      .sort(function (a, b) {
+        return (Number(cog[b]) || 0) - (Number(cog[a]) || 0);
+      })
+      .slice(0, n || 4);
+  }
+
+  function formatScoreLine(obj, keys) {
+    if (!obj) return 'none';
+    keys = keys || Object.keys(obj);
+    return keys
+      .map(function (k) {
+        return k + ':' + Math.round(Number(obj[k]) || 0);
+      })
+      .join(', ');
+  }
+
   function normalizeProfileForCompare(snap) {
     if (!snap) return null;
-    var out = Object.assign({}, snap);
+    var out = mapLegacyProfileFields(snap);
     var rawCog = out.cog && typeof out.cog === 'object' ? Object.assign({}, out.cog) : {};
     out._hasRealCog = cogSum(rawCog) > 0;
 
@@ -224,67 +252,489 @@
   }
 
   function canShowCompatScore(my, them) {
-    return hasRealCog(my) && hasRealCog(them);
+    if (!my || !them || !my.mbti || !them.mbti) return false;
+    return cogSum(my.cog) > 0 && cogSum(them.cog) > 0;
+  }
+
+  var ATT_LABELS = {
+    AT_SEC: 'Secure',
+    AT_ANX: 'Anxious-Preoccupied',
+    AT_AVO: 'Dismissive-Avoidant',
+    AT_DIS: 'Fearful-Avoidant'
+  };
+
+  var PHI_LABELS = {
+    PH_NIE: 'Nietzschean',
+    PH_STO: 'Stoic',
+    PH_EPI: 'Epicurean',
+    PH_KAN: 'Kantian',
+    PH_ARI: 'Aristotelian',
+    PH_EXI: 'Existentialist',
+    PH_PRA: 'Pragmatist',
+    PH_SKE: 'Skeptic'
+  };
+
+  function labelAtt(code) {
+    return ATT_LABELS[code] || String(code || '').replace('AT_', '') || '—';
+  }
+
+  function labelPhi(code) {
+    return PHI_LABELS[code] || String(code || '').replace('PH_', '') || '—';
+  }
+
+  function polSummary(snap) {
+    if (typeof snap.polX !== 'number') return '—';
+    var econ = snap.polX > 10 ? 'economically right' : snap.polX < -10 ? 'economically left' : 'economically centrist';
+    var soc = snap.polY > 10 ? 'socially authoritarian' : snap.polY < -10 ? 'socially libertarian' : 'socially moderate';
+    return econ + ', ' + soc;
+  }
+
+  function topEnnType(enn) {
+    if (!enn || typeof enn !== 'object') return null;
+    var best = null;
+    var bestScore = -1;
+    for (var i = 1; i <= 9; i++) {
+      var k = 'E' + i;
+      var s = Number(enn[k]) || 0;
+      if (s > bestScore) {
+        bestScore = s;
+        best = i;
+      }
+    }
+    return best;
+  }
+
+  function cogGapInsight(my, them, myName, themName) {
+    var keys = ['Ni', 'Ne', 'Ti', 'Te', 'Fi', 'Fe', 'Si', 'Se'];
+    var gaps = keys
+      .map(function (fn) {
+        var y = my.cog && my.cog[fn];
+        var t = them.cog && them.cog[fn];
+        if (y == null || t == null) return null;
+        return { fn: fn, d: Math.abs(Math.round(y) - Math.round(t)), y: Math.round(y), t: Math.round(t) };
+      })
+      .filter(Boolean)
+      .sort(function (a, b) {
+        return b.d - a.d;
+      });
+    if (!gaps.length || gaps[0].d < 14) return '';
+    var g = gaps[0];
+    return (
+      'Largest cognitive gap: ' +
+      g.fn +
+      ' (' +
+      myName +
+      ' ' +
+      g.y +
+      ' vs ' +
+      themName +
+      ' ' +
+      g.t +
+      ') — expect different defaults on planning depth, emotional tone, or sensory engagement.'
+    );
+  }
+
+  function big5GapNote(my, them) {
+    var keys = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
+    var gaps = keys
+      .map(function (k) {
+        var y = my.big5 && my.big5[k];
+        var t = them.big5 && them.big5[k];
+        if (y == null || t == null) return null;
+        return { k: k, d: Math.abs(Math.round(y) - Math.round(t)), y: Math.round(y), t: Math.round(t) };
+      })
+      .filter(Boolean)
+      .sort(function (a, b) {
+        return b.d - a.d;
+      });
+    if (!gaps.length || gaps[0].d < 12) return '';
+    var g = gaps[0];
+    return (
+      'Big Five gap: ' +
+      g.k +
+      ' (' +
+      g.y +
+      ' vs ' +
+      g.t +
+      ') — expect different defaults on pace, structure, or emotional bandwidth.'
+    );
+  }
+
+  function buildComparePrompt(my, them, myName, themName, scores) {
+    scores = scores || {};
+    var cogKeys = ['Ni', 'Ne', 'Ti', 'Te', 'Fi', 'Fe', 'Si', 'Se'];
+    var b5Keys = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
+    var myEnnDom = topEnnType(my.enn);
+    var themEnnDom = topEnnType(them.enn);
+    return (
+      'You are an expert personality analyst (MBTI cognitive functions, Enneagram, attachment, philosophy, political temperament). ' +
+      'Write a specific compatibility brief for two real people. Rules:\n' +
+      '- Name both people in every section; quote MBTI codes, dominant functions, Enneagram types, attachment styles, and numeric scores.\n' +
+      '- Reference at least two concrete score contrasts (cog, Big Five, or Enneagram) per section.\n' +
+      '- Ban vague lines like "you balance each other", "opposites attract", "great chemistry", or "communication is key" without tying them to a measured trait.\n' +
+      '- Describe conflict as predictable triggers (function grip, attachment protest, philosophy proof standards), not moral failure.\n' +
+      '- Tone: direct, psychologically literate, no horoscope fluff.\n\n' +
+      'Person 1 — ' +
+      myName +
+      ': MBTI ' +
+      (my.mbti || '?') +
+      (my.mbtiName ? ' (' + my.mbtiName + ')' : '') +
+      ', dominant ' +
+      topFn(my.cog) +
+      ', stack ' +
+      topFnList(my.cog, 4).join('>') +
+      '; cog [' +
+      formatScoreLine(my.cog, cogKeys) +
+      ']; Big5 [' +
+      formatScoreLine(my.big5, b5Keys) +
+      ']; Enneagram ' +
+      (my.ennType || '?') +
+      'w' +
+      (my.ennWing || '?') +
+      (my.ennTritype ? ', tritype ' + my.ennTritype : '') +
+      (myEnnDom ? ', enn score peak E' + myEnnDom : '') +
+      '; attachment ' +
+      labelAtt(my.att) +
+      ' (' +
+      (my.att || '?') +
+      '); instincts ' +
+      (my.instStack || '?') +
+      '; philosophy ' +
+      labelPhi(my.phi) +
+      ' (' +
+      (my.phi || '?') +
+      '); political ' +
+      polSummary(my) +
+      '; political X=' +
+      (my.polX || 0) +
+      ' Y=' +
+      (my.polY || 0) +
+      (my.tagline ? '; tagline "' + my.tagline + '"' : '') +
+      '.\n' +
+      'Person 2 — ' +
+      themName +
+      ': MBTI ' +
+      (them.mbti || '?') +
+      (them.mbtiName ? ' (' + them.mbtiName + ')' : '') +
+      ', dominant ' +
+      topFn(them.cog) +
+      ', stack ' +
+      topFnList(them.cog, 4).join('>') +
+      '; cog [' +
+      formatScoreLine(them.cog, cogKeys) +
+      ']; Big5 [' +
+      formatScoreLine(them.big5, b5Keys) +
+      ']; Enneagram ' +
+      (them.ennType || '?') +
+      'w' +
+      (them.ennWing || '?') +
+      (them.ennTritype ? ', tritype ' + them.ennTritype : '') +
+      (themEnnDom ? ', enn score peak E' + themEnnDom : '') +
+      '; attachment ' +
+      labelAtt(them.att) +
+      ' (' +
+      (them.att || '?') +
+      '); instincts ' +
+      (them.instStack || '?') +
+      '; philosophy ' +
+      labelPhi(them.phi) +
+      ' (' +
+      (them.phi || '?') +
+      '); political ' +
+      polSummary(them) +
+      '; political X=' +
+      (them.polX || 0) +
+      ' Y=' +
+      (them.polY || 0) +
+      (them.tagline ? '; tagline "' + them.tagline + '"' : '') +
+      '.\n' +
+      (scores.overall
+        ? '\nComputed compatibility ~' +
+          scores.overall +
+          '% (cognition ' +
+          (scores.cog || '?') +
+          '%, values ' +
+          (scores.blend || '?') +
+          '%, philosophy ' +
+          (scores.phi || '?') +
+          '%, political ' +
+          (scores.pol || '?') +
+          '%, attachment ' +
+          (scores.att || '?') +
+          '%, rapport ' +
+          (scores.rapport || '?') +
+          '%).\n'
+        : '') +
+      'Return ONLY valid JSON with string values (no markdown): {"whereAlign":"2 paragraphs (~120 words each) on synergy citing types, functions, and scores","whereClash":"2 paragraphs on friction citing attachment/philosophy/political gaps and inferior-function stress","dynamic":"1 paragraph on day-to-day interaction in calm talk, conflict, and groups","mutualEffect":"1 paragraph on growth each person pulls from the other with named functions/traits"}.'
+    );
   }
 
   function buildOfflineAnalysis(my, them, myName, themName, scores) {
     scores = scores || {};
     var overall = scores.overall || 0;
-    var align =
-      my.mbti === them.mbti
-        ? 'You share the same MBTI type (' +
-          my.mbti +
-          '), which often means similar default approaches to problems, communication pacing, and decision-making.'
-        : 'As ' +
-          my.mbti +
-          ' and ' +
-          them.mbti +
-          ', you bring different cognitive priorities — ' +
-          myName +
-          ' tends toward ' +
-          (my.mbtiName || my.mbti) +
-          ' patterns while ' +
-          themName +
-          ' leans ' +
-          (them.mbtiName || them.mbti) +
-          '.';
-    var clash =
-      (my.att && them.att && my.att !== them.att
-        ? 'Attachment styles (' +
-          String(my.att).replace('AT_', '') +
-          ' vs ' +
-          String(them.att).replace('AT_', '') +
-          ') may create push-pull around closeness and reassurance. '
-        : '') +
-      (my.phi && them.phi && my.phi !== them.phi
-        ? 'Philosophical leanings differ (' +
-          String(my.phi).replace('PH_', '') +
-          ' vs ' +
-          String(them.phi).replace('PH_', '') +
-          '), which can surface in arguments about meaning, ethics, and what counts as evidence.'
-        : 'Watch for friction when stress amplifies your inferior functions — small misunderstandings can escalate quickly.');
-    var dynamic =
+    var myDom = topFn(my.cog);
+    var themDom = topFn(them.cog);
+    var myStack = topFnList(my.cog, 4).join(' → ');
+    var themStack = topFnList(them.cog, 4).join(' → ');
+    var myInferior = topFnList(my.cog, 8).slice(-1)[0] || '—';
+    var themInferior = topFnList(them.cog, 8).slice(-1)[0] || '—';
+    var myEnn = (my.ennType || '?') + 'w' + (my.ennWing || '?');
+    var themEnn = (them.ennType || '?') + 'w' + (them.ennWing || '?');
+    var scoreLead =
       overall >= 70
-        ? 'In groups, you likely energize each other; one of you may take the strategic frame while the other handles rapport or execution.'
+        ? 'ANIMUS scores this pairing around ' + overall + '% — strong overlap on cognition and values with workable differences.'
         : overall >= 50
-          ? 'You can collaborate well with explicit roles: decide upfront who leads planning vs. who checks emotional tone.'
-          : 'You may need deliberate pacing — schedule decompression after intense conversations so neither person feels steamrolled.';
+          ? 'ANIMUS scores this pairing around ' + overall + '% — meaningful overlap, but several dimensions pull in different directions.'
+          : overall > 0
+            ? 'ANIMUS scores this pairing around ' + overall + '% — contrasting defaults that can sharpen each other when expectations are explicit.'
+            : 'Profile data supports a type-level read (overall % needs full assessments on both sides).';
+
+    var alignP1;
+    if (my.mbti === them.mbti) {
+      alignP1 =
+        scoreLead +
+        ' ' +
+        myName +
+        ' and ' +
+        themName +
+        ' both type as ' +
+        my.mbti +
+        (my.mbtiName ? ' (' + my.mbtiName + ')' : '') +
+        ' with ' +
+        myDom +
+        ' leading (' +
+        myStack +
+        '). You decode problems with the same cognitive vocabulary — fast rapport, shared humor about blind spots, and similar pacing in planning vs. spontaneity.';
+    } else {
+      alignP1 =
+        scoreLead +
+        ' ' +
+        myName +
+        ' (' +
+        my.mbti +
+        (my.mbtiName ? ', ' + my.mbtiName : '') +
+        ', ' +
+        myDom +
+        '-dom, stack ' +
+        myStack +
+        ') and ' +
+        themName +
+        ' (' +
+        them.mbti +
+        (them.mbtiName ? ', ' + them.mbtiName : '') +
+        ', ' +
+        themDom +
+        '-dom, stack ' +
+        themStack +
+        ') complement when roles are clear: ' +
+        myName +
+        ' supplies ' +
+        myDom +
+        ' framing while ' +
+        themName +
+        ' supplies ' +
+        themDom +
+        ' execution — useful in projects, travel logistics, or mentoring dynamics.';
+    }
+
+    var alignP2 = '';
+    if (my.ennType && them.ennType && my.ennType === them.ennType) {
+      alignP2 =
+        'Shared Enneagram core ' +
+        myEnn +
+        ': you recognize each other\'s core fear and desire language — motivation talks land quickly.';
+    } else if (my.ennTritype && them.ennTritype && my.ennTritype === them.ennTritype) {
+      alignP2 =
+        'Matching tritype ' +
+        my.ennTritype +
+        ' (' +
+        myEnn +
+        ' vs ' +
+        themEnn +
+        '): similar stress sequencing even when wings differ.';
+    } else {
+      alignP2 =
+        'Enneagram contrast (' +
+        myEnn +
+        ' vs ' +
+        themEnn +
+        '): ' +
+        myName +
+        ' may prioritize what Type ' +
+        (my.ennType || '?') +
+        ' protects; ' +
+        themName +
+        ' what Type ' +
+        (them.ennType || '?') +
+        ' protects — useful for covering each other\'s blind motivation spots.';
+    }
+    var b5Note = big5GapNote(my, them);
+    var cogNote = cogGapInsight(my, them, myName, themName);
+    if (b5Note) alignP2 += ' ' + b5Note;
+    else if (cogNote) alignP2 += ' ' + cogNote;
+    else if (scores.cog >= 65) {
+      alignP2 += ' Cognition ring ~' + scores.cog + '% — function stacks are close enough to translate intent without constant meta-conversation.';
+    }
+
+    var clashP1 = '';
+    if (my.att && them.att && my.att !== them.att) {
+      clashP1 =
+        'Attachment friction: ' +
+        myName +
+        ' (' +
+        labelAtt(my.att) +
+        ') vs ' +
+        themName +
+        ' (' +
+        labelAtt(them.att) +
+        '). Reassurance cadence differs — one may pursue clarity while the other withdraws to regulate, which reads as disinterest unless named early.';
+    } else if (my.att && them.att) {
+      clashP1 =
+        'Both show ' +
+        labelAtt(my.att) +
+        ' attachment — clashes are less about closeness fear and more about ' +
+        myDom +
+        '/' +
+        themDom +
+        ' processing speed under stress.';
+    }
+    if (my.phi && them.phi && my.phi !== them.phi) {
+      clashP1 +=
+        (clashP1 ? ' ' : '') +
+        'Philosophy split: ' +
+        labelPhi(my.phi) +
+        ' (' +
+        myName +
+        ') vs ' +
+        labelPhi(them.phi) +
+        ' (' +
+        themName +
+        ') — arguments about evidence, duty, or meaning can feel like moral indictment.';
+    }
+    if (typeof my.polX === 'number' && typeof them.polX === 'number') {
+      var polDelta = Math.abs(Math.round(my.polX) - Math.round(them.polX)) + Math.abs(Math.round(my.polY) - Math.round(them.polY));
+      if (polDelta >= 28) {
+        clashP1 +=
+          (clashP1 ? ' ' : '') +
+          'Political geometry diverges (' +
+          polSummary(my) +
+          ' vs ' +
+          polSummary(them) +
+          ') — civic or lifestyle debates may hijack unrelated conflicts.';
+      }
+    }
+    if (!clashP1) {
+      clashP1 =
+        'No single attachment or philosophy flag dominates — friction likely shows up in cognitive tempo (' +
+        myDom +
+        ' vs ' +
+        themDom +
+        ') when neither person has slept or eaten.';
+    }
+
+    var clashP2 =
+      'Grip risk: when stressed, ' +
+      myName +
+      '\'s weakest link (' +
+      myInferior +
+      ') and ' +
+      themName +
+      '\'s (' +
+      themInferior +
+      ') inflate — sarcasm, over-planning, emotional flooding, or blunt Te/Fe can land as character attacks. ' +
+      (myDom !== themDom
+        ? myName +
+          '\'s ' +
+          myDom +
+          ' may label ' +
+          themName +
+          '\'s ' +
+          themDom +
+          ' moves "irrational"; ' +
+          themName +
+          ' may return the verdict on ' +
+          myName +
+          '.'
+        : 'Shared dominant ' +
+          myDom +
+          ' means you fight the same way — double intensity unless someone calls a pause.') +
+      (scores.att && scores.att < 50
+        ? ' Attachment ring ~' + scores.att + '% — schedule repair talks, not silent scorekeeping.'
+        : '');
+
+    var dynamic;
+    if (overall >= 75) {
+      dynamic =
+        'In calm conversation, ' +
+        myName +
+        ' (' +
+        my.mbti +
+        ', ' +
+        myDom +
+        ') and ' +
+        themName +
+        ' (' +
+        them.mbti +
+        ', ' +
+        themDom +
+        ') likely finish each other\'s analytical sentences — groups read you as aligned. In conflict, watch shared shortcuts: you may skip empathy steps because the logic feels obvious. In groups, split roles: one narrates strategy (' +
+        myDom +
+        '), one reads interpersonal temperature (' +
+        (themDom === 'Fe' || themDom === 'Fi' ? themDom : 'secondary feeling function') +
+        ').';
+    } else if (overall >= 55) {
+      dynamic =
+        'Day-to-day, agree explicitly who owns timing (' +
+        myName +
+        ' vs ' +
+        themName +
+        ') and depth — ' +
+        myDom +
+        '-led minds want closure; ' +
+        themDom +
+        '-led minds may reopen topics for nuance. In groups, position yourselves on complementary tasks to avoid competing for the same cognitive lane. After disagreements, debrief with one measurable next step, not a re-litigation of motives.';
+    } else {
+      dynamic =
+        'Pacing is the lever: ' +
+        myName +
+        ' may read ' +
+        themName +
+        ' as too intense or too distant depending on whether ' +
+        themDom +
+        ' amplifies or dampens the room. Schedule cool-down before big decisions. In social settings, stagger visibility — one speaks, one synthesizes — so neither feels erased.';
+    }
+
     var mutual =
-      myName +
-      ' can help ' +
       themName +
-      ' see blind spots in ' +
-      (them.mbti || 'their') +
-      ' weak spots, while ' +
-      themName +
-      ' stretches ' +
+      ' trains ' +
       myName +
-      ' into perspectives outside the ' +
-      (my.mbti || 'default') +
-      ' comfort zone.';
+      '\'s underused ' +
+      themDom +
+      ' (currently shadowed by ' +
+      myInferior +
+      '); ' +
+      myName +
+      ' helps ' +
+      themName +
+      ' anticipate ' +
+      themInferior +
+      ' spirals before they become relationship verdicts. ' +
+      (my.ennType && them.ennType && my.ennType !== them.ennType
+        ? 'Enneagram cross-teach: Type ' +
+          them.ennType +
+          ' shows ' +
+          myName +
+          ' a healthier stress path; Type ' +
+          my.ennType +
+          ' does the same for ' +
+          themName +
+          '.'
+        : 'Treat overlap as depth, not redundancy — refine the same strength from two life histories.') +
+      ' Best results when you name the function or attachment dynamic in the moment instead of debating character.';
+
     return {
-      whereAlign: align,
-      whereClash: clash,
+      whereAlign: alignP1 + '\n\n' + alignP2,
+      whereClash: clashP1 + '\n\n' + clashP2,
       dynamic: dynamic,
       mutualEffect: mutual
     };
@@ -298,6 +748,8 @@
     hasRealCog: hasRealCog,
     canShowCompatScore: canShowCompatScore,
     buildOfflineAnalysis: buildOfflineAnalysis,
+    buildComparePrompt: buildComparePrompt,
+    topFn: topFn,
     deriveBig5FromCog: deriveBig5FromCog,
     spreadEnn: spreadEnn,
     spreadPhiS: spreadPhiS,

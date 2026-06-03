@@ -179,6 +179,8 @@ function shuffle(arr){
 
 // ── TEST MODE ──
 var testMode = 'short';
+var _introUserData = null;
+var _introEntitlementsLoaded = false;
 
 function applyRouteTestMode() {
   var params = new URLSearchParams(window.location.search);
@@ -223,7 +225,6 @@ function configureIntroForMode() {
   if (mode === 'detailed') {
     if (title) title.textContent = 'Detailed Test';
     if (label) label.textContent = 'Detailed Test';
-    if (hint) hint.style.display = 'none';
   } else if (mode === 'estimator') {
     if (title) title.textContent = 'What are they likely to do?';
     if (label) label.textContent = 'Behavioral Estimator';
@@ -239,6 +240,7 @@ function configureIntroForMode() {
     var meta = intro.querySelector('.intro-meta');
     if (meta) meta.style.display = 'none';
   }
+  refreshIntroModeUI(_introUserData);
 }
 
 function setTestMode(mode) {
@@ -382,28 +384,157 @@ function updateQuizModeSwitch() {
   }
 }
 
-function refreshIntroModeUI() {
-  var es = lang === 'es';
-  var hint = document.getElementById('introShopHint');
-  var durationEl = document.getElementById('introMetaDuration');
-  var tabs = document.querySelectorAll('#testModeTabs .intro-mode-btn');
-  tabs.forEach(function (tab) {
-    var on = tab.getAttribute('data-mode') === (testMode === 'full' ? 'full' : 'short');
-    tab.classList.toggle('active', on);
-    tab.setAttribute('aria-selected', on ? 'true' : 'false');
-  });
-  if (durationEl) durationEl.textContent = testMode === 'full' ? '~45' : '~20';
-  if (hint) {
-    hint.style.display = testMode === 'full' ? 'none' : '';
-    hint.innerHTML = es
-      ? 'Para un resultado más preciso, desbloqueá el <a href="/shop">Test Detallado</a> en la Tienda.'
-      : 'For a more accurate result, unlock the <a href="/shop">Detailed Test</a> in the Shop.';
+function hasDetailedEntitlement(userData) {
+  if (typeof AnimusEntitlements === 'undefined') return false;
+  return AnimusEntitlements.hasDetailedTest
+    ? AnimusEntitlements.hasDetailedTest(userData)
+    : AnimusEntitlements.hasEntitlement(userData, 'detailedTest');
+}
+
+function canSelectTestMode(mode, userData) {
+  userData = userData || _introUserData || {};
+  if (mode === 'full' || mode === 'detailed') return hasDetailedEntitlement(userData);
+  if (mode === 'estimator') {
+    return typeof AnimusEntitlements !== 'undefined' && AnimusEntitlements.hasTestEstimator
+      ? AnimusEntitlements.hasTestEstimator(userData)
+      : AnimusEntitlements.hasEntitlement(userData, 'testEstimator');
   }
+  return true;
+}
+
+function loadIntroEntitlements(cb) {
+  if (typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore) {
+    _introEntitlementsLoaded = true;
+    if (cb) cb(null);
+    return;
+  }
+  var user = firebase.auth().currentUser;
+  if (!user) {
+    _introUserData = null;
+    _introEntitlementsLoaded = true;
+    if (cb) cb(null);
+    return;
+  }
+  firebase
+    .firestore()
+    .collection('users')
+    .doc(user.uid)
+    .get()
+    .then(function (doc) {
+      _introUserData = doc.exists ? doc.data() : {};
+      _introEntitlementsLoaded = true;
+      refreshIntroModeUI(_introUserData);
+      if (cb) cb(_introUserData);
+    })
+    .catch(function () {
+      _introEntitlementsLoaded = true;
+      if (cb) cb(null);
+    });
+}
+
+function refreshIntroModeUI(userData) {
+  userData = userData || _introUserData || {};
+  var es = lang === 'es';
+  var hasDetailed = hasDetailedEntitlement(userData);
+  var hint = document.getElementById('introShopHint');
+  var entitledBanner = document.getElementById('introEntitledBanner');
+  var durationEl = document.getElementById('introMetaDuration');
+  var introShell = document.querySelector('.test-intro-shell');
+  var tabs = document.querySelectorAll('#testModeTabs .intro-mode-btn');
+
+  if (testMode === 'full' && !hasDetailed) {
+    setTestMode('short');
+  }
+
+  tabs.forEach(function (tab) {
+    var mode = tab.getAttribute('data-mode');
+    var on = mode === (testMode === 'full' ? 'full' : 'short');
+    var locked = mode === 'full' && !hasDetailed;
+    tab.classList.toggle('active', on);
+    tab.classList.toggle('is-locked', locked);
+    tab.setAttribute('aria-selected', on ? 'true' : 'false');
+    tab.setAttribute('aria-disabled', locked ? 'true' : 'false');
+    tab.title = locked
+      ? es
+        ? 'Desbloqueá el Test Detallado en la Tienda'
+        : 'Unlock the Detailed Test in the Shop'
+      : '';
+    var badge = tab.querySelector('.intro-mode-badge');
+    if (mode === 'full' && badge) {
+      if (hasDetailed) {
+        badge.textContent = es ? 'Desbloqueado' : 'Unlocked';
+        badge.classList.add('is-owned');
+        badge.style.display = 'inline-block';
+      } else {
+        badge.textContent = es ? 'Tienda' : 'Shop';
+        badge.classList.remove('is-owned');
+        badge.style.display = 'inline-block';
+      }
+    }
+  });
+
+  if (durationEl) durationEl.textContent = testMode === 'full' ? '~45' : '~20';
+  if (introShell) {
+    introShell.classList.toggle('intro--detailed-owned', hasDetailed);
+    introShell.classList.toggle('intro--detailed-locked', !hasDetailed && _introEntitlementsLoaded);
+  }
+  if (document.body) {
+    document.body.classList.toggle('test-has-detailed', hasDetailed);
+    document.body.classList.toggle('test-needs-detailed', !hasDetailed && _introEntitlementsLoaded);
+    document.body.classList.toggle('test-intro-detailed-active', testMode === 'full');
+    document.body.classList.toggle('test-intro-main-active', testMode !== 'full' && testMode !== 'estimator');
+  }
+
+  if (entitledBanner) {
+    if (hasDetailed && testMode !== 'estimator') {
+      entitledBanner.style.display = 'block';
+      entitledBanner.textContent = es
+        ? 'Test Detallado desbloqueado — acceso completo a ~45 min y resultados más profundos.'
+        : 'Detailed Test unlocked — full ~45 min depth and richer results.';
+    } else {
+      entitledBanner.style.display = 'none';
+    }
+  }
+
+  if (hint) {
+    if (hasDetailed) {
+      hint.style.display = 'none';
+      hint.classList.add('is-hidden');
+    } else if (testMode === 'full') {
+      hint.style.display = 'block';
+      hint.classList.remove('is-hidden');
+      hint.innerHTML = es
+        ? 'El Test Detallado requiere compra. <a href="/shop">Desbloquealo en la Tienda</a> para continuar.'
+        : 'The Detailed Test requires purchase. <a href="/shop">Unlock it in the Shop</a> to continue.';
+    } else {
+      hint.style.display = 'block';
+      hint.classList.remove('is-hidden');
+      hint.innerHTML = es
+        ? 'Para mayor precisión, desbloqueá el <a href="/shop">Test Detallado</a> en la Tienda (~$10).'
+        : 'For greater accuracy, unlock the <a href="/shop">Detailed Test</a> in the Shop (~$10).';
+    }
+  }
+
+  var startBtn = document.getElementById('startBtn');
+  if (startBtn) {
+    if (testMode === 'full' && hasDetailed) {
+      startBtn.textContent = es ? 'COMENZAR TEST DETALLADO' : 'BEGIN DETAILED TEST';
+    } else if (testMode === 'full' && !hasDetailed) {
+      startBtn.textContent = es ? 'IR A LA TIENDA' : 'GO TO SHOP';
+    } else {
+      startBtn.textContent = es ? 'COMENZAR EVALUACIÓN' : 'BEGIN ASSESSMENT';
+    }
+  }
+
   showResumePromptIfNeeded();
 }
 
 function switchTestMode(newMode, resumeOther) {
   if (newMode === testMode) return;
+  if (!canSelectTestMode(newMode, _introUserData)) {
+    window.location.href = '/shop';
+    return;
+  }
   if (isQuizPhase()) saveTestProgress();
   setTestMode(newMode);
   if (resumeOther) {
@@ -547,6 +678,10 @@ var ESTIMATOR_ALLOC = {
 };
 
 function startTest() {
+  if (testMode === 'full' && !hasDetailedEntitlement(_introUserData)) {
+    window.location.href = '/shop';
+    return;
+  }
   function launch() {
     buildActiveQuestionSet();
     answers = new Array(TOTAL).fill(null);
@@ -560,8 +695,14 @@ function startTest() {
       document.getElementById('qSection').textContent = 'Estimating: ' + observerSubjectName;
     } else if(testMode === 'full') {
       document.getElementById('qSection').textContent = 'Detailed Test';
+      document.body.classList.add('test-quiz-detailed');
+      var qhdr = document.querySelector('.qhdr');
+      if (qhdr) qhdr.classList.add('qhdr--detailed');
     } else {
       document.getElementById('qSection').textContent = 'Main Test';
+      document.body.classList.remove('test-quiz-detailed');
+      var qhdrMain = document.querySelector('.qhdr');
+      if (qhdrMain) qhdrMain.classList.remove('qhdr--detailed');
     }
     renderQ();
     saveTestProgress();
@@ -1722,14 +1863,20 @@ function insertDetailedTestUpsell() {
   if (existing) existing.remove();
   if (testMode !== 'short') return;
   var es = lang === 'es';
-  function renderBanner(skip) {
-    if (skip) return;
+  function renderBanner(hasDetailedOwned) {
     var banner = document.createElement('div');
     banner.id = 'detailedTestUpsell';
-    banner.className = 'detailed-test-upsell';
-    banner.innerHTML = es
-      ? 'Para mayor precisión, considerá el <a href="/shop">Test Detallado</a>.'
-      : 'For greater accuracy, consider the <a href="/shop">Detailed Test</a>.';
+    if (hasDetailedOwned && testMode === 'full') {
+      banner.className = 'detailed-test-owned-badge';
+      banner.textContent = es ? 'Test Detallado — resultados de profundidad completa' : 'Detailed Test — full-depth results';
+    } else if (hasDetailedOwned) {
+      return;
+    } else {
+      banner.className = 'detailed-test-upsell';
+      banner.innerHTML = es
+        ? 'Para mayor precisión, considerá el <a href="/shop">Test Detallado</a>.'
+        : 'For greater accuracy, consider the <a href="/shop">Detailed Test</a>.';
+    }
     var hero = document.getElementById('resHero');
     if (hero) hero.appendChild(banner);
   }
@@ -2828,13 +2975,27 @@ showResults=function(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     loadSavedTestMode: loadSavedTestMode,
     switchTestMode: switchTestMode,
     refreshIntroModeUI: refreshIntroModeUI,
+    loadIntroEntitlements: loadIntroEntitlements,
+    canSelectTestMode: canSelectTestMode,
+    hasDetailedEntitlement: hasDetailedEntitlement,
     readProgressForMode: readProgressForMode
   };
   function syncIntro() {
     try {
       migrateLegacyProgress();
       setTestMode(loadSavedTestMode());
-      refreshIntroModeUI();
+      refreshIntroModeUI(_introUserData);
+      loadIntroEntitlements();
+      if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().onAuthStateChanged(function (user) {
+          if (user) loadIntroEntitlements();
+          else {
+            _introUserData = null;
+            _introEntitlementsLoaded = true;
+            refreshIntroModeUI(null);
+          }
+        });
+      }
     } catch (e) {}
     if (g.AnimusIntro && g.AnimusIntro.onEngineReady) g.AnimusIntro.onEngineReady();
   }

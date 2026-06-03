@@ -88,6 +88,10 @@
         var mode = tab.getAttribute('data-mode');
         if (!mode || !g.AnimusPsyche) return;
         if (mode === 'full') {
+          if (g.AnimusPsyche.canSelectTestMode && !g.AnimusPsyche.canSelectTestMode('full')) {
+            window.location.href = '/shop';
+            return;
+          }
           g.AnimusPsyche.setTestMode('full');
         } else {
           g.AnimusPsyche.setTestMode('short');
@@ -146,7 +150,13 @@
     },
     onEngineReady: function () {
       setMainMode();
-      refreshIntro();
+      if (g.AnimusPsyche && typeof g.AnimusPsyche.loadIntroEntitlements === 'function') {
+        g.AnimusPsyche.loadIntroEntitlements(function () {
+          refreshIntro();
+        });
+      } else {
+        refreshIntro();
+      }
     }
   };
 

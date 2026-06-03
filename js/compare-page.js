@@ -6,18 +6,29 @@
 
   function animateCompareBars(scope) {
     scope = scope || document.getElementById('comparePanels') || document;
-    setTimeout(function () {
-      scope.querySelectorAll('.dual-bar-you, .dual-bar-them').forEach(function (el) {
-        var w = el.getAttribute('data-w');
-        if (w !== null && w !== '') {
-          el.style.width = w + '%';
+    var bars = scope.querySelectorAll('.dual-bar-you, .dual-bar-them');
+    bars.forEach(function (el) {
+      el.style.width = '0%';
+    });
+    var fill = scope.querySelector ? scope.querySelector('.compat-fill') : document.querySelector('.compat-fill');
+    if (!fill && scope !== document) {
+      fill = document.querySelector('.compat-fill');
+    }
+    if (fill) fill.style.width = '0%';
+
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        bars.forEach(function (el) {
+          var w = el.getAttribute('data-w');
+          if (w !== null && w !== '') {
+            el.style.width = w + '%';
+          }
+        });
+        if (fill && fill.getAttribute('data-w')) {
+          fill.style.width = fill.getAttribute('data-w') + '%';
         }
       });
-      var fill = document.querySelector('.compat-fill');
-      if (fill && fill.getAttribute('data-w')) {
-        fill.style.width = fill.getAttribute('data-w') + '%';
-      }
-    }, 50);
+    });
   }
 
   function switchTab(panelId) {

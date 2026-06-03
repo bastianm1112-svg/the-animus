@@ -455,8 +455,8 @@ body:not(.page-test) .stat-lbl {
   line-height: 0.9 !important;
 }
 
-/* Normalize --green across all pages */
-:root { --green: #27ae60; }
+/* Normalize accent greens across all pages */
+:root { --green: #27ae60; --green2: #2d6b47; }
 
 /* Mobile bottom nav clearance (profile, compare, settings, types, dashboard) */
 @media (max-width: 768px) {
