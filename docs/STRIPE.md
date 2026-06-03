@@ -55,6 +55,21 @@ Entitlements are written to `users/{uid}.entitlements` (same shape as admin gran
 | `FIREBASE_SERVICE_ACCOUNT_JSON` | Yes | Firebase admin JSON (Firestore writes) |
 | `SITE_URL` | Recommended | `https://animustest.com` (success/cancel URLs) |
 
+**Alternative to full JSON:** you can set `FIREBASE_CLIENT_EMAIL` + `FIREBASE_PRIVATE_KEY` instead (private key may use `\n` for newlines).
+
+### “Payments are not configured on the server yet”
+
+That message means **Vercel is missing server env vars**, not that Stripe Checkout is broken in code.
+
+1. [Vercel → your project → Settings → Environment Variables](https://vercel.com/dashboard)
+2. Add at minimum:
+   - `FIREBASE_SERVICE_ACCOUNT_JSON` — Firebase Console → Project settings → Service accounts → **Generate new private key** → paste the **entire** JSON as one value (Production + Preview).
+   - `STRIPE_SECRET_KEY` — Stripe Dashboard → Developers → API keys.
+3. **Redeploy** (env vars only apply after a new deployment).
+4. Optional check: open `https://animustest.com/api/payments-status` — `checkoutReady` should be `true`.
+
+Without `FIREBASE_SERVICE_ACCOUNT_JSON`, checkout cannot verify ownership or write entitlements after payment.
+
 Optional fixed Price IDs (if set and price matches list price, Checkout uses them instead of `price_data`):
 
 - `STRIPE_PRICE_DETAILED_TEST`

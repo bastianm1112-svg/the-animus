@@ -1,6 +1,6 @@
 const { setApiHeaders, rejectForeignOrigin } = require('./_lib');
 const { requireAuth } = require('./_auth');
-const { getUserDocument, hasServiceAccount } = require('./_firestore');
+const { getUserDocument, getPaymentsConfigMissing } = require('./_firestore');
 const { getStripe, createCheckoutSession, isValidProductId, productAlreadyOwned } = require('./_stripe');
 const { PRODUCTS } = require('./_entitlements');
 
@@ -12,13 +12,23 @@ module.exports = async function handler(req, res) {
   const user = await requireAuth(req, res);
   if (!user) return;
 
-  if (!hasServiceAccount()) {
-    return res.status(503).json({ error: 'Payments are not configured on the server yet.' });
+  const missing = getPaymentsConfigMissing();
+  if (missing.length) {
+    return res.status(503).json({
+      error:
+        'Payments are not configured on the server yet. Add these in Vercel → Settings → Environment Variables, then redeploy: ' +
+        missing.join(', ') +
+        '.',
+      missing: missing
+    });
   }
 
   const stripe = getStripe();
   if (!stripe) {
-    return res.status(503).json({ error: 'Stripe is not configured (missing STRIPE_SECRET_KEY).' });
+    return res.status(503).json({
+      error: 'Stripe is not configured (missing STRIPE_SECRET_KEY).',
+      missing: ['STRIPE_SECRET_KEY']
+    });
   }
 
   const body = req.body || {};

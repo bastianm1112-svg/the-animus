@@ -1,2 +1,4 @@
 .vercel
 node_modules/
+scripts/.service-account.generated.json
+scripts/.vercel-env-tmp.txt

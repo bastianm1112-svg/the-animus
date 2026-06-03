@@ -13,12 +13,44 @@
       .replace(/"/g, '&quot;');
   }
 
-  function toast(msg) {
+  function toast(msg, durationMs) {
     var el = document.getElementById('toast');
     if (!el) return;
     el.textContent = msg;
     el.classList.add('show');
-    setTimeout(function () { el.classList.remove('show'); }, 3200);
+    setTimeout(function () { el.classList.remove('show'); }, durationMs || 3200);
+  }
+
+  function showCheckoutConfigBanner(status) {
+    var el = document.getElementById('shopCheckoutBanner');
+    if (!el || !status) return;
+    el.classList.remove('is-success', 'is-warning');
+    if (status.checkoutReady) {
+      el.hidden = true;
+      el.textContent = '';
+      return;
+    }
+    var vars = (status.missing || []).join(', ');
+    el.hidden = false;
+    el.classList.add('is-warning');
+    el.textContent =
+      'Checkout is not available on this server yet. An admin must add ' +
+      vars +
+      ' in Vercel environment variables and redeploy.';
+  }
+
+  function loadPaymentsStatus() {
+    return fetch('/api/payments-status')
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (data) {
+        showCheckoutConfigBanner(data);
+        return data;
+      })
+      .catch(function () {
+        return null;
+      });
   }
 
   function priceHtml(product, userData) {
@@ -176,7 +208,8 @@
           g.location.href = res.data.url;
           return;
         }
-        toast((res.data && res.data.error) || 'Could not start checkout.');
+        var err = (res.data && res.data.error) || 'Could not start checkout.';
+        toast(err, err.indexOf('Environment Variables') !== -1 ? 8000 : 3200);
       })
       .catch(function () {
         toast('Checkout unavailable. Try again or contact support.');
@@ -273,6 +306,7 @@
   function boot(auth, db) {
     g.auth = auth;
     g.db = db;
+    loadPaymentsStatus();
     auth.onAuthStateChanged(function (user) {
       if (!user) {
         renderProducts(g.AnimusEntitlements.defaultEntitlements(), null);

@@ -36,6 +36,12 @@
   color: var(--green, #4a9e6a);
   border-color: rgba(74, 158, 106, 0.35);
 }
+
+.shop-checkout-banner.is-warning {
+  color: var(--white, #f0ece4);
+  border-color: rgba(200, 169, 110, 0.45);
+  background: rgba(200, 169, 110, 0.08);
+}
 .shop-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

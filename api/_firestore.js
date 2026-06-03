@@ -10,13 +10,37 @@ let googleAuth = null;
 
 function getServiceAccountCreds() {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch (e) {
-    console.error('Invalid FIREBASE_SERVICE_ACCOUNT_JSON');
-    return null;
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch (e) {
+      console.error('Invalid FIREBASE_SERVICE_ACCOUNT_JSON');
+      return null;
+    }
   }
+  const email = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  if (email && privateKey) {
+    return {
+      type: 'service_account',
+      project_id: PROJECT_ID,
+      client_email: email,
+      private_key: String(privateKey).replace(/\\n/g, '\n')
+    };
+  }
+  return null;
+}
+
+/** What must be set on Vercel for Shop checkout (webhook secret optional for starting checkout). */
+function getPaymentsConfigMissing() {
+  const missing = [];
+  if (!getServiceAccountCreds()) {
+    missing.push('FIREBASE_SERVICE_ACCOUNT_JSON');
+  }
+  if (!process.env.STRIPE_SECRET_KEY) {
+    missing.push('STRIPE_SECRET_KEY');
+  }
+  return missing;
 }
 
 async function getAccessToken() {
@@ -153,5 +177,6 @@ module.exports = {
   getCareerPdfUsageFromDoc,
   hasServiceAccount: function () {
     return !!getServiceAccountCreds();
-  }
+  },
+  getPaymentsConfigMissing
 };
