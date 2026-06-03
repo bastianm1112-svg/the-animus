@@ -1,5 +1,41 @@
 # Stripe checkout (ANIMUS Shop)
 
+## Already wired in the codebase
+
+The site is connected to Stripe in commit `eef156e` and later:
+
+| Route | Role |
+|-------|------|
+| `POST /api/create-checkout-session` | Starts Checkout (requires Firebase sign-in) |
+| `POST /api/stripe-webhook` | Grants entitlements after payment |
+| `POST /api/fulfill-checkout` | Backup grant on `/shop?checkout=success` |
+
+Shop UI: `/shop` → **Get** redirects to Stripe. No extra front-end Stripe.js is required (Checkout Sessions hosted page).
+
+## Connect your Stripe account (Cursor MCP or script)
+
+### Option A — Stripe MCP in Cursor
+
+1. Open **Cursor Settings → MCP** and ensure the Stripe server is enabled.
+2. When the agent asks to authenticate, **approve** `mcp_auth` (if you skip it, the agent cannot read your Stripe account).
+3. After auth, the agent can list products, prices, and webhooks and align them with this repo.
+
+### Option B — Provision script (no MCP)
+
+From the project root, with your **test** secret key:
+
+```powershell
+$env:STRIPE_SECRET_KEY = "sk_test_..."
+$env:SITE_URL = "https://animustest.com"
+node scripts/stripe-provision.js --create-webhook
+```
+
+This creates four Products/Prices (metadata `animusProductId`) and prints Price IDs for Vercel. With `--create-webhook` it also registers the webhook and prints `STRIPE_WEBHOOK_SECRET` once.
+
+### Option C — Manual Dashboard
+
+Create products/prices yourself and set optional env vars listed below, or rely on dynamic `price_data` (works without Price IDs; Plus 20% discount uses dynamic pricing automatically).
+
 ## Flow
 
 1. Signed-in user taps **Get** on `/shop`.
