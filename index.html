@@ -2,9 +2,9 @@
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ANIMUS ? Know Yourself Completely</title>
-<meta name="description" content="The most comprehensive personality assessment available. 280 questions across 14 dimensions ? MBTI, Enneagram, philosophy, political compass, attachment style and more.">
+<meta name="description" content="The most comprehensive personality assessment available — 14 dimensions across MBTI, Enneagram, philosophy, political compass, attachment style, and more. AI narrative, compare, and shareable profiles.">
 <meta property="og:title" content="ANIMUS ? Know Yourself Completely">
-<meta property="og:description" content="280 questions. 14 dimensions. AI-generated narrative. The most rigorous personality instrument available.">
+<meta property="og:description" content="14 dimensions. AI-generated narrative. Compare with friends. The most rigorous personality instrument available.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -525,8 +525,32 @@ section { padding: 120px 40px; }
   margin-bottom: 12px;
 }
 .tests-sub { color: var(--muted2); margin-bottom: 56px; max-width: 480px; font-size: 14px; line-height: 1.8; }
-.tests-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media(max-width:600px){ .tests-grid { grid-template-columns: 1fr; } }
+.tests-single { max-width: 640px; margin: 0 auto; }
+.tests-feature-list {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tests-feature-list li {
+  font-size: 13px;
+  color: var(--muted2);
+  line-height: 1.55;
+  padding-left: 18px;
+  position: relative;
+}
+.tests-feature-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  background: var(--gold2);
+  border-radius: 50%;
+}
 .test-card {
   border: 1px solid var(--border);
   padding: 40px;
@@ -775,10 +799,10 @@ var db = firebase.firestore();
   </div>
 
   <div class="hero-stats">
-    <div class="hero-stat"><strong>280</strong><span>Questions</span></div>
     <div class="hero-stat"><strong>14</strong><span>Dimensions</span></div>
-    <div class="hero-stat"><strong>~30</strong><span>Minutes</span></div>
-    <div class="hero-stat"><strong>8</strong><span>Insight</span></div>
+    <div class="hero-stat"><strong>AI</strong><span>Narrative</span></div>
+    <div class="hero-stat"><strong>Compare</strong><span>With friends</span></div>
+    <div class="hero-stat"><strong>Share</strong><span>Your profile</span></div>
   </div>
 
   <div class="scroll-indicator">
@@ -797,7 +821,7 @@ var db = firebase.firestore();
         Most personality tests tell you what you already know. ANIMUS goes deeper ? mapping the <strong>architecture of how you actually think</strong>, what you value at the deepest level, how you attach to others, and where you stand philosophically and politically.
       </p>
       <p class="about-body">
-        280 questions, 14 dimensions, AI-generated narrative analysis. Your profile isn't a label ? it's a complete picture of who you are, how you operate, and why you do what you do.
+        Fourteen dimensions and AI-generated narrative analysis. Your profile isn't a label ? it's a complete picture of who you are, how you operate, and why you do what you do.
       </p>
       <p class="about-body">
         Built for people who take self-knowledge seriously.
@@ -833,7 +857,7 @@ var db = firebase.firestore();
       <div class="step reveal">
         <div class="step-num">01</div>
         <div class="step-title">Take the Assessment</div>
-        <div class="step-body">280 questions, fully randomized. No labels, no hints about what each question measures. Every question has a plain-English simplification if you need it.</div>
+        <div class="step-body">A rigorous instrument across every dimension. Questions are randomized and unlabeled, with plain-English simplifications when you need them.</div>
       </div>
       <div class="step reveal reveal-delay-1">
         <div class="step-num">02</div>
@@ -865,73 +889,61 @@ var db = firebase.firestore();
         <div class="dim-full-label">Cognition</div>
         <div class="dim-full-name">Cognitive Functions</div>
         <div class="dim-full-desc">All 8 Jungian cognitive functions scored 0?100. Dominant, auxiliary, tertiary, inferior ? your full stack revealed.</div>
-        <div class="dim-full-q">72</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-1">
         <div class="dim-full-label">Personality</div>
         <div class="dim-full-name">Enneagram</div>
         <div class="dim-full-desc">Type, wing, tritype across all three centers (gut/heart/head), and instinctual variant stack (SP/SOC/SX).</div>
-        <div class="dim-full-q">27</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-2">
         <div class="dim-full-label">Relationships</div>
         <div class="dim-full-name">Attachment Style</div>
         <div class="dim-full-desc">Secure, anxious, avoidant, or disorganized ? how you seek connection and respond to intimacy.</div>
-        <div class="dim-full-q">16</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-3">
         <div class="dim-full-label">Worldview</div>
         <div class="dim-full-name">Philosophical School</div>
         <div class="dim-full-desc">Stoic, Epicurean, Kantian, Aristotelian, Nietzschean, Existentialist, Pragmatist, or Skeptic ? your conceptual home.</div>
-        <div class="dim-full-q">24</div>
       </div>
       <div class="dim-full-card reveal">
         <div class="dim-full-label">Knowledge</div>
         <div class="dim-full-name">Epistemology</div>
         <div class="dim-full-desc">Rationalist, empiricist, intuitionist, or skeptic ? how you believe you know what you know.</div>
-        <div class="dim-full-q">12</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-1">
         <div class="dim-full-label">Morality</div>
         <div class="dim-full-name">Ethical Framework</div>
         <div class="dim-full-desc">Virtue ethics, consequentialism, deontology, or rational egoism ? the structure of your moral reasoning.</div>
-        <div class="dim-full-q">12</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-2">
         <div class="dim-full-label">Politics</div>
         <div class="dim-full-name">Political Compass</div>
         <div class="dim-full-desc">Full two-axis mapping ? economic freedom vs state control, authoritarian vs libertarian ? with AI analysis of your psychological roots.</div>
-        <div class="dim-full-q">40</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-3">
         <div class="dim-full-label">Character</div>
         <div class="dim-full-name">Four Temperaments</div>
         <div class="dim-full-desc">The ancient precursor to all typology ? Choleric, Melancholic, Sanguine, Phlegmatic ? scored and explained.</div>
-        <div class="dim-full-q">16</div>
       </div>
       <div class="dim-full-card reveal">
         <div class="dim-full-label">Drive</div>
         <div class="dim-full-name">Instinctual Variants</div>
         <div class="dim-full-desc">Self-preservation, social, and sexual/intimate instincts ? the motivational layer beneath your Enneagram type.</div>
-        <div class="dim-full-q">12</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-1">
         <div class="dim-full-label">Social</div>
         <div class="dim-full-name">Interpersonal Style</div>
         <div class="dim-full-desc">How you present to others ? dominance, warmth, directness, introversion ? and how you actually are when nobody's watching.</div>
-        <div class="dim-full-q">21</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-2">
         <div class="dim-full-label">Values</div>
         <div class="dim-full-name">Moral Foundations</div>
         <div class="dim-full-desc">Haidt's six moral foundations scored ? Care, Fairness, Loyalty, Authority, Sanctity, Liberty ? revealing what you treat as sacred.</div>
-        <div class="dim-full-q">8</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-3">
         <div class="dim-full-label">Traits</div>
         <div class="dim-full-name">Big Five</div>
         <div class="dim-full-desc">Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism ? derived from your cognitive and personality scores.</div>
-        <div class="dim-full-q">?</div>
       </div>
     </div>
   </div>
@@ -1006,31 +1018,24 @@ var db = firebase.firestore();
 <section id="tests">
   <div class="tests-section">
     <div class="section-label reveal">The assessment</div>
-    <h2 class="tests-title reveal">Two versions.<br>One complete picture.</h2>
-    <p class="tests-sub reveal">Take the full assessment for maximum accuracy or the short version when time is limited. Both cover all 14 dimensions.</p>
-    <div class="tests-grid">
-      <div class="test-card featured reveal">
-        <div class="test-badge">Recommended</div>
-        <div class="test-q">280 <span>Q</span></div>
-        <div class="test-name">Full Assessment</div>
-        <div class="test-desc">The complete instrument. Maximum depth and accuracy across all 14 dimensions. Every question is unbiased ? randomized, unlabeled, with a plain-language simplification available.</div>
+    <h2 class="tests-title reveal">Fourteen dimensions.<br>One complete profile.</h2>
+    <p class="tests-sub reveal">One assessment maps cognition, personality, values, and worldview — then turns your results into something you can read, share, and compare.</p>
+    <div class="tests-single reveal">
+      <div class="test-card featured">
+        <div class="test-name">The ANIMUS Assessment</div>
+        <div class="test-desc">Unbiased, cross-dimensional scoring across every layer of who you are — from MBTI and Enneagram to philosophy, politics, attachment, and moral foundations.</div>
+        <ul class="tests-feature-list">
+          <li>14 scored dimensions with clear explanations</li>
+          <li>AI-written narrative across your full profile</li>
+          <li>Shareable profile link and PDF export</li>
+          <li>Compare with friends and track daily insights when signed in</li>
+        </ul>
         <div class="test-meta">
-          <div class="test-meta-item"><strong>~30</strong>Minutes</div>
           <div class="test-meta-item"><strong>14</strong>Dimensions</div>
+          <div class="test-meta-item"><strong>AI</strong>Narrative</div>
           <div class="test-meta-item"><strong>EN / ES</strong>Language</div>
         </div>
-        <a href="/test" class="btn-test">Begin Full Assessment ?</a>
-      </div>
-      <div class="test-card reveal reveal-delay-1">
-        <div class="test-q">100 <span>Q</span></div>
-        <div class="test-name">Short Assessment</div>
-        <div class="test-desc">A curated 100-question set that exploits cross-dimensional overlap ? questions chosen because each one scores multiple dimensions simultaneously. Still covers everything, less time.</div>
-        <div class="test-meta">
-          <div class="test-meta-item"><strong>~12</strong>Minutes</div>
-          <div class="test-meta-item"><strong>14</strong>Dimensions</div>
-          <div class="test-meta-item"><strong>EN / ES</strong>Language</div>
-        </div>
-        <a href="/test?mode=short" class="btn-test">Begin Short Assessment ?</a>
+        <a href="/test" class="btn-test">Take the Assessment ?</a>
       </div>
     </div>
   </div>
