@@ -185,6 +185,25 @@ var _introUserData = null;
 var _introEntitlementsLoaded = false;
 var _serverDraftByMode = {};
 var _serverDraftSaveTimer = null;
+var _milestonesShown = {};
+var _milestoneHideTimer = null;
+
+var MILESTONE_MSG_EN = [
+  'Getting closer…',
+  'A clearer image of who you are is taking shape.',
+  'Your pattern is coming into focus.',
+  'Keep going — your profile is building.',
+  'Almost there — stay with it.',
+  'Each answer sharpens the picture.'
+];
+var MILESTONE_MSG_ES = [
+  'Cada vez más cerca…',
+  'Se va formando una imagen más clara de quién sos.',
+  'Tu patrón empieza a enfocarse.',
+  'Seguí — tu perfil se está construyendo.',
+  'Casi llegás — mantené el ritmo.',
+  'Cada respuesta afina el retrato.'
+];
 
 function applyRouteTestMode() {
   var params = new URLSearchParams(window.location.search);
@@ -861,6 +880,7 @@ function startTest() {
     cur = 0;
     _explainCache = {};
     clearTestProgress();
+    resetTestMilestones();
     setTestPhase('quiz');
     if (typeof g.AnimusAnalytics !== 'undefined' && g.AnimusAnalytics.track) {
       g.AnimusAnalytics.track('test_start', {
@@ -1410,6 +1430,45 @@ function finishFill(filteredQ, fillAnswers, baseProfile){
   });
 }
 
+function resetTestMilestones() {
+  _milestonesShown = {};
+  clearTimeout(_milestoneHideTimer);
+  var el = document.getElementById('testMilestoneToast');
+  if (el) {
+    el.classList.remove('is-visible');
+    el.hidden = true;
+    el.textContent = '';
+  }
+}
+
+function maybeShowQuestionMilestone() {
+  if (!isQuizPhase() || TOTAL < 10) return;
+  var qNum = cur + 1;
+  if (qNum < 10 || qNum % 10 !== 0) return;
+  if (_milestonesShown[qNum]) return;
+  _milestonesShown[qNum] = true;
+  var el = document.getElementById('testMilestoneToast');
+  if (!el) return;
+  var msgs = lang === 'es' ? MILESTONE_MSG_ES : MILESTONE_MSG_EN;
+  var block = Math.floor(qNum / 10) - 1;
+  var text = msgs[block % msgs.length] || msgs[0];
+  el.textContent = text;
+  el.hidden = false;
+  el.classList.remove('is-visible');
+  void el.offsetWidth;
+  el.classList.add('is-visible');
+  clearTimeout(_milestoneHideTimer);
+  _milestoneHideTimer = setTimeout(function () {
+    el.classList.remove('is-visible');
+    setTimeout(function () {
+      if (!el.classList.contains('is-visible')) {
+        el.hidden = true;
+        el.textContent = '';
+      }
+    }, 400);
+  }, 3200);
+}
+
 function renderQ(){
   refreshAnimusLang();
   var q=(window._activeQ||Q)[cur];
@@ -1538,10 +1597,12 @@ function renderQ(){
   saveTestProgress();
   updateQuizModeSwitch();
   updateTestProgressChrome();
+  maybeShowQuestionMilestone();
 }
 
 // ── FINISH QUIZ (called when user completes last question) ──
 function finishQuiz(){
+  resetTestMilestones();
   clearTimeout(_serverDraftSaveTimer);
   clearTestProgress();
   setTestPhase('loading');

@@ -1085,6 +1085,43 @@ body.page-test #quiz .btn-next {
   display: none;
 }
 
+/* Milestone nudge every 10 questions — non-blocking */
+.test-milestone-toast {
+  position: fixed;
+  top: calc(var(--nav-h) + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-12px);
+  z-index: 210;
+  max-width: min(92vw, 420px);
+  padding: 10px 18px;
+  text-align: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--white, #f0ece4);
+  background: rgba(12, 12, 12, 0.92);
+  border: 1px solid rgba(200, 169, 110, 0.45);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+body.light-mode .test-milestone-toast {
+  background: rgba(244, 241, 236, 0.96);
+  color: #1a1a1a;
+  border-color: rgba(160, 130, 70, 0.5);
+}
+
+.test-milestone-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+body.page-test.test-progress-on .test-milestone-toast {
+  top: calc(var(--nav-h) + 18px);
+}
+
 /* ── Loading ── */
 #loading {
   flex-direction: column;
