@@ -284,6 +284,9 @@
     if (!p) return;
 
     toast('Opening secure checkout…');
+    if (typeof g.AnimusAnalytics !== 'undefined' && g.AnimusAnalytics.track) {
+      g.AnimusAnalytics.track('checkout_start', { product_id: productId });
+    }
 
     user
       .getIdToken()
@@ -304,6 +307,9 @@
       })
       .then(function (res) {
         if (res.ok && res.data && res.data.url) {
+          if (typeof g.AnimusAnalytics !== 'undefined' && g.AnimusAnalytics.track) {
+            g.AnimusAnalytics.track('checkout_redirect', { product_id: productId });
+          }
           g.location.href = res.data.url;
           return;
         }
@@ -370,6 +376,9 @@
           g.history.replaceState(null, '', '/shop');
         } catch (e) {}
         if (res.ok && res.data && res.data.ok) {
+          if (typeof g.AnimusAnalytics !== 'undefined' && g.AnimusAnalytics.track) {
+            g.AnimusAnalytics.track('purchase_complete', {});
+          }
           toast('Purchase complete — thank you!');
           reloadUserProducts();
           return;

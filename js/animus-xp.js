@@ -50,9 +50,9 @@
   }
 
   function awardXp(db, uid, reason, amount) {
-    if (!db || !uid) return Promise.resolve(null);
+    if (!db || !uid) return Promise.resolve(0);
     amount = amount != null ? amount : XP_AWARDS[reason] || 0;
-    if (amount <= 0) return Promise.resolve(null);
+    if (amount <= 0) return Promise.resolve(0);
     var ref = db.collection('users').doc(uid);
     return db.runTransaction(function (tx) {
       return tx.get(ref).then(function (doc) {
@@ -61,12 +61,20 @@
           g.AnimusEntitlements && g.AnimusEntitlements.getXpMultiplier
             ? g.AnimusEntitlements.getXpMultiplier(data)
             : 1;
-        amount = Math.max(1, Math.round(amount * mult));
+        var granted = Math.max(1, Math.round(amount * mult));
         var xp = normalizeXp(data);
-        var nextTotal = xp.total + amount;
+        var nextTotal = xp.total + granted;
         var next = { total: nextTotal, level: levelFromTotal(nextTotal) };
-        tx.set(ref, { xp: next, lastXpReason: reason, lastXpAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-        return next;
+        tx.set(
+          ref,
+          {
+            xp: next,
+            lastXpReason: reason,
+            lastXpAt: firebase.firestore.FieldValue.serverTimestamp()
+          },
+          { merge: true }
+        );
+        return granted;
       });
     });
   }
@@ -103,13 +111,13 @@
 
   function awardDailyInsightIfNew(db, uid, userData) {
     var today = new Date().toISOString().slice(0, 10);
-    if (userData && userData.lastDailyInsight === today) return Promise.resolve();
+    if (userData && userData.lastDailyInsight === today) return Promise.resolve(0);
     return db
       .collection('users')
       .doc(uid)
       .set({ lastDailyInsight: today }, { merge: true })
       .then(function () {
-        return awardXp(db, uid, 'daily_insight', 5);
+        return awardXp(db, uid, 'daily_insight', XP_AWARDS.daily_insight);
       });
   }
 

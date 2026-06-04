@@ -689,6 +689,12 @@ function startTest() {
     _explainCache = {};
     clearTestProgress();
     setTestPhase('quiz');
+    if (typeof g.AnimusAnalytics !== 'undefined' && g.AnimusAnalytics.track) {
+      g.AnimusAnalytics.track('test_start', {
+        test_mode: testMode || 'short',
+        observer_mode: !!observerMode
+      });
+    }
     if(observerMode && observerSubjectName){
       var logo = document.querySelector('.qhdr-logo');
       if(logo) logo.innerHTML = 'ANI<span>MUS</span> <span class="qhdr-est">ESTIMATOR</span>';
@@ -2409,6 +2415,12 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     }
 
     function onCloudSaved() {
+      if (typeof g.AnimusAnalytics !== 'undefined' && g.AnimusAnalytics.track) {
+        g.AnimusAnalytics.track('test_complete', {
+          test_mode: meta.testMode || testMode || 'short',
+          observer_mode: !!observerMode
+        });
+      }
       var btn = document.getElementById('btnSave');
       if (btn) {
         btn.innerHTML = '↓ SAVED ✓';

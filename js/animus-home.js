@@ -49,6 +49,23 @@
     }
   }
 
+  function showHomeToast(msg) {
+    var t = document.getElementById('toast');
+    if (!t) return;
+    var safe =
+      g.AnimusSafe && g.AnimusSafe.safeText
+        ? g.AnimusSafe.safeText(msg, 200)
+        : String(msg || '').substring(0, 200);
+    t.textContent = safe;
+    t.classList.add('show');
+    clearTimeout(t._homeTimer);
+    t._homeTimer = setTimeout(function () {
+      t.classList.remove('show');
+    }, 2800);
+  }
+
+  g.showToast = showHomeToast;
+
   function updateDailyXpBadge(userData) {
     var badge = document.getElementById('dailyXpBadge');
     if (!badge || !g.AnimusXp) return;
@@ -78,7 +95,34 @@
     g.__animusUserProfile = profile;
   }
 
+  function renderDailyFact(profile, uid) {
+    var factEl = document.getElementById('dailyFactText');
+    var factLabel = document.getElementById('dailyFactLabel');
+    var card = document.getElementById('dailyFactCard');
+    if (!factEl) return;
+    if (g.AnimusDailyFacts) {
+      var fact = g.AnimusDailyFacts.pickDailyFact(profile, uid);
+      factEl.classList.remove('animus-skeleton');
+      factEl.removeAttribute('aria-busy');
+      factEl.textContent = fact.text || 'Complete your assessment to unlock personalized insights.';
+      if (factLabel) factLabel.textContent = 'Daily insight · ' + (fact.label || 'Profile');
+      if (card) card.classList.add('is-ready');
+    } else {
+      factEl.classList.remove('animus-skeleton');
+      factEl.removeAttribute('aria-busy');
+      factEl.textContent = 'Complete your assessment to unlock personalized insights.';
+    }
+  }
+
+  function setDailyHubVisible(show) {
+    var sectionHead = document.getElementById('homeDailySectionHead');
+    var cards = document.getElementById('homeDailyCards');
+    if (sectionHead) sectionHead.hidden = !show;
+    if (cards) cards.hidden = !show;
+  }
+
   function renderHomeRetention(userData, profile, user, db) {
+    userData = userData || {};
     renderProfileSnapshot(profile, userData);
     if (g.AnimusXp) {
       g.AnimusXp.renderXpBar(document.getElementById('homeXpMount'), userData);
@@ -86,44 +130,79 @@
     updateDailyXpBadge(userData);
 
     var factEl = document.getElementById('dailyFactText');
-    var factLabel = document.getElementById('dailyFactLabel');
     if (factEl) factEl.classList.add('animus-skeleton');
-    if (g.AnimusDailyFacts && factEl) {
-      var fact = g.AnimusDailyFacts.pickDailyFact(profile, user.uid);
-      factEl.classList.remove('animus-skeleton');
-      factEl.removeAttribute('aria-busy');
-      factEl.textContent = fact.text || 'Complete your assessment to unlock personalized insights.';
-      if (factLabel) factLabel.textContent = 'Daily insight · ' + fact.label;
-    } else if (factEl) {
-      factEl.classList.remove('animus-skeleton');
-      factEl.removeAttribute('aria-busy');
-      factEl.textContent = 'Complete your assessment to unlock personalized insights.';
+
+    if (profile && profile.mbti) {
+      setDailyHubVisible(true);
+      renderDailyFact(profile, user.uid);
+    } else {
+      setDailyHubVisible(false);
+      if (factEl) {
+        factEl.classList.remove('animus-skeleton');
+        factEl.textContent =
+          'Complete your assessment to unlock a personalized insight each day.';
+      }
     }
 
-    function refreshRetention(fresh) {
+    function refreshRetention(fresh, opts) {
+      opts = opts || {};
+      fresh = fresh || userData;
       window.__animusHomeUserData = fresh;
       if (g.AnimusXp) {
         g.AnimusXp.renderXpBar(document.getElementById('homeXpMount'), fresh);
       }
       updateDailyXpBadge(fresh);
+      if (profile && profile.mbti) {
+        renderDailyFact(profile, user.uid);
+      }
       if (g.AnimusDaily) {
         var dailyRefresh = g.AnimusDaily.refresh || g.AnimusDaily.render;
-        dailyRefresh(db, user.uid, fresh, profile, refreshRetention);
+        dailyRefresh(db, user.uid, fresh, profile, function (next) {
+          refreshRetention(next, opts);
+        }).then(function () {
+          var cards = document.getElementById('homeDailyCards');
+          if (cards) cards.removeAttribute('aria-busy');
+        });
+      }
+      if (opts.xpToast && g.AnimusXp) {
+        showHomeToast(opts.xpToast);
       }
     }
 
     if (g.AnimusXp && profile && profile.mbti) {
-      g.AnimusXp.awardDailyInsightIfNew(db, user.uid, userData).then(function () {
-        return db.collection('users').doc(user.uid).get();
-      }).then(function (doc) {
-        refreshRetention(doc.exists ? doc.data() : userData);
-      }).catch(function () {});
+      var hadInsight = userData.lastDailyInsight === todayKey();
+      g.AnimusXp.awardDailyInsightIfNew(db, user.uid, userData)
+        .then(function (awarded) {
+          return db.collection('users').doc(user.uid).get().then(function (doc) {
+            return {
+              data: doc.exists ? doc.data() : userData,
+              awarded: awarded,
+              hadInsight: hadInsight
+            };
+          });
+        })
+        .then(function (res) {
+          var toast = null;
+          if (res.awarded && !res.hadInsight) {
+            toast = '+' + (g.AnimusXp.XP_AWARDS.daily_insight || 5) + ' XP · daily insight';
+          }
+          refreshRetention(res.data, { xpToast: toast });
+        })
+        .catch(function () {
+          refreshRetention(userData);
+        });
     }
 
     if (g.AnimusDaily && profile && profile.mbti) {
       g.AnimusDaily.boot(db, user.uid, userData, profile, refreshRetention).then(function (fresh) {
         if (fresh) refreshRetention(fresh);
-      }).catch(function () {});
+      }).catch(function () {
+        var cards = document.getElementById('homeDailyCards');
+        if (cards) cards.removeAttribute('aria-busy');
+      });
+    } else if (profile && profile.mbti) {
+      var cardsOnly = document.getElementById('homeDailyCards');
+      if (cardsOnly) cardsOnly.removeAttribute('aria-busy');
     }
   }
 

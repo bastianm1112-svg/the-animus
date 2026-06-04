@@ -170,6 +170,87 @@ function getCompareUsageFromDoc(doc) {
   return { monthKey: u.monthKey, count: parseInt(u.count, 10) || 0 };
 }
 
+async function listCollectionDocNames(collectionPath) {
+  const token = await getAccessToken();
+  if (!token) return { error: 'server_config', names: [] };
+  const base =
+    'https://firestore.googleapis.com/v1/projects/' +
+    PROJECT_ID +
+    '/databases/(default)/documents/' +
+    collectionPath;
+  const names = [];
+  let pageToken = '';
+  for (let i = 0; i < 20; i++) {
+    const url = base + (pageToken ? '?pageToken=' + encodeURIComponent(pageToken) : '');
+    const r = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+    if (!r.ok) {
+      if (r.status === 404) return { error: null, names: names };
+      console.error('Firestore list failed:', collectionPath, r.status);
+      return { error: 'firestore', names: names };
+    }
+    const data = await r.json();
+    (data.documents || []).forEach(function (doc) {
+      if (doc.name) names.push(doc.name);
+    });
+    pageToken = data.nextPageToken || '';
+    if (!pageToken) break;
+  }
+  return { error: null, names: names };
+}
+
+async function deleteDocumentByName(docName) {
+  const token = await getAccessToken();
+  if (!token || !docName) return false;
+  const r = await fetch('https://firestore.googleapis.com/v1/' + docName, {
+    method: 'DELETE',
+    headers: { Authorization: 'Bearer ' + token }
+  });
+  if (r.status === 404) return true;
+  if (!r.ok) {
+    console.error('Firestore delete failed:', docName, r.status);
+    return false;
+  }
+  return true;
+}
+
+async function deleteCollection(collectionPath) {
+  const listed = await listCollectionDocNames(collectionPath);
+  if (listed.error) return false;
+  for (const name of listed.names) {
+    const ok = await deleteDocumentByName(name);
+    if (!ok) return false;
+  }
+  return true;
+}
+
+async function deleteUserAccountData(uid, username) {
+  const estimationsOk = await deleteCollection('users/' + encodeURIComponent(uid) + '/estimations');
+  const recordsOk = await deleteCollection(
+    'testSessions/' + encodeURIComponent(uid) + '/records'
+  );
+  const profileOk = await deleteDocumentByName(
+    'projects/' +
+      PROJECT_ID +
+      '/databases/(default)/documents/profiles/' +
+      encodeURIComponent(uid)
+  );
+  if (username) {
+    await deleteDocumentByName(
+      'projects/' +
+        PROJECT_ID +
+        '/databases/(default)/documents/usernames/' +
+        encodeURIComponent(username)
+    );
+  }
+  const userOk = await deleteDocumentByName(
+    'projects/' +
+      PROJECT_ID +
+      '/databases/(default)/documents/users/' +
+      encodeURIComponent(uid)
+  );
+  return estimationsOk && recordsOk && profileOk && userOk;
+}
+
 module.exports = {
   getAccessToken,
   getUserDocument,
@@ -178,6 +259,10 @@ module.exports = {
   userHasPlusFromDoc,
   getCareerPdfUsageFromDoc,
   getCompareUsageFromDoc,
+  listCollectionDocNames,
+  deleteDocumentByName,
+  deleteCollection,
+  deleteUserAccountData,
   hasServiceAccount: function () {
     return !!getServiceAccountCreds();
   },

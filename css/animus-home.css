@@ -138,6 +138,21 @@ body.member-mode #guestApp {
   font-size: 11px;
 }
 
+.home-daily-section-head {
+  margin: 20px 0 10px;
+}
+
+.home-daily-section-head .home-section-title {
+  margin-bottom: 4px;
+}
+
+.home-daily-section-sub {
+  font-size: 12px;
+  color: var(--muted2, #888);
+  line-height: 1.5;
+  margin: 0;
+}
+
 .home-daily-hub {
   margin-bottom: 16px;
 }
@@ -375,6 +390,28 @@ body.light-mode .home-daily-hub {
   font-size: 14px;
   color: var(--muted2);
   line-height: 1.75;
+}
+
+.daily-fact-text.animus-skeleton {
+  min-height: 3.2em;
+  color: transparent;
+}
+
+.daily-fact-card.is-ready .daily-fact-text {
+  color: var(--text, #e2e2e2);
+}
+
+body.light-mode .daily-fact-card.is-ready .daily-fact-text {
+  color: var(--text, #1a1714);
+}
+
+.daily-card--weekly {
+  border-left: 3px solid var(--gold2, #8a6f3e);
+}
+
+.daily-card--mood .mood-btn.is-active {
+  border-color: var(--gold, #c8a96e);
+  background: rgba(200, 169, 110, 0.12);
 }
 
 .home-daily-cards {

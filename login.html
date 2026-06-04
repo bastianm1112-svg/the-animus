@@ -104,6 +104,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <link rel="canonical" href="https://animustest.com/login">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
+<script src="/js/animus-app.js" defer></script>
 </head>
 <body>
 <script>(function(){if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');})();</script>
@@ -328,6 +329,9 @@ function doSubmit(e){
           .then(function(){ return saveDoc(r.user, name, un); });
       })
       .then(function(){
+        if (typeof AnimusAnalytics !== 'undefined' && AnimusAnalytics.track) {
+          AnimusAnalytics.track('signup_complete', { method: 'email' });
+        }
         goToDashboard();
       })
       .catch(function(err){
@@ -402,6 +406,9 @@ function finishSetup(){
       return saveDoc(googleUser, googleUser.displayName||'', un);
     })
     .then(function(){
+      if (typeof AnimusAnalytics !== 'undefined' && AnimusAnalytics.track) {
+        AnimusAnalytics.track('signup_complete', { method: 'google' });
+      }
       googleUser = null;
       goToDashboard();
     })

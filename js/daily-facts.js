@@ -1,8 +1,82 @@
 /**
- * Daily personality facts — keyed by MBTI and Enneagram (stable per user per day).
+ * Daily personality facts — MBTI, Enneagram, attachment, philosophy, politics.
+ * One stable fact per user per day, rotated across dimensions they have scored.
  */
 (function (g) {
   'use strict';
+
+  var PHI_ORDER = ['PH_NIE', 'PH_EXI', 'PH_ARI', 'PH_KAN', 'PH_STO', 'PH_PRA', 'PH_SKE', 'PH_EPI'];
+  var PHI_NAMES = {
+    PH_NIE: 'Nietzschean',
+    PH_EXI: 'Existentialist',
+    PH_ARI: 'Aristotelian',
+    PH_KAN: 'Kantian',
+    PH_STO: 'Stoic',
+    PH_PRA: 'Pragmatist',
+    PH_SKE: 'Skeptic',
+    PH_EPI: 'Epicurean'
+  };
+
+  var PHI_FACTS = {
+    PH_NIE: [
+      'Nietzschean thought emerged in 19th-century Europe as a critique of comfortable morality — genealogy asks where your values came from, not just whether they are true.',
+      'This lens treats self-overcoming as craft: you are not fixed; you are something you are still sculpting under pressure.'
+    ],
+    PH_EXI: [
+      'Existentialism grew from Kierkegaard and later Paris cafés — meaning is not discovered in a manual; it is chosen under the weight of freedom.',
+      'Your profile leans here when authenticity matters more than fitting a script someone else wrote for you.'
+    ],
+    PH_ARI: [
+      'Aristotelian ethics began in Athens around practical wisdom (phronesis) — virtue is a habit trained in real relationships, not a slogan.',
+      'This tradition asks: what would a flourishing life look like for someone with your temperament — not an abstract ideal type.'
+    ],
+    PH_KAN: [
+      'Kantian philosophy crystalized in Königsberg — duty, universal law, and the idea that persons must never be treated as mere tools.',
+      'It originated as an answer to Hume\'s skepticism: what can reason still ground when habit and passion pull elsewhere?'
+    ],
+    PH_STO: [
+      'Stoicism began in Athens (Zeno) and later shaped Rome — Epictetus, Seneca, and Marcus Aurelius practiced it as training for a mind under uncertainty.',
+      'The core move is ancient: separate what you control (judgment, effort) from what you do not (outcomes, other people).'
+    ],
+    PH_PRA: [
+      'Pragmatism is American-born — Peirce, James, Dewey — truth as what works in lived experience and democratic inquiry over armchair certainty.',
+      'Ideas earn their keep by how they change conduct, not by how elegant they sound in debate.'
+    ],
+    PH_SKE: [
+      'Philosophical skepticism runs from Pyrrho through Sextus Empiricus to modern science — withholding final judgment until evidence compels it.',
+      'For your type mix, doubt is often a discipline: fewer false certainties, slower conclusions, better corrections.'
+    ],
+    PH_EPI: [
+      'Epicureanism began in Athens as a garden school — not reckless pleasure, but measured friends, simple needs, and freedom from anxiety.',
+      'It originated as a rival to Stoic severity: a good life might be quieter than ambition advertises.'
+    ]
+  };
+
+  var ATT_NAMES = {
+    AT_SEC: 'Secure attachment',
+    AT_ANX: 'Anxious attachment',
+    AT_AVO: 'Fearful-avoidant',
+    AT_DIS: 'Dismissive-avoidant'
+  };
+
+  var ATT_FACTS = {
+    AT_SEC: [
+      'Secure attachment research (Bowlby → Ainsworth) shows comfort with both closeness and solo recovery — trust is built from consistent repair, not perfect harmony.',
+      'This pattern often reads as “steady” to others: you can ask for help without collapsing boundaries.'
+    ],
+    AT_ANX: [
+      'Anxious-preoccupied attachment intensified in lab studies when responsiveness was inconsistent — the mind tracks micro-signals of distance.',
+      'Naming the loop (“I am scanning for rejection”) often lowers its volume faster than reassurance alone.'
+    ],
+    AT_AVO: [
+      'Fearful-avoidant patterns combine desire for closeness with fear of harm — often shaped by early environments where connection and danger overlapped.',
+      'Growth here is graded exposure: safety first, then intimacy in small, provable doses.'
+    ],
+    AT_DIS: [
+      'Dismissive-avoidant attachment privileges self-reliance — independence can be strength until it blocks the support that would actually help.',
+      'Others may misread your calm as indifference; your inner signal is often “I will handle it alone.”'
+    ]
+  };
 
   var MBTI = {
     INTJ: [
@@ -72,16 +146,108 @@
   };
 
   var ENN = {
-    '1': ['Type 1 energy often channels discomfort with imperfection into standards that protect integrity.', 'Ones frequently feel responsible for correcting what others leave ambiguous.'],
-    '2': ['Type 2 focus often tracks who needs support before tracking their own limits.', 'Twos frequently earn trust by anticipating needs others have not voiced.'],
-    '3': ['Type 3 attention often orients to measurable progress and visible competence.', 'Threes frequently adapt presentation to what success looks like in each context.'],
-    '4': ['Type 4 depth often seeks what is authentic, even when it is inconvenient.', 'Fours frequently feel meaning through distinct identity, not through blending in.'],
-    '5': ['Type 5 conservation often protects energy, information, and inner space.', 'Fives frequently prefer understanding before participating.'],
-    '6': ['Type 6 vigilance often scans for reliability — who and what can be trusted.', 'Sixes frequently build loyalty networks that reduce uncertainty.'],
-    '7': ['Type 7 breadth often keeps options open to avoid feeling trapped.', 'Sevens frequently reframe difficulty into possibility to stay mobile.'],
-    '8': ['Type 8 directness often confronts power imbalances early.', 'Eights frequently show care by protecting people and territory.'],
-    '9': ['Type 9 ease often harmonizes conflict by seeing all sides.', 'Nines frequently postpone self-preference to keep connection stable.']
+    '1': [
+      'Type 1 energy often channels discomfort with imperfection into standards that protect integrity.',
+      'Ones frequently feel responsible for correcting what others leave ambiguous.'
+    ],
+    '2': [
+      'Type 2 focus often tracks who needs support before tracking their own limits.',
+      'Twos frequently earn trust by anticipating needs others have not voiced.'
+    ],
+    '3': [
+      'Enneagram 3 — the Achiever — crystallized in modern coaching culture, but its root is vanity in service of value: being admired proves you matter.',
+      'Threes often read rooms as scoreboards; rest can feel like falling behind unless success is redefined privately.',
+      'Historically associated with the “performer” archetype, Type 3 adapts presentation before identity feels solid underneath.'
+    ],
+    '4': [
+      'Type 4 depth often seeks what is authentic, even when it is inconvenient.',
+      'Fours frequently feel meaning through distinct identity, not through blending in.'
+    ],
+    '5': [
+      'Type 5 conservation often protects energy, information, and inner space.',
+      'Fives frequently prefer understanding before participating.'
+    ],
+    '6': [
+      'Type 6 vigilance often scans for reliability — who and what can be trusted.',
+      'Sixes frequently build loyalty networks that reduce uncertainty.'
+    ],
+    '7': [
+      'Type 7 breadth often keeps options open to avoid feeling trapped.',
+      'Sevens frequently reframe difficulty into possibility to stay mobile.'
+    ],
+    '8': [
+      'Type 8 directness often confronts power imbalances early.',
+      'Eights frequently show care by protecting people and territory.'
+    ],
+    '9': [
+      'Type 9 ease often harmonizes conflict by seeing all sides.',
+      'Nines frequently postpone self-preference to keep connection stable.'
+    ]
   };
+
+  var POL_QUAD_LABEL = {
+    'lib-right': 'Libertarian-right compass',
+    'auth-right': 'Authoritarian-right compass',
+    'lib-left': 'Libertarian-left compass',
+    'auth-left': 'Authoritarian-left compass'
+  };
+
+  function polQuadrant(polX, polY) {
+    if (g.AnimusCross && g.AnimusCross.polQuadrant) {
+      return g.AnimusCross.polQuadrant(polX, polY);
+    }
+    if (polX >= 0 && polY < 0) return 'lib-right';
+    if (polX >= 0 && polY >= 0) return 'auth-right';
+    if (polX < 0 && polY < 0) return 'lib-left';
+    return 'auth-left';
+  }
+
+  function politicalFacts(polX, polY, uid, day) {
+    var q = polQuadrant(polX || 0, polY || 0);
+    var label = POL_QUAD_LABEL[q] || 'Political compass';
+    var lines = [];
+    if (g.AnimusCross && g.AnimusCross.buildPoliticalComparisons) {
+      var pack = g.AnimusCross.buildPoliticalComparisons(polX, polY);
+      if (pack.similarCountries && pack.similarCountries.length) {
+        var c = pack.similarCountries[day % pack.similarCountries.length];
+        lines.push(
+          'Your economic/social axes sit in the ' +
+            q.replace('-', ' / ') +
+            ' zone — policy cultures with a similar blend include: ' +
+            c.replace(/^Profile axis[^:]*:\s*/i, '')
+        );
+      }
+      if (pack.politicalThinkers && pack.politicalThinkers.length) {
+        var t = pack.politicalThinkers[(day + 3) % pack.politicalThinkers.length];
+        lines.push('Thinker parallel: ' + t.replace(/^Profile axis[^:]*:\s*/i, ''));
+      }
+    }
+    if (!lines.length) {
+      lines.push(
+        'Your compass quadrant (' +
+          q +
+          ') groups economies and social orders that stress different tradeoffs between liberty, equality, and institutional control.'
+      );
+    }
+    return { label: label, facts: lines };
+  }
+
+  function dominantPhi(profile) {
+    var scores = profile.phiS || profile.phiScores || {};
+    var best = null;
+    var bestV = -1;
+    PHI_ORDER.forEach(function (k) {
+      var v = typeof scores[k] === 'number' ? scores[k] : 0;
+      if (v > bestV) {
+        bestV = v;
+        best = k;
+      }
+    });
+    if (best && bestV > 0) return best;
+    var raw = profile.phi;
+    if (raw && PHI_FACTS[raw]) return raw;
+    return null;
+  }
 
   function hashStr(s) {
     var h = 0;
@@ -97,18 +263,35 @@
     var pool = [];
     var mbti = (profile.mbti || '').toUpperCase();
     if (mbti && MBTI[mbti]) {
-      pool.push({ label: 'MBTI ' + mbti, facts: MBTI[mbti] });
+      pool.push({ label: 'Cognition · ' + mbti, facts: MBTI[mbti] });
     }
     var en = profile.ennType ? String(profile.ennType).replace(/\D/g, '') : '';
     if (en && ENN[en]) {
-      pool.push({ label: 'Enneagram ' + en, facts: ENN[en] });
+      pool.push({ label: 'Enneagram · Type ' + en, facts: ENN[en] });
     }
+    var att = profile.att || profile.attachment;
+    if (att && ATT_FACTS[att]) {
+      pool.push({ label: ATT_NAMES[att] || att, facts: ATT_FACTS[att] });
+    }
+    var phiKey = dominantPhi(profile);
+    if (phiKey && PHI_FACTS[phiKey]) {
+      pool.push({
+        label: 'Philosophy · ' + (PHI_NAMES[phiKey] || phiKey),
+        facts: PHI_FACTS[phiKey]
+      });
+    }
+    if (typeof profile.polX === 'number' && typeof profile.polY === 'number') {
+      var day = Math.floor(Date.now() / 86400000);
+      pool.push(politicalFacts(profile.polX, profile.polY, uid, day));
+    }
+
     if (!pool.length) {
       return {
         label: 'ANIMUS',
-        text: 'Complete your assessment to unlock daily insights tied to your types.'
+        text: 'Complete your assessment to unlock daily insights tied to your types, philosophy, and political compass.'
       };
     }
+
     var day = Math.floor(Date.now() / 86400000);
     var seed = hashStr((uid || 'guest') + ':' + day);
     var bucket = pool[seed % pool.length];
@@ -116,5 +299,5 @@
     return { label: bucket.label, text: bucket.facts[factIdx] };
   }
 
-  g.AnimusDailyFacts = { pickDailyFact: pickDailyFact };
+  g.AnimusDailyFacts = { pickDailyFact: pickDailyFact, PHI_NAMES: PHI_NAMES };
 })(typeof window !== 'undefined' ? window : globalThis);

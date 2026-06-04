@@ -142,7 +142,7 @@
         total++;
       }
     }
-    if (total < 3) return null;
+    if (total < 2) return null;
     var dominant = 'neutral';
     if (counts.energized >= counts.neutral && counts.energized >= counts.drained) dominant = 'energized';
     if (counts.drained > counts.energized && counts.drained >= counts.neutral) dominant = 'drained';
@@ -402,9 +402,15 @@
           moodHistory: hist
         });
         if (!hadToday && g.AnimusXp) {
-          return g.AnimusXp.awardXp(db, uid, 'mood_checkin').then(function () {
+          return g.AnimusXp.awardXp(db, uid, 'mood_checkin').then(function (granted) {
+            if (granted && typeof g.showToast === 'function') {
+              g.showToast('+' + granted + ' XP · mood check-in');
+            }
             return fresh;
           });
+        }
+        if (typeof g.showToast === 'function') {
+          g.showToast('Mood saved for today');
         }
         return fresh;
       });
@@ -434,7 +440,10 @@
           reflectionHistory: hist
         });
         if (note && !hadNote && g.AnimusXp) {
-          return g.AnimusXp.awardXp(db, uid, 'reflection_note').then(function () {
+          return g.AnimusXp.awardXp(db, uid, 'reflection_note').then(function (granted) {
+            if (granted && typeof g.showToast === 'function') {
+              g.showToast('+' + granted + ' XP · reflection');
+            }
             return fresh;
           });
         }
@@ -629,7 +638,7 @@
           moodButtons +
           '</div>' +
           moodStripHtml(moodHist) +
-          '<p class="daily-row-hint">Tap today — fill the week to unlock your pattern.</p>',
+          '<p class="daily-row-hint">Tap today — two or more days unlock your weekly pattern below.</p>',
         ''
       )
     );

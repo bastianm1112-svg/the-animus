@@ -45,13 +45,9 @@
 
   function polishLoadingNodes() {
     var fact = document.getElementById('dailyFactText');
-    if (fact) {
-      var t = (fact.textContent || '').trim();
-      if (t === 'Loading…' || t === 'Loading...') {
-        fact.textContent = '';
-        fact.classList.add('animus-skeleton');
-        fact.setAttribute('aria-busy', 'true');
-      }
+    if (fact && !fact.classList.contains('animus-skeleton') && !(fact.textContent || '').trim()) {
+      fact.classList.add('animus-skeleton');
+      fact.setAttribute('aria-busy', 'true');
     }
 
     var notifList = document.getElementById('notifPageList');

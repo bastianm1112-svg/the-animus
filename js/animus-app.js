@@ -151,9 +151,19 @@
     }
   }
 
+  function ensureAnalytics() {
+    if (g.AnimusAnalytics || document.querySelector('script[data-animus-analytics]')) return;
+    var s = document.createElement('script');
+    s.src = '/js/animus-analytics.js?v=20260608';
+    s.defer = true;
+    s.setAttribute('data-animus-analytics', '1');
+    document.head.appendChild(s);
+  }
+
   function boot() {
     initTheme();
     initMobileNav();
+    ensureAnalytics();
     initGlobalErrorFallback();
     initPageReveal();
     initSeoAndPerf();
