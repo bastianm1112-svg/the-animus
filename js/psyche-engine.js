@@ -346,10 +346,12 @@ function writeProgressToSession(mode, data) {
 }
 
 function draftIsResumable(data) {
+  if (!data || !data.answers || !data.total) return false;
+  if (!data.activeKeys || !data.activeKeys.length) return false;
   if (typeof AnimusShared !== 'undefined' && AnimusShared.testDraftIsResumable) {
     return AnimusShared.testDraftIsResumable(data);
   }
-  return !!(data && data.answers && data.cur >= 1);
+  return data.cur >= 1;
 }
 
 function readProgressFromSession(mode) {
@@ -492,22 +494,10 @@ function refreshOtherModeResumeLink() {
 
 function updateQuizModeSwitch() {
   var btn = document.getElementById('quizModeSwitch');
-  if (!btn || !isQuizPhase()) return;
-  var other = otherTestMode();
-  if (!other) {
+  if (btn) {
     btn.style.display = 'none';
-    return;
-  }
-  var data = readProgressForMode(other);
-  var es = lang === 'es';
-  if (draftIsResumable(data)) {
-    btn.textContent = other === 'full'
-      ? (es ? 'Test Detallado' : 'Detailed Test')
-      : (es ? 'Test Principal' : 'Main Test');
-    btn.style.display = 'inline-flex';
-    btn.onclick = function () { switchTestMode(other, true); };
-  } else {
-    btn.style.display = 'none';
+    btn.hidden = true;
+    btn.onclick = null;
   }
 }
 
@@ -735,35 +725,100 @@ function switchTestMode(newMode, resumeOther) {
   refreshIntroModeUI();
 }
 
+function applyQuizHeaderForMode() {
+  var qSection = document.getElementById('qSection');
+  if (observerMode && observerSubjectName) {
+    var logo = document.querySelector('.qhdr-logo');
+    if (logo) logo.innerHTML = 'ANI<span>MUS</span> <span class="qhdr-est">ESTIMATOR</span>';
+    if (qSection) qSection.textContent = 'Estimating: ' + observerSubjectName;
+    document.body.classList.remove('test-quiz-detailed');
+    return;
+  }
+  if (testMode === 'full') {
+    if (qSection) qSection.textContent = lang === 'es' ? 'Test Detallado' : 'Detailed Test';
+    document.body.classList.add('test-quiz-detailed');
+    var qhdr = document.querySelector('.qhdr');
+    if (qhdr) qhdr.classList.add('qhdr--detailed');
+  } else {
+    if (qSection) qSection.textContent = lang === 'es' ? 'Test Principal' : 'Main Test';
+    document.body.classList.remove('test-quiz-detailed');
+    var qhdrMain = document.querySelector('.qhdr');
+    if (qhdrMain) qhdrMain.classList.remove('qhdr--detailed');
+  }
+}
+
+function restoreAnswersFromProgress(data) {
+  var ans = Array.isArray(data.answers) ? data.answers.slice() : [];
+  if (ans.length > TOTAL) ans = ans.slice(0, TOTAL);
+  while (ans.length < TOTAL) ans.push(null);
+  answers = ans;
+  var ix = Array.isArray(data.choiceIx) ? data.choiceIx.slice() : [];
+  if (ix.length > TOTAL) ix = ix.slice(0, TOTAL);
+  _choiceIx = new Array(TOTAL).fill(-1);
+  for (var i = 0; i < TOTAL; i++) {
+    _choiceIx[i] = i < ix.length && typeof ix[i] === 'number' ? ix[i] : -1;
+  }
+  cur = Math.min(Math.max(0, parseInt(data.cur, 10) || 0), TOTAL - 1);
+}
+
 function resumeTestFromStorage(forceMode) {
-  var data = readProgressForMode(forceMode || testMode);
-  if(!data || !data.answers) return;
-  setTestMode(forceMode || data.testMode || 'short');
+  var mode = forceMode || testMode;
+  var data = readProgressForMode(mode);
+  if (!draftIsResumable(data)) {
+    showToast(
+      lang === 'es'
+        ? 'No se encontró un progreso que se pueda continuar.'
+        : 'No saved progress found to resume.'
+    );
+    return false;
+  }
+
+  if (typeof firebase !== 'undefined' && firebase.auth && !firebase.auth().currentUser) {
+    showToast(lang === 'es' ? 'Iniciá sesión para continuar.' : 'Sign in to resume your test.');
+    var path = window.location.pathname + window.location.search;
+    window.location.href =
+      typeof AnimusShared !== 'undefined' && AnimusShared.buildLoginUrl
+        ? AnimusShared.buildLoginUrl(path)
+        : '/login?next=' + encodeURIComponent(path);
+    return false;
+  }
+
+  setTestMode(data.testMode || mode || 'short');
+  if (testMode === 'full' && !hasDetailedEntitlement(_introUserData)) {
+    window.location.href = '/shop';
+    return false;
+  }
+
   observerMode = !!data.observerMode;
   observerSubjectName = data.observerSubjectName || '';
   var qKey = Cross.qKey || function (q) { return (q.fn || '') + '|' + (q.t || ''); };
-  if (data.activeKeys && data.activeKeys.length) {
-    var keyToQ = {};
-    Q.forEach(function (q) { keyToQ[qKey(q)] = q; });
-    window._activeQ = data.activeKeys.map(function (k) { return keyToQ[k]; }).filter(Boolean);
-    TOTAL = window._activeQ.length;
-    if (!answers || answers.length !== TOTAL) answers = new Array(TOTAL).fill(null);
-  } else {
-    buildActiveQuestionSet();
+  var keyToQ = {};
+  Q.forEach(function (q) {
+    keyToQ[qKey(q)] = q;
+  });
+  window._activeQ = data.activeKeys.map(function (k) {
+    return keyToQ[k];
+  }).filter(Boolean);
+
+  if (!window._activeQ.length) {
+    showToast(
+      lang === 'es'
+        ? 'El progreso guardado no es compatible. Empezá un test nuevo.'
+        : 'Saved progress could not be restored. Please start a new test.'
+    );
+    return false;
   }
-  if(data.answers.length === TOTAL){
-    answers = data.answers.slice();
-    _choiceIx = (data.choiceIx && data.choiceIx.length === TOTAL) ? data.choiceIx.slice() : new Array(TOTAL).fill(-1);
-    cur = Math.min(data.cur, TOTAL - 1);
-    setTestPhase('quiz');
-    if(observerMode && observerSubjectName){
-      document.querySelector('.qhdr-logo').innerHTML = 'ANI<span>MUS</span> <span class="qhdr-est">ESTIMATOR</span>';
-      document.getElementById('qSection').textContent = 'Estimating: ' + observerSubjectName;
-    }
-    renderQ();
-    updateQuizModeSwitch();
-    updateTestProgressChrome();
-  }
+
+  TOTAL = window._activeQ.length;
+  restoreAnswersFromProgress(data);
+  resetTestMilestones();
+  setTestPhase('quiz');
+  applyQuizHeaderForMode();
+  updateQuizModeSwitch();
+  renderQ();
+  updateTestProgressChrome();
+  showToast(lang === 'es' ? 'Continuando tu test…' : 'Resuming your test…');
+  return true;
 }
 
 function buildTaggedPools() {
@@ -888,21 +943,7 @@ function startTest() {
         observer_mode: !!observerMode
       });
     }
-    if(observerMode && observerSubjectName){
-      var logo = document.querySelector('.qhdr-logo');
-      if(logo) logo.innerHTML = 'ANI<span>MUS</span> <span class="qhdr-est">ESTIMATOR</span>';
-      document.getElementById('qSection').textContent = 'Estimating: ' + observerSubjectName;
-    } else if(testMode === 'full') {
-      document.getElementById('qSection').textContent = 'Detailed Test';
-      document.body.classList.add('test-quiz-detailed');
-      var qhdr = document.querySelector('.qhdr');
-      if (qhdr) qhdr.classList.add('qhdr--detailed');
-    } else {
-      document.getElementById('qSection').textContent = 'Main Test';
-      document.body.classList.remove('test-quiz-detailed');
-      var qhdrMain = document.querySelector('.qhdr');
-      if (qhdrMain) qhdrMain.classList.remove('qhdr--detailed');
-    }
+    applyQuizHeaderForMode();
     renderQ();
     saveTestProgress();
   }

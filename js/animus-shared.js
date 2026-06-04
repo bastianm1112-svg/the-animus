@@ -1191,6 +1191,7 @@
 
   function testDraftIsResumable(data) {
     if (!data || !data.answers || !data.total) return false;
+    if (!data.activeKeys || !data.activeKeys.length) return false;
     if (data.cur >= 1) return true;
     for (var i = 0; i < data.answers.length; i++) {
       if (data.answers[i] !== null && data.answers[i] !== undefined) return true;

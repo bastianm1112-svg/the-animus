@@ -73,11 +73,21 @@
   }
 
   function resumeTest() {
-    if (g.AnimusPsyche && typeof g.AnimusPsyche.resumeTest === 'function') {
-      g.AnimusPsyche.resumeTest();
+    function run() {
+      if (g.AnimusPsyche && typeof g.AnimusPsyche.resumeTest === 'function') {
+        var ok = g.AnimusPsyche.resumeTest();
+        if (ok === false) return;
+        return;
+      }
+      startTest();
+    }
+    if (g.AnimusPsyche && typeof g.AnimusPsyche.loadIntroEntitlements === 'function') {
+      g.AnimusPsyche.loadIntroEntitlements(function () {
+        run();
+      });
       return;
     }
-    startTest();
+    run();
   }
 
   function bindModeTabs() {
@@ -117,11 +127,12 @@
       };
     }
     if (resumeBtn) {
-      resumeBtn.onclick = function (e) {
+      resumeBtn.type = 'button';
+      resumeBtn.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         resumeTest();
-      };
+      });
     }
     if (otherBtn) {
       otherBtn.onclick = function (e) {

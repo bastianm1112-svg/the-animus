@@ -392,21 +392,7 @@ body.page-test.test-progress-on #quiz .qbody {
 }
 
 #quiz .qhdr-mode-switch {
-  appearance: none;
-  -webkit-appearance: none;
-  background: none;
-  border: none;
-  color: var(--gold2);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0;
-  cursor: pointer;
-  flex-shrink: 0;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color 0.2s;
+  display: none !important;
 }
 
 #quiz .qhdr-mode-switch:hover {
