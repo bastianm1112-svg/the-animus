@@ -96,6 +96,12 @@ service cloud.firestore {
       return resource.data.get('banned', false) != true;
     }
 
+    // Profile writes must read ban status from users/{uid}, not profiles (resource is null on create).
+    function userIsNotBanned(userId) {
+      let userDoc = get(/databases/$(database)/documents/users/$(userId));
+      return !userDoc.exists || userDoc.data.get('banned', false) != true;
+    }
+
     function ownerProfileUpdate(userId) {
       return isOwner(userId)
         && isNotBanned()
@@ -276,7 +282,7 @@ service cloud.firestore {
 
     function ownerProfileWrite(userId) {
       return isOwner(userId)
-        && isNotBanned()
+        && userIsNotBanned(userId)
         && profileNoPrivilegeEscalation()
         && (!('adminEditedAt' in request.resource.data)
           || request.resource.data.adminEditedAt == resource.data.get('adminEditedAt', null))
@@ -285,7 +291,7 @@ service cloud.firestore {
 
     match /profiles/{userId} {
       allow read: if true;
-      allow create: if (isOwner(userId) && isNotBanned() && profileCreateValid() && profileNoPrivilegeEscalation())
+      allow create: if (isOwner(userId) && userIsNotBanned(userId) && profileCreateValid() && profileNoPrivilegeEscalation())
         || isAdmin();
       allow update: if isAdmin() || ownerProfileWrite(userId);
       allow delete: if isOwner(userId) || isAdmin();

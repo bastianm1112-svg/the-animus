@@ -887,26 +887,46 @@ function startTest() {
     saveTestProgress();
   }
 
-  if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
-    var user = firebase.auth().currentUser;
-    firebase.firestore().collection('users').doc(user.uid).get().then(function(doc){
+  function redirectToLoginForTest() {
+    var path = window.location.pathname + window.location.search;
+    var dest =
+      typeof AnimusShared !== 'undefined' && AnimusShared.buildLoginUrl
+        ? AnimusShared.buildLoginUrl(path)
+        : '/login?next=' + encodeURIComponent(path);
+    window.location.href = dest;
+  }
+
+  if (typeof firebase === 'undefined' || !firebase.auth) {
+    alert('Sign in to save your results to your profile.');
+    redirectToLoginForTest();
+    return;
+  }
+
+  var authUser = firebase.auth().currentUser;
+  if (!authUser) {
+    alert('Sign in to take the test — your results are saved to your account when you finish.');
+    redirectToLoginForTest();
+    return;
+  }
+
+  firebase
+    .firestore()
+    .collection('users')
+    .doc(authUser.uid)
+    .get()
+    .then(function (doc) {
       var data = doc.exists ? doc.data() : {};
       var gate = entitlementGateForMode(data);
-      if(gate){
+      if (gate) {
         alert(gate);
         window.location.href = '/shop';
         return;
       }
       launch();
-    }).catch(function(){ launch(); });
-    return;
-  }
-  if(testMode === 'full' || testMode === 'estimator'){
-    alert('Sign in and unlock this feature in the Shop.');
-    window.location.href = '/shop';
-    return;
-  }
-  launch();
+    })
+    .catch(function () {
+      launch();
+    });
 }
 
 
@@ -2589,17 +2609,32 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
       );
     }
 
+    function setCloudSaveUi(state) {
+      var btn = document.getElementById('btnSave');
+      if (!btn) return;
+      if (state === 'saved') {
+        btn.innerHTML = '↓ SAVED ✓';
+        btn.style.opacity = '0.7';
+        btn.disabled = false;
+      } else if (state === 'pending') {
+        btn.innerHTML = '↓ SAVING…';
+        btn.style.opacity = '1';
+        btn.disabled = true;
+      } else if (state === 'error') {
+        btn.innerHTML = '↓ SAVE TO CLOUD';
+        btn.style.opacity = '1';
+        btn.disabled = false;
+      }
+    }
+
     function onCloudSaved() {
+      window.__animusCloudSaveOk = true;
+      setCloudSaveUi('saved');
       if (typeof g.AnimusAnalytics !== 'undefined' && g.AnimusAnalytics.track) {
         g.AnimusAnalytics.track('test_complete', {
           test_mode: meta.testMode || testMode || 'short',
           observer_mode: !!observerMode
         });
-      }
-      var btn = document.getElementById('btnSave');
-      if (btn) {
-        btn.innerHTML = '↓ SAVED ✓';
-        btn.style.opacity = '0.7';
       }
       if (redirectAfter) {
         showToast('Profile saved to your account ✓');
@@ -2607,6 +2642,24 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
       } else {
         showToast('Saved to your profile automatically ✓');
       }
+    }
+
+    function onCloudSaveFailed(err) {
+      window.__animusCloudSaveOk = false;
+      setCloudSaveUi('error');
+      console.error('Profile save:', err);
+      var code = err && err.code ? String(err.code) : '';
+      var msg =
+        err && err.message
+          ? err.message
+          : 'Could not save to cloud';
+      if (code === 'permission-denied') {
+        msg =
+          'Cloud save blocked (permissions). Sign out and back in, then tap Save to Cloud. If it persists, deploy the latest Firestore rules.';
+      } else if (msg.indexOf('Not signed in') >= 0) {
+        msg = 'Session expired — sign in again, then tap Save to Cloud.';
+      }
+      showToast(msg + ' — results kept on this device.');
     }
 
     function doSave(user) {
@@ -2663,6 +2716,8 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
       var choiceIx = _choiceIx ? _choiceIx.slice() : [];
       var answersCopy = answers ? answers.slice() : [];
 
+      setCloudSaveUi('pending');
+
       AnimusShared.saveProfileToFirestore(user.uid, snapshot, {
         rawData: data,
         testMode: meta.testMode,
@@ -2670,8 +2725,9 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
         completedAt: meta.completedAt
       })
         .then(function () {
+          onCloudSaved();
           if (AnimusShared.saveTestSessionToFirestore) {
-            return AnimusShared.saveTestSessionToFirestore(user.uid, {
+            AnimusShared.saveTestSessionToFirestore(user.uid, {
               activeQ: activeQ,
               answers: answersCopy,
               choiceIx: choiceIx,
@@ -2691,17 +2747,26 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
               console.warn('Test session save:', e);
             });
           }
-        })
-        .then(function () {
           if (typeof AnimusXp !== 'undefined' && user) {
             var xpReason = observerMode ? 'estimator_complete' : 'test_complete';
-            return AnimusXp.awardXp(firebase.firestore(), user.uid, xpReason);
+            AnimusXp.awardXp(firebase.firestore(), user.uid, xpReason).catch(function (e) {
+              console.warn('XP award:', e);
+            });
           }
+          if (AnimusShared.clearTestDraftFromFirestore) {
+            AnimusShared.clearTestDraftFromFirestore(user.uid, meta.testMode).catch(function () {});
+          }
+          try {
+            clearTestProgress(meta.testMode);
+          } catch (e) {}
         })
-        .then(onCloudSaved)
         .catch(function (e) {
-          console.error('Profile save:', e);
-          showToast('Could not save to cloud — results kept on this device. Tap Save again.');
+          onCloudSaveFailed(e);
+          if (typeof AnimusShared !== 'undefined' && AnimusShared.trySyncLocalResultToFirestore) {
+            AnimusShared.trySyncLocalResultToFirestore(user).then(function (synced) {
+              if (synced) onCloudSaved();
+            });
+          }
         });
     }
 
@@ -2724,7 +2789,14 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
         try {
           unsub();
         } catch (e) {}
-      }, 45000);
+        if (!window.__animusCloudSaveOk) {
+          setCloudSaveUi('error');
+          showToast('Sign in to save your results to the cloud, then tap Save to Cloud.');
+        }
+      }, 12000);
+    } else {
+      setCloudSaveUi('error');
+      showToast('Sign in to save your results to your profile.');
     }
   }
 

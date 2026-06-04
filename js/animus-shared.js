@@ -1590,6 +1590,28 @@
     });
   }
 
+  function prepareUserForProfileSave(user) {
+    if (!user) return Promise.reject(new Error('Not signed in'));
+    var chain = Promise.resolve(user);
+    if (typeof user.getIdToken === 'function') {
+      chain = chain.then(function (u) {
+        return u.getIdToken(true).then(function () {
+          return u;
+        }).catch(function () {
+          return u;
+        });
+      });
+    }
+    if (typeof firebase !== 'undefined' && firebase.firestore && user.uid) {
+      chain = chain.then(function (u) {
+        return ensureUserDocument(firebase.firestore(), u).then(function () {
+          return u;
+        });
+      });
+    }
+    return chain;
+  }
+
   function saveProfileToFirestore(userId, snapshot, options) {
     options = options || {};
     if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
@@ -1598,6 +1620,9 @@
     var authUser = firebase.auth && firebase.auth().currentUser;
     if (!authUser) {
       return Promise.reject(new Error('Not signed in'));
+    }
+    if (authUser.uid !== userId) {
+      return Promise.reject(new Error('Session mismatch — sign in again and retry save'));
     }
     var isAdminSave = !!options.adminEdit;
     var snap = enrichProfileSnapshot(snapshot, options.rawData, {
@@ -1625,24 +1650,30 @@
       });
     }
 
+    function runSave(adminEdit) {
+      return prepareUserForProfileSave(authUser).then(function () {
+        return finishWrite(!!adminEdit);
+      });
+    }
+
     if (isAdminSave) {
       return isUserAdmin(authUser.uid).then(function (admin) {
         if (!admin) {
           return Promise.reject(new Error('Only admins can save admin edits'));
         }
-        return finishWrite(true);
+        return runSave(true);
       });
     }
 
     if (authUser.uid === userId) {
-      return finishWrite(false);
+      return runSave(false);
     }
 
     return isUserAdmin(authUser.uid).then(function (admin) {
       if (!admin) {
         return Promise.reject(new Error('Only admins can edit other profiles'));
       }
-      return finishWrite(true);
+      return runSave(true);
     });
   }
 
@@ -1671,10 +1702,16 @@
       if (remote && remote.latest && remote.latest.mbti) return false;
       if (profileHasAdminLock(remote)) return false;
       if (local._typesLocked || local.adminEditedAt) return false;
-      return saveProfileToFirestore(user.uid, local, {
-        testMode: local.testMode,
-        completedAt: local.completedAt
-      }).then(function () { return true; });
+      return prepareUserForProfileSave(user)
+        .then(function () {
+          return saveProfileToFirestore(user.uid, local, {
+            testMode: local.testMode,
+            completedAt: local.completedAt
+          });
+        })
+        .then(function () {
+          return true;
+        });
     });
   }
 
@@ -1765,6 +1802,7 @@
     fillMbtiBasics: fillMbtiBasics,
     hydrateSparseProfile: hydrateSparseProfile,
     stripCompareInternals: stripCompareInternals,
+    prepareUserForProfileSave: prepareUserForProfileSave,
     saveProfileToFirestore: saveProfileToFirestore,
     adminSaveProfileToFirestore: adminSaveProfileToFirestore,
     profileHasAdminLock: profileHasAdminLock,

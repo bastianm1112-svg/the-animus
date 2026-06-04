@@ -524,12 +524,21 @@ function goToDashboard(){
   var dest = typeof AnimusShared !== 'undefined' && AnimusShared.safeLoginRedirectPath
     ? AnimusShared.safeLoginRedirectPath(nextRaw)
     : '/';
-  if (dest && dest !== '/') {
-    window.location.replace(dest);
-    return;
-  }
-  showScreen('screenSuccess');
-  setTimeout(function(){ window.location.href = '/'; }, 1000);
+  var user = auth.currentUser;
+  var syncPromise =
+    user && typeof AnimusShared !== 'undefined' && AnimusShared.trySyncLocalResultToFirestore
+      ? AnimusShared.trySyncLocalResultToFirestore(user)
+      : Promise.resolve(false);
+  syncPromise.finally(function () {
+    if (dest && dest !== '/') {
+      window.location.replace(dest);
+      return;
+    }
+    showScreen('screenSuccess');
+    setTimeout(function () {
+      window.location.href = '/';
+    }, 1000);
+  });
 }
 
 function showScreen(id){
