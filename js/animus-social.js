@@ -37,7 +37,7 @@
   }
 
   function openFriends() {
-    g.location.href = '/friends';
+    g.location.href = '/activity';
   }
 
   function openNotifs() {
@@ -51,7 +51,7 @@
   function openAddFriend() {
     var modal = document.getElementById('addFriendModal');
     if (!modal) {
-      g.location.href = '/friends';
+      g.location.href = '/activity';
       return;
     }
     modal.classList.add('open');
@@ -361,7 +361,7 @@
         code: 'failed-precondition',
         message:
           whoLabel +
-          ' account has corrupted friend-list data. They should open https://the-animus.vercel.app/friends once while signed in.'
+          ' account has corrupted friend-list data. They should open https://animustest.com/activity once while signed in.'
       };
     }
     if (fr.sent !== undefined && !Array.isArray(fr.sent)) {
@@ -614,7 +614,7 @@
             );
           } else {
             list.innerHTML =
-              '<div class="notif-page-empty">You\'re all caught up. Friend requests will show up here.<br><a href="/friends">Find friends</a></div>';
+              '<div class="notif-page-empty">You\'re all caught up. Friend requests will show up here.<br><a href="/activity">Find friends</a></div>';
           }
           return;
         }

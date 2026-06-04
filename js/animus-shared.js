@@ -384,8 +384,8 @@
   };
 
   function validateUsername(raw) {
-    if (g.AnimusUsernamePolicy && g.AnimusUsernamePolicy.validate) {
-      return g.AnimusUsernamePolicy.validate(raw);
+    if (global.AnimusUsernamePolicy && global.AnimusUsernamePolicy.validate) {
+      return global.AnimusUsernamePolicy.validate(raw);
     }
     var username = normalizeUsername(raw);
     if (username.length < 3) {

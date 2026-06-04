@@ -24,7 +24,7 @@
 <script src="/js/profile-narratives.js"></script>
 <script src="/js/animus-entitlements.js?v=20260607"></script>
 <script src="/js/animus-xp.js"></script>
-<script src="/js/animus-shared.js?v=20260608"></script>
+<script src="/js/animus-shared.js?v=20260616"></script>
 <script>
   AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
   var auth = firebase.auth();
@@ -69,7 +69,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
     <div class="compare-picker-label">Compare with a friend</div>
     <div class="compare-friend-chips" id="compareFriendChips"></div>
     <p class="compare-picker-hint" id="friendsPickerEmpty" style="display:none"></p>
-    <p class="compare-picker-hint"><a href="/friends">+ Add friends</a></p>
+    <p class="compare-picker-hint"><a href="/activity">+ Add friends</a></p>
   </div>
 
 <div class="compare-mode-bar" id="compare-main">

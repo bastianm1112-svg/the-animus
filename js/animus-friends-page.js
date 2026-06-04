@@ -11,7 +11,7 @@
 
     auth.onAuthStateChanged(function (user) {
       if (!user) {
-        g.location.href = '/login?next=' + encodeURIComponent('/friends');
+        g.location.href = '/login?next=' + encodeURIComponent('/activity');
         return;
       }
 

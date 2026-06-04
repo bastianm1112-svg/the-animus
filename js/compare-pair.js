@@ -704,7 +704,7 @@
             if (empty) {
               empty.style.display = 'block';
               empty.innerHTML =
-                'No friends yet. <a href="/friends">Add friends</a>, then pick someone to compare.';
+                'No friends yet. <a href="/activity">Add friends</a>, then pick someone to compare.';
             }
           } else {
             if (empty) empty.style.display = 'none';
