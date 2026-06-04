@@ -408,7 +408,8 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="/js/animus-username-policy.js"></script>
-  <script src="/js/animus-shared.js"></script>
+  <script src="/js/animus-shared.js?v=20260610"></script>
+  <script src="/js/animus-entitlements.js?v=20260610"></script>
   <script>
     AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
     var auth = firebase.auth();
@@ -727,6 +728,21 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
             </div>
           </div>
         </div>
+        <div class="field-row" id="testProgressBarRow" style="display:none">
+          <div class="field-info">
+            <div class="field-label">Test progress bar</div>
+            <div class="field-desc">Show question number and a progress bar while you take an assessment (Plus and paid packs).</div>
+          </div>
+          <div class="field-control">
+            <div class="toggle-wrap">
+              <label class="toggle">
+                <input type="checkbox" id="testProgressBar" checked onchange="markDirty()" />
+                <div class="toggle-track"></div>
+              </label>
+              <span class="toggle-label">Show progress</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -948,6 +964,7 @@ function snapshotFormState() {
     theme: (document.getElementById('theme') || {}).value || 'dark',
     language: (document.getElementById('language') || {}).value || 'en',
     defaultMode: modeEl ? modeEl.value : 'full',
+    testProgressBar: !!(document.getElementById('testProgressBar') && document.getElementById('testProgressBar').checked),
     currentPw: (document.getElementById('currentPw') || {}).value || '',
     newPw: (document.getElementById('newPw') || {}).value || '',
     confirmPw: (document.getElementById('confirmPw') || {}).value || ''
@@ -1066,6 +1083,28 @@ function applySettingsFormFromProfile(user, p) {
   if (confirmPw) confirmPw.value = '';
   checkPwStrength('');
   updateCharCount();
+  applyPremiumSettingsVisibility(p);
+}
+
+function hasPremiumTestPerksFromDoc(p) {
+  p = p || {};
+  if (typeof AnimusEntitlements === 'undefined') return false;
+  if (AnimusEntitlements.hasAnimusPlus && AnimusEntitlements.hasAnimusPlus(p)) return true;
+  if (AnimusEntitlements.hasDetailedTest && AnimusEntitlements.hasDetailedTest(p)) return true;
+  if (AnimusEntitlements.hasTestEstimator && AnimusEntitlements.hasTestEstimator(p)) return true;
+  return false;
+}
+
+function applyPremiumSettingsVisibility(p) {
+  var row = document.getElementById('testProgressBarRow');
+  var toggle = document.getElementById('testProgressBar');
+  if (!row || !toggle) return;
+  var premium = hasPremiumTestPerksFromDoc(p);
+  row.style.display = premium ? '' : 'none';
+  if (premium) {
+    var prefs = (p && p.prefs) || {};
+    toggle.checked = prefs.testProgressBar !== false;
+  }
 }
 
 function discardChanges() {
@@ -1191,6 +1230,13 @@ function saveChanges() {
       // Update password if entered
       if(newPw && newPw === confirmPw && newPw.length >= 6){
         chain = chain.then(function(){ return user.updatePassword(newPw); });
+      }
+
+      if (hasPremiumTestPerksFromDoc(doc.exists ? doc.data() : {})) {
+        var prefs = { testProgressBar: !!(document.getElementById('testProgressBar') && document.getElementById('testProgressBar').checked) };
+        chain = chain.then(function () {
+          return db.collection('users').doc(uid).set({ prefs: prefs }, { merge: true });
+        });
       }
 
       return chain;

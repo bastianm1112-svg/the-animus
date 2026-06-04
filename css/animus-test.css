@@ -363,8 +363,32 @@ body.light-mode #quiz .qhdr {
 }
 
 #quiz .qhdr-num,
-#quiz .pbar-wrap {
-  display: none !important;
+#quiz .pbar-wrap,
+#quiz .test-progress-wrap,
+#quiz .test-progress-label {
+  display: none;
+}
+
+body.page-test.test-progress-on #quiz .qhdr-num {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--gold2);
+  flex-shrink: 0;
+}
+
+body.page-test.test-progress-on .test-progress-wrap {
+  display: block;
+}
+
+body.page-test.test-progress-on .test-progress-label {
+  display: block;
+}
+
+body.page-test.test-progress-on #quiz .qbody {
+  padding-top: calc(var(--nav-h) + 28px);
 }
 
 #quiz .qhdr-mode-switch {

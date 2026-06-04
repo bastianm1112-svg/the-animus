@@ -23,6 +23,8 @@
 function setTestPhase(phase) {
   if (typeof g.setPagePhase === 'function') g.setPagePhase(phase);
   else if (g.AnimusApp && g.AnimusApp.setPagePhase) g.AnimusApp.setPagePhase(phase);
+  if (phase === 'quiz') updateTestProgressChrome();
+  else if (document.body) document.body.classList.remove('test-progress-on');
 }
 
 function isQuizPhase() {
@@ -181,6 +183,8 @@ function shuffle(arr){
 var testMode = 'short';
 var _introUserData = null;
 var _introEntitlementsLoaded = false;
+var _serverDraftByMode = {};
+var _serverDraftSaveTimer = null;
 
 function applyRouteTestMode() {
   var params = new URLSearchParams(window.location.search);
@@ -269,14 +273,22 @@ function migrateLegacyProgress() {
 }
 
 function readProgressForMode(mode) {
-  migrateLegacyProgress();
-  try {
-    var raw = sessionStorage.getItem(progressStorageKey(mode));
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) {
-    return null;
+  var local = readProgressFromSession(mode);
+  var docId =
+    typeof AnimusShared !== 'undefined' && AnimusShared.testDraftDocId
+      ? AnimusShared.testDraftDocId(mode)
+      : mode === 'full'
+        ? 'full'
+        : mode === 'estimator'
+          ? 'estimator'
+          : 'short';
+  var server = _serverDraftByMode[docId];
+  if (!local && server) return server;
+  if (local && !server) return local;
+  if (local && server) {
+    return (server.savedAt || 0) >= (local.savedAt || 0) ? server : local;
   }
+  return null;
 }
 
 function localSimplifyQuestion(text) {
@@ -291,26 +303,101 @@ function localSimplifyQuestion(text) {
   return t || String(text).trim();
 }
 
-function saveTestProgress() {
-  if(!window._activeQ || !answers) return;
+function buildProgressPayload() {
+  if (!window._activeQ || !answers) return null;
   var qKey = Cross.qKey || function (q) { return (q.fn || '') + '|' + (q.t || ''); };
+  return {
+    testMode: testMode,
+    cur: cur,
+    total: TOTAL,
+    answers: answers.slice(),
+    choiceIx: _choiceIx.slice(),
+    activeKeys: window._activeQ.map(qKey),
+    observerMode: !!observerMode,
+    observerSubjectName: observerSubjectName || '',
+    savedAt: Date.now()
+  };
+}
+
+function writeProgressToSession(mode, data) {
+  if (!data) return;
   try {
-    sessionStorage.setItem(progressStorageKey(), JSON.stringify({
-      testMode: testMode,
-      cur: cur,
-      total: TOTAL,
-      answers: answers,
-      choiceIx: _choiceIx.slice(),
-      activeKeys: window._activeQ.map(qKey),
-      observerMode: !!observerMode,
-      observerSubjectName: observerSubjectName || '',
-      savedAt: Date.now()
-    }));
-  } catch(e){}
+    sessionStorage.setItem(progressStorageKey(mode || data.testMode), JSON.stringify(data));
+  } catch (e) {}
+}
+
+function draftIsResumable(data) {
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.testDraftIsResumable) {
+    return AnimusShared.testDraftIsResumable(data);
+  }
+  return !!(data && data.answers && data.cur >= 1);
+}
+
+function readProgressFromSession(mode) {
+  migrateLegacyProgress();
+  try {
+    var raw = sessionStorage.getItem(progressStorageKey(mode));
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+function flushServerDraftSave(payload) {
+  payload = payload || buildProgressPayload();
+  if (!payload || !draftIsResumable(payload)) return;
+  if (typeof firebase === 'undefined' || !firebase.auth || !firebase.auth().currentUser) return;
+  if (typeof AnimusShared === 'undefined' || !AnimusShared.saveTestDraftToFirestore) return;
+  var uid = firebase.auth().currentUser.uid;
+  AnimusShared.saveTestDraftToFirestore(uid, payload).then(function () {
+    var docId = AnimusShared.testDraftDocId(payload.testMode);
+    _serverDraftByMode[docId] = payload;
+  });
+}
+
+function scheduleServerDraftSave(payload) {
+  payload = payload || buildProgressPayload();
+  if (!payload || !draftIsResumable(payload)) return;
+  clearTimeout(_serverDraftSaveTimer);
+  _serverDraftSaveTimer = setTimeout(function () {
+    flushServerDraftSave(payload);
+  }, 700);
+}
+
+function saveTestProgress() {
+  var payload = buildProgressPayload();
+  if (!payload) return;
+  writeProgressToSession(testMode, payload);
+  scheduleServerDraftSave(payload);
 }
 
 function clearTestProgress(mode) {
-  try { sessionStorage.removeItem(progressStorageKey(mode)); } catch(e){}
+  var m = mode || testMode;
+  try {
+    sessionStorage.removeItem(progressStorageKey(m));
+  } catch (e) {}
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.testDraftDocId) {
+    delete _serverDraftByMode[AnimusShared.testDraftDocId(m)];
+  }
+  if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+    var uid = firebase.auth().currentUser.uid;
+    if (typeof AnimusShared !== 'undefined' && AnimusShared.clearTestDraftFromFirestore) {
+      AnimusShared.clearTestDraftFromFirestore(uid, m);
+    }
+  }
+}
+
+function hydrateDraftsFromServer(drafts) {
+  _serverDraftByMode = drafts || {};
+  Object.keys(_serverDraftByMode).forEach(function (modeKey) {
+    var server = _serverDraftByMode[modeKey];
+    if (!server || !draftIsResumable(server)) return;
+    var local = readProgressFromSession(modeKey);
+    if (!local || (server.savedAt || 0) >= (local.savedAt || 0)) {
+      writeProgressToSession(modeKey, server);
+    }
+  });
 }
 
 function loadSavedTestMode() {
@@ -322,15 +409,36 @@ function loadSavedTestMode() {
   return 'short';
 }
 
+function resumePromptLabel(data) {
+  var es = lang === 'es';
+  if (!data || !data.total) {
+    return es ? 'Continuar donde lo dejaste →' : 'Resume where you left off →';
+  }
+  var answered = 0;
+  if (data.answers) {
+    for (var i = 0; i < data.answers.length; i++) {
+      if (data.answers[i] !== null && data.answers[i] !== undefined) answered++;
+    }
+  }
+  var at = Math.min((data.cur || 0) + 1, data.total);
+  var pct = Math.round((answered / data.total) * 100);
+  if (es) {
+    return 'Continuar · pregunta ' + at + ' de ' + data.total + ' (' + pct + '%) →';
+  }
+  return 'Resume · question ' + at + ' of ' + data.total + ' (' + pct + '%) →';
+}
+
 function showResumePromptIfNeeded() {
   var wrap = document.getElementById('resumeTestWrap');
-  if(!wrap) return;
+  var btn = document.getElementById('resumeTestBtn');
+  if (!wrap) return;
   var data = readProgressForMode(testMode);
-  if(!data || !data.answers || data.cur < 1) {
+  if (!draftIsResumable(data)) {
     wrap.style.display = 'none';
     return;
   }
   wrap.style.display = 'block';
+  if (btn) btn.textContent = resumePromptLabel(data);
   refreshOtherModeResumeLink();
   updateQuizModeSwitch();
 }
@@ -351,7 +459,7 @@ function refreshOtherModeResumeLink() {
     return;
   }
   var data = readProgressForMode(other);
-  if (!data || !data.answers || data.cur < 1) {
+  if (!draftIsResumable(data)) {
     wrap.style.display = 'none';
     return;
   }
@@ -373,7 +481,7 @@ function updateQuizModeSwitch() {
   }
   var data = readProgressForMode(other);
   var es = lang === 'es';
-  if (data && data.answers && data.cur >= 1) {
+  if (draftIsResumable(data)) {
     btn.textContent = other === 'full'
       ? (es ? 'Test Detallado' : 'Detailed Test')
       : (es ? 'Test Principal' : 'Main Test');
@@ -389,6 +497,62 @@ function hasDetailedEntitlement(userData) {
   return AnimusEntitlements.hasDetailedTest
     ? AnimusEntitlements.hasDetailedTest(userData)
     : AnimusEntitlements.hasEntitlement(userData, 'detailedTest');
+}
+
+function hasPremiumTestPerks(userData) {
+  userData = userData || _introUserData || {};
+  if (typeof AnimusEntitlements === 'undefined') return false;
+  if (AnimusEntitlements.hasAnimusPlus && AnimusEntitlements.hasAnimusPlus(userData)) return true;
+  if (hasDetailedEntitlement(userData)) return true;
+  if (AnimusEntitlements.hasTestEstimator && AnimusEntitlements.hasTestEstimator(userData)) return true;
+  return false;
+}
+
+function wantsTestProgressBar(userData) {
+  userData = userData || _introUserData || {};
+  if (!hasPremiumTestPerks(userData)) return false;
+  var prefs = userData.prefs || {};
+  return prefs.testProgressBar !== false;
+}
+
+function updateTestProgressChrome() {
+  var on = isQuizPhase() && wantsTestProgressBar(_introUserData);
+  if (document.body) {
+    document.body.classList.toggle('test-progress-on', on);
+  }
+  var numEl = document.getElementById('qhdrNum');
+  var fillEl = document.getElementById('testProgressFill');
+  var labelEl = document.getElementById('testProgressLabel');
+  var wrapEl = document.getElementById('testProgressWrap');
+  if (!on) {
+    if (numEl) numEl.setAttribute('aria-hidden', 'true');
+    if (labelEl) labelEl.setAttribute('aria-hidden', 'true');
+    if (wrapEl) wrapEl.setAttribute('aria-hidden', 'true');
+    return;
+  }
+  var total = TOTAL || (window._activeQ && window._activeQ.length) || 1;
+  var current = Math.min(cur + 1, total);
+  var answered = 0;
+  if (answers) {
+    for (var i = 0; i < answers.length; i++) {
+      if (answers[i] !== null && answers[i] !== undefined) answered++;
+    }
+  }
+  var pct = Math.max(4, Math.round((answered / total) * 100));
+  if (numEl) {
+    numEl.textContent = current + ' / ' + total;
+    numEl.setAttribute('aria-hidden', 'false');
+  }
+  if (fillEl) fillEl.style.width = pct + '%';
+  if (labelEl) {
+    labelEl.textContent = answered + ' answered · ' + pct + '%';
+    labelEl.setAttribute('aria-hidden', 'false');
+  }
+  if (wrapEl) {
+    wrapEl.setAttribute('aria-valuenow', String(pct));
+    wrapEl.setAttribute('aria-valuemax', '100');
+    wrapEl.setAttribute('aria-hidden', 'false');
+  }
 }
 
 function canSelectTestMode(mode, userData) {
@@ -423,8 +587,19 @@ function loadIntroEntitlements(cb) {
     .then(function (doc) {
       _introUserData = doc.exists ? doc.data() : {};
       _introEntitlementsLoaded = true;
-      refreshIntroModeUI(_introUserData);
-      if (cb) cb(_introUserData);
+      var chain = Promise.resolve();
+      if (
+        typeof AnimusShared !== 'undefined' &&
+        AnimusShared.fetchAllTestDraftsFromFirestore
+      ) {
+        chain = AnimusShared.fetchAllTestDraftsFromFirestore(user.uid).then(function (drafts) {
+          hydrateDraftsFromServer(drafts);
+        });
+      }
+      return chain.then(function () {
+        refreshIntroModeUI(_introUserData);
+        if (cb) cb(_introUserData);
+      });
     })
     .catch(function () {
       _introEntitlementsLoaded = true;
@@ -571,6 +746,7 @@ function resumeTestFromStorage(forceMode) {
     }
     renderQ();
     updateQuizModeSwitch();
+    updateTestProgressChrome();
   }
 }
 
@@ -1344,10 +1520,12 @@ function renderQ(){
 
   saveTestProgress();
   updateQuizModeSwitch();
+  updateTestProgressChrome();
 }
 
 // ── FINISH QUIZ (called when user completes last question) ──
 function finishQuiz(){
+  clearTimeout(_serverDraftSaveTimer);
   clearTestProgress();
   setTestPhase('loading');
   document.getElementById('loadStatus').textContent='Scoring your responses...';
@@ -3014,6 +3192,11 @@ showResults=function(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     } catch (e) {}
     if (g.AnimusIntro && g.AnimusIntro.onEngineReady) g.AnimusIntro.onEngineReady();
   }
+  window.addEventListener('pagehide', function () {
+    clearTimeout(_serverDraftSaveTimer);
+    flushServerDraftSave();
+  });
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncIntro);
   else syncIntro();
 })(window);

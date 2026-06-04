@@ -1122,6 +1122,166 @@
     return items;
   }
 
+  var TEST_DRAFT_MODES = ['short', 'full', 'estimator'];
+
+  function testDraftDocId(mode) {
+    if (mode === 'full' || mode === 'detailed') return 'full';
+    if (mode === 'estimator') return 'estimator';
+    return 'short';
+  }
+
+  function sanitizeAnswerArray(arr, total) {
+    var out = [];
+    var len = Math.min(Array.isArray(arr) ? arr.length : 0, total);
+    for (var i = 0; i < total; i++) {
+      if (i >= len) {
+        out.push(null);
+        continue;
+      }
+      var v = arr[i];
+      if (v === null || v === undefined) {
+        out.push(null);
+        continue;
+      }
+      var n = typeof v === 'number' ? v : parseInt(v, 10);
+      out.push(isNaN(n) ? null : Math.max(-99, Math.min(99, n)));
+    }
+    return out;
+  }
+
+  function sanitizeChoiceIxArray(arr, total) {
+    var out = [];
+    var len = Math.min(Array.isArray(arr) ? arr.length : 0, total);
+    for (var i = 0; i < total; i++) {
+      if (i >= len) {
+        out.push(-1);
+        continue;
+      }
+      var v = arr[i];
+      var n = typeof v === 'number' ? v : parseInt(v, 10);
+      out.push(isNaN(n) ? -1 : Math.max(-1, Math.min(24, n)));
+    }
+    return out;
+  }
+
+  function sanitizeTestDraftPayload(payload) {
+    if (!payload || typeof payload !== 'object') return null;
+    var total = parseInt(payload.total, 10);
+    if (!total || total < 1 || total > 320) return null;
+    var cur = parseInt(payload.cur, 10);
+    if (isNaN(cur) || cur < 0) cur = 0;
+    if (cur >= total) cur = total - 1;
+    var answers = sanitizeAnswerArray(payload.answers, total);
+    var choiceIx = sanitizeChoiceIxArray(payload.choiceIx, total);
+    var activeKeys = sanitizeStringArray(payload.activeKeys, 80, 320);
+    var savedAt = parseInt(payload.savedAt, 10);
+    if (isNaN(savedAt) || savedAt < 0) savedAt = Date.now();
+    return sanitizeForFirestore({
+      testMode: sanitizePlainText(payload.testMode || 'short', 16),
+      cur: cur,
+      total: total,
+      answers: answers,
+      choiceIx: choiceIx,
+      activeKeys: activeKeys,
+      observerMode: !!payload.observerMode,
+      observerSubjectName: sanitizePlainText(payload.observerSubjectName || '', 64),
+      savedAt: savedAt
+    });
+  }
+
+  function testDraftIsResumable(data) {
+    if (!data || !data.answers || !data.total) return false;
+    if (data.cur >= 1) return true;
+    for (var i = 0; i < data.answers.length; i++) {
+      if (data.answers[i] !== null && data.answers[i] !== undefined) return true;
+    }
+    return false;
+  }
+
+  function saveTestDraftToFirestore(userId, payload) {
+    if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
+      return Promise.resolve(false);
+    }
+    var authUser = firebase.auth && firebase.auth().currentUser;
+    if (!authUser || authUser.uid !== userId) return Promise.resolve(false);
+    var draft = sanitizeTestDraftPayload(payload);
+    if (!draft || !testDraftIsResumable(draft)) return Promise.resolve(false);
+    var docId = testDraftDocId(draft.testMode);
+    return firebase
+      .firestore()
+      .collection('users')
+      .doc(userId)
+      .collection('testDrafts')
+      .doc(docId)
+      .set(
+        Object.assign({}, draft, {
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }),
+        { merge: true }
+      )
+      .then(function () {
+        return true;
+      })
+      .catch(function () {
+        return false;
+      });
+  }
+
+  function clearTestDraftFromFirestore(userId, mode) {
+    if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
+      return Promise.resolve(false);
+    }
+    var authUser = firebase.auth && firebase.auth().currentUser;
+    if (!authUser || authUser.uid !== userId) return Promise.resolve(false);
+    return firebase
+      .firestore()
+      .collection('users')
+      .doc(userId)
+      .collection('testDrafts')
+      .doc(testDraftDocId(mode))
+      .delete()
+      .catch(function () {
+        return false;
+      });
+  }
+
+  function fetchTestDraftFromFirestore(userId, mode) {
+    if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
+      return Promise.resolve(null);
+    }
+    return firebase
+      .firestore()
+      .collection('users')
+      .doc(userId)
+      .collection('testDrafts')
+      .doc(testDraftDocId(mode))
+      .get()
+      .then(function (doc) {
+        if (!doc.exists) return null;
+        var data = doc.data() || {};
+        return sanitizeTestDraftPayload(data);
+      })
+      .catch(function () {
+        return null;
+      });
+  }
+
+  function fetchAllTestDraftsFromFirestore(userId) {
+    if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
+      return Promise.resolve({});
+    }
+    var out = {};
+    return Promise.all(
+      TEST_DRAFT_MODES.map(function (mode) {
+        return fetchTestDraftFromFirestore(userId, mode).then(function (draft) {
+          if (draft && testDraftIsResumable(draft)) out[mode] = draft;
+        });
+      })
+    ).then(function () {
+      return out;
+    });
+  }
+
   function saveTestSessionToFirestore(userId, sessionInput, options) {
     options = options || {};
     if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
@@ -1610,6 +1770,13 @@
     profileHasAdminLock: profileHasAdminLock,
     stripPrivateFromProfileSnapshot: stripPrivateFromProfileSnapshot,
     saveTestSessionToFirestore: saveTestSessionToFirestore,
+    testDraftDocId: testDraftDocId,
+    testDraftIsResumable: testDraftIsResumable,
+    sanitizeTestDraftPayload: sanitizeTestDraftPayload,
+    saveTestDraftToFirestore: saveTestDraftToFirestore,
+    clearTestDraftFromFirestore: clearTestDraftFromFirestore,
+    fetchTestDraftFromFirestore: fetchTestDraftFromFirestore,
+    fetchAllTestDraftsFromFirestore: fetchAllTestDraftsFromFirestore,
     fetchTestSessionsForAdmin: fetchTestSessionsForAdmin,
     trySyncLocalResultToFirestore: trySyncLocalResultToFirestore,
     getResolvedLang: getResolvedLang,

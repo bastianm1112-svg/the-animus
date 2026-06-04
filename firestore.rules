@@ -119,6 +119,20 @@ service cloud.firestore {
         ]);
     }
 
+    function prefsUpdateOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['prefs']);
+    }
+
+    function userPrefsValid() {
+      return request.resource.data.prefs is map
+        && request.resource.data.prefs.keys().hasOnly(['testProgressBar'])
+        && request.resource.data.prefs.testProgressBar is bool;
+    }
+
+    function ownerPrefsUpdate(userId) {
+      return isOwner(userId) && isNotBanned() && entitlementsUnchanged() && prefsUpdateOnly() && userPrefsValid();
+    }
+
     function compareUsageIncrementValid() {
       return resource.data.get('entitlements', {}).get('animusPlus', false) == true
         || (
@@ -159,6 +173,47 @@ service cloud.firestore {
       allow delete: if isOwner(userId);
     }
 
+    function testDraftModeValid(modeId) {
+      return modeId in ['short', 'full', 'estimator'];
+    }
+
+    function testDraftValid() {
+      return request.resource.data.keys().hasAll([
+          'testMode', 'cur', 'total', 'answers', 'savedAt'
+        ])
+        && request.resource.data.testMode is string
+        && request.resource.data.testMode.size() <= 16
+        && request.resource.data.cur is int
+        && request.resource.data.cur >= 0
+        && request.resource.data.cur <= 319
+        && request.resource.data.total is int
+        && request.resource.data.total > 0
+        && request.resource.data.total <= 320
+        && request.resource.data.cur < request.resource.data.total
+        && request.resource.data.answers is list
+        && request.resource.data.answers.size() == request.resource.data.total
+        && request.resource.data.savedAt is int
+        && request.resource.data.savedAt > 0
+        && (!('choiceIx' in request.resource.data)
+          || (request.resource.data.choiceIx is list
+            && request.resource.data.choiceIx.size() == request.resource.data.total))
+        && (!('activeKeys' in request.resource.data)
+          || (request.resource.data.activeKeys is list
+            && request.resource.data.activeKeys.size() > 0
+            && request.resource.data.activeKeys.size() <= 320))
+        && (!('observerMode' in request.resource.data)
+          || request.resource.data.observerMode is bool)
+        && (!('observerSubjectName' in request.resource.data)
+          || (request.resource.data.observerSubjectName is string
+            && request.resource.data.observerSubjectName.size() <= 64));
+    }
+
+    match /users/{userId}/testDrafts/{modeId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && testDraftModeValid(modeId) && testDraftValid();
+      allow delete: if isOwner(userId);
+    }
+
     match /users/{userId} {
       allow read: if signedIn();
       allow create: if isOwner(userId)
@@ -169,6 +224,7 @@ service cloud.firestore {
         && (
           ownerProfileUpdateSafe(userId)
           || ownerRetentionUpdate(userId)
+          || ownerPrefsUpdate(userId)
           || incomingFriendRequest(userId)
           || peerAcceptFriend(userId)
           || adminUserUpdate(userId)

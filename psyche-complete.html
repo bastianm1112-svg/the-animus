@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="/css/animus-shop.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-premium.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-motion.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-test.css?v=20260609">
+<link rel="stylesheet" href="/css/animus-test.css?v=20260610">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
 <script src="/js/animus-app.js?v=20260603" defer></script>
@@ -38,7 +38,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="/js/animus-shared.js?v=20260609"></script>
+  <script src="/js/animus-shared.js?v=20260610"></script>
   <script>
     AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
     var auth = firebase.auth();
@@ -164,10 +164,15 @@ if(window.top!==window.self){window.top.location=window.self.location;}
   <div class="qhdr">
     <a href="/" class="qhdr-logo">ANI<span>MUS</span></a>
     <div class="qhdr-right">
+      <span class="qhdr-num" id="qhdrNum" aria-hidden="true"></span>
       <span class="qhdr-section" id="qSection">Main Test</span>
       <button type="button" class="qhdr-mode-switch" id="quizModeSwitch" style="display:none"></button>
     </div>
   </div>
+  <div class="test-progress-wrap" id="testProgressWrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-hidden="true">
+    <div class="test-progress-fill" id="testProgressFill"></div>
+  </div>
+  <span class="test-progress-label" id="testProgressLabel" aria-hidden="true"></span>
   <div class="qbody" id="qBody"></div>
 </div>
 
@@ -222,7 +227,7 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <script src="/js/psyche-cross.js"></script>
 <script src="/js/profile-narrative-depth.js?v=20260609"></script>
 <script src="/js/profile-narratives.js?v=20260609"></script>
-<script src="/js/psyche-engine.js?v=20260609"></script>
+<script src="/js/psyche-engine.js?v=20260610"></script>
 <script src="/js/psyche-intro.js?v=20260607"></script>
 
 <div id="appBottomMount"></div>

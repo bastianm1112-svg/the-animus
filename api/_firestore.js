@@ -224,6 +224,7 @@ async function deleteCollection(collectionPath) {
 }
 
 async function deleteUserAccountData(uid, username) {
+  const draftsOk = await deleteCollection('users/' + encodeURIComponent(uid) + '/testDrafts');
   const estimationsOk = await deleteCollection('users/' + encodeURIComponent(uid) + '/estimations');
   const recordsOk = await deleteCollection(
     'testSessions/' + encodeURIComponent(uid) + '/records'
@@ -248,7 +249,7 @@ async function deleteUserAccountData(uid, username) {
       '/databases/(default)/documents/users/' +
       encodeURIComponent(uid)
   );
-  return estimationsOk && recordsOk && profileOk && userOk;
+  return draftsOk && estimationsOk && recordsOk && profileOk && userOk;
 }
 
 module.exports = {
