@@ -525,10 +525,16 @@ function goToDashboard(){
     ? AnimusShared.safeLoginRedirectPath(nextRaw)
     : '/';
   var user = auth.currentUser;
-  var syncPromise =
-    user && typeof AnimusShared !== 'undefined' && AnimusShared.trySyncLocalResultToFirestore
-      ? AnimusShared.trySyncLocalResultToFirestore(user)
+  var syncPromise = Promise.resolve(false);
+  if (user && typeof AnimusShared !== 'undefined') {
+    syncPromise = AnimusShared.trySyncPendingCloudResult
+      ? AnimusShared.trySyncPendingCloudResult(user)
       : Promise.resolve(false);
+    syncPromise = syncPromise.then(function (synced) {
+      if (synced || !AnimusShared.trySyncLocalResultToFirestore) return synced;
+      return AnimusShared.trySyncLocalResultToFirestore(user);
+    });
+  }
   syncPromise.finally(function () {
     if (dest && dest !== '/') {
       window.location.replace(dest);

@@ -292,7 +292,7 @@ function migrateLegacyProgress() {
 }
 
 function readProgressForMode(mode) {
-  var local = readProgressFromSession(mode);
+  var session = readProgressFromSession(mode);
   var docId =
     typeof AnimusShared !== 'undefined' && AnimusShared.testDraftDocId
       ? AnimusShared.testDraftDocId(mode)
@@ -302,12 +302,25 @@ function readProgressForMode(mode) {
           ? 'estimator'
           : 'short';
   var server = _serverDraftByMode[docId];
-  if (!local && server) return server;
-  if (local && !server) return local;
-  if (local && server) {
-    return (server.savedAt || 0) >= (local.savedAt || 0) ? server : local;
+  var device = null;
+  if (
+    typeof firebase !== 'undefined' &&
+    firebase.auth &&
+    firebase.auth().currentUser &&
+    typeof AnimusShared !== 'undefined' &&
+    AnimusShared.readTestDraftLocal
+  ) {
+    device = AnimusShared.readTestDraftLocal(firebase.auth().currentUser.uid, mode);
   }
-  return null;
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.pickNewestTestProgress) {
+    return AnimusShared.pickNewestTestProgress(session, device, server);
+  }
+  var best = session;
+  [device, server].forEach(function (item) {
+    if (!item) return;
+    if (!best || (item.savedAt || 0) >= (best.savedAt || 0)) best = item;
+  });
+  return best;
 }
 
 function localSimplifyQuestion(text) {
@@ -343,6 +356,15 @@ function writeProgressToSession(mode, data) {
   try {
     sessionStorage.setItem(progressStorageKey(mode || data.testMode), JSON.stringify(data));
   } catch (e) {}
+  if (
+    typeof firebase !== 'undefined' &&
+    firebase.auth &&
+    firebase.auth().currentUser &&
+    typeof AnimusShared !== 'undefined' &&
+    AnimusShared.writeTestDraftLocal
+  ) {
+    AnimusShared.writeTestDraftLocal(firebase.auth().currentUser.uid, mode || data.testMode, data);
+  }
 }
 
 function draftIsResumable(data) {
@@ -367,23 +389,36 @@ function readProgressFromSession(mode) {
 
 function flushServerDraftSave(payload) {
   payload = payload || buildProgressPayload();
-  if (!payload || !draftIsResumable(payload)) return;
-  if (typeof firebase === 'undefined' || !firebase.auth || !firebase.auth().currentUser) return;
-  if (typeof AnimusShared === 'undefined' || !AnimusShared.saveTestDraftToFirestore) return;
+  if (!payload) return Promise.resolve(false);
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.testDraftCanSync && !AnimusShared.testDraftCanSync(payload)) {
+    return Promise.resolve(false);
+  }
+  if (typeof firebase === 'undefined' || !firebase.auth || !firebase.auth().currentUser) {
+    return Promise.resolve(false);
+  }
+  if (typeof AnimusShared === 'undefined' || !AnimusShared.saveTestDraftToFirestore) {
+    return Promise.resolve(false);
+  }
   var uid = firebase.auth().currentUser.uid;
-  AnimusShared.saveTestDraftToFirestore(uid, payload).then(function () {
-    var docId = AnimusShared.testDraftDocId(payload.testMode);
-    _serverDraftByMode[docId] = payload;
+  return AnimusShared.saveTestDraftToFirestore(uid, payload).then(function (ok) {
+    if (ok) {
+      var docId = AnimusShared.testDraftDocId(payload.testMode);
+      _serverDraftByMode[docId] = payload;
+    }
+    return ok;
   });
 }
 
 function scheduleServerDraftSave(payload) {
   payload = payload || buildProgressPayload();
-  if (!payload || !draftIsResumable(payload)) return;
+  if (!payload) return;
+  if (typeof AnimusShared !== 'undefined' && AnimusShared.testDraftCanSync && !AnimusShared.testDraftCanSync(payload)) {
+    return;
+  }
   clearTimeout(_serverDraftSaveTimer);
   _serverDraftSaveTimer = setTimeout(function () {
     flushServerDraftSave(payload);
-  }, 700);
+  }, 500);
 }
 
 function saveTestProgress() {
@@ -410,15 +445,53 @@ function clearTestProgress(mode) {
 }
 
 function hydrateDraftsFromServer(drafts) {
-  _serverDraftByMode = drafts || {};
-  Object.keys(_serverDraftByMode).forEach(function (modeKey) {
-    var server = _serverDraftByMode[modeKey];
-    if (!server || !draftIsResumable(server)) return;
-    var local = readProgressFromSession(modeKey);
-    if (!local || (server.savedAt || 0) >= (local.savedAt || 0)) {
+  _serverDraftByMode = {};
+  Object.keys(drafts || {}).forEach(function (modeKey) {
+    var server = drafts[modeKey];
+    if (!server) return;
+    var docId =
+      typeof AnimusShared !== 'undefined' && AnimusShared.testDraftDocId
+        ? AnimusShared.testDraftDocId(modeKey)
+        : modeKey;
+    _serverDraftByMode[docId] = server;
+    var merged = readProgressForMode(modeKey);
+    if (merged && draftIsResumable(merged)) {
+      writeProgressToSession(modeKey, merged);
+    } else if (
+      typeof AnimusShared !== 'undefined' &&
+      AnimusShared.testDraftCanSync &&
+      AnimusShared.testDraftCanSync(server)
+    ) {
       writeProgressToSession(modeKey, server);
     }
   });
+}
+
+function refreshCloudDrafts(cb) {
+  if (typeof firebase === 'undefined' || !firebase.auth || !firebase.auth().currentUser) {
+    if (cb) cb();
+    return;
+  }
+  if (typeof AnimusShared === 'undefined' || !AnimusShared.fetchAllTestDraftsFromFirestore) {
+    if (cb) cb();
+    return;
+  }
+  var uid = firebase.auth().currentUser.uid;
+  AnimusShared.fetchAllTestDraftsFromFirestore(uid)
+    .then(function (drafts) {
+      hydrateDraftsFromServer(drafts);
+      showResumePromptIfNeeded();
+      if (isQuizPhase()) {
+        var payload = buildProgressPayload();
+        if (payload && AnimusShared.testDraftCanSync && AnimusShared.testDraftCanSync(payload)) {
+          flushServerDraftSave(payload);
+        }
+      }
+      if (cb) cb();
+    })
+    .catch(function () {
+      if (cb) cb();
+    });
 }
 
 function loadSavedTestMode() {
@@ -593,18 +666,12 @@ function loadIntroEntitlements(cb) {
     .then(function (doc) {
       _introUserData = doc.exists ? doc.data() : {};
       _introEntitlementsLoaded = true;
-      var chain = Promise.resolve();
-      if (
-        typeof AnimusShared !== 'undefined' &&
-        AnimusShared.fetchAllTestDraftsFromFirestore
-      ) {
-        chain = AnimusShared.fetchAllTestDraftsFromFirestore(user.uid).then(function (drafts) {
-          hydrateDraftsFromServer(drafts);
+      return new Promise(function (resolve) {
+        refreshCloudDrafts(function () {
+          refreshIntroModeUI(_introUserData);
+          if (cb) cb(_introUserData);
+          resolve();
         });
-      }
-      return chain.then(function () {
-        refreshIntroModeUI(_introUserData);
-        if (cb) cb(_introUserData);
       });
     })
     .catch(function () {
@@ -2765,7 +2832,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     }
 
     function doSave(user) {
-      if (!user || typeof AnimusShared === 'undefined') return;
+      if (!user || typeof AnimusShared === 'undefined') return Promise.resolve();
 
       if (observerMode && typeof AnimusEstimator !== 'undefined') {
         var estSnap = Object.assign({}, snapshot, {
@@ -2820,7 +2887,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
       setCloudSaveUi('pending');
 
-      AnimusShared.saveProfileToFirestore(user.uid, snapshot, {
+      return AnimusShared.saveProfileToFirestore(user.uid, snapshot, {
         rawData: data,
         testMode: meta.testMode,
         answerCount: meta.answerCount,
@@ -2864,12 +2931,37 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
         })
         .catch(function (e) {
           onCloudSaveFailed(e);
+          if (AnimusShared.markPendingCloudResult) {
+            AnimusShared.markPendingCloudResult(user.uid, snapshot);
+          }
           if (typeof AnimusShared !== 'undefined' && AnimusShared.trySyncLocalResultToFirestore) {
-            AnimusShared.trySyncLocalResultToFirestore(user).then(function (synced) {
+            return AnimusShared.trySyncLocalResultToFirestore(user).then(function (synced) {
               if (synced) onCloudSaved();
+              return synced;
             });
           }
+          return false;
         });
+    }
+
+    function runCloudSave(user, attempt) {
+      attempt = attempt || 0;
+      return doSave(user).catch(function (e) {
+        if (attempt >= 2 || observerMode) throw e;
+        var prep =
+          typeof AnimusShared !== 'undefined' && AnimusShared.prepareUserForProfileSave
+            ? AnimusShared.prepareUserForProfileSave(user)
+            : Promise.resolve(user);
+        return prep
+          .then(function () {
+            return new Promise(function (r) {
+              setTimeout(r, 500 + attempt * 500);
+            });
+          })
+          .then(function () {
+            return runCloudSave(user, attempt + 1);
+          });
+      });
     }
 
     var cur =
@@ -2877,14 +2969,14 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
         ? firebase.auth().currentUser
         : null;
     if (cur) {
-      doSave(cur);
+      runCloudSave(cur);
     } else if (typeof firebase !== 'undefined' && firebase.auth) {
       var unsub = firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
           try {
             unsub();
           } catch (e) {}
-          doSave(user);
+          runCloudSave(user);
         }
       });
       setTimeout(function () {
@@ -3360,12 +3452,17 @@ showResults=function(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
           }
         });
       }
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') refreshCloudDrafts();
+      });
     } catch (e) {}
     if (g.AnimusIntro && g.AnimusIntro.onEngineReady) g.AnimusIntro.onEngineReady();
   }
   window.addEventListener('pagehide', function () {
     clearTimeout(_serverDraftSaveTimer);
-    flushServerDraftSave();
+    var payload = buildProgressPayload();
+    if (payload) writeProgressToSession(testMode, payload);
+    flushServerDraftSave(payload);
   });
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncIntro);

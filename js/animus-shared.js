@@ -10,7 +10,9 @@
     testMode: 'animus_test_mode',
     lastResult: 'animus_last_result',
     pendingDoc: 'animus_pending_doc',
-    testProgress: 'animus_test_progress'
+    testProgress: 'animus_test_progress',
+    pendingCloudResult: 'animus_pending_cloud_result',
+    cloudDraftPrefix: 'animus_cloud_draft'
   };
 
   var FIREBASE_CONFIG = {
@@ -1199,6 +1201,100 @@
     return false;
   }
 
+  function testDraftCanSync(data) {
+    var draft = sanitizeTestDraftPayload(data);
+    return !!(draft && draft.activeKeys && draft.activeKeys.length && draft.total > 0);
+  }
+
+  function cloudDraftLocalKey(uid, mode) {
+    return KEYS.cloudDraftPrefix + '_' + (uid || 'anon') + '_' + testDraftDocId(mode || 'short');
+  }
+
+  function writeTestDraftLocal(uid, mode, data) {
+    if (!uid || !data) return;
+    try {
+      localStorage.setItem(cloudDraftLocalKey(uid, mode || data.testMode), JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  function readTestDraftLocal(uid, mode) {
+    if (!uid) return null;
+    try {
+      var raw = localStorage.getItem(cloudDraftLocalKey(uid, mode));
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      return sanitizeTestDraftPayload(parsed) || parsed;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function clearTestDraftLocal(uid, mode) {
+    if (!uid) return;
+    try {
+      localStorage.removeItem(cloudDraftLocalKey(uid, mode));
+    } catch (e) {}
+  }
+
+  function pickNewestTestProgress() {
+    var best = null;
+    var bestAt = -1;
+    for (var i = 0; i < arguments.length; i++) {
+      var item = arguments[i];
+      if (!item) continue;
+      var at = parseInt(item.savedAt, 10) || 0;
+      if (!best || at >= bestAt) {
+        best = item;
+        bestAt = at;
+      }
+    }
+    return best;
+  }
+
+  function parseSnapshotCompletedAt(snap) {
+    if (!snap || !snap.completedAt) return 0;
+    var t = Date.parse(snap.completedAt);
+    return isNaN(t) ? 0 : t;
+  }
+
+  function markPendingCloudResult(userId, snapshot) {
+    if (!userId || !snapshot || !snapshot.mbti) return;
+    try {
+      localStorage.setItem(
+        KEYS.pendingCloudResult,
+        JSON.stringify({
+          uid: userId,
+          mbti: snapshot.mbti,
+          completedAt: snapshot.completedAt || new Date().toISOString()
+        })
+      );
+    } catch (e) {}
+  }
+
+  function clearPendingCloudResult() {
+    try {
+      localStorage.removeItem(KEYS.pendingCloudResult);
+    } catch (e) {}
+  }
+
+  function verifyProfileSaved(userId, mbti) {
+    if (!userId || !mbti || typeof firebase === 'undefined' || !firebase.firestore) {
+      return Promise.resolve(false);
+    }
+    return firebase
+      .firestore()
+      .collection('profiles')
+      .doc(userId)
+      .get()
+      .then(function (doc) {
+        if (!doc.exists || !doc.data().latest) return false;
+        return String(doc.data().latest.mbti || '').toUpperCase() === String(mbti).toUpperCase();
+      })
+      .catch(function () {
+        return false;
+      });
+  }
+
   function saveTestDraftToFirestore(userId, payload) {
     if (!userId || typeof firebase === 'undefined' || !firebase.firestore) {
       return Promise.resolve(false);
@@ -1206,24 +1302,29 @@
     var authUser = firebase.auth && firebase.auth().currentUser;
     if (!authUser || authUser.uid !== userId) return Promise.resolve(false);
     var draft = sanitizeTestDraftPayload(payload);
-    if (!draft || !testDraftIsResumable(draft)) return Promise.resolve(false);
+    if (!testDraftCanSync(draft)) return Promise.resolve(false);
     var docId = testDraftDocId(draft.testMode);
-    return firebase
-      .firestore()
-      .collection('users')
-      .doc(userId)
-      .collection('testDrafts')
-      .doc(docId)
-      .set(
-        Object.assign({}, draft, {
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }),
-        { merge: true }
-      )
+    return prepareUserForProfileSave(authUser)
       .then(function () {
+        return firebase
+          .firestore()
+          .collection('users')
+          .doc(userId)
+          .collection('testDrafts')
+          .doc(docId)
+          .set(
+            Object.assign({}, draft, {
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }),
+            { merge: true }
+          );
+      })
+      .then(function () {
+        writeTestDraftLocal(userId, draft.testMode, draft);
         return true;
       })
-      .catch(function () {
+      .catch(function (err) {
+        console.warn('Test draft cloud save:', err);
         return false;
       });
   }
@@ -1234,6 +1335,7 @@
     }
     var authUser = firebase.auth && firebase.auth().currentUser;
     if (!authUser || authUser.uid !== userId) return Promise.resolve(false);
+    clearTestDraftLocal(userId, mode);
     return firebase
       .firestore()
       .collection('users')
@@ -1275,7 +1377,7 @@
     return Promise.all(
       TEST_DRAFT_MODES.map(function (mode) {
         return fetchTestDraftFromFirestore(userId, mode).then(function (draft) {
-          if (draft && testDraftIsResumable(draft)) out[mode] = draft;
+          if (draft && (testDraftIsResumable(draft) || testDraftCanSync(draft))) out[mode] = draft;
         });
       })
     ).then(function () {
@@ -1646,8 +1748,14 @@
       return writeProfileDoc(userId, snap, writeMeta).then(function () {
         if (authUser.uid === userId) {
           saveLastResultLocal(snap);
+          clearPendingCloudResult();
         }
-        return snap;
+        return verifyProfileSaved(userId, snap.mbti).then(function (ok) {
+          if (!ok) {
+            return Promise.reject(new Error('Profile cloud verify failed'));
+          }
+          return snap;
+        });
       });
     }
 
@@ -1698,22 +1806,43 @@
     if (!user || !user.uid) return Promise.resolve(false);
     var local = loadLastResultLocal();
     if (!local || !local.mbti) return Promise.resolve(false);
+    if (local._typesLocked || local.adminEditedAt) return Promise.resolve(false);
     return firebase.firestore().collection('profiles').doc(user.uid).get().then(function (doc) {
       var remote = doc.exists ? doc.data() : null;
-      if (remote && remote.latest && remote.latest.mbti) return false;
-      if (profileHasAdminLock(remote)) return false;
-      if (local._typesLocked || local.adminEditedAt) return false;
+      if (profileHasAdminLock(remote)) return Promise.resolve(false);
+      var localAt = parseSnapshotCompletedAt(local);
+      var remoteAt = remote && remote.latest ? parseSnapshotCompletedAt(remote.latest) : 0;
+      if (remote && remote.latest && remote.latest.mbti && localAt <= remoteAt) {
+        return false;
+      }
       return prepareUserForProfileSave(user)
         .then(function () {
           return saveProfileToFirestore(user.uid, local, {
             testMode: local.testMode,
-            completedAt: local.completedAt
+            completedAt: local.completedAt,
+            answerCount: local.answerCount
           });
         })
         .then(function () {
+          clearPendingCloudResult();
           return true;
+        })
+        .catch(function (err) {
+          markPendingCloudResult(user.uid, local);
+          console.warn('Pending result sync:', err);
+          return false;
         });
     });
+  }
+
+  function trySyncPendingCloudResult(user) {
+    if (!user || !user.uid) return Promise.resolve(false);
+    var pending = null;
+    try {
+      pending = JSON.parse(localStorage.getItem(KEYS.pendingCloudResult) || 'null');
+    } catch (e) {}
+    if (!pending || pending.uid !== user.uid) return Promise.resolve(false);
+    return trySyncLocalResultToFirestore(user);
   }
 
   function getFirebaseIdToken() {
@@ -1811,13 +1940,22 @@
     saveTestSessionToFirestore: saveTestSessionToFirestore,
     testDraftDocId: testDraftDocId,
     testDraftIsResumable: testDraftIsResumable,
+    testDraftCanSync: testDraftCanSync,
     sanitizeTestDraftPayload: sanitizeTestDraftPayload,
+    writeTestDraftLocal: writeTestDraftLocal,
+    readTestDraftLocal: readTestDraftLocal,
+    clearTestDraftLocal: clearTestDraftLocal,
+    pickNewestTestProgress: pickNewestTestProgress,
     saveTestDraftToFirestore: saveTestDraftToFirestore,
     clearTestDraftFromFirestore: clearTestDraftFromFirestore,
     fetchTestDraftFromFirestore: fetchTestDraftFromFirestore,
     fetchAllTestDraftsFromFirestore: fetchAllTestDraftsFromFirestore,
     fetchTestSessionsForAdmin: fetchTestSessionsForAdmin,
+    verifyProfileSaved: verifyProfileSaved,
+    markPendingCloudResult: markPendingCloudResult,
+    clearPendingCloudResult: clearPendingCloudResult,
     trySyncLocalResultToFirestore: trySyncLocalResultToFirestore,
+    trySyncPendingCloudResult: trySyncPendingCloudResult,
     getResolvedLang: getResolvedLang,
     setResolvedLang: setResolvedLang,
     getSavedTestMode: getSavedTestMode,

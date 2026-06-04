@@ -185,7 +185,7 @@ service cloud.firestore {
 
     function testDraftValid() {
       return request.resource.data.keys().hasAll([
-          'testMode', 'cur', 'total', 'answers', 'savedAt'
+          'testMode', 'cur', 'total', 'answers', 'savedAt', 'activeKeys'
         ])
         && request.resource.data.testMode is string
         && request.resource.data.testMode.size() <= 16
@@ -203,10 +203,9 @@ service cloud.firestore {
         && (!('choiceIx' in request.resource.data)
           || (request.resource.data.choiceIx is list
             && request.resource.data.choiceIx.size() == request.resource.data.total))
-        && (!('activeKeys' in request.resource.data)
-          || (request.resource.data.activeKeys is list
-            && request.resource.data.activeKeys.size() > 0
-            && request.resource.data.activeKeys.size() <= 320))
+        && request.resource.data.activeKeys is list
+        && request.resource.data.activeKeys.size() > 0
+        && request.resource.data.activeKeys.size() <= 320
         && (!('observerMode' in request.resource.data)
           || request.resource.data.observerMode is bool)
         && (!('observerSubjectName' in request.resource.data)

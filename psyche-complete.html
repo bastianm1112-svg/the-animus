@@ -38,7 +38,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="/js/animus-shared.js?v=20260612"></script>
+  <script src="/js/animus-shared.js?v=20260615"></script>
   <script>
     AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
     var auth = firebase.auth();
@@ -227,8 +227,8 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <script src="/js/psyche-cross.js"></script>
 <script src="/js/profile-narrative-depth.js?v=20260609"></script>
 <script src="/js/profile-narratives.js?v=20260609"></script>
-<script src="/js/psyche-engine.js?v=20260614"></script>
-<script src="/js/psyche-intro.js?v=20260614"></script>
+<script src="/js/psyche-engine.js?v=20260615"></script>
+<script src="/js/psyche-intro.js?v=20260615"></script>
 
 <div id="appBottomMount"></div>
 <script src="/js/animus-social.js"></script>
@@ -260,7 +260,16 @@ document.addEventListener('DOMContentLoaded', function () {
       if (u) {
         if (typeof AnimusShared !== 'undefined') {
           AnimusShared.ensureUserDocument(d, u).catch(function () {});
-          AnimusShared.trySyncLocalResultToFirestore(u).catch(function () {});
+          var syncChain = AnimusShared.trySyncPendingCloudResult
+            ? AnimusShared.trySyncPendingCloudResult(u)
+            : Promise.resolve(false);
+          syncChain
+            .then(function (synced) {
+              if (!synced && AnimusShared.trySyncLocalResultToFirestore) {
+                return AnimusShared.trySyncLocalResultToFirestore(u);
+              }
+            })
+            .catch(function () {});
         }
         AnimusSocial.loadNotifs(u.uid);
       }
