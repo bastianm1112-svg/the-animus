@@ -731,7 +731,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
         <div class="field-row" id="testProgressBarRow" style="display:none">
           <div class="field-info">
             <div class="field-label">Test progress bar</div>
-            <div class="field-desc">Show question number and a progress bar while you take an assessment (Plus and paid packs).</div>
+            <div class="field-desc">Animus Plus only — show question number and a progress bar during assessments.</div>
           </div>
           <div class="field-control">
             <div class="toggle-wrap">
@@ -1086,22 +1086,19 @@ function applySettingsFormFromProfile(user, p) {
   applyPremiumSettingsVisibility(p);
 }
 
-function hasPremiumTestPerksFromDoc(p) {
+function hasAnimusPlusFromDoc(p) {
   p = p || {};
   if (typeof AnimusEntitlements === 'undefined') return false;
-  if (AnimusEntitlements.hasAnimusPlus && AnimusEntitlements.hasAnimusPlus(p)) return true;
-  if (AnimusEntitlements.hasDetailedTest && AnimusEntitlements.hasDetailedTest(p)) return true;
-  if (AnimusEntitlements.hasTestEstimator && AnimusEntitlements.hasTestEstimator(p)) return true;
-  return false;
+  return !!(AnimusEntitlements.hasAnimusPlus && AnimusEntitlements.hasAnimusPlus(p));
 }
 
 function applyPremiumSettingsVisibility(p) {
   var row = document.getElementById('testProgressBarRow');
   var toggle = document.getElementById('testProgressBar');
   if (!row || !toggle) return;
-  var premium = hasPremiumTestPerksFromDoc(p);
-  row.style.display = premium ? '' : 'none';
-  if (premium) {
+  var plus = hasAnimusPlusFromDoc(p);
+  row.style.display = plus ? '' : 'none';
+  if (plus) {
     var prefs = (p && p.prefs) || {};
     toggle.checked = prefs.testProgressBar !== false;
   }
@@ -1232,7 +1229,7 @@ function saveChanges() {
         chain = chain.then(function(){ return user.updatePassword(newPw); });
       }
 
-      if (hasPremiumTestPerksFromDoc(doc.exists ? doc.data() : {})) {
+      if (hasAnimusPlusFromDoc(doc.exists ? doc.data() : {})) {
         var prefs = { testProgressBar: !!(document.getElementById('testProgressBar') && document.getElementById('testProgressBar').checked) };
         chain = chain.then(function () {
           return db.collection('users').doc(uid).set({ prefs: prefs }, { merge: true });

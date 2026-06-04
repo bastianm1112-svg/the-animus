@@ -499,18 +499,15 @@ function hasDetailedEntitlement(userData) {
     : AnimusEntitlements.hasEntitlement(userData, 'detailedTest');
 }
 
-function hasPremiumTestPerks(userData) {
+function hasAnimusPlusMembership(userData) {
   userData = userData || _introUserData || {};
   if (typeof AnimusEntitlements === 'undefined') return false;
-  if (AnimusEntitlements.hasAnimusPlus && AnimusEntitlements.hasAnimusPlus(userData)) return true;
-  if (hasDetailedEntitlement(userData)) return true;
-  if (AnimusEntitlements.hasTestEstimator && AnimusEntitlements.hasTestEstimator(userData)) return true;
-  return false;
+  return !!(AnimusEntitlements.hasAnimusPlus && AnimusEntitlements.hasAnimusPlus(userData));
 }
 
 function wantsTestProgressBar(userData) {
   userData = userData || _introUserData || {};
-  if (!hasPremiumTestPerks(userData)) return false;
+  if (!hasAnimusPlusMembership(userData)) return false;
   var prefs = userData.prefs || {};
   return prefs.testProgressBar !== false;
 }
