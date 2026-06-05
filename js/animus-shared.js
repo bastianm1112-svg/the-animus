@@ -1175,7 +1175,8 @@
     if (cur >= total) cur = total - 1;
     var answers = sanitizeAnswerArray(payload.answers, total);
     var choiceIx = sanitizeChoiceIxArray(payload.choiceIx, total);
-    var activeKeys = sanitizeStringArray(payload.activeKeys, 80, 320);
+    // qKey = fn|questionText — must not truncate or resume drops questions (e.g. 60/100).
+    var activeKeys = sanitizeStringArray(payload.activeKeys, 512, 320);
     var savedAt = parseInt(payload.savedAt, 10);
     if (isNaN(savedAt) || savedAt < 0) savedAt = Date.now();
     return sanitizeForFirestore({
@@ -1238,14 +1239,18 @@
 
   function pickNewestTestProgress() {
     var best = null;
-    var bestAt = -1;
+    var bestScore = -1;
     for (var i = 0; i < arguments.length; i++) {
       var item = arguments[i];
       if (!item) continue;
       var at = parseInt(item.savedAt, 10) || 0;
-      if (!best || at >= bestAt) {
+      var total = parseInt(item.total, 10) || 0;
+      var keys = item.activeKeys && item.activeKeys.length ? item.activeKeys.length : 0;
+      var complete = total > 0 && keys === total ? 1 : 0;
+      var score = complete * 1e13 + at;
+      if (!best || score > bestScore) {
         best = item;
-        bestAt = at;
+        bestScore = score;
       }
     }
     return best;

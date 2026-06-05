@@ -828,6 +828,61 @@ function restoreAnswersFromProgress(data) {
   cur = Math.min(Math.max(0, parseInt(data.cur, 10) || 0), TOTAL - 1);
 }
 
+function buildQuestionLookup() {
+  var qKey = Cross.qKey || function (q) { return (q.fn || '') + '|' + (q.t || ''); };
+  var exact = {};
+  var byPrefix = {};
+  Q.forEach(function (q) {
+    var full = qKey(q);
+    exact[full] = q;
+    var pre80 = full.substring(0, 80);
+    if (!byPrefix[pre80]) byPrefix[pre80] = q;
+    var pre512 = full.substring(0, 512);
+    if (!byPrefix[pre512]) byPrefix[pre512] = q;
+  });
+  return { qKey: qKey, exact: exact, byPrefix: byPrefix };
+}
+
+function lookupQuestionByStoredKey(storedKey, lookup) {
+  if (!storedKey || !lookup) return null;
+  if (lookup.exact[storedKey]) return lookup.exact[storedKey];
+  if (lookup.byPrefix[storedKey]) return lookup.byPrefix[storedKey];
+  var i;
+  for (i = 0; i < Q.length; i++) {
+    var full = lookup.qKey(Q[i]);
+    if (full.indexOf(storedKey) === 0) return Q[i];
+    if (storedKey.indexOf(full) === 0) return Q[i];
+  }
+  return null;
+}
+
+function restoreActiveQFromDraft(data) {
+  var keys = Array.isArray(data.activeKeys) ? data.activeKeys : [];
+  var lookup = buildQuestionLookup();
+  var activeQ = [];
+  var alignedAnswers = [];
+  var alignedIx = [];
+  var i;
+  for (i = 0; i < keys.length; i++) {
+    var q = lookupQuestionByStoredKey(keys[i], lookup);
+    if (!q) continue;
+    activeQ.push(q);
+    alignedAnswers.push(
+      data.answers && i < data.answers.length ? data.answers[i] : null
+    );
+    alignedIx.push(
+      data.choiceIx && i < data.choiceIx.length && typeof data.choiceIx[i] === 'number'
+        ? data.choiceIx[i]
+        : -1
+    );
+  }
+  return {
+    activeQ: activeQ,
+    answers: alignedAnswers,
+    choiceIx: alignedIx
+  };
+}
+
 function resumeTestFromStorage(forceMode) {
   var mode = forceMode || testMode;
   var data = readProgressForMode(mode);
@@ -858,14 +913,8 @@ function resumeTestFromStorage(forceMode) {
 
   observerMode = !!data.observerMode;
   observerSubjectName = data.observerSubjectName || '';
-  var qKey = Cross.qKey || function (q) { return (q.fn || '') + '|' + (q.t || ''); };
-  var keyToQ = {};
-  Q.forEach(function (q) {
-    keyToQ[qKey(q)] = q;
-  });
-  window._activeQ = data.activeKeys.map(function (k) {
-    return keyToQ[k];
-  }).filter(Boolean);
+  var restored = restoreActiveQFromDraft(data);
+  window._activeQ = restored.activeQ;
 
   if (!window._activeQ.length) {
     showToast(
@@ -876,7 +925,21 @@ function resumeTestFromStorage(forceMode) {
     return false;
   }
 
+  var expectedTotal = parseInt(data.total, 10) || window._activeQ.length;
+  if (window._activeQ.length < expectedTotal) {
+    showToast(
+      lang === 'es'
+        ? 'Algunas preguntas no se pudieron restaurar. Empezá un test nuevo si los números no coinciden.'
+        : 'Some questions could not be restored. Start a new test if your progress count looks wrong.'
+    );
+  }
+
   TOTAL = window._activeQ.length;
+  data = Object.assign({}, data, {
+    answers: restored.answers,
+    choiceIx: restored.choiceIx,
+    total: TOTAL
+  });
   restoreAnswersFromProgress(data);
   resetTestMilestones();
   setTestPhase('quiz');
@@ -884,6 +947,7 @@ function resumeTestFromStorage(forceMode) {
   updateQuizModeSwitch();
   renderQ();
   updateTestProgressChrome();
+  saveTestProgress();
   showToast(lang === 'es' ? 'Continuando tu test…' : 'Resuming your test…');
   return true;
 }
