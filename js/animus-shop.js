@@ -23,9 +23,13 @@
       el.textContent = '';
       return;
     }
-    var vars = (status.missing || []).join(', ');
     el.hidden = false;
     el.classList.add('is-warning');
+    if (status.warning) {
+      el.textContent = status.warning;
+      return;
+    }
+    var vars = (status.missing || []).join(', ');
     el.textContent =
       'Checkout is not available on this server yet. An admin must add ' +
       vars +
@@ -314,7 +318,11 @@
           return;
         }
         var err = (res.data && res.data.error) || 'Could not start checkout.';
-        toast(err, err.indexOf('Environment Variables') !== -1 ? 8000 : 3200);
+        var longMsg =
+          err.indexOf('Environment Variables') !== -1 ||
+          err.indexOf('test mode') !== -1 ||
+          err.indexOf('sk_live_') !== -1;
+        toast(err, longMsg ? 9000 : 3200);
       })
       .catch(function () {
         toast('Checkout unavailable. Try again or contact support.');

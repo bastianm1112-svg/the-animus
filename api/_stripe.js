@@ -14,6 +14,30 @@ function getStripe() {
   return new Stripe(key);
 }
 
+function getStripeMode() {
+  const key = (process.env.STRIPE_SECRET_KEY || '').trim();
+  if (key.indexOf('sk_live_') === 0) return 'live';
+  if (key.indexOf('sk_test_') === 0) return 'test';
+  return 'unknown';
+}
+
+function isProductionSite() {
+  const site = getSiteUrl().toLowerCase();
+  if (site.indexOf('localhost') !== -1 || site.indexOf('127.0.0.1') !== -1) return false;
+  return site.indexOf('animustest.com') !== -1;
+}
+
+/** Real cards fail in Stripe Checkout when test keys are used on the public site. */
+function getLivePaymentsBlockReason() {
+  if (!isProductionSite()) return null;
+  if (getStripeMode() === 'test') {
+    return (
+      'Checkout is in Stripe test mode. Real cards cannot be charged on animustest.com until STRIPE_SECRET_KEY is set to sk_live_… in Vercel (plus live webhook secret and price IDs), then redeploy.'
+    );
+  }
+  return null;
+}
+
 function getSiteUrl() {
   const url = (process.env.SITE_URL || process.env.VERCEL_URL || 'https://animustest.com').trim();
   if (url.startsWith('http')) return url.replace(/\/$/, '');
@@ -106,6 +130,9 @@ async function createCheckoutSession(stripe, opts) {
 
 module.exports = {
   getStripe,
+  getStripeMode,
+  isProductionSite,
+  getLivePaymentsBlockReason,
   getSiteUrl,
   readRawBody,
   createCheckoutSession,

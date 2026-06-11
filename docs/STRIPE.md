@@ -90,7 +90,20 @@ Plus-discounted one-time purchases always use dynamic `price_data` so the charge
 
 2. Copy the **signing secret** into `STRIPE_WEBHOOK_SECRET`.
 
-3. Use **test mode** keys until you are ready for live payments.
+3. Use **test mode** keys on preview/local. For **animustest.com production**, use **live** keys (`sk_live_…`) or real cards will fail with Stripe’s “test card” message.
+
+### Switch production to live payments
+
+From project root (requires Vercel CLI login and your **live** secret key):
+
+```powershell
+$env:STRIPE_SECRET_KEY = "sk_live_..."
+node scripts/provision-vercel-env.js --stripe-only
+```
+
+This sets `STRIPE_SECRET_KEY`, creates/finds the live webhook, provisions live Price IDs on Vercel, and deploys. After deploy, `https://animustest.com/api/payments-status` should show `"stripeMode":"live"` and `"livePayments":true`.
+
+Or manually in Vercel → Environment Variables: replace `STRIPE_SECRET_KEY` with `sk_live_…`, add a **live mode** webhook signing secret, optional live `STRIPE_PRICE_*` IDs, then redeploy.
 
 ## Local webhook testing
 

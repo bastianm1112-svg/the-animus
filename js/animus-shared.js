@@ -1729,10 +1729,10 @@
     if (!authUser) {
       return Promise.reject(new Error('Not signed in'));
     }
-    if (authUser.uid !== userId) {
+    var isAdminSave = !!options.adminEdit;
+    if (authUser.uid !== userId && !isAdminSave) {
       return Promise.reject(new Error('Session mismatch — sign in again and retry save'));
     }
-    var isAdminSave = !!options.adminEdit;
     var snap = enrichProfileSnapshot(snapshot, options.rawData, {
       completedAt: options.completedAt || snapshot.completedAt || new Date().toISOString(),
       testMode: options.testMode || snapshot.testMode || 'full',

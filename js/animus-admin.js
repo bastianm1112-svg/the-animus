@@ -24,6 +24,11 @@
     if (!el) return;
     el.textContent = msg || '';
     el.className = 'admin-status' + (kind ? ' ' + kind : '');
+    if (msg && kind === 'err') {
+      try {
+        el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      } catch (e) {}
+    }
   }
 
   function setDirty(isDirty) {

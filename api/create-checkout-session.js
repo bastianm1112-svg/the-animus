@@ -1,7 +1,13 @@
 const { setApiHeaders, rejectForeignOrigin, rejectBodyTooLarge } = require('./_lib');
 const { requireAuth } = require('./_auth');
 const { getUserDocument, getPaymentsConfigMissing } = require('./_firestore');
-const { getStripe, createCheckoutSession, isValidProductId, productAlreadyOwned } = require('./_stripe');
+const {
+  getStripe,
+  getLivePaymentsBlockReason,
+  createCheckoutSession,
+  isValidProductId,
+  productAlreadyOwned
+} = require('./_stripe');
 const { PRODUCTS } = require('./_entitlements');
 
 module.exports = async function handler(req, res) {
@@ -29,6 +35,15 @@ module.exports = async function handler(req, res) {
     return res.status(503).json({
       error: 'Stripe is not configured (missing STRIPE_SECRET_KEY).',
       missing: ['STRIPE_SECRET_KEY']
+    });
+  }
+
+  const liveBlock = getLivePaymentsBlockReason();
+  if (liveBlock) {
+    return res.status(503).json({
+      error: liveBlock,
+      stripeMode: 'test',
+      livePayments: false
     });
   }
 
