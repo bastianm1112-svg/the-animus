@@ -1088,16 +1088,27 @@ function startTest() {
     window.location.href = dest;
   }
 
+  function noticeThenGo(msg, go) {
+    if (typeof showToast === 'function') {
+      showToast(msg);
+      setTimeout(go, 1400);
+    } else {
+      alert(msg);
+      go();
+    }
+  }
+
   if (typeof firebase === 'undefined' || !firebase.auth) {
-    alert('Sign in to save your results to your profile.');
-    redirectToLoginForTest();
+    noticeThenGo('Sign in to save your results to your profile.', redirectToLoginForTest);
     return;
   }
 
   var authUser = firebase.auth().currentUser;
   if (!authUser) {
-    alert('Sign in to take the test — your results are saved to your account when you finish.');
-    redirectToLoginForTest();
+    noticeThenGo(
+      'Sign in to take the test — your results are saved to your account when you finish.',
+      redirectToLoginForTest
+    );
     return;
   }
 
@@ -1110,8 +1121,9 @@ function startTest() {
       var data = doc.exists ? doc.data() : {};
       var gate = entitlementGateForMode(data);
       if (gate) {
-        alert(gate);
-        window.location.href = '/shop';
+        noticeThenGo(gate, function () {
+          window.location.href = '/shop';
+        });
         return;
       }
       launch();

@@ -622,18 +622,24 @@
       .get()
       .then(function (doc) {
         if (doc.exists && doc.data() && doc.data().uid) {
+          var resolvedUid = doc.data().uid;
           return db
             .collection('users')
-            .doc(doc.data().uid)
+            .doc(resolvedUid)
             .get()
             .then(function (userDoc) {
               var canonical =
                 userDoc.exists && userDoc.data() && userDoc.data().username
                   ? normalizeUsername(userDoc.data().username)
                   : username;
-              return finish(doc.data().uid, canonical);
+              return finish(resolvedUid, canonical);
+            })
+            .catch(function () {
+              // Signed-out visitors cannot read users/* — the usernames doc alone is enough.
+              return finish(resolvedUid, null);
             });
         }
+        // Fallback queries read users/*, which requires sign-in; treat denial as not found.
         return db
           .collection('users')
           .where('username', '==', username)
@@ -656,6 +662,9 @@
                 }
                 throw new Error('Username not found');
               });
+          })
+          .catch(function () {
+            throw new Error('Username not found');
           });
       });
   }
@@ -1670,8 +1679,12 @@
     meta = meta || {};
     var nowIso = new Date().toISOString();
     var ref = firebase.firestore().collection('profiles').doc(userId);
+    var userRef = firebase.firestore().collection('users').doc(userId);
     return firebase.firestore().runTransaction(function (tx) {
-      return tx.get(ref).then(function (doc) {
+      return Promise.all([tx.get(ref), tx.get(userRef)]).then(function (docs) {
+        var doc = docs[0];
+        var userDoc = docs[1];
+        var userData = userDoc && userDoc.exists ? userDoc.data() || {} : {};
         var previousLatest = doc.exists && doc.data().latest ? doc.data().latest : null;
         var skipReconcile = shouldSkipCogReconcile(snap, meta);
         snap = refreshSnapshotNarratives(snap, {
@@ -1690,6 +1703,16 @@
           history: history,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
+        // Mirror public display fields so signed-out visitors can render shared profiles.
+        if (typeof userData.displayName === 'string' && userData.displayName) {
+          payload.displayName = userData.displayName.substring(0, 48);
+        }
+        if (typeof userData.username === 'string' && userData.username) {
+          payload.username = userData.username.substring(0, 32);
+        }
+        if (typeof userData.photoURL === 'string' && userData.photoURL) {
+          payload.photoURL = userData.photoURL.substring(0, 1024);
+        }
         if (meta.adminEdit) {
           payload.adminEditedAt = firebase.firestore.FieldValue.serverTimestamp();
         }

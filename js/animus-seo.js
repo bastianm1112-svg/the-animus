@@ -101,7 +101,7 @@
       '@context': 'https://schema.org',
       url: SITE_ORIGIN + (path === '/' || path === '/index.html' ? '' : path.replace(/\.html$/i, ''))
     };
-    if (path === '/' || path === '/index.html' || path === '/landing.html') {
+    if (path === '/' || path === '/index.html') {
       return Object.assign({}, base, {
         '@type': 'WebApplication',
         name: 'ANIMUS',

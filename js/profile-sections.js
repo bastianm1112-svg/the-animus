@@ -24,7 +24,7 @@
   }
 
   var ATT_LABELS = {
-    AT_SEC: 'Secure', AT_ANX: 'Anxious-Preoccupied', AT_AVO: 'Fearful-Avoidant', AT_DIS: 'Dismissive-Avoidant'
+    AT_SEC: 'Secure', AT_ANX: 'Anxious-Preoccupied', AT_AVO: 'Dismissive-Avoidant', AT_DIS: 'Fearful-Avoidant'
   };
 
   var ETH_LABELS = {

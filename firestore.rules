@@ -266,7 +266,20 @@ service cloud.firestore {
 
     function profileWriteKeysOnly() {
       return request.resource.data.diff(resource.data).affectedKeys()
-        .hasOnly(['latest', 'history', 'updatedAt', 'adminEditedAt']);
+        .hasOnly(['latest', 'history', 'updatedAt', 'adminEditedAt', 'displayName', 'username', 'photoURL']);
+    }
+
+    // Public mirror fields so signed-out visitors can render shared profiles.
+    function profileMirrorFieldsValid() {
+      return (!('displayName' in request.resource.data)
+          || (request.resource.data.displayName is string
+              && request.resource.data.displayName.size() <= 48))
+        && (!('username' in request.resource.data)
+          || (request.resource.data.username is string
+              && request.resource.data.username.size() <= 32))
+        && (!('photoURL' in request.resource.data)
+          || (request.resource.data.photoURL is string
+              && request.resource.data.photoURL.size() <= 1024));
     }
 
     function profileCreateValid() {
@@ -285,12 +298,13 @@ service cloud.firestore {
         && profileNoPrivilegeEscalation()
         && (!('adminEditedAt' in request.resource.data)
           || request.resource.data.adminEditedAt == resource.data.get('adminEditedAt', null))
-        && profileWriteKeysOnly();
+        && profileWriteKeysOnly()
+        && profileMirrorFieldsValid();
     }
 
     match /profiles/{userId} {
       allow read: if true;
-      allow create: if (isOwner(userId) && userIsNotBanned(userId) && profileCreateValid() && profileNoPrivilegeEscalation())
+      allow create: if (isOwner(userId) && userIsNotBanned(userId) && profileCreateValid() && profileNoPrivilegeEscalation() && profileMirrorFieldsValid())
         || isAdmin();
       allow update: if isAdmin() || ownerProfileWrite(userId);
       allow delete: if isOwner(userId) || isAdmin();
