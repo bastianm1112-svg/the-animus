@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Corner Barber Shop in Scottsville, Virginia — professional haircuts for men, women, and children. Owned and operated by Jessica. Call (434) 286-6500 to book.">
+  <title>Corner Barber Shop | Scottsville, Virginia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #f4efe6;
+      --cream-dark: #e8dfd2;
+      --forest: #1e3a2f;
+      --forest-light: #2d5243;
+      --navy: #1c2a38;
+      --wood: #6b4c35;
+      --wood-light: #8a6548;
+      --gold: #b8956a;
+      --text: #2a2420;
+      --text-muted: #5c534c;
+      --white: #faf8f4;
+      --shadow: rgba(28, 42, 56, 0.08);
+      --shadow-deep: rgba(28, 42, 56, 0.16);
+      --font-display: "Libre Baskerville", Georgia, "Times New Roman", serif;
+      --font-body: "Source Serif 4", Georgia, serif;
+      --max-width: 72rem;
+      --header-height: 4.5rem;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--header-height);
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 1.0625rem;
+      line-height: 1.7;
+      color: var(--text);
+      background-color: var(--cream);
+      background-image:
+        linear-gradient(180deg, rgba(244, 239, 230, 0.97), rgba(244, 239, 230, 0.97)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: var(--forest);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      transition: color 0.2s ease;
+    }
+
+    a:hover {
+      color: var(--wood);
+    }
+
+    /* Header */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: var(--header-height);
+      background: rgba(250, 248, 244, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(30, 58, 47, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .site-header.scrolled {
+      box-shadow: 0 2px 20px var(--shadow);
+    }
+
+    .header-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.25rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--forest);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .logo span {
+      color: var(--wood);
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .nav-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 2.5rem;
+      height: 2.5rem;
+      padding: 0.5rem;
+      background: none;
+      border: 1px solid rgba(30, 58, 47, 0.2);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .nav-toggle span {
+      display: block;
+      height: 2px;
+      background: var(--forest);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .nav-toggle[aria-expanded="true"] span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .nav-toggle[aria-expanded="true"] span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .nav-toggle[aria-expanded="true"] span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .site-nav {
+      display: none;
+      position: absolute;
+      top: var(--header-height);
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border-bottom: 1px solid rgba(30, 58, 47, 0.1);
+      padding: 1rem 1.25rem 1.5rem;
+      box-shadow: 0 12px 24px var(--shadow);
+    }
+
+    .site-nav.open {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .site-nav ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .site-nav a {
+      display: block;
+      padding: 0.625rem 0;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 1rem;
+      border-bottom: 1px solid rgba(30, 58, 47, 0.06);
+    }
+
+    .site-nav a:hover {
+      color: var(--forest);
+    }
+
+    .header-cta {
+      display: none;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--forest);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(30, 58, 47, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: var(--forest-light);
+      color: var(--white);
+      box-shadow: 0 6px 20px rgba(30, 58, 47, 0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--forest);
+      border: 2px solid var(--forest);
+    }
+
+    .btn-outline:hover {
+      background: var(--forest);
+      color: var(--white);
+    }
+
+    /* Sections */
+    section {
+      padding: 4.5rem 1.25rem;
+    }
+
+    .section-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--wood);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+      margin-bottom: 1rem;
+    }
+
+    .section-intro {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      max-width: 38rem;
+    }
+
+    /* Reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      padding-top: var(--header-height);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(30, 58, 47, 0.88) 0%, rgba(28, 42, 56, 0.82) 100%),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 40px,
+          rgba(184, 149, 106, 0.03) 40px,
+          rgba(184, 149, 106, 0.03) 41px
+        );
+      z-index: 0;
+    }
+
+    .hero-wood-accent {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: repeating-linear-gradient(
+        90deg,
+        #8a6548 0px,
+        #6b4c35 8px,
+        #a07855 16px,
+        #5c3f2a 24px
+      );
+      z-index: 2;
+    }
+
+    .hero-pole {
+      position: absolute;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 180px;
+      border-radius: 6px;
+      overflow: hidden;
+      opacity: 0.15;
+      display: none;
+      z-index: 1;
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    }
+
+    .hero-pole::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        180deg,
+        #c41e3a 0px,
+        #c41e3a 20px,
+        #f5f5f5 20px,
+        #f5f5f5 40px,
+        #1a3a6e 40px,
+        #1a3a6e 60px
+      );
+      animation: poleSpin 4s linear infinite;
+    }
+
+    @keyframes poleSpin {
+      from { transform: translateY(0); }
+      to { transform: translateY(-60px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 3rem 1.25rem 4rem;
+      width: 100%;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(250, 248, 244, 0.12);
+      border: 1px solid rgba(250, 248, 244, 0.2);
+      border-radius: 3px;
+      color: var(--gold);
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.8s ease 0.2s both;
+    }
+
+    .hero-badge .stars {
+      color: var(--gold);
+      letter-spacing: 2px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 8vw, 4.25rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+      animation: fadeIn 0.8s ease 0.35s both;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-display);
+      font-size: clamp(1.125rem, 3vw, 1.5rem);
+      font-style: italic;
+      color: rgba(250, 248, 244, 0.85);
+      max-width: 32rem;
+      margin-bottom: 2rem;
+      animation: fadeIn 0.8s ease 0.5s both;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      animation: fadeIn 0.8s ease 0.65s both;
+    }
+
+    .hero-actions .btn-primary {
+      background: var(--gold);
+      color: var(--navy);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-actions .btn-primary:hover {
+      background: #c9a87a;
+      color: var(--navy);
+    }
+
+    .hero-actions .btn-outline {
+      border-color: rgba(250, 248, 244, 0.5);
+      color: var(--white);
+    }
+
+    .hero-actions .btn-outline:hover {
+      background: rgba(250, 248, 244, 0.1);
+      border-color: var(--white);
+      color: var(--white);
+    }
+
+    .hero-location {
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(250, 248, 244, 0.15);
+      color: rgba(250, 248, 244, 0.7);
+      font-size: 0.9375rem;
+      animation: fadeIn 0.8s ease 0.8s both;
+    }
+
+    /* About */
+    .about {
+      background: var(--white);
+    }
+
+    .about-grid {
+      display: grid;
+      gap: 2.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .about-text p + p {
+      margin-top: 1.25rem;
+    }
+
+    .about-aside {
+      background: var(--cream);
+      border-left: 4px solid var(--wood);
+      padding: 2rem;
+    }
+
+    .about-aside h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--forest);
+      margin-bottom: 1rem;
+    }
+
+    .about-aside ul {
+      list-style: none;
+    }
+
+    .about-aside li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(30, 58, 47, 0.08);
+      color: var(--text-muted);
+    }
+
+    .about-aside li:last-child {
+      border-bottom: none;
+    }
+
+    .about-aside strong {
+      color: var(--text);
+    }
+
+    /* Services */
+    .services-grid {
+      display: grid;
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+
+    .service-card {
+      background: var(--white);
+      border: 1px solid rgba(30, 58, 47, 0.1);
+      border-radius: 4px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .service-card:hover {
+      box-shadow: 0 8px 30px var(--shadow);
+      transform: translateY(-3px);
+    }
+
+    .service-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--navy);
+    }
+
+    .service-card p {
+      color: var(--text-muted);
+      font-size: 0.975rem;
+      flex-grow: 1;
+    }
+
+    .service-price {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-top: 0.75rem;
+      border-top: 1px dashed rgba(30, 58, 47, 0.15);
+    }
+
+    .service-price span:first-child {
+      font-size: 0.8125rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--wood);
+      font-weight: 600;
+    }
+
+    .service-price span:last-child {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: var(--forest);
+    }
+
+    .services-note {
+      margin-top: 2rem;
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Reviews */
+    .reviews {
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    .reviews .section-label {
+      color: var(--gold);
+    }
+
+    .reviews .section-title {
+      color: var(--white);
+    }
+
+    .reviews .section-intro {
+      color: rgba(250, 248, 244, 0.7);
+    }
+
+    .reviews-grid {
+      display: grid;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .review-card {
+      background: rgba(250, 248, 244, 0.06);
+      border: 1px solid rgba(250, 248, 244, 0.1);
+      border-radius: 4px;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .review-card::before {
+      content: "\201C";
+      position: absolute;
+      top: 1rem;
+      left: 1.25rem;
+      font-family: var(--font-display);
+      font-size: 4rem;
+      line-height: 1;
+      color: var(--gold);
+      opacity: 0.3;
+    }
+
+    .review-stars {
+      color: var(--gold);
+      font-size: 1rem;
+      letter-spacing: 3px;
+      margin-bottom: 1rem;
+    }
+
+    .review-text {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: rgba(250, 248, 244, 0.9);
+      position: relative;
+      z-index: 1;
+    }
+
+    .reviews-rating {
+      margin-top: 2.5rem;
+      text-align: center;
+      padding: 1.5rem;
+      border-top: 1px solid rgba(250, 248, 244, 0.1);
+    }
+
+    .reviews-rating strong {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--gold);
+    }
+
+    .reviews-rating span {
+      display: block;
+      margin-top: 0.25rem;
+      color: rgba(250, 248, 244, 0.6);
+      font-size: 0.9375rem;
+    }
+
+    /* Hours & Location */
+    .location-grid {
+      display: grid;
+      gap: 2rem;
+      margin-top: 2.5rem;
+    }
+
+    .hours-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--white);
+      border: 1px solid rgba(30, 58, 47, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .hours-table th,
+    .hours-table td {
+      padding: 0.875rem 1.25rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(30, 58, 47, 0.06);
+    }
+
+    .hours-table th {
+      background: var(--forest);
+      color: var(--white);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9375rem;
+    }
+
+    .hours-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .hours-table tr.closed td {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .hours-table tr.highlight td {
+      background: rgba(184, 149, 106, 0.1);
+      font-weight: 600;
+    }
+
+    .location-info {
+      background: var(--white);
+      border: 1px solid rgba(30, 58, 47, 0.1);
+      border-radius: 4px;
+      padding: 2rem;
+    }
+
+    .location-info h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--navy);
+      margin-bottom: 1.25rem;
+    }
+
+    .location-detail {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      align-items: flex-start;
+    }
+
+    .location-detail svg {
+      flex-shrink: 0;
+      margin-top: 3px;
+      color: var(--wood);
+    }
+
+    .location-detail a {
+      color: var(--forest);
+      font-weight: 600;
+    }
+
+    .map-container {
+      margin-top: 2rem;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid rgba(30, 58, 47, 0.1);
+      box-shadow: 0 8px 30px var(--shadow);
+      aspect-ratio: 16 / 10;
+    }
+
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Contact */
+    .contact {
+      background: var(--white);
+    }
+
+    .contact-grid {
+      display: grid;
+      gap: 2.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.02em;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      padding: 0.875rem 1rem;
+      border: 1px solid rgba(30, 58, 47, 0.2);
+      border-radius: 3px;
+      background: var(--cream);
+      color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--forest);
+      box-shadow: 0 0 0 3px rgba(30, 58, 47, 0.1);
+    }
+
+    .form-group textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .form-success {
+      display: none;
+      padding: 1rem 1.25rem;
+      background: rgba(30, 58, 47, 0.08);
+      border: 1px solid rgba(30, 58, 47, 0.2);
+      border-radius: 3px;
+      color: var(--forest);
+      font-weight: 600;
+    }
+
+    .form-success.show {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .contact-aside {
+      background: var(--forest);
+      color: var(--white);
+      padding: 2.5rem;
+      border-radius: 4px;
+    }
+
+    .contact-aside h3 {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      margin-bottom: 1rem;
+    }
+
+    .contact-aside p {
+      color: rgba(250, 248, 244, 0.8);
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .contact-phone:hover {
+      color: #c9a87a;
+    }
+
+    /* Footer */
+    .site-footer {
+      background: var(--navy);
+      color: rgba(250, 248, 244, 0.6);
+      padding: 2.5rem 1.25rem;
+      text-align: center;
+      font-size: 0.9375rem;
+    }
+
+    .site-footer p + p {
+      margin-top: 0.5rem;
+    }
+
+    .site-footer a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Desktop */
+    @media (min-width: 640px) {
+      .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .reviews-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .reviews-grid .review-card:last-child {
+        grid-column: 1 / -1;
+        max-width: 50%;
+        margin: 0 auto;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .nav-toggle {
+        display: none;
+      }
+
+      .site-nav {
+        display: block;
+        position: static;
+        background: none;
+        border: none;
+        padding: 0;
+        box-shadow: none;
+      }
+
+      .site-nav ul {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .site-nav a {
+        padding: 0.5rem 0.875rem;
+        border: none;
+        font-size: 0.9375rem;
+        border-radius: 3px;
+        transition: background 0.2s ease;
+      }
+
+      .site-nav a:hover {
+        background: rgba(30, 58, 47, 0.06);
+      }
+
+      .header-cta {
+        display: inline-flex;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.9375rem;
+      }
+
+      .about-grid {
+        grid-template-columns: 1.5fr 1fr;
+        align-items: start;
+      }
+
+      .location-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1.2fr 1fr;
+        align-items: start;
+      }
+
+      .hero-pole {
+        display: block;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      section {
+        padding: 6rem 2rem;
+      }
+
+      .services-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .reviews-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .reviews-grid .review-card:last-child {
+        grid-column: auto;
+        max-width: none;
+        margin: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .hero-badge, .hero h1, .hero-tagline, .hero-actions, .hero-location { animation: none; }
+      .hero-pole::before { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header" id="header">
+    <div class="header-inner">
+      <a href="#" class="logo">Corner <span>Barber Shop</span></a>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="site-nav" id="siteNav" aria-label="Main navigation">
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#reviews">Reviews</a></li>
+          <li><a href="#location">Hours &amp; Location</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <a href="tel:+14342866500" class="btn btn-primary header-cta">Call to Book</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="home">
+      <div class="hero-pole" aria-hidden="true"></div>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="stars">★★★★★</span>
+          <span>5.0 on Google · 40+ reviews</span>
+        </div>
+        <h1>Corner Barber Shop</h1>
+        <p class="hero-tagline">Classic cuts and warm welcomes on South Constitution Route — Scottsville's neighborhood barbershop.</p>
+        <div class="hero-actions">
+          <a href="tel:+14342866500" class="btn btn-primary">Call to Book</a>
+          <a href="#services" class="btn btn-outline">View Services</a>
+        </div>
+        <p class="hero-location">
+          13146 S Constitution Route · Scottsville, VA 24590
+        </p>
+      </div>
+      <div class="hero-wood-accent" aria-hidden="true"></div>
+    </section>
+
+    <!-- About -->
+    <section class="about" id="about">
+      <div class="section-inner">
+        <span class="section-label reveal">About the Shop</span>
+        <h2 class="section-title reveal reveal-delay-1">A Scottsville Staple, One Chair at a Time</h2>
+        <div class="about-grid">
+          <div class="about-text reveal reveal-delay-2">
+            <p>Corner Barber Shop is owned and operated by Jessica, a skilled barber who brings the same care and integrity to every haircut that her family has brought to this community for generations. Located along South Constitution Route — right next door to Scottsville Power Equipment — the shop has become a welcoming stop for locals and travelers alike.</p>
+            <p>Whether you're a regular from down the road or passing through on the way to visit family in southern Virginia, you'll find a comfortable chair, attentive service, and a haircut done your way — not just copied from a style on the wall.</p>
+            <p>Jessica listens first, cuts second. That's the difference between a quick trim and a cut you're happy to walk out with.</p>
+          </div>
+          <aside class="about-aside reveal reveal-delay-3">
+            <h3>At a Glance</h3>
+            <ul>
+              <li><strong>Owner &amp; Barber:</strong> Jessica</li>
+              <li><strong>Established:</strong> Neighborhood barbershop on Constitution Route</li>
+              <li><strong>Serves:</strong> Men, women &amp; children</li>
+              <li><strong>Walk-ins &amp; appointments:</strong> Call ahead to book</li>
+              <li><strong>Community:</strong> Rooted in Scottsville, VA</li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="services" id="services">
+      <div class="section-inner">
+        <span class="section-label reveal">Services</span>
+        <h2 class="section-title reveal reveal-delay-1">Haircuts &amp; Grooming</h2>
+        <p class="section-intro reveal reveal-delay-2">Straightforward services at fair prices. All cuts include a consultation — tell Jessica exactly what you're looking for.</p>
+
+        <div class="services-grid">
+          <article class="service-card reveal">
+            <h3>Men's Haircut</h3>
+            <p>Classic cuts, fades, and everything in between. Clean lines and a finish you'll feel good about.</p>
+            <div class="service-price">
+              <span>Starting at</span>
+              <span>$18</span>
+            </div>
+          </article>
+
+          <article class="service-card reveal reveal-delay-1">
+            <h3>Women's Haircut</h3>
+            <p>Precision cuts tailored to your style and hair type. Jessica takes the time to get it right.</p>
+            <div class="service-price">
+              <span>Starting at</span>
+              <span>$22</span>
+            </div>
+          </article>
+
+          <article class="service-card reveal reveal-delay-2">
+            <h3>Children's Haircut</h3>
+            <p>Patient, friendly cuts for kids of all ages. A comfortable experience from the first snip.</p>
+            <div class="service-price">
+              <span>Starting at</span>
+              <span>$15</span>
+            </div>
+          </article>
+
+          <article class="service-card reveal reveal-delay-3">
+            <h3>Beard Trim</h3>
+            <p>Shape, line, and tidy your beard with careful attention to detail.</p>
+            <div class="service-price">
+              <span>Starting at</span>
+              <span>$12</span>
+            </div>
+          </article>
+        </div>
+
+        <p class="services-note reveal">Prices shown are estimates. Final pricing may vary by style and length. Call <a href="tel:+14342866500">(434) 286-6500</a> for current rates.</p>
+      </div>
+    </section>
+
+    <!-- Reviews -->
+    <section class="reviews" id="reviews">
+      <div class="section-inner">
+        <span class="section-label reveal">What Customers Say</span>
+        <h2 class="section-title reveal reveal-delay-1">Trusted by Locals &amp; Travelers</h2>
+        <p class="section-intro reveal reveal-delay-2">Real reviews from Google — unedited and straight from the chair.</p>
+
+        <div class="reviews-grid">
+          <blockquote class="review-card reveal">
+            <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+            <p class="review-text">I discovered this establishment on the route to my elderly parents' home in southern Virginia. Although I live approximately 3½ hours away I've stopped in for a haircut on three different trips. Jessica is professional and a great person. She and other clients I've met at the shop make me feel welcome even though I am not local. I am always extremely happy with each haircut (and my wife is too)!</p>
+          </blockquote>
+
+          <blockquote class="review-card reveal reveal-delay-1">
+            <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+            <p class="review-text">I had my first haircut yesterday from the owner, Jessica. I am more than satisfied. I have dealt with her Dad JD Palmore for years next door at Scottsville Power Equipment and he is first class so it shouldn't be no surprise that she was too. I'll be coming back for sure. Even if you go somewhere else currently, give her a try you'll be glad you did. High quality cut and very reasonably priced.</p>
+          </blockquote>
+
+          <blockquote class="review-card reveal reveal-delay-2">
+            <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+            <p class="review-text">It's been nearly 20 years since I've been in a barber shop. Though getting married brings many new changes. She did an excellent job and listened to how I wanted my hair to look. Not just a style on the wall. My own style just executed with more talented hands.</p>
+          </blockquote>
+        </div>
+
+        <div class="reviews-rating reveal">
+          <strong>5.0 ★★★★★</strong>
+          <span>Based on 40+ Google reviews</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hours & Location -->
+    <section class="location" id="location">
+      <div class="section-inner">
+        <span class="section-label reveal">Visit Us</span>
+        <h2 class="section-title reveal reveal-delay-1">Hours &amp; Location</h2>
+        <p class="section-intro reveal reveal-delay-2">Find us on South Constitution Route in Scottsville, just south of Charlottesville along Route 20.</p>
+
+        <div class="location-grid">
+          <div class="reveal reveal-delay-2">
+            <table class="hours-table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Hours</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Monday</td>
+                  <td>8:00 AM – 5:00 PM</td>
+                </tr>
+                <tr>
+                  <td>Tuesday</td>
+                  <td>8:00 AM – 5:00 PM</td>
+                </tr>
+                <tr>
+                  <td>Wednesday</td>
+                  <td>8:00 AM – 5:00 PM</td>
+                </tr>
+                <tr class="highlight">
+                  <td>Thursday</td>
+                  <td>8:00 AM – 6:00 PM</td>
+                </tr>
+                <tr>
+                  <td>Friday</td>
+                  <td>8:00 AM – 5:00 PM</td>
+                </tr>
+                <tr class="closed">
+                  <td>Saturday</td>
+                  <td>Closed</td>
+                </tr>
+                <tr class="closed">
+                  <td>Sunday</td>
+                  <td>Closed</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="location-info reveal reveal-delay-3">
+            <h3>Corner Barber Shop</h3>
+            <div class="location-detail">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <div>
+                <strong>Address</strong><br>
+                13146 S Constitution Route<br>
+                Scottsville, VA 24590
+              </div>
+            </div>
+            <div class="location-detail">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <div>
+                <strong>Phone</strong><br>
+                <a href="tel:+14342866500">(434) 286-6500</a>
+              </div>
+            </div>
+            <div class="location-detail">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <div>
+                <strong>Best time to call</strong><br>
+                During shop hours, Mon–Fri
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-container reveal">
+          <iframe
+            title="Corner Barber Shop location on Google Maps"
+            src="https://maps.google.com/maps?q=Corner+Barber+Shop,+13146+South+Constitution+Route,+Scottsville,+VA+24590&amp;hl=en&amp;z=16&amp;output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact" id="contact">
+      <div class="section-inner">
+        <span class="section-label reveal">Get in Touch</span>
+        <h2 class="section-title reveal reveal-delay-1">Send a Message</h2>
+        <p class="section-intro reveal reveal-delay-2">Prefer to write instead of call? Fill out the form below and Jessica will get back to you during business hours.</p>
+
+        <div class="contact-grid">
+          <!--
+            FORM SETUP: Replace YOUR_FORM_ID with a free Formspree form ID from https://formspree.io
+            Sign up, create a form, and paste your form endpoint below. No coding required after that.
+          -->
+          <form class="contact-form reveal reveal-delay-2" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+            <div class="form-group">
+              <label for="name">Your Name</label>
+              <input type="text" id="name" name="name" required autocomplete="name" placeholder="John Smith">
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" required placeholder="I'd like to schedule a haircut for..."></textarea>
+            </div>
+            <div class="form-success" id="formSuccess" role="status">
+              Thank you! Your message has been sent. Jessica will be in touch soon.
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+          </form>
+
+          <aside class="contact-aside reveal reveal-delay-3">
+            <h3>Prefer to Call?</h3>
+            <p>The fastest way to book an appointment is to call during shop hours. Walk-ins are welcome when availability allows.</p>
+            <a href="tel:+14342866500" class="contact-phone">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              (434) 286-6500
+            </a>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> Corner Barber Shop · Scottsville, Virginia</p>
+    <p>13146 S Constitution Route · <a href="tel:+14342866500">(434) 286-6500</a></p>
+  </footer>
+
+  <script>
+    (function () {
+      var header = document.getElementById('header');
+      var navToggle = document.getElementById('navToggle');
+      var siteNav = document.getElementById('siteNav');
+      var navLinks = siteNav.querySelectorAll('a');
+      var form = document.getElementById('contactForm');
+      var formSuccess = document.getElementById('formSuccess');
+
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      window.addEventListener('scroll', function () {
+        header.classList.toggle('scrolled', window.scrollY > 20);
+      }, { passive: true });
+
+      navToggle.addEventListener('click', function () {
+        var expanded = navToggle.getAttribute('aria-expanded') === 'true';
+        navToggle.setAttribute('aria-expanded', String(!expanded));
+        navToggle.setAttribute('aria-label', expanded ? 'Open menu' : 'Close menu');
+        siteNav.classList.toggle('open', !expanded);
+      });
+
+      navLinks.forEach(function (link) {
+        link.addEventListener('click', function () {
+          navToggle.setAttribute('aria-expanded', 'false');
+          navToggle.setAttribute('aria-label', 'Open menu');
+          siteNav.classList.remove('open');
+        });
+      });
+
+      var revealEls = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        revealEls.forEach(function (el) { observer.observe(el); });
+      } else {
+        revealEls.forEach(function (el) { el.classList.add('visible'); });
+      }
+
+      form.addEventListener('submit', function (e) {
+        var action = form.getAttribute('action');
+        if (action.indexOf('YOUR_FORM_ID') !== -1) {
+          e.preventDefault();
+          formSuccess.textContent = 'Form is ready — Jessica just needs to connect a free Formspree account (see HTML comments). For now, please call (434) 286-6500.';
+          formSuccess.classList.add('show');
+          return;
+        }
+        e.preventDefault();
+        fetch(action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        }).then(function (res) {
+          if (res.ok) {
+            form.reset();
+            formSuccess.classList.add('show');
+          } else {
+            formSuccess.textContent = 'Something went wrong. Please call (434) 286-6500 instead.';
+            formSuccess.classList.add('show');
+          }
+        }).catch(function () {
+          formSuccess.textContent = 'Unable to send. Please call (434) 286-6500 instead.';
+          formSuccess.classList.add('show');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
