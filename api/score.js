@@ -3,14 +3,13 @@ const {
   setApiHeaders,
   rejectForeignOrigin,
   rejectBodyTooLarge,
-  sanitizeAnthropicPayload,
   sendApiError,
   LIMITS
 } = require('./_lib');
 const { requireAuth } = require('./_auth');
-
-/** Full test narrative JSON (~10+ paragraphs + arrays); needs high output budget. */
-const SCORE_MAX_TOKENS = 8192;
+const { getUserDocument, hasServiceAccount, userHasPlusFromDoc } = require('./_firestore');
+const { cacheKey, rateLimit, logAi, callHaiku, singleFlight, TOKEN_BUDGET, SCORE_MODEL, PROMPT_VERSION } = require('./_ai');
+const { getCache, setCache } = require('./_cache');
 
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
@@ -20,39 +19,53 @@ module.exports = async function handler(req, res) {
 
   const user = await requireAuth(req, res);
   if (!user) return;
+  if (!rateLimit(user.uid, 12)) return res.status(429).json({ error: 'Too many AI requests' });
 
-  const checked = assertPrompt(req.body || {}, LIMITS.score);
+  const body = req.body || {};
+  const checked = assertPrompt(body, LIMITS.score);
   if (checked.error) return res.status(checked.status).json({ error: checked.error });
   const prompt = checked.value;
+  const depth = body.depth === 'deeper' ? 'deeper' : 'free';
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
+  let plus = false;
+  if (hasServiceAccount()) {
+    const loaded = await getUserDocument(user.uid);
+    plus = userHasPlusFromDoc(loaded.doc || {});
+  }
+  if (depth === 'deeper' && !plus) {
+    return res.status(403).json({ error: 'Animus Plus required for Deeper Insight' });
+  }
+
+  const tokens = depth === 'deeper' ? TOKEN_BUDGET.deeper : plus ? TOKEN_BUDGET.scorePlus : TOKEN_BUDGET.scoreFree;
+  const hash = cacheKey({
+    taskType: 'score-' + depth,
+    promptVersion: PROMPT_VERSION,
+    model: SCORE_MODEL,
+    lang: body.lang || 'en',
+    prompt: prompt
+  });
 
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: SCORE_MAX_TOKENS,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    if (!r.ok) {
-      const err = await r.text();
-      console.error('Anthropic score error:', err);
-      return res.status(500).json({ error: 'Upstream error' });
+    const cached = await getCache(hash);
+    if (cached) {
+      logAi('cache-hit', { uid: user.uid, hash: hash.slice(0, 12) });
+      return res.json(cached);
     }
-
-    const data = await r.json();
-    res.json(sanitizeAnthropicPayload(data));
+    const data = await singleFlight(hash, function () {
+      return callHaiku(prompt, tokens).then(function (out) {
+        return setCache(hash, out, {
+          taskType: 'score-' + depth,
+          promptVersion: PROMPT_VERSION,
+          model: SCORE_MODEL
+        }).then(function () {
+          return out;
+        });
+      });
+    });
+    logAi('generate', { uid: user.uid, hash: hash.slice(0, 12) });
+    res.json(data);
   } catch (e) {
     console.error('Score handler error:', e);
-    sendApiError(res, 500, 'Internal error');
+    sendApiError(res, e.name === 'AbortError' ? 504 : 500, e.name === 'AbortError' ? 'Timed out' : 'Internal error');
   }
 };

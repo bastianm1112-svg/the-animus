@@ -15,7 +15,7 @@ const {
   hasServiceAccount
 } = require('./_firestore');
 
-const PLUS_CAREER_PDF_PER_MONTH = 3;
+const { rateLimit, logAi, callHaiku, extractText, TOKEN_BUDGET } = require('./_ai');
 const PROFILE_MAX = 6000;
 
 function sanitizeProfile(body) {
@@ -121,6 +121,8 @@ module.exports = async function handler(req, res) {
     });
   }
 
+  if (!rateLimit(user.uid, 8)) return res.status(429).json({ error: 'Too many AI requests' });
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
@@ -131,28 +133,9 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: 1800,
-        messages: [{ role: 'user', content: buildPrompt(profile, displayName) }]
-      })
-    });
-
-    if (!r.ok) {
-      console.error('Anthropic career-guide error:', await r.text());
-      return res.status(500).json({ error: 'AI generation failed' });
-    }
-
-    const data = await r.json();
-    const text =
-      data.content && data.content[0] && data.content[0].text ? data.content[0].text : '';
+    const data = await callHaiku(buildPrompt(profile, displayName), TOKEN_BUDGET.career);
+    logAi('generate', { uid: user.uid, hash: 'career' });
+    const text = extractText(data);
     const guide = parseGuideJson(text);
     if (!guide || !guide.careers) {
       console.error('Career guide parse failed:', text.slice(0, 400));

@@ -467,6 +467,16 @@
     }
 
     if (scores) {
+      var overall = scores.overall;
+      var polDetail = (typeof AnimusPolitical !== 'undefined')
+        ? AnimusPolitical.overallSimilarity(mySnap, themSnap, { includeCultural: false })
+        : null;
+      var glance = document.getElementById('compareGlance');
+      if (glance && typeof AnimusResultsUI !== 'undefined') {
+        glance.innerHTML =
+          AnimusResultsUI.scoreCard('Overall', overall + '%', polDetail ? AnimusPolitical.similarityLabel(polDetail.overall) : '') +
+          (polDetail ? AnimusResultsUI.similarityCard('Political distance', polDetail.overall, polDetail.axes) : '');
+      }
       var pct = document.querySelector('.compat-pct');
       if (pct) pct.innerHTML = scores.overall + '<span>%</span>';
       var fill = document.querySelector('.compat-fill');

@@ -190,6 +190,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 
 </style>
 <link rel="stylesheet" href="/css/animus-shell.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-results.css">
 <link rel="stylesheet" href="/css/animus-unified.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-profile-panels.css">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -197,6 +198,11 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/psyche-cross.js"></script>
 <script src="/js/animus-scoring-core.js"></script>
+<script src="/js/animus-versions.js"></script>
+<script src="/js/animus-political.js"></script>
+<script src="/js/political-figures.js"></script>
+<script src="/js/animus-results-ui.js"></script>
+<script src="/js/animus-ads.js"></script>
 <script src="/js/figures-library.js"></script>
 <script src="/js/profile-narrative-depth.js?v=20260609"></script>
 <script src="/js/profile-narratives.js?v=20260609"></script>
@@ -308,6 +314,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
 
   <div class="panel" id="panel-political">
     <div class="panel-main" id="politicalPanelRoot"></div>
+    <div id="culturalModule" class="owner-only"></div>
   </div>
 
   <div class="panel" id="panel-social">
@@ -316,6 +323,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
 
   <div class="panel" id="panel-figures">
     <div class="panel-main" id="figuresPanelRoot"></div>
+    <p class="animus-fine" style="padding:0 16px"><a href="/figures">Browse the full figures catalog</a></p>
     <div class="panel-side"><div class="profile-actions-card"><button class="btn-full btn-full-gold" onclick="shareProfile()">&#11041; Share Profile</button><a href="/compare" class="btn-full btn-full-outline">&#8652; Compare</a><button class="btn-full btn-full-outline" onclick="downloadPDF()">&#9113; Download PDF</button></div></div>
   </div>
 
@@ -783,6 +791,7 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
 <div id="appFooterMount"></div>
 <div id="appBottomMount"></div>
 <script src="/js/animus-career-guide.js"></script>
+<script src="/js/animus-cultural-ui.js"></script>
 <script src="/js/animus-social.js"></script>
 <script src="/js/animus-nav.js"></script>
 <script>

@@ -70,6 +70,9 @@
       '">' +
       SVG_TYPES +
       ' <span data-en="Types" data-es="Tipos">Types</span></a>' +
+      '<a href="/figures" class="nav-item' +
+      ac(active, 'figures') +
+      '"><span data-en="Figures" data-es="Figuras">Figures</span></a>' +
       '</div>' +
       '<div class="nav-right">' +
       '<button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleThemeGlobal()" title="Toggle theme">' +
@@ -102,6 +105,9 @@
       '<a href="/types" class="nav-mobile-item' +
       ac(active, 'types') +
       '">Types</a>' +
+      '<a href="/figures" class="nav-mobile-item' +
+      ac(active, 'figures') +
+      '">Figures</a>' +
       '</div>'
     );
   }

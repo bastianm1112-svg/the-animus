@@ -39,6 +39,16 @@
       }
       return;
     }
+    if (mode === 'quick') {
+      try {
+        localStorage.setItem('animus_test_mode', 'quick');
+      } catch (e) {}
+      g.__animusTestMode = 'quick';
+      if (g.AnimusPsyche && typeof g.AnimusPsyche.setTestMode === 'function') {
+        g.AnimusPsyche.setTestMode('quick');
+      }
+      return;
+    }
     var saved = g.AnimusPsyche && g.AnimusPsyche.loadSavedTestMode
       ? g.AnimusPsyche.loadSavedTestMode()
       : 'short';
@@ -103,6 +113,8 @@
             return;
           }
           g.AnimusPsyche.setTestMode('full');
+        } else if (mode === 'quick') {
+          g.AnimusPsyche.setTestMode('quick');
         } else {
           g.AnimusPsyche.setTestMode('short');
         }

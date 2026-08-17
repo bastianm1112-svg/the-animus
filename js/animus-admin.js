@@ -130,6 +130,18 @@
       });
   }
 
+  function adminApi(payload) {
+    if (!g.AnimusShared || !g.AnimusShared.fetchApiPost) {
+      return Promise.reject(new Error('API unavailable'));
+    }
+    return g.AnimusShared.fetchApiPost('/api/admin', payload).then(function (r) {
+      return r.json().then(function (j) {
+        if (!r.ok) throw new Error(j.error || 'Admin request failed');
+        return j;
+      });
+    });
+  }
+
   function banUser() {
     if (!targetUid) {
       setStatus('Load a user first', 'err');
@@ -142,17 +154,7 @@
     var reasonEl = document.getElementById('adminBanReason');
     var reason = reasonEl && reasonEl.value ? reasonEl.value.trim().substring(0, 200) : '';
     if (!g.confirm('Ban this user? They will be signed out and cannot use the app.')) return;
-    db.collection('users')
-      .doc(targetUid)
-      .set(
-        {
-          banned: true,
-          bannedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          bannedBy: adminUid || 'admin',
-          banReason: reason
-        },
-        { merge: true }
-      )
+    adminApi({ action: 'ban', targetUid: targetUid, reason: reason })
       .then(function () {
         targetUser.banned = true;
         targetUser.banReason = reason;
@@ -169,16 +171,7 @@
       setStatus('Load a user first', 'err');
       return;
     }
-    db.collection('users')
-      .doc(targetUid)
-      .set(
-        {
-          banned: false,
-          unbannedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          unbannedBy: adminUid || 'admin'
-        },
-        { merge: true }
-      )
+    adminApi({ action: 'unban', targetUid: targetUid })
       .then(function () {
         targetUser.banned = false;
         loadModerationIntoForm();
@@ -874,16 +867,13 @@
       until.setMonth(until.getMonth() + 1);
       ent.animusPlusUntil = until.toISOString();
     }
-    db.collection('users')
-      .doc(targetUid)
-      .set(
-        {
-          entitlements: ent,
-          entitlementsGrantedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          entitlementsGrantedBy: adminUid || 'admin'
-        },
-        { merge: true }
-      )
+    adminApi({
+      action: 'entitlements',
+      targetUid: targetUid,
+      detailedTest: !!ent.detailedTest,
+      testEstimator: !!ent.testEstimator,
+      animusPlus: !!ent.animusPlus
+    })
       .then(function () {
         setStatus('Entitlements saved for user.', 'ok');
       })

@@ -155,8 +155,17 @@ service cloud.firestore {
         && compareUsageIncrementValid();
     }
 
+    function politicalPrivateUnchanged() {
+      return !('politicalPrivate' in request.resource.data)
+        || request.resource.data.politicalPrivate == resource.data.get('politicalPrivate', {});
+    }
+
     function ownerProfileUpdateSafe(userId) {
-      return ownerProfileUpdate(userId) && entitlementsUnchanged();
+      return ownerProfileUpdate(userId)
+        && entitlementsUnchanged()
+        && politicalPrivateUnchanged()
+        && request.resource.data.get('polZ', null) == resource.data.get('polZ', null)
+        && request.resource.data.get('deeperInsight', null) == resource.data.get('deeperInsight', null);
     }
 
     function adminUserUpdate(userId) {
@@ -180,7 +189,7 @@ service cloud.firestore {
     }
 
     function testDraftModeValid(modeId) {
-      return modeId in ['short', 'full', 'estimator'];
+      return modeId in ['quick', 'short', 'full', 'estimator'];
     }
 
     function testDraftValid() {
@@ -289,7 +298,10 @@ service cloud.firestore {
     function profileNoPrivilegeEscalation() {
       return !('isAdmin' in request.resource.data)
         && !('entitlements' in request.resource.data)
-        && !('banned' in request.resource.data);
+        && !('banned' in request.resource.data)
+        && !('polZ' in request.resource.data.get('latest', {}))
+        && !('deeperInsight' in request.resource.data.get('latest', {}))
+        && !('politicalPrivate' in request.resource.data);
     }
 
     function ownerProfileWrite(userId) {
@@ -331,6 +343,19 @@ service cloud.firestore {
     // Stripe idempotency — server (service account) only.
     match /stripe_processed/{docId} {
       allow read, write: if false;
+    }
+
+    match /aiCache/{docId} {
+      allow read, write: if false;
+    }
+
+    match /auditLog/{docId} {
+      allow read, write: if false;
+    }
+
+    match /siteConfig/{docId} {
+      allow read: if true;
+      allow write: if false;
     }
 
     // Legacy collection — unused by app; deny all client access.

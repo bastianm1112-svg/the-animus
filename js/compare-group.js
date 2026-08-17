@@ -226,13 +226,21 @@
     var polLabel = avgPolX > 10 ? 'Right' : avgPolX < -10 ? 'Left' : 'Center';
     var authLabel = avgPolY > 10 ? 'Auth' : avgPolY < -10 ? 'Lib' : 'Moderate';
 
-    var insightsHtml = '<div class="matrix-section"><div class="section-title">Group Insights</div><div class="insights-grid">'
-      + (avgCompat !== null ? '<div class="insight-card"><div class="insight-label">Avg Compatibility</div><div class="insight-value ' + compatClass(avgCompat) + '">' + avgCompat + '<span style="font-size:16px">%</span></div><div class="insight-sub">across all pairs</div></div>' : '')
-      + '<div class="insight-card"><div class="insight-label">Most Common Type</div><div class="insight-value">' + escapeHTML(mostCommon) + '</div><div class="insight-sub">' + (mbtiCounts[mostCommon] > 1 ? mbtiCounts[mostCommon] + ' people' : 'unique in group') + '</div></div>'
-      + (mostEnn !== '—' ? '<div class="insight-card"><div class="insight-label">Common Ennea</div><div class="insight-value">' + escapeHTML(mostEnn) + '</div><div class="insight-sub">most frequent type</div></div>' : '')
-      + '<div class="insight-card"><div class="insight-label">Group Politics</div><div class="insight-value" style="font-size:20px">' + polLabel + '<br>' + authLabel + '</div><div class="insight-sub">average position</div></div>'
-      + '<div class="insight-card"><div class="insight-label">Group Size</div><div class="insight-value">' + people.length + '</div><div class="insight-sub">people selected</div></div>'
-      + '</div></div>';
+    var dyn = (g.AnimusGroupDynamics && g.AnimusGroupDynamics.analyze)
+      ? g.AnimusGroupDynamics.analyze(people, {
+          includeCultural: !!_hasPlus
+        })
+      : null;
+    var insightsHtml = dyn && g.AnimusResultsUI
+      ? g.AnimusResultsUI.groupDynamicCard(dyn)
+      : '<div class="matrix-section"><div class="section-title">Group Insights</div></div>';
+    if (dyn && dyn.clusters && dyn.clusters.length) {
+      insightsHtml += '<div class="animus-card"><div class="animus-card-kicker">Subgroups</div><ul>' +
+        dyn.clusters.map(function (c) {
+          return '<li>' + escapeHTML(c.label) + ': ' + escapeHTML((c.members || []).join(', ')) + '</li>';
+        }).join('') + '</ul><p class="animus-fine">' + escapeHTML(dyn.qualified) + '</p></div>';
+    }
+    insightsHtml += '<div class="animus-card animus-card--deeper"><div class="animus-card-kicker">Deeper Insight</div><p>Plus members can request a longer group-dynamics writeup. It is interpretation, not a forecast.</p></div>';
 
     content.innerHTML = cardsHtml + matrixHtml + insightsHtml;
   }

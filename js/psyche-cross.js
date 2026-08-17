@@ -297,11 +297,23 @@
   };
 
   function buildPoliticalComparisons(polX, polY) {
-    var q = polQuadrant(polX || 0, polY || 0);
-    var base = POL_COMPARISONS[q] || POL_COMPARISONS['lib-left'];
     var leanEcon = polX > 15 ? 'market-leaning' : polX < -15 ? 'redistribution-leaning' : 'economically centrist';
     var leanSoc = polY > 15 ? 'order-leaning' : polY < -15 ? 'liberty-leaning' : 'socially centrist';
-    var prefix = 'Profile axis X=' + Math.round(polX || 0) + ' Y=' + Math.round(polY || 0) + ' (' + leanEcon + ', ' + leanSoc + '): ';
+    var prefix = 'Coordinates X=' + Math.round(polX || 0) + ' Y=' + Math.round(polY || 0) + ' (' + leanEcon + ', ' + leanSoc + '). Ranked by axis distance, not quadrant club: ';
+    if (typeof AnimusPoliticalFigures !== 'undefined' && AnimusPoliticalFigures.rankClosest) {
+      var ranked = AnimusPoliticalFigures.rankClosest({ polX: polX, polY: polY }, { limit: 5 });
+      var people = ranked.map(function (f) {
+        return f.name + ': estimated placement; ' + (f.label || '') + ' (similarity ' + f.similarity + '). ' + (f.sourceNote || '');
+      });
+      return {
+        politicalThinkers: people.slice(0, 4),
+        similarPoliticians: people,
+        similarCountries: [prefix + 'Country lists are illustrative, not measured.'],
+        similarParties: [prefix + 'Party labels are illustrative of nearby coordinates, not membership.']
+      };
+    }
+    var q = polQuadrant(polX || 0, polY || 0);
+    var base = POL_COMPARISONS[q] || POL_COMPARISONS['lib-left'];
     return {
       politicalThinkers: base.thinkers.map(function (t) { return prefix + t; }),
       similarPoliticians: base.politicians.map(function (t) { return prefix + t; }),

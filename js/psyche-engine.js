@@ -210,6 +210,7 @@ function applyRouteTestMode() {
   var mode = params.get('mode');
   if (mode === 'detailed') testMode = 'full';
   else if (mode === 'estimator') testMode = 'estimator';
+  else if (mode === 'quick') testMode = 'quick';
   else if (mode === 'main' || mode === 'short') testMode = 'short';
   if (mode === 'estimator') {
     var name = params.get('name');
@@ -269,6 +270,7 @@ function configureIntroForMode() {
 function setTestMode(mode) {
   if (mode === 'estimator') testMode = 'estimator';
   else if (mode === 'full' || mode === 'detailed') testMode = 'full';
+  else if (mode === 'quick') testMode = 'quick';
   else testMode = 'short';
   try { localStorage.setItem(AnimusShared.KEYS.testMode, testMode); } catch(e){}
 }
@@ -277,6 +279,7 @@ function progressStorageKey(mode) {
   var m = mode || testMode;
   if (m === 'full' || m === 'detailed') return AnimusShared.KEYS.testProgress + '_full';
   if (m === 'estimator') return AnimusShared.KEYS.testProgress + '_estimator';
+  if (m === 'quick') return AnimusShared.KEYS.testProgress + '_quick';
   return AnimusShared.KEYS.testProgress + '_short';
 }
 
@@ -497,7 +500,7 @@ function refreshCloudDrafts(cb) {
 function loadSavedTestMode() {
   var saved = null;
   try { saved = localStorage.getItem(AnimusShared.KEYS.testMode); } catch(e){}
-  if(saved === 'short' || saved === 'full' || saved === 'estimator') return saved;
+  if(saved === 'short' || saved === 'full' || saved === 'estimator' || saved === 'quick') return saved;
   if(window.location.search.indexOf('mode=detailed') > -1) return 'full';
   if(window.location.search.indexOf('mode=estimator') > -1) return 'estimator';
   return 'short';
@@ -696,7 +699,7 @@ function refreshIntroModeUI(userData) {
 
   tabs.forEach(function (tab) {
     var mode = tab.getAttribute('data-mode');
-    var on = mode === (testMode === 'full' ? 'full' : 'short');
+    var on = mode === testMode || (mode === 'short' && testMode === 'short');
     var locked = mode === 'full' && !hasDetailed;
     tab.classList.toggle('active', on);
     tab.classList.toggle('is-locked', locked);
@@ -721,7 +724,9 @@ function refreshIntroModeUI(userData) {
     }
   });
 
-  if (durationEl) durationEl.textContent = testMode === 'full' ? '~45' : '~20';
+  if (durationEl) {
+    durationEl.textContent = testMode === 'full' ? '~45' : (testMode === 'quick' ? '~10' : '~20');
+  }
   if (introShell) {
     introShell.classList.toggle('intro--detailed-owned', hasDetailed);
     introShell.classList.toggle('intro--detailed-locked', !hasDetailed && _introEntitlementsLoaded);
@@ -806,6 +811,9 @@ function applyQuizHeaderForMode() {
     document.body.classList.add('test-quiz-detailed');
     var qhdr = document.querySelector('.qhdr');
     if (qhdr) qhdr.classList.add('qhdr--detailed');
+  } else if (testMode === 'quick') {
+    if (qSection) qSection.textContent = lang === 'es' ? 'Test rápido' : 'Quick Test';
+    document.body.classList.remove('test-quiz-detailed');
   } else {
     if (qSection) qSection.textContent = lang === 'es' ? 'Test Principal' : 'Main Test';
     document.body.classList.remove('test-quiz-detailed');
@@ -1004,13 +1012,17 @@ function poolForAlloc(fn, byTag) {
 function buildActiveQuestionSet() {
   var activeQ;
   _choiceIx = [];
-  if (testMode === 'short' || testMode === 'estimator') {
+  if (testMode === 'short' || testMode === 'estimator' || testMode === 'quick') {
     var pools = buildTaggedPools();
     var byTag = pools.byTag;
     var qKey = pools.qKey;
     var used = {};
     activeQ = [];
-    var alloc = testMode === 'estimator' ? ESTIMATOR_ALLOC : SHORT_ALLOC;
+    var alloc = testMode === 'estimator'
+      ? ESTIMATOR_ALLOC
+      : (testMode === 'quick' && typeof AnimusTestScore !== 'undefined'
+        ? AnimusTestScore.QUICK_ALLOC
+        : SHORT_ALLOC);
     Object.keys(alloc).forEach(function (fn) {
       var count = alloc[fn];
       var p = poolForAlloc(fn, byTag);
@@ -2035,7 +2047,10 @@ function scoreContributionBuckets(activeQ){
   activeQ.forEach(function (q, i) {
     var raw = answers[i];
     if (raw === null || raw === undefined) return;
-    var val = valFromRaw(raw);
+    var val = (typeof AnimusTestScore !== 'undefined')
+      ? AnimusTestScore.valFromRaw(q, raw)
+      : ((raw - 1) / 6) * 100;
+    if (val === null) return;
     add(q.fn, val, 1);
     if (q.also) {
       Object.keys(q.also).forEach(function (k) {
@@ -2184,7 +2199,7 @@ function buildPrompt(data){
     +'Quadrant: '+polQuadrant+'\n'
     +'Economic interpretation: '+(data.polX>60?'Hard libertarian-right':data.polX>30?'Classical liberal / libertarian':data.polX>10?'Centre-right':data.polX>-10?'True centrist':data.polX>-30?'Centre-left / social democrat':data.polX>-60?'Democratic socialist':'Hard left')+'\n'
     +'Social interpretation: '+(data.polY<-60?'Strong libertarian / near-anarchist':data.polY<-30?'Libertarian':data.polY<-10?'Centre-libertarian':data.polY<10?'Moderate':data.polY<30?'Centre-authoritarian':data.polY<60?'Authoritarian':'Hard authoritarian')+'\n\n'
-    +'IMPORTANT: Base ALL analysis on the actual scores above. Do NOT default to stereotype assumptions (INTJ, ENTJ, etc.). '
+    +'IMPORTANT: Base ALL analysis on the actual numeric coordinates and scores. Do NOT treat everyone in a compass quadrant as the same. Distance on the axes matters. Do not call someone an ideological twin unless scores are extremely close. Do not invent quotes, votes, or biographical facts for figures. Label estimates as estimates.\n'
     +'This person is '+mbti+' type '+enn.type+'w'+enn.wing+'. Their dominant function is '+fnsSorted[0]+' (score '+data.cog[fnsSorted[0]]+'). '
     +'Be specific to THEIR actual profile — every narrative must match their actual scores.\n'
     +'Write for the person reading their own profile. Each narrative must explain THREE layers: '
@@ -2227,13 +2242,13 @@ function buildPrompt(data){
 
 
 
-function callAIWithRetry(prompt,retriesLeft,onSuccess,onFail){
+function callAIWithRetry(prompt,retriesLeft,onSuccess,onFail,depth){
   var retryEl=document.getElementById('loadRetry');
   var attempt=4-retriesLeft;
-  if(attempt>0) retryEl.textContent='Retry '+attempt+' of 3...';
+  if(retryEl && attempt>0) retryEl.textContent='Retry '+attempt+' of 3...';
 
   var scoreFetch = (typeof AnimusShared !== 'undefined' && AnimusShared.fetchApiPost)
-    ? AnimusShared.fetchApiPost('/api/score', { prompt: prompt })
+    ? AnimusShared.fetchApiPost('/api/score', { prompt: prompt, depth: depth || 'free' })
     : Promise.reject(new Error('auth_required'));
 
   scoreFetch
@@ -2244,22 +2259,22 @@ function callAIWithRetry(prompt,retriesLeft,onSuccess,onFail){
   .then(function(d){
     var text=(d.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('').replace(/```json|```/g,'').trim();
     var parsed=JSON.parse(text);
-    retryEl.textContent='';
+    if (retryEl) retryEl.textContent='';
     onSuccess(parsed);
   })
   .catch(function(e){
     console.warn('AI attempt failed:',e.message);
     if(e.message === 'auth_required' || e.message === 'Sign in required'){
-      retryEl.textContent='';
+      if (retryEl) retryEl.textContent='';
       onFail();
       return;
     }
     // If CORS/network error, go straight to fallback (no point retrying)
     var isCORS = e.message && (e.message.indexOf('Failed to fetch')>=0 || e.message.indexOf('NetworkError')>=0 || e.message.indexOf('CORS')>=0);
     if(!isCORS && retriesLeft>1){
-      setTimeout(function(){callAIWithRetry(prompt,retriesLeft-1,onSuccess,onFail);},1500);
+      setTimeout(function(){callAIWithRetry(prompt,retriesLeft-1,onSuccess,onFail,depth);},1500);
     } else {
-      retryEl.textContent='';
+      if (retryEl) retryEl.textContent='';
       onFail();
     }
   });
@@ -2310,7 +2325,7 @@ var TABS=[
 function insertDetailedTestUpsell() {
   var existing = document.getElementById('detailedTestUpsell');
   if (existing) existing.remove();
-  if (testMode !== 'short') return;
+  if (testMode !== 'short' && testMode !== 'quick') return;
   var es = lang === 'es';
   function renderBanner(hasDetailedOwned) {
     var banner = document.createElement('div');
@@ -2338,6 +2353,49 @@ function insertDetailedTestUpsell() {
   } else {
     renderBanner(false);
   }
+}
+
+function bindDeeperInsight(data) {
+  var mount = document.getElementById('deeperInsightMount');
+  if (!mount || typeof AnimusResultsUI === 'undefined') return;
+  function renderLocked() {
+    mount.innerHTML = AnimusResultsUI.insightCard('Deeper Insight', '', true, true);
+  }
+  var user = typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser;
+  if (!user || typeof AnimusEntitlements === 'undefined') {
+    renderLocked();
+    return;
+  }
+  firebase.firestore().collection('users').doc(user.uid).get().then(function (doc) {
+    var ud = doc.exists ? doc.data() : {};
+    if (!AnimusEntitlements.hasAnimusPlus(ud)) {
+      renderLocked();
+      return;
+    }
+    mount.innerHTML = AnimusResultsUI.card({
+      kind: 'deeper',
+      kicker: 'Deeper Insight',
+      title: 'Plus',
+      body: '<p>Longer interpretation of contradictions and unusual score combinations. This is commentary, not a diagnosis.</p><button type="button" class="btn-primary" id="deeperInsightBtn">Generate Deeper Insight</button><div id="deeperInsightOut" class="animus-prose"></div>'
+    });
+    var btn = document.getElementById('deeperInsightBtn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      var extra = buildPrompt(data) +
+        '\nAlso include "deeperInsight":"700-1100 words on contradictions, trait interactions, and unusual combinations. Do not invent quotes or votes. Label estimates as estimates."\n';
+      callAIWithRetry(extra, 3, function (parsed) {
+        var out = document.getElementById('deeperInsightOut');
+        if (out) {
+          out.textContent = parsed.deeperInsight || parsed.shadowDesc || parsed.politicalNarrative || 'Generated.';
+        }
+        btn.disabled = false;
+      }, function () {
+        btn.disabled = false;
+        if (typeof showToast === 'function') showToast('Could not generate Deeper Insight.');
+      }, 'deeper');
+    });
+  }).catch(renderLocked);
 }
 
 function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
@@ -2392,7 +2450,14 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   // ── OVERVIEW PANEL ──
   panels+='<div class="panel active" id="panel-overview">'
     +'<div class="panel-title">Your Profile at a Glance</div>'
-    +'<p class="panel-sub">A complete summary of who you are across every dimension measured.</p>'
+    +'<p class="panel-sub">Scan the cards, then open any tab for more. Full read: about 10 minutes.</p>'
+    +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.legacyNote({ bankVersion: data.bankVersion, scoringVersion: data.scoringVersion }) : '')
+    +(typeof AnimusAds !== 'undefined' ? AnimusAds.slot('results.belowSummary', _introUserData) : '')
+    +'<div class="animus-results-scan">'
+    +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.scoreCard('Type', mbti, enn.type + 'w' + enn.wing + ' · ' + fnsSorted[0]) : '')
+    +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.scoreCard('Compass', (data.polX > 0 ? '+' : '') + data.polX + ' / ' + (data.polY > 0 ? '+' : '') + data.polY, 'Actual coordinates — not just a quadrant') : '')
+    +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.compassSvg(data.polX, data.polY) : '')
+    +'</div>'
 
     +'<div class="stat-grid">'
     +'<div class="stat-cell"><span class="stat-big">'+mbti+'</span><span class="stat-lbl">Cognitive type</span></div>'
@@ -2590,7 +2655,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
   panels+='<div class="panel" id="panel-political">'
     +'<div class="panel-title">Political spectrum</div>'
-    +'<p class="panel-sub">Up = Authoritarian &nbsp;|&nbsp; Down = Libertarian &nbsp;|&nbsp; Right = Economic Freedom &nbsp;|&nbsp; Left = State Control</p>'
+    +'<p class="panel-sub">Position uses exact coordinates. Nearby figures are ranked by distance, then popularity — not by sharing a quadrant.</p>'
 
     // Compass + axis cards
     +'<div class="grid2" style="align-items:start;margin-bottom:16px">'
@@ -2633,6 +2698,23 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
       +(sanitizeText(ai.politicalIdeologyDesc,2000) ? '<p style="font-size:12px;color:var(--muted2);line-height:1.8">'+sanitizeText(ai.politicalIdeologyDesc,2000)+'</p>' : '')
       +'</div>'
     ) : '')
+
+    +(function () {
+      if (typeof AnimusPoliticalFigures === 'undefined' || typeof AnimusResultsUI === 'undefined') return '';
+      var ranked = AnimusPoliticalFigures.rankClosest({ polX: data.polX, polY: data.polY }, { limit: 5 });
+      if (!ranked.length) return '';
+      return '<div class="section-label">Closest political figures (estimated placements)</div>' +
+        ranked.map(function (f) {
+          return AnimusResultsUI.figureCard({
+            name: f.name,
+            dataStatus: f.dataStatus,
+            note: f.label + ' · similarity ' + f.similarity,
+            sourceNote: f.sourceNote
+          });
+        }).join('');
+    })()
+    +'<div id="deeperInsightMount"></div>'
+    +'<p class="animus-fine">Cultural axis (Plus) is scored separately and is not stored on public profiles.</p>'
 
     // AI narrative
     +(sanitizeText(ai.politicalNarrative,2000)
@@ -2769,6 +2851,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'</div>';
 
   document.getElementById('tabPanels').innerHTML=panels;
+  bindDeeperInsight(data);
 
   // Tab switching
   document.getElementById('tabsBar').querySelectorAll('.tab').forEach(function(tab){
@@ -2839,8 +2922,54 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   }
 
   function persistProfileSnapshot(redirectAfter) {
+    snapshot.bankVersion = (typeof AnimusVersions !== 'undefined') ? AnimusVersions.BANK_VERSION : '2026.08.16';
+    snapshot.scoringVersion = (typeof AnimusVersions !== 'undefined') ? AnimusVersions.SCORING_VERSION : '2026.08.16';
+    snapshot.serverScored = false;
+    var sessionId = 's' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+
+    function submitAuthoritative() {
+      if (observerMode || typeof AnimusShared === 'undefined' || !AnimusShared.fetchApiPost) {
+        return Promise.resolve(null);
+      }
+      var activeQ = window._activeQ || [];
+      var items = [];
+      for (var i = 0; i < activeQ.length; i++) {
+        var q = activeQ[i];
+        if (!q) continue;
+        items.push({
+          id: q.id || ('q' + i),
+          raw: answers[i],
+          choiceIx: (_choiceIx && _choiceIx[i] >= 0) ? _choiceIx[i] : undefined
+        });
+      }
+      return AnimusShared.fetchApiPost('/api/submit-test', {
+        sessionId: sessionId,
+        testMode: testMode,
+        items: items
+      }).then(function (r) {
+        return r.json().then(function (j) {
+          if (!r.ok) throw new Error(j.error || 'Submit failed');
+          return j.snapshot;
+        });
+      }).catch(function (err) {
+        var retry = document.getElementById('loadRetry');
+        if (retry) {
+          retry.innerHTML = '<button type="button" class="btn-primary" id="retrySubmitBtn">Retry save scores</button>';
+          var btn = document.getElementById('retrySubmitBtn');
+          if (btn) btn.addEventListener('click', function () {
+            retry.innerHTML = '';
+            submitAuthoritative().then(function (srv) {
+              if (srv) Object.assign(snapshot, srv);
+            });
+          });
+        }
+        console.error('submit-test', err);
+        return null;
+      });
+    }
+
     var meta = {
-      testMode: observerMode ? 'estimator' : TOTAL <= 100 ? 'short' : 'full',
+      testMode: observerMode ? 'estimator' : (testMode || 'short'),
       answerCount: Object.keys(answers || {}).length,
       completedAt: new Date().toISOString()
     };
@@ -2963,7 +3092,21 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
       setCloudSaveUi('pending');
 
-      return AnimusShared.saveProfileToFirestore(user.uid, snapshot, {
+      return submitAuthoritative().then(function (srv) {
+        if (srv && srv.mbti) {
+          snapshot.mbti = srv.mbti;
+          snapshot.polX = srv.polX;
+          snapshot.polY = srv.polY;
+          snapshot.cog = srv.cog || snapshot.cog;
+          snapshot.att = srv.att || snapshot.att;
+          snapshot.phi = srv.phi || snapshot.phi;
+          snapshot.bankVersion = srv.bankVersion;
+          snapshot.scoringVersion = srv.scoringVersion;
+          snapshot.serverScored = true;
+          if (srv.ennType) snapshot.ennType = srv.ennType;
+          if (srv.ennWing) snapshot.ennWing = srv.ennWing;
+        }
+        return AnimusShared.saveProfileToFirestore(user.uid, snapshot, {
         rawData: data,
         testMode: meta.testMode,
         answerCount: meta.answerCount,
@@ -3018,6 +3161,7 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
           }
           return false;
         });
+      });
     }
 
     function runCloudSave(user, attempt) {

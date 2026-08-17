@@ -3,7 +3,6 @@ const {
   setApiHeaders,
   rejectForeignOrigin,
   rejectBodyTooLarge,
-  sanitizeAnthropicPayload,
   sendApiError,
   LIMITS
 } = require('./_lib');
@@ -16,9 +15,8 @@ const {
   getCompareUsageFromDoc,
   hasServiceAccount
 } = require('./_firestore');
-
-/** Compare AI returns ~4 JSON sections (~750 words); 4096 tokens is ample headroom. */
-const COMPARE_MAX_TOKENS = 4096;
+const { cacheKey, rateLimit, logAi, callHaiku, singleFlight, TOKEN_BUDGET, SCORE_MODEL, PROMPT_VERSION } = require('./_ai');
+const { getCache, setCache } = require('./_cache');
 
 module.exports = async function handler(req, res) {
   setApiHeaders(res);
@@ -28,17 +26,22 @@ module.exports = async function handler(req, res) {
 
   const user = await requireAuth(req, res);
   if (!user) return;
+  if (!rateLimit(user.uid, 12)) return res.status(429).json({ error: 'Too many AI requests' });
 
   if (!hasServiceAccount()) {
     return res.status(503).json({ error: 'Compare service unavailable' });
   }
 
-  const checked = assertPrompt(req.body || {}, LIMITS.compare);
+  const body = req.body || {};
+  if (body.mode === 'group') {
+    const loadedGate = await getUserDocument(user.uid);
+    if (!userHasPlusFromDoc(loadedGate.doc || {})) {
+      return res.status(403).json({ error: 'Group analysis requires Animus Plus' });
+    }
+  }
+  const checked = assertPrompt(body, LIMITS.compare);
   if (checked.error) return res.status(checked.status).json({ error: checked.error });
   const prompt = checked.value;
-
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
   let userDoc = null;
   let compareUsage = null;
@@ -63,28 +66,31 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  const hash = cacheKey({
+    taskType: body.mode === 'group' ? 'group' : 'compare',
+    promptVersion: PROMPT_VERSION,
+    model: SCORE_MODEL,
+    lang: body.lang || 'en',
+    prompt: prompt
+  });
+
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: COMPARE_MAX_TOKENS,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    if (!r.ok) {
-      const err = await r.text();
-      console.error('Anthropic compare error:', err);
-      return res.status(500).json({ error: 'Upstream error' });
+    const cached = await getCache(hash);
+    let data = cached;
+    if (!data) {
+      data = await singleFlight(hash, function () {
+        return callHaiku(prompt, body.mode === 'group' ? TOKEN_BUDGET.group : TOKEN_BUDGET.compare).then(function (out) {
+          return setCache(hash, out, {
+            taskType: body.mode === 'group' ? 'group' : 'compare',
+            promptVersion: PROMPT_VERSION,
+            model: SCORE_MODEL
+          }).then(function () { return out; });
+        });
+      });
+      logAi('generate', { uid: user.uid, hash: hash.slice(0, 12) });
+    } else {
+      logAi('cache-hit', { uid: user.uid, hash: hash.slice(0, 12) });
     }
-
-    const data = await r.json();
 
     if (hasServiceAccount() && userDoc && !userHasPlusFromDoc(userDoc) && compareUsage) {
       const nextUsage = {
@@ -97,7 +103,7 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    res.json(sanitizeAnthropicPayload(data));
+    res.json(data);
   } catch (e) {
     console.error('Compare handler error:', e);
     sendApiError(res, 500, 'Internal error');

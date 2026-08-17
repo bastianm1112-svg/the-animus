@@ -9,6 +9,14 @@ module.exports = async function handler(req, res) {
     (process.env.ANIMUS_GA_MEASUREMENT_ID || process.env.GA_MEASUREMENT_ID || '').trim();
 
   res.status(200).json({
-    gaMeasurementId: /^G-[A-Z0-9]+$/i.test(ga) ? ga : null
+    gaMeasurementId: /^G-[A-Z0-9]+$/i.test(ga) ? ga : null,
+    ads: {
+      enabled: false,
+      provider: null,
+      placements: {
+        'results.belowSummary': true,
+        'home.footer': true
+      }
+    }
   });
 };

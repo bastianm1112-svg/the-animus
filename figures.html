@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ANIMUS — Figures</title>
+<link rel="stylesheet" href="/css/animus-shell.css">
+<link rel="stylesheet" href="/css/animus-results.css">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="appNavMount"></div>
+<main class="app-page app-page--wide" style="padding:24px 16px">
+  <h1 class="compare-page-title" style="font-family:Playfair Display,serif">Figures</h1>
+  <p class="animus-muted">Personality catalog matches are estimates, not test results. Political closest-figures use a separate estimated coordinate set.</p>
+  <div class="figures-toolbar">
+    <input id="figSearch" type="search" placeholder="Search names" aria-label="Search figures">
+    <select id="figCat" aria-label="Category">
+      <option value="">All categories</option>
+    </select>
+  </div>
+  <div id="figGrid" class="animus-results-scan"></div>
+</main>
+<div id="appBottomMount"></div>
+<script src="/js/animus-safe.js"></script>
+<script src="/js/figures-library.js"></script>
+<script src="/js/animus-results-ui.js"></script>
+<script src="/js/animus-page-shell.js"></script>
+<script src="/js/animus-nav.js"></script>
+<script>
+(function () {
+  if (window.AnimusNav) {
+    AnimusNav.mountTop('appNavMount', 'figures');
+    AnimusNav.mountBottom('appBottomMount', 'figures');
+  }
+  var cat = document.getElementById('figCat');
+  var search = document.getElementById('figSearch');
+  var grid = document.getElementById('figGrid');
+  var cats = (window.AnimusFigures && AnimusFigures.categories) || [];
+  cats.forEach(function (c) {
+    var o = document.createElement('option');
+    o.value = c; o.textContent = c; cat.appendChild(o);
+  });
+  function render() {
+    var q = (search.value || '').toLowerCase();
+    var c = cat.value;
+    var list = (AnimusFigures.CATALOG || []).filter(function (f) {
+      if (c && f.cat !== c) return false;
+      if (q && String(f.name).toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    }).sort(function (a, b) {
+      return (b.popularity || 0) - (a.popularity || 0) || a.name.localeCompare(b.name);
+    });
+    grid.innerHTML = list.slice(0, 80).map(function (f) {
+      return AnimusResultsUI.figureCard({
+        name: f.name,
+        cat: f.cat + ' · ' + f.mbti,
+        note: f.note,
+        dataStatus: f.dataStatus || 'estimated',
+        initials: f.name.slice(0, 2)
+      });
+    }).join('') || '<p class="animus-muted">No matches.</p>';
+  }
+  search.addEventListener('input', render);
+  cat.addEventListener('change', render);
+  render();
+})();
+</script>
+</body>
+</html>

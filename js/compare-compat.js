@@ -25,6 +25,9 @@
   }
 
   function calcPolCompat(x1, y1, x2, y2) {
+    if (typeof AnimusPolitical !== 'undefined' && AnimusPolitical.calcPolCompat) {
+      return AnimusPolitical.calcPolCompat(x1, y1, x2, y2);
+    }
     var d = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     return Math.max(0, Math.round(100 - d * 0.7));
   }

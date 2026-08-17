@@ -98,7 +98,8 @@
     {"source": "/shop", "destination": "/shop.html"},
     {"source": "/admin", "destination": "/admin.html"},
     {"source": "/types", "destination": "/types.html"},
-    {"source": "/about", "destination": "/about.html"},
+    {"source": "/figures", "destination": "/figures.html"},
+    {"source": "/api/admin/me", "destination": "/api/admin"},
     {"source": "/profile", "destination": "/profile.html"},
     {"source": "/404", "destination": "/404.html"},
     {"source": "/:username([^/.]+)", "destination": "/profile.html?u=:username"}

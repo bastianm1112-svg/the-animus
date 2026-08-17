@@ -37,6 +37,7 @@
 <link rel="stylesheet" href="/css/animus-unified.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-release.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-compare.css?v=20260607">
+<link rel="stylesheet" href="/css/animus-results.css">
 <link rel="stylesheet" href="/css/animus-plus.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-premium.css?v=20260608">
 <link rel="stylesheet" href="/css/animus-app-shell.css?v=20260608">
@@ -113,6 +114,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
     </div>
 
     <p class="compare-data-notice" id="compareDataNotice" style="display:none" role="status"></p>
+    <div id="compareGlance"></div>
 
     <div id="compareScoreBlock" class="compare-score-block is-hidden">
     <!-- Compatibility score -->
@@ -389,6 +391,9 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="/js/animus-political.js"></script>
+<script src="/js/animus-group-dynamics.js"></script>
+<script src="/js/animus-results-ui.js"></script>
 <script src="/js/compare-compat.js"></script>
 <script src="/js/compare-normalize.js?v=20260607"></script>
 <script src="/js/compare-friends.js"></script>

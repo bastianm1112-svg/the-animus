@@ -295,7 +295,21 @@
     {sec:"Temperamento",t:"Soy sociable, entusiasta y me entusiasma la gente; me encanta estar en medio de las cosas.",lo:"No es como yo",hi:"Muy como yo"},
     {sec:"Temperamento",t:"Proceso las emociones externamente y hablo de mis sentimientos en lugar de sentarme solo con ellos.",lo:"En desacuerdo",hi:"Muy de acuerdo"},
     {sec:"Temperamento",t:"Soy tranquilo, paciente y diplomático: evito conflictos innecesarios y busco puntos en común.",lo:"No es como yo",hi:"Muy como yo"},
-    {sec:"Temperamento",t:"Puedo llevarme bien con casi cualquier persona y tiendo a hacer que la gente se sienta cómoda a mi alrededor.",lo:"Rara vez",hi:"Consecuentemente"}
+    {sec:"Temperamento",t:"Puedo llevarme bien con casi cualquier persona y tiendo a hacer que la gente se sienta cómoda a mi alrededor.",lo:"Rara vez",hi:"Consecuentemente"},
+    {sec:"Cognitivo",t:"Suelo quedarme mucho tiempo con varias lecturas distintas de una situación.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Cognitivo",t:"Cuando ya elegí un rumbo, prefiero no seguir generando más opciones.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Cognitivo",t:"Me resulta cómodo usar una explicación de confianza sin reconstruirla desde cero.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Cognitivo",t:"Puedo dejar que un proceso desordenado siga si la gente parece conforme.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Cognitivo",t:"A menudo dejo de lado mi reacción personal para que el grupo se mantenga alineado.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Cognitivo",t:"Puedo ignorar el ánimo de una sala si la tarea todavía hay que hacerla.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Cognitivo",t:"Me inquieto cuando una semana se parece demasiado a la anterior.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Cognitivo",t:"Prefiero mapear la situación primero antes de meterme en los detalles físicos.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Apego",t:"A menudo busco señales de que la gente se podría alejar.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Apego",t:"Puedo soportar la incertidumbre en una relación sin buscar contacto extra.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Política",t:"Las grandes fortunas privadas deberían limitarse cuando distorsionan la vida pública.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Política",t:"La mayoría de los bienes se asignan bastante bien cuando compradores y vendedores negocian libremente.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Política",t:"La gente debería poder ignorar las indicaciones oficiales cuando chocan con sus planes.",lo:"En desacuerdo",hi:"De acuerdo"},
+    {sec:"Política",t:"Las reglas compartidas que restringen algunas elecciones personales igual pueden valer la pena.",lo:"En desacuerdo",hi:"De acuerdo"}
   ];
   g.AnimusI18n = g.AnimusI18n || {};
   g.AnimusI18n.SEC_ES = SEC_ES;

@@ -33,6 +33,7 @@
 <link rel="stylesheet" href="/css/animus-premium.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-motion.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-test.css?v=20260614">
+<link rel="stylesheet" href="/css/animus-results.css">
 <script src="/js/animus-safe.js"></script>
 <script src="/js/animus-seo.js"></script>
 <script src="/js/animus-app.js?v=20260603" defer></script>
@@ -134,6 +135,10 @@ if(window.top!==window.self){window.top.location=window.self.location;}
   <p class="intro-desc" data-en="Map your cognitive architecture, philosophical orientation, political geometry, attachment patterns, and moral foundations — the core of who you are." data-es="Mapea tu arquitectura cognitiva, orientación filosófica, geometría política, patrones de apego y fundamentos morales — el núcleo de quién eres.">Map your cognitive architecture, philosophical orientation, political geometry, attachment patterns, and moral foundations — the core of who you are.</p>
   <div class="test-intro-card intro-actions">
   <div class="intro-mode-toggle" id="testModeTabs" role="tablist" aria-label="Test type">
+    <button type="button" class="intro-mode-btn" data-mode="quick" role="tab" aria-selected="false">
+      <span class="mode-label" data-en="Quick" data-es="Rápido">Quick</span>
+      <span class="mode-sub" data-en="50 questions · ~10 min · Free" data-es="50 preguntas · ~10 min · Gratis">50 questions · ~10 min · Free</span>
+    </button>
     <button type="button" class="intro-mode-btn active" data-mode="short" role="tab" aria-selected="true">
       <span class="mode-label" data-en="Main" data-es="Principal">Main</span>
       <span class="mode-sub" data-en="~100 questions · ~20 min" data-es="~100 preguntas · ~20 min">~100 questions · ~20 min</span>
@@ -220,11 +225,19 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 <div class="toast" id="toast"></div>
 
 <script src="/js/animus-scoring-core.js"></script>
+<script src="/js/animus-versions.js"></script>
+<script src="/js/animus-test-score.js"></script>
+<script src="/js/animus-political.js"></script>
+<script src="/js/political-figures.js"></script>
+<script src="/js/animus-results-ui.js"></script>
+<script src="/js/animus-ads.js"></script>
 <script src="/js/animus-i18n.js"></script>
 <script src="/js/animus-estimator.js"></script>
 <script src="/js/animus-entitlements.js?v=20260607"></script>
 <script src="/js/animus-xp.js"></script>
 <script src="/js/psyche-questions.js"></script>
+<script src="/js/psyche-question-patches.js"></script>
+<script src="/js/psyche-quick-extra.js"></script>
 <script src="/js/psyche-q-es.js"></script>
 <script src="/js/psyche-cross.js"></script>
 <script src="/js/profile-narrative-depth.js?v=20260609"></script>

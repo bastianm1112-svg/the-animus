@@ -261,11 +261,19 @@
 
     snap._narrativeIdentity = narrativeIdentityKey(snap);
     snap._narrativesRefreshedAt = new Date().toISOString();
+    delete snap.polZ;
+    delete snap.deeperInsight;
+    delete snap.culturalAnswers;
+    delete snap.politicalPrivate;
     return snap;
   }
 
   function sanitizeProfileSnapshot(snapshot) {
     var snap = Object.assign({}, snapshot || {});
+    delete snap.polZ;
+    delete snap.deeperInsight;
+    delete snap.culturalAnswers;
+    delete snap.politicalPrivate;
     PROFILE_TEXT_KEYS.forEach(function (k) {
       if (snap[k] == null) return;
       var maxLen =
@@ -318,14 +326,14 @@
   function getSavedTestMode() {
     try {
       var m = localStorage.getItem(KEYS.testMode);
-      return m === 'short' ? 'short' : 'full';
+      return m === 'quick' || m === 'short' ? m : 'full';
     } catch (e) {
       return 'full';
     }
   }
 
   function setSavedTestMode(mode) {
-    mode = mode === 'short' ? 'short' : 'full';
+    mode = mode === 'quick' ? 'quick' : (mode === 'short' ? 'short' : 'full');
     try {
       localStorage.setItem(KEYS.testMode, mode);
     } catch (e) {}
@@ -1093,7 +1101,8 @@
   }
 
   var PROFILE_PRIVATE_KEYS = [
-    'answers', 'choiceIx', 'activeKeys', 'testItems', 'testResponses', 'items', 'questions'
+    'answers', 'choiceIx', 'activeKeys', 'testItems', 'testResponses', 'items', 'questions',
+    'polZ', 'deeperInsight', 'culturalAnswers', 'politicalPrivate'
   ];
 
   function stripPrivateFromProfileSnapshot(snapshot) {
@@ -1138,6 +1147,7 @@
   function testDraftDocId(mode) {
     if (mode === 'full' || mode === 'detailed') return 'full';
     if (mode === 'estimator') return 'estimator';
+    if (mode === 'quick') return 'quick';
     return 'short';
   }
 
@@ -1883,6 +1893,15 @@
   }
 
   /** POST JSON to ANIMUS API routes with Firebase Bearer auth. */
+  function fetchApiGet(path) {
+    return getFirebaseIdToken().then(function (token) {
+      return fetch(path, {
+        method: 'GET',
+        headers: { Authorization: 'Bearer ' + token }
+      });
+    });
+  }
+
   function fetchApiPost(path, body) {
     return getFirebaseIdToken().then(function (token) {
       return fetch(path, {
@@ -1993,6 +2012,7 @@
     resolveUsernameToUid: resolveUsernameToUid,
     repairUsernameIndexForUser: repairUsernameIndexForUser,
     getFirebaseIdToken: getFirebaseIdToken,
+    fetchApiGet: fetchApiGet,
     fetchApiPost: fetchApiPost
   };
 })(typeof window !== 'undefined' ? window : this);

@@ -1,0 +1,175 @@
+/* Result design system — cards, compass, motion, ads slots */
+
+.animus-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 0 0 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.animus-card-kicker {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.animus-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  margin: 0 0 8px;
+  color: var(--white);
+}
+
+.animus-card-body { color: var(--text); }
+.animus-muted { color: var(--muted2); }
+.animus-fine { font-size: 12px; color: var(--muted); }
+.animus-legacy {
+  border: 1px dashed var(--gold2);
+  padding: 10px 12px;
+  font-size: 13px;
+  margin: 12px 0;
+}
+
+.animus-meter {
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.animus-meter > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--gold2), var(--gold));
+  transition: width 0.7s ease;
+}
+
+.animus-why, .animus-more { margin-top: 8px; }
+.animus-why > summary, .animus-more > summary {
+  cursor: pointer;
+  color: var(--gold);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.animus-why > summary:focus, .animus-more > summary:focus,
+.animus-card a:focus, .intro-mode-btn:focus, button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.animus-badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--border2);
+  padding: 2px 6px;
+  border-radius: 99px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.animus-badge--estimated { color: var(--muted2); }
+.animus-badge--documented { color: var(--green); }
+
+.animus-fig-fallback {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: var(--gold);
+}
+.animus-fig-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.animus-compass {
+  width: min(100%, 320px);
+  height: auto;
+  display: block;
+  margin: 12px auto;
+}
+.animus-compass-bg { fill: var(--surface2); stroke: var(--border2); }
+.animus-compass-axis { stroke: var(--border2); }
+.animus-compass-label { fill: var(--muted2); font-size: 9px; font-family: 'DM Sans', sans-serif; }
+.animus-compass-dot {
+  fill: var(--gold);
+  transition: cx 0.8s ease, cy 0.8s ease;
+}
+.animus-compass-other { fill: var(--muted2); opacity: 0.7; }
+
+.animus-cultural-track {
+  position: relative;
+  height: 8px;
+  background: linear-gradient(90deg, #8a6f3e, #c8a96e, #6ea0c8);
+  border-radius: 99px;
+  margin: 12px 0 6px;
+}
+.animus-cultural-track > span {
+  position: absolute;
+  top: -5px;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  background: var(--white);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--gold);
+}
+.animus-cultural-ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted2);
+}
+
+.animus-card--deeper {
+  border-color: var(--gold2);
+  background: linear-gradient(180deg, rgba(200, 169, 110, 0.08), var(--surface));
+}
+
+.animus-results-scan {
+  display: grid;
+  gap: 12px;
+}
+@media (min-width: 720px) {
+  .animus-results-scan { grid-template-columns: 1fr 1fr; }
+}
+
+.animus-ad-slot {
+  min-height: 0;
+  margin: 16px 0;
+}
+
+.animus-link { color: var(--gold); }
+
+.figures-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+.figures-toolbar input, .figures-toolbar select {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animus-meter > span, .animus-compass-dot { transition: none; }
+  html { scroll-behavior: auto; }
+}

@@ -194,7 +194,23 @@
     {mbti:"ENFP",name:"Carl Rogers",cat:"Historical",e:1,w:NaN,note:"Archetypal parallel."},
     {mbti:"ENFP",name:"Ellen DeGeneres",cat:"Celebrity",e:6,w:NaN,note:"Archetypal parallel."},
     {mbti:"ENFP",name:"Elizabeth Bennet",cat:"Pop Culture",e:4,w:NaN,note:"Archetypal parallel."}
+    {mbti:"ESTP",name:"Serena Williams",cat:"Sports",e:8,w:7,note:"Competitive presence under elite pressure.",popularity:5,dataStatus:"estimated"},
+    {mbti:"ESFP",name:"Lionel Messi",cat:"Sports",e:9,w:1,note:"Quiet craft expressed through play.",popularity:5,dataStatus:"estimated"},
+    {mbti:"ESTP",name:"Cristiano Ronaldo",cat:"Sports",e:3,w:8,note:"Relentless self-demand and showmanship.",popularity:5,dataStatus:"estimated"},
+    {mbti:"ISTP",name:"Michael Jordan",cat:"Sports",e:8,w:3,note:"Competitive intensity channeled into craft.",popularity:5,dataStatus:"estimated"},
+    {mbti:"ESFP",name:"Simone Biles",cat:"Sports",e:3,w:2,note:"Precision and presence at the highest stage.",popularity:5,dataStatus:"estimated"},
+    {mbti:"ESTP",name:"Usain Bolt",cat:"Sports",e:7,w:8,note:"Explosive performance with public ease.",popularity:4,dataStatus:"estimated"},
+    {mbti:"ISFP",name:"Naomi Osaka",cat:"Sports",e:4,w:5,note:"Private values under public competition.",popularity:4,dataStatus:"estimated"},
+    {mbti:"ESTJ",name:"Tom Brady",cat:"Sports",e:3,w:1,note:"Longevity through disciplined systems.",popularity:5,dataStatus:"estimated"},
+    {mbti:"ENFJ",name:"Megan Rapinoe",cat:"Sports",e:8,w:7,note:"Public advocacy alongside elite play.",popularity:4,dataStatus:"estimated"},
+    {mbti:"ISTP",name:"Kobe Bryant",cat:"Sports",e:3,w:8,note:"Obsessive craft and competitive standard.",popularity:5,dataStatus:"estimated"}
   ];
+  CATALOG.forEach(function (f) {
+    if (!f.popularity) f.popularity = 3;
+    if (!f.dataStatus) f.dataStatus = 'estimated';
+    if (f.cat === 'Celebrity') f.cat = 'Entertainment';
+    if (f.cat === 'Pop Culture') f.cat = 'Other';
+  });
   function initials(name) {
     var parts = String(name || '').replace(/\([^)]*\)/g, '').split(/\s+/).filter(Boolean);
     if (!parts.length) return '??';
@@ -208,7 +224,9 @@
       cat: fig.cat,
       type: fig.mbti + ' ' + fig.e + 'w' + fig.w,
       initials: initials(fig.name),
-      note: fig.note
+      note: fig.note,
+      popularity: fig.popularity || 3,
+      dataStatus: fig.dataStatus || 'estimated'
     };
   }
 
@@ -220,6 +238,7 @@
     else if (Math.abs(parseInt(fig.e, 10) - parseInt(ennType, 10)) === 1) s += 12;
     if (String(fig.w) === String(ennWing)) s += 18;
     else if (Math.abs(parseInt(fig.w, 10) - parseInt(ennWing, 10)) === 1) s += 6;
+    s += (fig.popularity || 3) * 2;
     return s;
   }
 
@@ -239,8 +258,8 @@
       });
 
     var picked = [];
-    var cats = { Historical: 0, Celebrity: 0, 'Pop Culture': 0, Philosopher: 0 };
-    var quotas = { Historical: 3, Celebrity: 3, 'Pop Culture': 3, Philosopher: 1 };
+    var cats = { Historical: 0, Entertainment: 0, Other: 0, Sports: 0, Business: 0, Political: 0, Celebrity: 0, 'Pop Culture': 0 };
+    var quotas = { Historical: 2, Entertainment: 2, Other: 2, Sports: 2, Business: 1, Political: 1, Celebrity: 2, 'Pop Culture': 2 };
 
     ranked.forEach(function (r) {
       if (picked.length >= limit) return;
@@ -268,6 +287,7 @@
   g.AnimusFigures = {
     CATALOG: CATALOG,
     pickFigures: pickFigures,
-    formatFigure: formatFigure
+    formatFigure: formatFigure,
+    categories: ['Historical', 'Sports', 'Entertainment', 'Business', 'Political', 'Other']
   };
 })(typeof window !== 'undefined' ? window : globalThis);
