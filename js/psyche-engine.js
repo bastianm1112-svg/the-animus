@@ -170,6 +170,125 @@ var scaleLabels = {
        opts:['Muy en desacuerdo','En desacuerdo','Algo en desacuerdo','Neutral','Algo de acuerdo','De acuerdo','Muy de acuerdo']}
 };
 
+var _quizNavDir = 1;
+var _quizKeysBound = false;
+
+function quizModeLabel() {
+  if (typeof observerMode !== 'undefined' && observerMode) return lang === 'es' ? 'Observador' : 'Observer';
+  if (testMode === 'quick') return lang === 'es' ? 'Rápido' : 'Quick';
+  if (testMode === 'full') return lang === 'es' ? 'Detallado' : 'Detailed';
+  if (testMode === 'estimator') return lang === 'es' ? 'Estimador' : 'Estimator';
+  return lang === 'es' ? 'Corto' : 'Short';
+}
+
+function updateQuizHeader(sec) {
+  var el = document.getElementById('qSection');
+  if (!el) return;
+  var mode = quizModeLabel();
+  var section = (sec || '').trim();
+  el.textContent = section ? (section + ' · ' + mode) : mode;
+}
+
+function quizPromptHint(isMc) {
+  if (isMc) return lang === 'es' ? 'Elegí la opción más cercana' : 'Choose the closest fit';
+  return lang === 'es' ? '¿Qué tan cierto es esto para vos?' : 'How true is this for you?';
+}
+
+function buildQuestionChrome(qText, loc, isMc) {
+  var prompt = /[:?]$/.test(String(qText || '').trim());
+  return '<div class="q-stage">'
+    + '<p class="q-kicker"><span class="q-kicker-sec">' + escapeHTML(loc.sec || quizModeLabel()) + '</span>'
+    + '<span class="q-kicker-dot" aria-hidden="true"></span>'
+    + '<span class="q-kicker-hint">' + escapeHTML(quizPromptHint(isMc)) + '</span></p>'
+    + '<div class="q-header-row"><div class="q-text' + (prompt ? ' q-text--prompt' : '') + '">' + escapeHTML(qText) + '</div></div>';
+}
+
+function buildLikertHtml(selected, loc, lbl) {
+  var sel = selected == null ? 0 : selected;
+  var lo = loc.lo || lbl.lo;
+  var hi = loc.hi || lbl.hi;
+  var html = '<div class="scale-wrap' + (sel ? ' is-set' : '') + '" style="--scale-n:' + sel + '">';
+  html += '<div class="scale-track" aria-hidden="true"><div class="scale-track-fill"></div></div>';
+  html += '<div class="scale-row" role="radiogroup" aria-label="' + escapeHTML(lbl.lo + ' — ' + lbl.hi) + '">';
+  for (var i = 1; i <= 7; i++) {
+    var word = lbl.opts[i - 1] || String(i);
+    html += '<button type="button" class="scale-btn' + (sel === i ? ' sel' : '') + '" data-v="' + i + '" role="radio" aria-checked="' + (sel === i ? 'true' : 'false') + '" title="' + escapeHTML(word) + '">'
+      + '<span class="scale-num">' + i + '</span>'
+      + '<span class="scale-word">' + escapeHTML(word) + '</span>'
+      + '</button>';
+  }
+  html += '</div><div class="scale-lbls"><span>' + escapeHTML(lo) + '</span><span>' + escapeHTML(hi) + '</span></div></div>';
+  return html;
+}
+
+function applyChoiceChrome(root, v, ci) {
+  if (!root) return;
+  root.querySelectorAll('.mc-choice').forEach(function (el) {
+    var on = ci !== null && ci !== undefined && ci !== '' && el.getAttribute('data-ci') === String(ci);
+    el.classList.toggle('selected', on);
+  });
+  root.querySelectorAll('.scale-btn').forEach(function (el) {
+    var on = parseInt(el.getAttribute('data-v'), 10) === v;
+    el.classList.toggle('sel', on);
+    el.setAttribute('aria-checked', on ? 'true' : 'false');
+  });
+  var wrap = root.querySelector('.scale-wrap');
+  if (wrap) {
+    wrap.classList.add('is-set');
+    wrap.style.setProperty('--scale-n', String(v || 0));
+  }
+  var nb = document.getElementById('nBtn');
+  if (nb) {
+    nb.disabled = false;
+    nb.classList.remove('disabled');
+    nb.classList.add('is-ready');
+  }
+}
+
+function playQuestionEnter(body) {
+  if (!body) return;
+  var stage = body.querySelector('.q-stage') || body;
+  stage.classList.remove('q-enter-next', 'q-enter-back');
+  void stage.offsetWidth;
+  stage.classList.add(_quizNavDir < 0 ? 'q-enter-back' : 'q-enter-next');
+}
+
+function bindQuizKeysOnce() {
+  if (_quizKeysBound) return;
+  _quizKeysBound = true;
+  document.addEventListener('keydown', function (e) {
+    if (!isQuizPhase()) return;
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var q = (window._activeQ || Q)[cur];
+    if (!q) return;
+    var k = e.key;
+    if (k === 'Enter' || k === 'ArrowRight') {
+      var nb = document.getElementById('nBtn');
+      if (nb && !nb.disabled) { e.preventDefault(); nb.click(); }
+      return;
+    }
+    if (k === 'ArrowLeft') {
+      var bb = document.getElementById('bBtn');
+      if (bb && !bb.disabled) { e.preventDefault(); bb.click(); }
+      return;
+    }
+    if (q.type === 'mc' && q.choices) {
+      var letter = k.toUpperCase();
+      if (letter >= 'A' && letter <= 'D') {
+        var btn = document.querySelector('#qBody .mc-choice[data-ci="' + (letter.charCodeAt(0) - 65) + '"]');
+        if (btn) { e.preventDefault(); btn.click(); }
+      }
+      return;
+    }
+    if (/^[1-7]$/.test(k)) {
+      var sb = document.querySelector('#qBody .scale-btn[data-v="' + k + '"]');
+      if (sb) { e.preventDefault(); sb.click(); }
+    }
+  });
+}
+
 // ── SHUFFLE (Fisher-Yates) ──
 function shuffle(arr){
   for(var i=arr.length-1;i>0;i--){
@@ -598,15 +717,17 @@ function wantsTestProgressBar(userData) {
 }
 
 function updateTestProgressChrome() {
-  var on = isQuizPhase() && wantsTestProgressBar(_introUserData);
+  var live = isQuizPhase();
+  var on = live && wantsTestProgressBar(_introUserData);
   if (document.body) {
+    document.body.classList.toggle('test-progress-live', live);
     document.body.classList.toggle('test-progress-on', on);
   }
   var numEl = document.getElementById('qhdrNum');
   var fillEl = document.getElementById('testProgressFill');
   var labelEl = document.getElementById('testProgressLabel');
   var wrapEl = document.getElementById('testProgressWrap');
-  if (!on) {
+  if (!live) {
     if (numEl) numEl.setAttribute('aria-hidden', 'true');
     if (labelEl) labelEl.setAttribute('aria-hidden', 'true');
     if (wrapEl) wrapEl.setAttribute('aria-hidden', 'true');
@@ -620,20 +741,25 @@ function updateTestProgressChrome() {
       if (answers[i] !== null && answers[i] !== undefined) answered++;
     }
   }
-  var pct = Math.max(4, Math.round((answered / total) * 100));
-  if (numEl) {
-    numEl.textContent = current + ' / ' + total;
-    numEl.setAttribute('aria-hidden', 'false');
-  }
+  var pct = Math.max(answered ? 3 : 0, Math.round((current / total) * 100));
   if (fillEl) fillEl.style.width = pct + '%';
-  if (labelEl) {
-    labelEl.textContent = answered + ' answered · ' + pct + '%';
-    labelEl.setAttribute('aria-hidden', 'false');
-  }
   if (wrapEl) {
     wrapEl.setAttribute('aria-valuenow', String(pct));
     wrapEl.setAttribute('aria-valuemax', '100');
     wrapEl.setAttribute('aria-hidden', 'false');
+  }
+  if (!on) {
+    if (numEl) numEl.setAttribute('aria-hidden', 'true');
+    if (labelEl) labelEl.setAttribute('aria-hidden', 'true');
+    return;
+  }
+  if (numEl) {
+    numEl.textContent = current + ' / ' + total;
+    numEl.setAttribute('aria-hidden', 'false');
+  }
+  if (labelEl) {
+    labelEl.textContent = answered + ' answered · ' + pct + '%';
+    labelEl.setAttribute('aria-hidden', 'false');
   }
 }
 
@@ -1453,7 +1579,7 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
   setTestPhase('quiz');
 
   var missingLabel = missingDims.length + ' missing dimension' + (missingDims.length > 1 ? 's' : '');
-  document.getElementById('qSection').textContent = '';
+  updateQuizHeader(lang === 'es' ? 'Completar' : 'Fill-in');
 
   function renderFill(){
     var q = filteredQ[fillCur];
@@ -1463,39 +1589,29 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
     var hasExplain = !!(loc.explain || q.e);
     var explainText = loc.explain || (q.e || '');
     var lbl = scaleLabels[lang] || scaleLabels['en'];
+    var isMc = q.type === 'mc' && q.choices;
 
-    var html = '<div class="q-header-row"><div class="q-text">' + escapeHTML(qText) + '</div></div>';
+    updateQuizHeader(loc.sec || (lang === 'es' ? 'Completar' : 'Fill-in'));
+    var html = buildQuestionChrome(qText, loc, isMc);
     if(hasExplain){
       html += '<button class="btn-explain" id="btnExplain"><span class="btn-explain-icon">◎</span>'
         + (lang==='es'?'SIMPLIFICAR PREGUNTA':'SIMPLIFY QUESTION') + '</button>';
       html += '<div class="explain-bubble" id="explainBubble">' + explainText + '</div>';
     }
 
-    if(q.type === 'mc' && q.choices){
+    if(isMc){
       html += '<div class="mc-choices">';
       (loc.choices.length ? loc.choices : q.choices.map(function(c){ return { letter:c.l, text:c.t, score:c.s }; })).forEach(function(c, ci){
         var sel = fillAnswers[fillCur]===c.score ? ' selected' : '';
-        html += '<button class="mc-choice'+sel+'" data-v="'+c.score+'" data-ci="'+ci+'">'
+        html += '<button type="button" class="mc-choice'+sel+'" data-v="'+c.score+'" data-ci="'+ci+'">'
           + '<span class="mc-letter">'+c.letter+'</span>'
           + '<div class="mc-content"><span class="mc-text">'+escapeHTML(c.text)+'</span></div></button>';
       });
       html += '</div>';
-    } else if(q.type === 's'){
-      html += '<div class="scale-wrap"><div class="scale-row">';
-      for(var i=1;i<=7;i++){
-        var c = fillAnswers[fillCur]===i ? 'scale-btn sel' : 'scale-btn';
-        html += '<button class="'+c+'" data-v="'+i+'">'+i+'</button>';
-      }
-      html += '</div><div class="scale-lbls"><span>'+escapeHTML(loc.lo || lbl.lo)+'</span><span>'+escapeHTML(loc.hi || lbl.hi)+'</span></div></div>';
     } else {
-      html += '<div class="agree-grid">';
-      for(var j=0;j<lbl.opts.length;j++){
-        var v = j+1;
-        var c2 = fillAnswers[fillCur]===v ? 'agree-btn sel' : 'agree-btn';
-        html += '<button class="'+c2+'" data-v="'+v+'"><span class="agree-letter">'+String.fromCharCode(65+j)+'</span><span class="agree-label">'+lbl.opts[j]+'</span></button>';
-      }
-      html += '</div>';
+      html += buildLikertHtml(fillAnswers[fillCur], loc, lbl);
     }
+    html += '</div>';
 
     var isLast = fillCur === filteredQ.length - 1;
     var hasAns = fillAnswers[fillCur] !== null;
@@ -1504,11 +1620,12 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
     var resTxt   = lang==='es' ? 'VER RESULTADOS &#8594;' : 'SEE RESULTS &#8594;';
     html += '<div class="nav-row">'
       + '<button class="btn-sec" id="bBtn"'+(fillCur===0?' disabled':'')+'>'+backTxt+'</button>'
-      + '<button class="btn-next'+(hasAns?'':' disabled')+'" id="nBtn"'+(hasAns?'':' disabled')+'>'
+      + '<button class="btn-next'+(hasAns?' is-ready':' disabled')+'" id="nBtn"'+(hasAns?'':' disabled')+'>'
       + (isLast ? resTxt : nextTxt) + '</button></div>';
 
     var body = document.getElementById('qBody');
     body.innerHTML = html;
+    playQuestionEnter(body);
     window.scrollTo(0,0);
 
     var bBtn = document.getElementById('bBtn');
@@ -1527,13 +1644,14 @@ function runFillQuiz(filteredQ, baseProfile, missingDims){
     body.querySelectorAll('[data-v]').forEach(function(btn){
       btn.addEventListener('click', function(){
         fillAnswers[fillCur] = parseInt(this.getAttribute('data-v'), 10);
-        renderFill();
+        applyChoiceChrome(body, fillAnswers[fillCur], this.getAttribute('data-ci'));
       });
     });
-    if(bBtn && !bBtn.disabled) bBtn.addEventListener('click', function(){ fillCur--; renderFill(); });
-    if(nBtn && !nBtn.disabled) nBtn.addEventListener('click', function(){
+    if(bBtn) bBtn.addEventListener('click', function(){ if(bBtn.disabled) return; _quizNavDir = -1; fillCur--; renderFill(); });
+    if(nBtn) nBtn.addEventListener('click', function(){
+      if(nBtn.disabled) return;
       if(isLast){ finishFill(filteredQ, fillAnswers, baseProfile); }
-      else { fillCur++; renderFill(); }
+      else { _quizNavDir = 1; fillCur++; renderFill(); }
     });
   }
 
@@ -1667,70 +1785,51 @@ function maybeShowQuestionMilestone() {
 
 function renderQ(){
   refreshAnimusLang();
+  bindQuizKeysOnce();
   var q=(window._activeQ||Q)[cur];
   var loc = localizedForQuestion(q, cur);
   if (observerMode && observerSubjectName && typeof AnimusEstimator !== 'undefined') {
     loc = AnimusEstimator.localizeObserver(loc, q, observerSubjectName);
   }
-  var qSection = document.getElementById('qSection');
-  if(qSection && !observerMode && testMode !== 'full'){
-    qSection.textContent = (qSection.textContent.indexOf('Main') > -1 ? 'Main Test' : qSection.textContent) || loc.sec || '';
-  } else if(qSection && !observerMode && testMode === 'full'){
-    qSection.textContent = lang === 'es' ? 'Test Detallado' : 'Detailed Test';
-  }
+  updateQuizHeader(loc.sec);
 
   var qText = loc.text;
   var explainText = _explainCache[cur] || loc.explain || q.e || '';
   var lbl = scaleLabels[lang]||scaleLabels['en'];
+  var isMc = q.type==='mc' && q.choices;
 
-  var h = '<div class="q-header-row"><div class="q-text">'+escapeHTML(qText)+'</div></div>';
+  var h = buildQuestionChrome(qText, loc, isMc);
 
   // Always show simplify button
   h += '<button class="btn-explain" id="btnExplain">&#9711; '+(lang==='es'?'Simplificar pregunta':'Simplify question')+'</button>';
   h += '<div class="explain-bubble" id="explainBubble">'+(explainText||'')+'</div>';
 
-  if(q.type==='mc' && q.choices){
+  if(isMc){
     h += '<div class="mc-choices">';
     (loc.choices.length ? loc.choices : q.choices.map(function(c){ return { letter:c.l, text:c.t, score:c.s }; })).forEach(function(c, ci){
       var sel = (_choiceIx[cur]===ci || (answers[cur]===c.score && _choiceIx[cur]===undefined)) ? ' selected' : '';
-      h += '<button class="mc-choice'+sel+'" data-v="'+c.score+'" data-ci="'+ci+'">'
+      h += '<button type="button" class="mc-choice'+sel+'" data-v="'+c.score+'" data-ci="'+ci+'">'
         + '<span class="mc-letter">'+c.letter+'</span>'
         + '<div class="mc-content"><span class="mc-text">'+escapeHTML(c.text)+'</span></div>'
         + '</button>';
     });
     h += '</div>';
-  } else if(q.type==='s'){
-    h += '<div class="scale-wrap"><div class="scale-row">';
-    for(var i=1;i<=7;i++){
-      var sc = answers[cur]===i ? 'scale-btn sel' : 'scale-btn';
-      h += '<button class="'+sc+'" data-v="'+i+'">'+i+'</button>';
-    }
-    h += '</div><div class="scale-lbls"><span>'+escapeHTML(loc.lo || lbl.lo)+'</span><span>'+escapeHTML(loc.hi || lbl.hi)+'</span></div></div>';
   } else {
-    var opts = lbl.opts;
-    h += '<div class="agree-grid">';
-    for(var j=0;j<opts.length;j++){
-      var v = j+1;
-      var sel2 = answers[cur]===v ? ' sel' : '';
-      var letter = String.fromCharCode(65+j);
-      h += '<button class="agree-btn'+sel2+'" data-v="'+v+'">'
-        + '<span class="agree-letter">'+letter+'</span>'
-        + '<span class="agree-label">'+opts[j]+'</span>'
-        + '</button>';
-    }
-    h += '</div>';
+    h += buildLikertHtml(answers[cur], loc, lbl);
   }
+  h += '</div>';
 
   var isLast = cur===TOTAL-1;
   var hasAns = answers[cur]!==null;
   h += '<div class="nav-row">'
     + '<button class="btn-sec" id="bBtn"'+(cur===0?' disabled':'')+'>&#8592; '+(lang==='es'?'ATRÁS':'BACK')+'</button>'
-    + '<button class="btn-next'+(hasAns?'':' disabled')+'" id="nBtn"'+(hasAns?'':' disabled')+'>'
+    + '<button class="btn-next'+(hasAns?' is-ready':' disabled')+'" id="nBtn"'+(hasAns?'':' disabled')+'>'
     + (isLast?(lang==='es'?'VER RESULTADOS &#8594;':'SEE RESULTS &#8594;'):(lang==='es'?'SIGUIENTE &#8594;':'NEXT &#8594;'))+'</button>'
     + '</div>';
 
   var body = document.getElementById('qBody');
   body.innerHTML = h;
+  playQuestionEnter(body);
   window.scrollTo(0,0);
 
   var btnEx = document.getElementById('btnExplain');
@@ -1779,15 +1878,19 @@ function renderQ(){
       answers[cur] = parseInt(this.getAttribute('data-v'), 10);
       var ci = this.getAttribute('data-ci');
       _choiceIx[cur] = ci !== null && ci !== '' ? parseInt(ci, 10) : -1;
-      renderQ();
+      applyChoiceChrome(body, answers[cur], ci);
+      saveTestProgress();
+      updateQuizModeSwitch();
+      updateTestProgressChrome();
     });
   });
 
   var bb = document.getElementById('bBtn');
   var nb = document.getElementById('nBtn');
-  if(bb && !bb.disabled) bb.addEventListener('click', function(){ cur--; renderQ(); });
-  if(nb && !nb.disabled) nb.addEventListener('click', function(){
-    if(isLast) finishQuiz(); else { cur++; renderQ(); }
+  if(bb) bb.addEventListener('click', function(){ if(bb.disabled) return; _quizNavDir = -1; cur--; renderQ(); });
+  if(nb) nb.addEventListener('click', function(){
+    if(nb.disabled) return;
+    if(isLast) finishQuiz(); else { _quizNavDir = 1; cur++; renderQ(); }
   });
 
   saveTestProgress();

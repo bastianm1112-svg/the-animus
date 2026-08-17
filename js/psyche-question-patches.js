@@ -86,6 +86,19 @@
     }
   });
 
+  var choiceRewrites = {
+    'Focused on who it affects rather than whether it\'s technically correct': 'Focused on who it affects, not only on whether it is technically correct',
+    'Focus on being warm and connecting rather than impressive': 'Focus on being warm and connecting, not on looking impressive',
+    'Activated by doing and physical engagement rather than thinking': 'Activated by doing and physical engagement more than by thinking',
+    'Feel hurt but pull back rather than reaching out': 'Feel hurt and pull back instead of reaching out'
+  };
+  Q.forEach(function (q) {
+    if (!q.choices) return;
+    q.choices.forEach(function (c) {
+      if (c.t && choiceRewrites[c.t]) c.t = choiceRewrites[c.t];
+    });
+  });
+
   var reverseTexts = {
     'I trust my gut convictions even when I cannot articulate a logical basis for them.': true,
     'I care more about whether an idea is logically consistent than whether it produces results.': true,
