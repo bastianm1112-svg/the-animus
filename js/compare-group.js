@@ -144,7 +144,7 @@
       hint.textContent = _selected.length === 0
         ? 'Select 2–6 people to see group comparison'
         : 'Select at least one more person';
-      content.innerHTML = '<div class="group-placeholder"><div class="group-placeholder-title">SELECT PEOPLE ABOVE</div><div>Choose 2 or more people to compare their personalities</div></div>';
+      content.innerHTML = '<div class="group-placeholder"><div class="group-placeholder-title">Pick people above</div><div>Choose 2–6 friends. You will get a live brief like 1-on-1: where you align, where you clash, and how the room actually runs.</div></div>';
       return;
     }
     hint.textContent = _selected.length + ' people selected';
@@ -179,7 +179,7 @@
         + '<div class="matrix-wrap"><table class="matrix-table"><thead><tr><th></th>'
         + people.map(function (p) {
           return '<th>' + (p.isYou ? 'You' : escapeHTML(p.displayName.split(' ')[0]))
-            + '<br><span style="color:var(--gold);font-family:\'Bebas Neue\',sans-serif;font-size:14px">' + escapeHTML(p.mbti || '—') + '</span></th>';
+            + '<br><span style="color:var(--gold);font-family:var(--font-display),serif;font-size:14px">' + escapeHTML(p.mbti || '—') + '</span></th>';
         }).join('')
         + '</tr></thead><tbody>'
         + people.map(function (a) {
@@ -231,18 +231,94 @@
           includeCultural: !!_hasPlus
         })
       : null;
-    var insightsHtml = dyn && g.AnimusResultsUI
-      ? g.AnimusResultsUI.groupDynamicCard(dyn)
-      : '<div class="matrix-section"><div class="section-title">Group Insights</div></div>';
+    var insightsHtml = '<div class="c-panel compare-panel-card" id="groupAiPanel" style="margin-top:8px">' +
+      '<div class="ai-section-title">Group analysis</div>' +
+      '<p class="compare-ai-note">Live brief for this mix — same four beats as 1-on-1, plus a plain-language opener.</p>' +
+      '<div id="groupAiContent"><div class="compare-ai-loading" role="status">Writing the group brief…</div></div>' +
+      '</div>';
+    if (dyn && g.AnimusResultsUI) {
+      insightsHtml += g.AnimusResultsUI.groupDynamicCard(dyn);
+    }
     if (dyn && dyn.clusters && dyn.clusters.length) {
       insightsHtml += '<div class="animus-card"><div class="animus-card-kicker">Subgroups</div><ul>' +
         dyn.clusters.map(function (c) {
           return '<li>' + escapeHTML(c.label) + ': ' + escapeHTML((c.members || []).join(', ')) + '</li>';
         }).join('') + '</ul><p class="animus-fine">' + escapeHTML(dyn.qualified) + '</p></div>';
     }
-    insightsHtml += '<div class="animus-card animus-card--deeper"><div class="animus-card-kicker">Deeper Insight</div><p>Plus members can request a longer group-dynamics writeup. It is interpretation, not a forecast.</p></div>';
 
-    content.innerHTML = cardsHtml + matrixHtml + insightsHtml;
+    content.innerHTML = cardsHtml + insightsHtml + matrixHtml;
+    runGroupAnalysis(people, dyn, avgCompat);
+  }
+
+  function formatAiParagraphs(text) {
+    if (!text) return '';
+    return String(text).split(/\n\n+/).map(function (p) { return p.trim(); }).filter(Boolean)
+      .map(function (p) { return '<p>' + escapeHTML(p) + '</p>'; }).join('');
+  }
+
+  function renderGroupAnalysisHtml(ai, note) {
+    var html = '';
+    if (ai.simpleTake) {
+      html += '<p class="insight-simple">' + escapeHTML(ai.simpleTake) + '</p>';
+    }
+    html +=
+      '<div class="ai-section"><div class="ai-section-title">Where You Align</div><div class="ai-block"><div class="ai-block-text">' + formatAiParagraphs(ai.whereAlign) + '</div></div></div>' +
+      '<div class="ai-section"><div class="ai-section-title">Where You\'ll Clash</div><div class="ai-block"><div class="ai-block-text">' + formatAiParagraphs(ai.whereClash) + '</div></div></div>' +
+      '<div class="ai-section"><div class="ai-section-title">How You\'d Interact</div><div class="ai-block"><div class="ai-block-text">' + formatAiParagraphs(ai.dynamic) + '</div></div></div>' +
+      '<div class="ai-section"><div class="ai-section-title">What Each Brings Out</div><div class="ai-block"><div class="ai-block-text">' + formatAiParagraphs(ai.mutualEffect) + '</div></div></div>';
+    if (note) html = '<p class="compare-ai-note">' + escapeHTML(note) + '</p>' + html;
+    return html;
+  }
+
+  function runGroupAnalysis(people, dyn, avgCompat) {
+    var el = document.getElementById('groupAiContent');
+    if (!el) return;
+    var Normalize = g.AnimusCompareNormalize;
+    var meta = {
+      avgCompat: avgCompat,
+      closest: dyn && dyn.closestPair && (dyn.closestPair.names || []).join(' & '),
+      contrast: dyn && dyn.contrastingPair && (dyn.contrastingPair.names || []).join(' & ')
+    };
+    function showOffline(note) {
+      var ai = Normalize && Normalize.buildOfflineGroupAnalysis
+        ? Normalize.buildOfflineGroupAnalysis(people, meta)
+        : { whereAlign: 'This group shares overlapping types.', whereClash: 'Friction follows the widest matrix gaps.', dynamic: 'Roles will sort themselves under stress.', mutualEffect: 'Name functions instead of character.', simpleTake: 'In plain words: overlap is the glue; the matrix shows the weather.' };
+      el.innerHTML = renderGroupAnalysisHtml(ai, note);
+    }
+    var prompt = Normalize && Normalize.buildGroupPrompt
+      ? Normalize.buildGroupPrompt(people, meta)
+      : 'Analyze this group. JSON keys whereAlign, whereClash, dynamic, mutualEffect.';
+    if (!g.AnimusShared || !g.AnimusShared.fetchApiPost) {
+      showOffline('Local brief — sign in for the live group analysis.');
+      return;
+    }
+    g.AnimusShared.fetchApiPost('/api/compare', { prompt: prompt, mode: 'group' })
+      .then(function (r) {
+        if (!r.ok) throw new Error(String(r.status));
+        return r.json();
+      })
+      .then(function (d) {
+        var text = (d.content || []).map(function (b) {
+          return b.type === 'text' ? b.text : '';
+        }).join('').trim();
+        if (!text && d.whereAlign) {
+          el.innerHTML = renderGroupAnalysisHtml(d);
+          return;
+        }
+        var ai = null;
+        try { ai = JSON.parse(text.replace(/```json|```/g, '').trim()); } catch (e) {
+          var m = text.match(/\{[\s\S]*\}/);
+          if (m) { try { ai = JSON.parse(m[0]); } catch (e2) { ai = null; } }
+        }
+        if (!ai || !ai.whereAlign) {
+          showOffline('Live response was incomplete — showing the local group brief.');
+          return;
+        }
+        el.innerHTML = renderGroupAnalysisHtml(ai);
+      })
+      .catch(function () {
+        showOffline('Live analysis unavailable right now. This is the local group brief.');
+      });
   }
 
   function bindSelectorClicks() {

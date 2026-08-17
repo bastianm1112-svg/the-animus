@@ -281,10 +281,14 @@ body.page-compare .compat-pct {
   }
 }
 
-.compare-panel-card .ai-block-text {
-  font-size: 14px;
-  line-height: 1.75;
-  color: var(--text);
+.compare-panel-card .insight-simple {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-left: 2px solid var(--gold);
+  background: rgba(200, 169, 110, 0.08);
+  font-size: 15px;
+  color: var(--white);
+  line-height: 1.55;
 }
 
 .compare-panel-card .ai-block-text p {
@@ -1356,11 +1360,12 @@ body.page-compare .friends-picker-bar {
 }
 
 .group-page-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(28px, 5vw, 36px);
-  letter-spacing: 0.08em;
+  font-family: var(--font-display, 'Playfair Display', serif);
+  font-size: clamp(26px, 4vw, 34px);
+  letter-spacing: 0.02em;
   color: var(--white);
   margin-bottom: 6px;
+  text-transform: none;
 }
 
 .group-page-sub {
@@ -1468,11 +1473,12 @@ body.page-compare .friends-picker-bar {
 }
 
 .group-placeholder-title {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 22px;
-  letter-spacing: 0.12em;
-  color: var(--muted);
+  letter-spacing: 0.02em;
+  color: var(--white);
   margin-bottom: 8px;
+  text-transform: none;
 }
 
 .group-content .section-title {

@@ -236,16 +236,16 @@
       + '<div class="pol-axis-val">' + Math.round(v) + '</div></div>';
   }
 
-  function renderPolitical(snap, isOwner, voice) {
+  function paintPolitical(snap, isOwner, voice, plus) {
     var root = document.getElementById('politicalPanelRoot');
     if (!root) return;
     var p = pron(isOwner);
 
     if (!snap || !snap.mbti || typeof snap.polX !== 'number') {
       var polEmpty = isOwner
-        ? 'Complete the assessment to map your economic and social position.'
-        : 'Political compass data will appear after they complete the assessment.';
-      root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Political compass</div>'
+        ? 'Take the test to see where you sit on money, rules, and (with Plus) culture.'
+        : 'Their political map shows up after they finish the test.';
+      root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Political cube</div>'
         + '<p>' + polEmpty + '</p></div>';
       return;
     }
@@ -253,77 +253,63 @@
     var q = quadrantInfo(snap.polX, snap.polY);
     var polText = snap.politicalNarrative
       ? narr(voice, snap.politicalNarrative, isOwner)
-      : narr(voice, p.subj + ' ' + p.verb + ' in the <strong>' + q.title + '</strong> quadrant — '
-        + p.lean + ' ' + q.auth.toLowerCase() + ' on authority and ' + q.econ.toLowerCase() + ' on economics.', isOwner);
+      : narr(voice, p.subj + ' ' + p.verb + ' in the <strong>' + q.title + '</strong> area — '
+        + 'more ' + (q.auth === 'Authoritarian' ? 'rules' : q.auth === 'Libertarian' ? 'personal freedom' : 'middle-ground rules')
+        + ' and ' + (q.econ === 'Right' ? 'markets' : q.econ === 'Left' ? 'state' : 'a mixed economy') + '.', isOwner);
+
+    var simple = p.subj + ' sit in a see-through cube: left–right is money, up–down is rules vs freedom'
+      + (plus ? ', and front–back is culture.' : '. Culture (front–back) is a Plus layer.');
+    var panel = g.AnimusResultsUI && g.AnimusResultsUI.politicalPanelHtml
+      ? g.AnimusResultsUI.politicalPanelHtml({ data: snap, ai: snap, plus: !!plus })
+      : '';
 
     root.innerHTML = ''
       + '<div class="pol-hero" style="--pol-accent:' + q.color + '">'
-      + '<div class="pol-hero-kicker">Political identity</div>'
+      + '<div class="pol-hero-kicker">Where you sit</div>'
       + '<div class="pol-hero-title">' + escapeHTML(q.title) + '</div>'
       + '<div class="pol-hero-chips">'
-      + '<span class="pol-chip">' + escapeHTML(q.auth) + '</span>'
-      + '<span class="pol-chip">' + escapeHTML(q.econ) + '</span></div></div>'
-      + (polText ? '<div class="narrative pol-narrative"><div class="narrative-title">What this means for you</div><div class="narrative-sub">Political compass</div><div class="narrative-text">' + polText + '</div></div>' : '')
-      + '<div class="pol-layout">'
-      + '<div class="card pol-compass-card"><div class="card-title">Compass position</div>'
-      + '<div class="pol-compass-wrap">' + buildCompassSvg(snap.polX, snap.polY) + '</div>'
-      + '<div class="pol-quad-legend">'
-      + '<span class="pol-quad tl">Auth Left</span><span class="pol-quad tr">Auth Right</span>'
-      + '<span class="pol-quad bl">Lib Left</span><span class="pol-quad br">Lib Right</span>'
-      + '</div></div>'
-      + '<div class="card pol-axes-card"><div class="card-title">Axis intensity</div>'
-      + axisTrack('Economic', snap.polX, 'Left', 'Right')
-      + axisTrack('Social', snap.polY, 'Libertarian', 'Authoritarian')
-      + '</div></div>'
-      + (snap.mf ? '<div class="card pol-mf-card"><div class="card-title">Moral foundations</div>'
+      + '<span class="pol-chip">' + escapeHTML(q.auth === 'Authoritarian' ? 'More rules' : q.auth === 'Libertarian' ? 'More freedom' : 'Middle on rules') + '</span>'
+      + '<span class="pol-chip">' + escapeHTML(q.econ === 'Right' ? 'More markets' : q.econ === 'Left' ? 'More state' : 'Mixed money') + '</span></div></div>'
+      + '<p class="insight-simple">' + escapeHTML(simple) + '</p>'
+      + (polText ? '<div class="narrative pol-narrative"><div class="narrative-title">In everyday words</div><div class="narrative-text">' + polText + '</div></div>' : '')
+      + '<div id="politicalDynamicRoot">' + panel + '</div>'
+      + '<div class="card pol-axes-card" style="margin-top:16px"><div class="card-title">The two everyday sliders</div>'
+      + axisTrack('Money', snap.polX, 'More state', 'More markets')
+      + axisTrack('Rules', snap.polY, 'More freedom', 'More rules')
+      + '</div>'
+      + (snap.mf ? '<div class="card pol-mf-card"><div class="card-title">What feels morally important</div>'
+        + '<p class="pol-align-sub">Not a party. Six gut-level cares, scored from your answers.</p>'
         + '<div class="pol-mf-layout"><div class="mf-radar-wrap">' + buildMfRadar(snap.mf) + '</div>'
         + '<div class="mf-bar-list">' + MF_META.map(function (m) {
           var v = Math.round(snap.mf[m.key] || 0);
           return '<div class="mf-bar-item"><span>' + escapeHTML(m.label) + '</span>'
             + '<div class="mf-mini-track"><div class="mf-mini-fill" data-w="' + v + '"></div></div>'
             + '<strong>' + v + '</strong></div>';
-        }).join('') + '</div></div></div>' : '')
-      + (g.AnimusResultsUI && g.AnimusResultsUI.politicalPanelHtml
-        ? '<div id="politicalDynamicRoot">' + g.AnimusResultsUI.politicalPanelHtml({ data: snap, ai: snap, plus: false }) + '</div>'
-        : '');
-
-    var align = ensurePoliticalAlignments(snap);
-    var alignLead = narr(voice,
-      'Beyond the compass, these parallels show where ' + p.possL + ' position rhymes globally — regimes, parties, and public figures, not endorsements.',
-      isOwner);
-
-    root.innerHTML += ''
-      + '<div class="pol-align-wrap">'
-      + '<p class="section-lead pol-align-lead">' + alignLead + '</p>'
-      + buildPolAlignSection(
-        'Similar countries',
-        'Governance and policy cultures that echo ' + p.possL + ' economic and social axes.',
-        align.countries,
-        'country'
-      )
-      + buildPolAlignSection(
-        'Political parties worldwide',
-        'Parties from multiple regions whose platforms align with this profile.',
-        align.parties,
-        'party'
-      )
-      + buildPolAlignSection(
-        'Political figures',
-        'Historical and contemporary leaders with comparable positions.',
-        align.politicians,
-        'person'
-      )
-      + buildPolAlignSection(
-        'Political thinkers',
-        'Theorists whose arguments resonate with this orientation.',
-        align.thinkers,
-        'thinker'
-      )
-      + '</div>';
+        }).join('') + '</div></div></div>' : '');
 
     if (g.AnimusResultsUI && g.AnimusResultsUI.bindCompassAndDepth) {
       g.AnimusResultsUI.bindCompassAndDepth(root);
     }
+  }
+
+  function renderPolitical(snap, isOwner, voice) {
+    paintPolitical(snap, isOwner, voice, false);
+    if (!isOwner || typeof firebase === 'undefined' || !firebase.auth) return;
+    var user = firebase.auth().currentUser;
+    if (!user || typeof g.AnimusEntitlements === 'undefined') return;
+    firebase.firestore().collection('users').doc(user.uid).get().then(function (doc) {
+      var ud = doc.exists ? doc.data() : {};
+      var plus = g.AnimusEntitlements.hasAnimusPlus(ud);
+      if (!plus || typeof g.AnimusShared === 'undefined' || !g.AnimusShared.fetchApiGet) {
+        if (plus) paintPolitical(snap, isOwner, voice, true);
+        return;
+      }
+      g.AnimusShared.fetchApiGet('/api/cultural').then(function (r) { return r.json(); }).then(function (cult) {
+        var z = cult && cult.polZ != null ? cult.polZ : snap.polZ;
+        if (z != null) snap.polZ = z;
+        paintPolitical(snap, isOwner, voice, true);
+      }).catch(function () { paintPolitical(snap, isOwner, voice, true); });
+    }).catch(function () {});
   }
 
   function buildAttachmentMap(att) {

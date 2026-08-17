@@ -220,44 +220,54 @@
     }).join('');
   }
 
-  function compass3dHtml(polX, polY, polZ) {
+  function cubeFace(cls) {
+    return '<div class="cube-face ' + cls + '"></div>';
+  }
+
+  function compassCubeHtml(polX, polY, polZ, hasZ) {
     var x = Number(polX) || 0;
     var y = Number(polY) || 0;
-    var z = Number.isFinite(Number(polZ)) ? Number(polZ) : 0;
-    var tx = (x / 100) * 70;
-    var tz = (-y / 100) * 70;
-    var ty = (-z / 100) * 55;
+    var z = hasZ && Number.isFinite(Number(polZ)) ? Number(polZ) : 0;
+    var tx = (x / 100) * 62;
+    var ty = (-y / 100) * 62;
+    var tz = (z / 100) * 62;
     return (
-      '<div class="c3d-stage" data-c3d>' +
-      '<div class="c3d-scene" style="--c3d-yaw:-28deg">' +
-      '<div class="c3d-floor" aria-hidden="true">' +
-      '<span class="c3d-lab c3d-lab-n">Auth</span><span class="c3d-lab c3d-lab-s">Lib</span>' +
-      '<span class="c3d-lab c3d-lab-w">Left</span><span class="c3d-lab c3d-lab-e">Right</span>' +
+      '<div class="animus-compass-block" data-compass-block>' +
+      '<p class="cube-lead">This cube <em>is</em> the compass. Gold dot = you. Left–right = money. Up–down = rules vs freedom. Front–back = culture' +
+      (hasZ ? '.' : ' (Plus).') + '</p>' +
+      '<div class="cube-legend" aria-hidden="true">' +
+      '<span><i class="cube-key cube-key-x"></i> Money</span>' +
+      '<span><i class="cube-key cube-key-y"></i> Rules / freedom</span>' +
+      '<span><i class="cube-key cube-key-z"></i> Culture</span>' +
       '</div>' +
-      '<div class="c3d-z" aria-hidden="true"><span>Trad</span><span>Prog</span></div>' +
-      '<div class="c3d-dot" style="transform:translate3d(' + tx + 'px,' + ty + 'px,' + tz + 'px)"></div>' +
+      '<div class="cube-stage">' +
+      '<div class="cube-scene" data-cube-scene style="--cube-yaw:-38deg;--cube-pitch:-22deg">' +
+      '<div class="cube" aria-hidden="true">' +
+      cubeFace('cube-front') + cubeFace('cube-back') + cubeFace('cube-right') +
+      cubeFace('cube-left') + cubeFace('cube-top') + cubeFace('cube-bottom') +
+      '<div class="cube-axis cube-axis-x"></div>' +
+      '<div class="cube-axis cube-axis-y"></div>' +
+      '<div class="cube-axis cube-axis-z"></div>' +
+      '<span class="cube-cap cube-cap-r">Right</span>' +
+      '<span class="cube-cap cube-cap-l">Left</span>' +
+      '<span class="cube-cap cube-cap-u">Rules</span>' +
+      '<span class="cube-cap cube-cap-d">Freedom</span>' +
+      '<span class="cube-cap cube-cap-f">Culture+</span>' +
+      '<span class="cube-cap cube-cap-b">Culture−</span>' +
+      '<div class="cube-dot" style="transform:translate3d(' + tx + 'px,' + ty + 'px,' + tz + 'px)"></div>' +
+      '</div></div></div>' +
+      '<div class="cube-controls">' +
+      '<button type="button" class="c3d-rot" data-rot="-22">Turn</button>' +
+      '<button type="button" class="c3d-flat" data-flat>Look straight on</button>' +
+      '<button type="button" class="c3d-rot" data-rot="22">Turn</button>' +
       '</div>' +
-      '<div class="c3d-orbit">' +
-      '<button type="button" class="c3d-rot" data-rot="-18" aria-label="Rotate left">←</button>' +
-      '<button type="button" class="c3d-rot" data-rot="18" aria-label="Rotate right">→</button>' +
-      '</div>' +
-      '<p class="animus-fine">X economic · Y authority · Z cultural (Plus). Drag-free orbit buttons.</p>' +
+      (hasZ ? culturalSlider(polZ) : '') +
       '</div>'
     );
   }
 
   function compassBlockHtml(polX, polY, polZ, hasZ) {
-    return (
-      '<div class="animus-compass-block" data-compass-block>' +
-      '<div class="animus-seg" role="group" aria-label="Compass view">' +
-      '<button type="button" class="animus-seg-btn is-on" data-compass-view="2d">2D</button>' +
-      '<button type="button" class="animus-seg-btn" data-compass-view="3d">3D</button>' +
-      '</div>' +
-      '<div class="animus-compass-pane" data-pane="2d">' + compassSvg(polX, polY) + '</div>' +
-      '<div class="animus-compass-pane is-hidden" data-pane="3d">' + compass3dHtml(polX, polY, hasZ ? polZ : 0) + '</div>' +
-      (hasZ ? culturalSlider(polZ) : '<p class="animus-fine">3D uses cultural Z from Animus Plus. Without Plus, Z sits at center.</p>') +
-      '</div>'
-    );
+    return compassCubeHtml(polX, polY, polZ, hasZ);
   }
 
   function collectMatches(profile, includeCultural, simpleLimit, complexLimit) {
@@ -337,23 +347,29 @@
     });
     var block = root.querySelector('[data-compass-block]');
     if (block) {
-      block.querySelectorAll('[data-compass-view]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var view = btn.getAttribute('data-compass-view');
-          block.querySelectorAll('[data-compass-view]').forEach(function (b) { b.classList.toggle('is-on', b === btn); });
-          block.querySelectorAll('[data-pane]').forEach(function (pane) {
-            pane.classList.toggle('is-hidden', pane.getAttribute('data-pane') !== view);
-          });
-        });
-      });
-      var scene = block.querySelector('.c3d-scene');
-      var yaw = -28;
+      var scene = block.querySelector('[data-cube-scene]');
+      var yaw = -38;
+      var pitch = -22;
+      function applyCube() {
+        if (!scene) return;
+        scene.classList.add('is-paused');
+        scene.style.setProperty('--cube-yaw', yaw + 'deg');
+        scene.style.setProperty('--cube-pitch', pitch + 'deg');
+      }
       block.querySelectorAll('[data-rot]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           yaw += Number(btn.getAttribute('data-rot')) || 0;
-          if (scene) scene.style.setProperty('--c3d-yaw', yaw + 'deg');
+          applyCube();
         });
       });
+      var flat = block.querySelector('[data-flat]');
+      if (flat) {
+        flat.addEventListener('click', function () {
+          yaw = 0;
+          pitch = 0;
+          applyCube();
+        });
+      }
     }
   }
 

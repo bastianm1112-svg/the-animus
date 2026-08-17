@@ -123,7 +123,8 @@
           ['Cognitive type', snap.mbti],
           ['Dom', domFn],
           ['Socionics', snap.socionics || '—']
-        ]
+        ],
+        simple: 'In simple terms: ' + p.subjL + ' usually solve problems with ' + (FN_DESC[domFn] || 'a favorite thinking style') + '. That is a habit, not a cage.'
       },
       {
         kicker: 'Personality',
@@ -140,7 +141,8 @@
           ['Ennea', (snap.ennType || '—') + 'w' + (snap.ennWing || '')],
           ['Tritype', snap.ennTritype || '—'],
           ['Instinct', snap.instStack || '—']
-        ]
+        ],
+        simple: 'In simple terms: this is the emotional engine — what ' + p.subjL + ' want when things get hard, and how ' + p.subjL + ' try to feel okay again.'
       },
       {
         kicker: 'Philosophy',
@@ -156,7 +158,8 @@
           ['School', phiName],
           ['Ethics', ETH_LABELS[topKey(snap.eth)] || '—'],
           ['Temperament', snap.tmp ? (topKey(snap.tmp) || '').replace('TMP_', '') : '—']
-        ]
+        ],
+        simple: 'In simple terms: when ' + p.subjL + ' decide what is true or good, a ' + phiName + ' lens usually speaks first.'
       },
       {
         kicker: 'Political',
@@ -179,7 +182,10 @@
             ['Social', pl ? pl.auth : '—'],
             ['Keirsey', snap.keirsey || '—']
           ];
-        })()
+        })(),
+        simple: (typeof snap.polX === 'number'
+          ? 'In simple terms: ' + p.subjL + ' sit ' + polLabel(snap.polX, snap.polY) + ' on a map of money vs the state, and rules vs personal freedom. Nearby names are map rhymes, not copies of ' + p.possL + ' whole politics.'
+          : 'In simple terms: a political map appears after the test.')
       },
       {
         kicker: 'Social',
@@ -194,7 +200,8 @@
           ['Attachment', attName],
           ['Alone', snap.aloneDesc ? 'Mapped' : '—'],
           ['With others', snap.socialDesc ? 'Mapped' : '—']
-        ]
+        ],
+        simple: 'In simple terms: this is how close ' + p.subjL + ' like people to get, and what happens when someone pulls away or leans in.'
       },
       {
         kicker: 'Shadow',
@@ -208,7 +215,8 @@
           ['Stress', snap.ennType ? 'Type ' + snap.ennType : '—'],
           ['Values', snap.values && snap.values.length ? snap.values.length + ' core' : '—'],
           ['Figures', snap.figures && snap.figures.length ? snap.figures.length + ' matches' : '—']
-        ]
+        ],
+        simple: 'In simple terms: under stress, the same strength can get loud and clumsy. That is a pattern to notice, not a verdict.'
       }
     ];
 
@@ -233,6 +241,7 @@
       return '<article class="insight-block">' +
         '<div class="insight-kicker">' + esc(b.kicker) + '</div>' +
         '<div class="insight-title">' + esc(b.title) + '</div>' +
+        (b.simple ? '<p class="insight-simple">' + esc(b.simple) + '</p>' : '') +
         '<div class="insight-body">' + body + '</div>' +
         '<div class="insight-metrics">' + metrics + '</div>' +
         '</article>';
@@ -271,13 +280,13 @@
 
     var leads = {
       panelCognitionLead: snap.mbti
-        ? narr(p.subj + ' process the world primarily through <strong>' + esc(topKey(snap.cog) || '—') + '</strong>. The scores below rank all eight functions — higher bars mean more natural, reliable access.')
+        ? narr('<p class="insight-simple">In simple terms: some thinking moves come easy; others take more effort. The bars are that ranking — not a grade.</p>' + p.subj + ' process the world primarily through <strong>' + esc(topKey(snap.cog) || '—') + '</strong>. Higher bars mean more natural access.')
         : '',
       panelPersonalityLead: snap.ennType
-        ? narr('Enneagram scores show relative intensity across all nine types — not just ' + p.possL + ' core type. Peaks reveal motivation, fear, and adaptive strategy.')
+        ? narr('<p class="insight-simple">In simple terms: Enneagram is the emotional engine — what ' + p.subjL + ' want when things get hard.</p>Scores show relative intensity across all nine types — not just ' + p.possL + ' core type.')
         : '',
       panelPhilosophyLead: snap.phi || snap.phiS
-        ? narr('Philosophical schools are scored in parallel — ' + p.subjL + ' rarely embody one school alone, but the distribution shows where ' + p.possL + ' moral reasoning anchors.')
+        ? narr('<p class="insight-simple">In simple terms: this is the lens ' + p.subjL + ' use first when deciding what is true or good.</p>Schools are scored in parallel — ' + p.subjL + ' rarely embody one school alone.')
         : ''
     };
 

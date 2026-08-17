@@ -16,6 +16,9 @@
   --green: #27ae60;
   --green2: #2d6b47;
   --red: #c0392b;
+  --font-ui: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --compare-mode-h: 44px;
   --nav-h: 56px;
   --mbn-h: 60px;
@@ -42,12 +45,31 @@ html {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.65;
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-tap-highlight-color: rgba(200, 169, 110, 0.15);
+}
+
+h1, h2, h3,
+.panel-title,
+.intro-title,
+.profile-name,
+.animus-card-title,
+.insight-title,
+.group-page-title,
+.compare-page-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+.qhdr-num,
+.stat-big,
+.sc-type,
+.sc-logo {
+  font-family: var(--font-display);
 }
 
 img, video, svg {

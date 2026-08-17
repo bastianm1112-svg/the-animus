@@ -74,7 +74,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .profile-meta-item strong { color: var(--text); font-weight: 500; }
 .type-strip { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 16px 0 0; }
 .type-badge { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1px solid var(--border2); font-size: 12px; color: var(--muted2); background: var(--bg); }
-.type-badge strong { color: var(--gold); font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 0.06em; }
+.type-badge strong { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 15px; letter-spacing: 0.04em; }
 .hero-actions { display: flex; align-items: center; gap: 10px; padding-bottom: 20px; flex-wrap: wrap; min-width: 200px; justify-content: flex-end; }
 .btn-action-profile { display: flex; align-items: center; gap: 7px; padding: 9px 18px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: all 0.2s; border: none; }
 .btn-primary-profile { background: var(--gold); color: #000; }
@@ -105,10 +105,10 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .narrative-text { font-size: 12px; color: var(--muted2); line-height: 1.9; }
 .stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); margin-bottom: 16px; }
 .stat-cell { background: var(--surface); padding: 18px 14px; text-align: center; }
-.stat-big { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: var(--white); display: block; margin-bottom: 2px; line-height: 1; }
+.stat-big { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--white); display: block; margin-bottom: 2px; line-height: 1; }
 .stat-lbl { font-size: 9px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
 .enn-display { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
-.enn-big { font-family: 'Bebas Neue', sans-serif; font-size: 52px; color: var(--white); line-height: 1; }
+.enn-big { font-family: 'Playfair Display', serif; font-size: 48px; color: var(--white); line-height: 1; }
 .enn-wing { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); font-style: italic; }
 .values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .value-tag { display: flex; align-items: center; gap: 7px; padding: 9px 12px; border: 1px solid var(--border); font-size: 11px; color: var(--text); }
@@ -153,9 +153,16 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .sc-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(to bottom,#c8a96e,#5a3f1e);}
 .sc-card::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(200,169,110,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(200,169,110,0.035) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;}
 .sc-inner{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;}
-.sc-logo{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.25em;color:#c8a96e;opacity:0.8;}
+.sc-kinds{display:flex;gap:8px;margin-bottom:12px;width:100%;max-width:560px;}
+.sc-kind{flex:1;padding:10px 8px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;background:transparent;border:1px solid var(--border2);color:var(--muted2);cursor:pointer;}
+.sc-kind.is-on{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,0.08);}
+.sc-pane{display:none;}
+.sc-pane.is-on{display:block;}
+.sc-nearby-list{font-size:13px;color:var(--text);line-height:1.6;margin:8px 0 0;}
+.sc-nearby-list strong{color:var(--gold);font-weight:500;display:block;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;margin:10px 0 4px;}
+.sc-type{font-family:'Playfair Display',serif;font-size:clamp(52px,11vw,96px);color:#f0ece4;line-height:0.9;letter-spacing:0.02em;margin-bottom:4px;}
+.sc-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:0.22em;color:#c8a96e;opacity:0.8;}
 .sc-main{flex:1;display:flex;flex-direction:column;justify-content:center;}
-.sc-type{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,13vw,110px);color:#f0ece4;line-height:0.85;letter-spacing:0.02em;margin-bottom:4px;}
 .sc-typename{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#c8a96e;margin-bottom:10px;}
 .sc-sep{width:48px;height:1px;background:#2a2a2a;margin-bottom:10px;}
 .sc-details{font-size:11px;letter-spacing:0.06em;color:#555;margin-bottom:6px;}
@@ -168,7 +175,8 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .sc-btn-gold{background:var(--gold);color:#000;border:none;}
 .sc-btn-gold:hover{background:var(--gold3);}
 .sc-btn-outline{background:none;border:1px solid var(--border2);color:var(--muted2);}
-.sc-btn-outline:hover{border-color:var(--gold2);color:var(--gold);}
+.sc-card .cube-stage { height: 168px; }
+.sc-card .cube-lead, .sc-card .cube-legend, .sc-card .cube-controls, .sc-card .animus-fine { display: none; }
 /* ── COLOR-CODED FUNCTION BARS ── */
 .bar-fill.fn-ni, .bar-fill.fn-ne { background: #7c5cbf; }
 .bar-fill.fn-ti, .bar-fill.fn-te { background: #4a7abf; }
@@ -189,9 +197,9 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 @media print { .navbar, .profile-tabs, .hero-actions, .profile-actions-card, .mobile-bottom-nav { display: none !important; } body { background: #fff !important; color: #000 !important; } .card { background: #fff !important; border: 1px solid #ccc !important; break-inside: avoid; } .bar-fill { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
 
 </style>
-<link rel="stylesheet" href="/css/animus-shell.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-results.css?v=20260816">
-<link rel="stylesheet" href="/css/animus-unified.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-shell.css?v=20260817">
+<link rel="stylesheet" href="/css/animus-results.css?v=20260817">
+<link rel="stylesheet" href="/css/animus-unified.css?v=20260817">
 <link rel="stylesheet" href="/css/animus-profile-panels.css">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -202,13 +210,13 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script src="/js/animus-political.js"></script>
 <script src="/js/political-figures.js"></script>
 <script src="/js/political-countries.js"></script>
-<script src="/js/animus-results-ui.js?v=20260816"></script>
+<script src="/js/animus-results-ui.js?v=20260817"></script>
 <script src="/js/animus-ads.js"></script>
 <script src="/js/figures-library.js"></script>
 <script src="/js/profile-narrative-depth.js?v=20260609"></script>
 <script src="/js/profile-narratives.js?v=20260609"></script>
 <script src="/js/animus-i18n.js"></script>
-<script src="/js/compare-normalize.js"></script>
+<script src="/js/compare-normalize.js?v=20260817"></script>
 <script src="/js/animus-entitlements.js"></script>
 <script src="/js/animus-shared.js?v=20260619"></script>
 <script>
@@ -216,9 +224,9 @@ AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 var auth=firebase.auth(); var db=firebase.firestore();
 </script>
 <script src="/js/profile-voice.js"></script>
-<script src="/js/profile-sections.js"></script>
+<script src="/js/profile-sections.js?v=20260817"></script>
 <script src="/js/profile-panels-visual.js"></script>
-<script src="/js/profile-visuals.js?v=20260816"></script>
+<script src="/js/profile-visuals.js?v=20260817"></script>
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-release.css">
 <link rel="stylesheet" href="/css/animus-plus.css">
@@ -358,20 +366,61 @@ function animateBars(){
 window.animateBars = animateBars;
 setTimeout(animateBars, 200);
 
-var _snap={}, _pName='', _pUser='', _viewUid='', _isProfileOwner=true;
+var _snap={}, _pName='', _pUser='', _viewUid='', _isProfileOwner=true, _shareKind='type';
 
-function shareProfile(){
-  if(!_snap.mbti){ var u=window.location.href; if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){showToast('Link copied');}); return; }
-  document.getElementById('scType').textContent = _snap.mbti||'';
-  document.getElementById('scTypeName').textContent = (_snap.mbtiName||'').toUpperCase();
+function shareDetailsLine(){
   var det=[];
   if(_snap.ennType&&_snap.ennWing) det.push(_snap.ennType+'w'+_snap.ennWing);
   if(_snap.instStack) det.push(_snap.instStack);
   var phiN={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'};
   if(_snap.phi) det.push(phiN[_snap.phi]||_snap.phi);
-  document.getElementById('scDetails').textContent = det.join(' · ');
+  return det.join(' · ');
+}
+function nearbyShareNames(){
+  var profile={ polX:_snap.polX, polY:_snap.polY, polZ:_snap.polZ };
+  var figs = (window.AnimusPoliticalFigures && AnimusPoliticalFigures.rankClosest)
+    ? AnimusPoliticalFigures.rankClosest(profile, { includeCultural:false, limit:3 }) : [];
+  var countries = (window.AnimusPoliticalCountries && AnimusPoliticalCountries.rankClosest)
+    ? AnimusPoliticalCountries.rankClosest(profile, { includeCultural:false, limit:3 }) : [];
+  return { figs: figs, countries: countries };
+}
+function setShareKind(kind){
+  _shareKind = kind || 'type';
+  document.querySelectorAll('.sc-kind').forEach(function(b){
+    b.classList.toggle('is-on', b.getAttribute('data-kind')===_shareKind);
+  });
+  document.querySelectorAll('.sc-pane').forEach(function(p){
+    p.classList.toggle('is-on', p.getAttribute('data-pane')===_shareKind);
+  });
+  if(_shareKind==='compass' && window.AnimusResultsUI && AnimusResultsUI.compassBlockHtml){
+    var mount=document.getElementById('scCompassMount');
+    if(mount){
+      mount.innerHTML = AnimusResultsUI.compassBlockHtml(_snap.polX, _snap.polY, _snap.polZ, false);
+      AnimusResultsUI.bindCompassAndDepth(mount);
+    }
+  }
+  if(_shareKind==='nearby'){
+    var n=nearbyShareNames();
+    var el=document.getElementById('scNearbyList');
+    if(el){
+      el.innerHTML = '<strong>People nearby on the map</strong>' +
+        (n.figs.map(function(f){ return f.name; }).join(', ') || '—') +
+        '<strong>Countries nearby</strong>' +
+        (n.countries.map(function(c){ return c.name; }).join(', ') || '—') +
+        '<p style="margin-top:10px;color:#888;font-size:12px">Map rhymes, not copies of a whole politics.</p>';
+    }
+  }
+}
+function shareProfile(){
+  if(!_snap.mbti){ var u=window.location.href; if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){showToast('Link copied');}); return; }
+  document.getElementById('scType').textContent = _snap.mbti||'';
+  document.getElementById('scTypeName').textContent = (_snap.mbtiName||'').toUpperCase();
+  document.getElementById('scDetails').textContent = shareDetailsLine();
   document.getElementById('scTagline').textContent = _snap.tagline||'';
   document.getElementById('scName').textContent = _pName + (_pUser?' · @'+_pUser:'');
+  document.getElementById('scName2').textContent = _pName + (_pUser?' · @'+_pUser:'');
+  document.getElementById('scName3').textContent = _pName + (_pUser?' · @'+_pUser:'');
+  setShareKind('type');
   document.getElementById('scModal').classList.add('open');
 }
 function closeShareCard(){ document.getElementById('scModal').classList.remove('open'); }
@@ -391,58 +440,85 @@ function downloadShareCard(){
   canvas.width=1200; canvas.height=675;
   var ctx=canvas.getContext('2d');
   document.fonts.ready.then(function(){
-    // Background
     ctx.fillStyle='#080808'; ctx.fillRect(0,0,1200,675);
-    // Grid
     ctx.strokeStyle='rgba(200,169,110,0.04)'; ctx.lineWidth=1;
     for(var x=0;x<1200;x+=48){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,675);ctx.stroke();}
     for(var y=0;y<675;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(1200,y);ctx.stroke();}
-    // Gold bar
     var bar=ctx.createLinearGradient(0,0,0,675);
     bar.addColorStop(0,'#c8a96e'); bar.addColorStop(1,'#5a3f1e');
     ctx.fillStyle=bar; ctx.fillRect(0,0,6,675);
-    // Logo
-    ctx.fillStyle='#c8a96e'; ctx.globalAlpha=0.85;
-    ctx.font='400 15px "Bebas Neue",sans-serif'; ctx.letterSpacing='0.25em';
-    ctx.fillText('ANIMUS',50,58); ctx.globalAlpha=1;
-    // MBTI type
-    ctx.fillStyle='#f0ece4';
-    ctx.font='400 '+((_snap.mbti||'').length>4?'160':'190')+'px "Bebas Neue",sans-serif';
-    ctx.fillText(_snap.mbti||'—',50,340);
-    // Type name
-    if(_snap.mbtiName){
-      ctx.font='400 15px "DM Sans",sans-serif'; ctx.fillStyle='#c8a96e';
-      ctx.fillText((_snap.mbtiName||'').toUpperCase(),50,380);
-    }
-    // Separator
-    ctx.strokeStyle='#2a2a2a'; ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(50,405);ctx.lineTo(280,405);ctx.stroke();
-    // Details row
-    var det=[];
-    if(_snap.ennType&&_snap.ennWing)det.push(_snap.ennType+'w'+_snap.ennWing);
-    if(_snap.instStack)det.push(_snap.instStack);
-    var phiN2={PH_STO:'Stoic',PH_EPI:'Epicurean',PH_KAN:'Kantian',PH_ARI:'Aristotelian',PH_NIE:'Nietzschean',PH_EXI:'Existentialist',PH_PRA:'Pragmatist',PH_SKE:'Skeptic'};
-    if(_snap.phi)det.push(phiN2[_snap.phi]||_snap.phi);
-    ctx.font='400 14px "DM Sans",sans-serif'; ctx.fillStyle='#555';
-    ctx.fillText(det.join('  ·  '),50,432);
-    // Tagline word-wrap
-    if(_snap.tagline){
-      ctx.font='italic 400 15px "Playfair Display",serif'; ctx.fillStyle='#666';
-      var words=_snap.tagline.split(' '),line='',lines=[],maxW=900;
-      for(var w=0;w<words.length;w++){var test=line+words[w]+' ';if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=words[w]+' ';}else{line=test;}}
-      lines.push(line);
-      lines.slice(0,3).forEach(function(l,i){ctx.fillText(l.trim(),50,490+i*28);});
-    }
-    // Name
-    ctx.font='400 14px "DM Sans",sans-serif'; ctx.fillStyle='#888';
+    ctx.fillStyle='#c8a96e';
+    ctx.font='400 18px "Playfair Display",serif';
+    ctx.fillText('ANIMUS',50,58);
+    ctx.fillStyle='#888';
+    ctx.font='400 14px "DM Sans",sans-serif';
     ctx.fillText(_pName+(_pUser?' · @'+_pUser:''),50,618);
-    // URL
-    ctx.font='400 13px "DM Sans",sans-serif'; ctx.fillStyle='#2a2a2a';
+    ctx.fillStyle='#2a2a2a';
     var urlTxt='animustest.com'; var uw=ctx.measureText(urlTxt).width;
     ctx.fillText(urlTxt,1200-50-uw,618);
-    // Download
+    var slug='profile';
+    if(_shareKind==='compass'){
+      slug='compass';
+      ctx.fillStyle='#f0ece4';
+      ctx.font='italic 400 36px "Playfair Display",serif';
+      ctx.fillText('The cube compass',50,160);
+      ctx.fillStyle='#c8a96e';
+      ctx.font='400 16px "DM Sans",sans-serif';
+      ctx.fillText('Gold dot = you. Three axes in one box.',50,200);
+      var cx=780, cy=340;
+      ctx.strokeStyle='rgba(200,169,110,0.7)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(cx-160,cy); ctx.lineTo(cx+160,cy); ctx.stroke();
+      ctx.strokeStyle='rgba(110,160,200,0.8)';
+      ctx.beginPath(); ctx.moveTo(cx,cy-140); ctx.lineTo(cx,cy+140); ctx.stroke();
+      ctx.strokeStyle='rgba(124,92,191,0.8)';
+      ctx.beginPath(); ctx.moveTo(cx-90,cy+80); ctx.lineTo(cx+90,cy-80); ctx.stroke();
+      var dx=cx+((_snap.polX||0)/100)*140;
+      var dy=cy-(( _snap.polY||0)/100)*120;
+      ctx.fillStyle='#c8a96e';
+      ctx.beginPath(); ctx.arc(dx,dy,10,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#888'; ctx.font='400 13px "DM Sans",sans-serif';
+      ctx.fillText('Money →', cx+120, cy-12);
+      ctx.fillText('Rules', cx+8, cy-148);
+      ctx.fillText('Freedom', cx+8, cy+158);
+    } else if(_shareKind==='nearby'){
+      slug='nearby';
+      var n=nearbyShareNames();
+      ctx.fillStyle='#f0ece4';
+      ctx.font='italic 400 36px "Playfair Display",serif';
+      ctx.fillText('Nearby on the map',50,160);
+      ctx.fillStyle='#c8a96e'; ctx.font='400 14px "DM Sans",sans-serif';
+      ctx.fillText('PEOPLE',50,220);
+      ctx.fillStyle='#e2e2e2'; ctx.font='400 22px "Playfair Display",serif';
+      ctx.fillText(n.figs.map(function(f){return f.name;}).join('  ·  ')||'—',50,258);
+      ctx.fillStyle='#c8a96e'; ctx.font='400 14px "DM Sans",sans-serif';
+      ctx.fillText('COUNTRIES',50,330);
+      ctx.fillStyle='#e2e2e2'; ctx.font='400 22px "Playfair Display",serif';
+      ctx.fillText(n.countries.map(function(c){return c.name;}).join('  ·  ')||'—',50,368);
+      ctx.fillStyle='#666'; ctx.font='italic 400 16px "Playfair Display",serif';
+      ctx.fillText('Coordinate rhymes — not endorsements.',50,440);
+    } else {
+      slug=(_snap.mbti||'type').toLowerCase();
+      ctx.fillStyle='#f0ece4';
+      ctx.font='400 '+((_snap.mbti||'').length>4?'120':'150')+'px "Playfair Display",serif';
+      ctx.fillText(_snap.mbti||'—',50,340);
+      if(_snap.mbtiName){
+        ctx.font='400 15px "DM Sans",sans-serif'; ctx.fillStyle='#c8a96e';
+        ctx.fillText((_snap.mbtiName||'').toUpperCase(),50,380);
+      }
+      ctx.strokeStyle='#2a2a2a'; ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(50,405);ctx.lineTo(280,405);ctx.stroke();
+      ctx.font='400 14px "DM Sans",sans-serif'; ctx.fillStyle='#555';
+      ctx.fillText(shareDetailsLine(),50,432);
+      if(_snap.tagline){
+        ctx.font='italic 400 15px "Playfair Display",serif'; ctx.fillStyle='#666';
+        var words=_snap.tagline.split(' '),line='',lines=[],maxW=900;
+        for(var w=0;w<words.length;w++){var test=line+words[w]+' ';if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=words[w]+' ';}else{line=test;}}
+        lines.push(line);
+        lines.slice(0,3).forEach(function(l,i){ctx.fillText(l.trim(),50,490+i*28);});
+      }
+    }
     var link=document.createElement('a');
-    link.download='animus-'+((_snap.mbti||'profile').toLowerCase())+'.png';
+    link.download='animus-'+slug+'.png';
     link.href=canvas.toDataURL('image/png'); link.click();
   });
 }
@@ -756,20 +832,45 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
 </script>
 <!-- Share Card Modal -->
 <div id="scModal" class="sc-modal-overlay" onclick="if(event.target===this)closeShareCard()">
+  <div class="sc-kinds">
+    <button type="button" class="sc-kind is-on" data-kind="type" onclick="setShareKind('type')">Type</button>
+    <button type="button" class="sc-kind" data-kind="compass" onclick="setShareKind('compass')">Compass</button>
+    <button type="button" class="sc-kind" data-kind="nearby" onclick="setShareKind('nearby')">Nearby</button>
+  </div>
   <div class="sc-wrap">
     <div class="sc-card">
       <div class="sc-inner">
-        <div class="sc-logo">ANIMUS</div>
-        <div class="sc-main">
-          <div class="sc-type" id="scType">INTJ</div>
-          <div class="sc-typename" id="scTypeName">THE STRATEGIC VISIONARY</div>
-          <div class="sc-sep"></div>
-          <div class="sc-details" id="scDetails">5w4 · SP/SO · Stoic</div>
-          <div class="sc-tagline" id="scTagline"></div>
+        <div class="sc-pane is-on" data-pane="type">
+          <div class="sc-logo">ANIMUS</div>
+          <div class="sc-main">
+            <div class="sc-type" id="scType">INTJ</div>
+            <div class="sc-typename" id="scTypeName">THE STRATEGIC VISIONARY</div>
+            <div class="sc-sep"></div>
+            <div class="sc-details" id="scDetails">5w4 · SP/SO · Stoic</div>
+            <div class="sc-tagline" id="scTagline"></div>
+          </div>
+          <div class="sc-footer">
+            <span class="sc-name" id="scName"></span>
+            <span class="sc-url">animustest.com</span>
+          </div>
         </div>
-        <div class="sc-footer">
-          <span class="sc-name" id="scName"></span>
-          <span class="sc-url">animustest.com</span>
+        <div class="sc-pane" data-pane="compass">
+          <div class="sc-logo">ANIMUS · COMPASS</div>
+          <div id="scCompassMount" style="flex:1;min-height:0;overflow:hidden"></div>
+          <div class="sc-footer">
+            <span class="sc-name" id="scName2"></span>
+            <span class="sc-url">animustest.com</span>
+          </div>
+        </div>
+        <div class="sc-pane" data-pane="nearby">
+          <div class="sc-logo">ANIMUS · NEARBY</div>
+          <div class="sc-main">
+            <div class="sc-nearby-list" id="scNearbyList"></div>
+          </div>
+          <div class="sc-footer">
+            <span class="sc-name" id="scName3"></span>
+            <span class="sc-url">animustest.com</span>
+          </div>
         </div>
       </div>
     </div>

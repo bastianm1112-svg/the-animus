@@ -2772,19 +2772,19 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
   panels+='<div class="panel" id="panel-political">'
     +'<div class="panel-title">Political spectrum</div>'
-    +'<p class="panel-sub">Simple cards stay visible even with Plus. Complex adds distances, more names, Cultural Z, and Deeper Insight.</p>'
+    +'<p class="panel-sub">The cube below is the compass. Simple cards stay on even with Plus.</p>'
     +'<div class="grid2" style="margin-bottom:12px">'
     +'<div class="card2"><div class="card-title">Economic Axis</div>'
-    +'<p style="font-size:22px;font-family:\'Cormorant Garamond\',serif;color:var(--text);">'+econLabel+'</p>'
+    +'<p style="font-size:22px;font-family:var(--font-display),Georgia,serif;color:var(--text);">'+econLabel+'</p>'
     +'<p style="font-size:10px;color:var(--muted);margin-top:4px">Score: '+(px>0?'+':'')+px+'</p></div>'
     +'<div class="card2"><div class="card-title">Social Axis</div>'
-    +'<p style="font-size:22px;font-family:\'Cormorant Garamond\',serif;color:var(--text);">'+socialLabel+'</p>'
+    +'<p style="font-size:22px;font-family:var(--font-display),Georgia,serif;color:var(--text);">'+socialLabel+'</p>'
     +'<p style="font-size:10px;color:var(--muted);margin-top:4px">Score: '+(py>0?'+':'')+py+'</p></div>'
     +'</div>'
     +(sanitizeText(ai.politicalIdeology,2000) ? (
       '<div class="card" style="margin-bottom:16px">'
       +'<div class="card-title">Your Ideology</div>'
-      +'<p style="font-family:\'Cormorant Garamond\',serif;font-size:clamp(24px,4vw,36px);font-weight:300;color:var(--text);line-height:1.1;margin-bottom:10px">'+sanitizeText(ai.politicalIdeology,2000)+'</p>'
+      +'<p style="font-family:var(--font-display),Georgia,serif;font-size:clamp(24px,4vw,36px);font-weight:300;color:var(--text);line-height:1.1;margin-bottom:10px">'+sanitizeText(ai.politicalIdeology,2000)+'</p>'
       +(sanitizeText(ai.politicalIdeologyDesc,2000) ? '<p style="font-size:12px;color:var(--muted2);line-height:1.8">'+sanitizeText(ai.politicalIdeologyDesc,2000)+'</p>' : '')
       +'</div>'
     ) : '')
