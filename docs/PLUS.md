@@ -5,7 +5,8 @@
 - Unlimited profile compares (free tier: 10/month)
 - Group compare (2–6 people)
 - Cultural axis module (traditionalism ↔ progressivism) — scored on the server, not stored on public profiles
-- Deeper Insight on results and compare (longer interpretation; not a rename of Plus)
+- Deeper Insight on results and compare (longer interpretation; not a rename of Plus) — simple cards stay visible next to it
+- 2D / 3D political compass (cultural axis is Z; 3D is Plus)
 - 1.25× XP on all XP awards
 - 20% off one-time Shop items (Detailed Test, Estimator, Complete Pack)
 - Plus badge on profile

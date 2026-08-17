@@ -14,6 +14,9 @@
   var PLUS_PERKS = [
     'Unlimited compares each month',
     'Group compare (up to 6 people)',
+    'Cultural axis (traditional ↔ progressive) — Plus only',
+    'Deeper Insight on results, plus the same simple cards free users see',
+    '2D and 3D political compass (cultural axis as Z)',
     '1.25× XP on all activities',
     '20% off assessment packs in the Shop',
     'AI Career & Lifestyle Guide PDF (3 per month)',
@@ -53,7 +56,7 @@
       interval: 'month',
       badge: 'Membership',
       description:
-        'Unlimited compares, group compare, 1.25× XP, 20% Shop discount, Plus badge, and 3 AI Career & Lifestyle PDFs per month.'
+        'Unlimited compares, group compare, Cultural axis (Plus), Deeper Insight, 2D/3D compass, 1.25× XP, 20% Shop discount, Plus badge, and 3 AI Career & Lifestyle PDFs per month.'
     }
   };
 

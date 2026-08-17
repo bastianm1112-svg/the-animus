@@ -828,8 +828,32 @@
           g.AnimusSocial.init(auth, db);
           g.AnimusSocial.loadNotifs(user.uid);
         }
+        restoreFromQuery();
       });
     });
+  }
+
+  function restoreFromQuery() {
+    var params = new URLSearchParams(g.location.search);
+    var uid = params.get('uid');
+    if (!uid) return;
+    var uidEl = document.getElementById('adminUid');
+    if (uidEl) uidEl.value = uid;
+    loadAccount().then(function () {
+      if (typeof loadProfile === 'function') loadProfile();
+    });
+  }
+
+  function refreshPanel() {
+    var uid =
+      targetUid ||
+      (document.getElementById('adminUid') && document.getElementById('adminUid').value) ||
+      '';
+    var url = new URL(g.location.href);
+    url.searchParams.set('refresh', String(Date.now()));
+    if (uid) url.searchParams.set('uid', uid);
+    setStatus('Reloading admin with latest scripts and data…');
+    g.location.replace(url.toString());
   }
 
   function loadEntitlementsIntoForm() {
@@ -892,6 +916,7 @@
     reconcileFromCog: reconcileFromCog,
     unlockTypes: unlockTypes,
     saveEntitlements: saveEntitlements,
+    refreshPanel: refreshPanel,
     banUser: banUser,
     unbanUser: unbanUser,
     changeUsername: changeUsername

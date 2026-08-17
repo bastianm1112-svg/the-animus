@@ -282,7 +282,10 @@
           return '<div class="mf-bar-item"><span>' + escapeHTML(m.label) + '</span>'
             + '<div class="mf-mini-track"><div class="mf-mini-fill" data-w="' + v + '"></div></div>'
             + '<strong>' + v + '</strong></div>';
-        }).join('') + '</div></div></div>' : '');
+        }).join('') + '</div></div></div>' : '')
+      + (g.AnimusResultsUI && g.AnimusResultsUI.politicalPanelHtml
+        ? '<div id="politicalDynamicRoot">' + g.AnimusResultsUI.politicalPanelHtml({ data: snap, ai: snap, plus: false }) + '</div>'
+        : '');
 
     var align = ensurePoliticalAlignments(snap);
     var alignLead = narr(voice,
@@ -317,6 +320,10 @@
         'thinker'
       )
       + '</div>';
+
+    if (g.AnimusResultsUI && g.AnimusResultsUI.bindCompassAndDepth) {
+      g.AnimusResultsUI.bindCompassAndDepth(root);
+    }
   }
 
   function buildAttachmentMap(att) {

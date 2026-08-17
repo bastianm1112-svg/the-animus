@@ -92,7 +92,7 @@
     if (locked) {
       return card({
         kind: 'deeper',
-        kicker: 'Deeper Insight',
+        kicker: title || 'Plus',
         title: esc(title || 'Plus'),
         body: '<p>Unlock Animus Plus for longer interpretation of contradictions, trait interactions, and unusual score combinations.</p><p><a class="animus-link" href="/shop">View Plus</a></p>'
       });
@@ -173,12 +173,188 @@
     var pct = ((z + 100) / 200) * 100;
     return (
       '<div class="animus-cultural">' +
-      '<div class="animus-card-kicker">Cultural axis (Plus)</div>' +
+      '<div class="animus-card-kicker">Cultural axis · Animus Plus</div>' +
       '<div class="animus-cultural-track"><span style="left:' + pct + '%"></span></div>' +
       '<div class="animus-cultural-ends"><span>Traditional</span><span>Progressive</span></div>' +
       '<p>' + esc(g.AnimusPolitical ? g.AnimusPolitical.culturalLabel(z) : '') + ' · ' + Math.round(z) + '</p>' +
       '</div>'
     );
+  }
+
+  function leanWords(polX, polY) {
+    var econ = polX > 12 ? 'more market-oriented on the economy' : polX < -12 ? 'more state-oriented on the economy' : 'near the economic center';
+    var auth = polY > 12 ? 'more comfortable with strong authority' : polY < -12 ? 'more liberty-first on personal life' : 'middling on authority vs liberty';
+    return { econ: econ, auth: auth };
+  }
+
+  function simpleMatchMeaning(name, polX, polY) {
+    var w = leanWords(polX, polY);
+    return 'In simple terms: you and ' + name + ' both sit ' + w.econ + ' and ' + w.auth +
+      '. That is a location on this map — not proof you agree on every issue.';
+  }
+
+  function complexMatchMeaning(item) {
+    var bits = (item.axes || []).map(function (ax) {
+      return ax.label + ' gap ' + Math.round(ax.delta);
+    }).join(' · ');
+    return (item.label || 'Coordinate match') + ' (' + Math.round(item.similarity || 0) + '%). ' +
+      (bits ? bits + '. ' : '') +
+      'Ranked by distance on the axes we actually measured' +
+      (item.axes && item.axes.length > 2 ? ', including cultural Z' : '') +
+      '. Estimated placement, not a psychometric score for that person or country.';
+  }
+
+  function matchCardsHtml(list, mode, kind) {
+    return (list || []).map(function (item) {
+      var meaning = mode === 'complex'
+        ? complexMatchMeaning(item)
+        : simpleMatchMeaning(item.name, item.polX, item.polY);
+      return card({
+        kind: kind === 'country' ? 'country' : 'figure',
+        kicker: kind === 'country' ? 'Country rhyme' : 'Figure rhyme',
+        title: esc(item.name || '') +
+          (item.dataStatus ? ' <span class="animus-badge animus-badge--estimated">estimated</span>' : ''),
+        body: '<p>' + esc(meaning) + '</p>' +
+          (mode === 'complex' && item.sourceNote ? '<p class="animus-fine">' + esc(item.sourceNote) + '</p>' : '')
+      });
+    }).join('');
+  }
+
+  function compass3dHtml(polX, polY, polZ) {
+    var x = Number(polX) || 0;
+    var y = Number(polY) || 0;
+    var z = Number.isFinite(Number(polZ)) ? Number(polZ) : 0;
+    var tx = (x / 100) * 70;
+    var tz = (-y / 100) * 70;
+    var ty = (-z / 100) * 55;
+    return (
+      '<div class="c3d-stage" data-c3d>' +
+      '<div class="c3d-scene" style="--c3d-yaw:-28deg">' +
+      '<div class="c3d-floor" aria-hidden="true">' +
+      '<span class="c3d-lab c3d-lab-n">Auth</span><span class="c3d-lab c3d-lab-s">Lib</span>' +
+      '<span class="c3d-lab c3d-lab-w">Left</span><span class="c3d-lab c3d-lab-e">Right</span>' +
+      '</div>' +
+      '<div class="c3d-z" aria-hidden="true"><span>Trad</span><span>Prog</span></div>' +
+      '<div class="c3d-dot" style="transform:translate3d(' + tx + 'px,' + ty + 'px,' + tz + 'px)"></div>' +
+      '</div>' +
+      '<div class="c3d-orbit">' +
+      '<button type="button" class="c3d-rot" data-rot="-18" aria-label="Rotate left">←</button>' +
+      '<button type="button" class="c3d-rot" data-rot="18" aria-label="Rotate right">→</button>' +
+      '</div>' +
+      '<p class="animus-fine">X economic · Y authority · Z cultural (Plus). Drag-free orbit buttons.</p>' +
+      '</div>'
+    );
+  }
+
+  function compassBlockHtml(polX, polY, polZ, hasZ) {
+    return (
+      '<div class="animus-compass-block" data-compass-block>' +
+      '<div class="animus-seg" role="group" aria-label="Compass view">' +
+      '<button type="button" class="animus-seg-btn is-on" data-compass-view="2d">2D</button>' +
+      '<button type="button" class="animus-seg-btn" data-compass-view="3d">3D</button>' +
+      '</div>' +
+      '<div class="animus-compass-pane" data-pane="2d">' + compassSvg(polX, polY) + '</div>' +
+      '<div class="animus-compass-pane is-hidden" data-pane="3d">' + compass3dHtml(polX, polY, hasZ ? polZ : 0) + '</div>' +
+      (hasZ ? culturalSlider(polZ) : '<p class="animus-fine">3D uses cultural Z from Animus Plus. Without Plus, Z sits at center.</p>') +
+      '</div>'
+    );
+  }
+
+  function collectMatches(profile, includeCultural, simpleLimit, complexLimit) {
+    var figs = g.AnimusPoliticalFigures && g.AnimusPoliticalFigures.rankClosest
+      ? g.AnimusPoliticalFigures.rankClosest(profile, { includeCultural: includeCultural, limit: complexLimit || 8 })
+      : [];
+    var countries = g.AnimusPoliticalCountries && g.AnimusPoliticalCountries.rankClosest
+      ? g.AnimusPoliticalCountries.rankClosest(profile, { includeCultural: includeCultural, limit: complexLimit || 8 })
+      : [];
+    return {
+      figuresSimple: figs.slice(0, simpleLimit || 3),
+      figuresComplex: figs,
+      countriesSimple: countries.slice(0, simpleLimit || 3),
+      countriesComplex: countries
+    };
+  }
+
+  function politicalPanelHtml(opts) {
+    opts = opts || {};
+    var data = opts.data || {};
+    var ai = opts.ai || {};
+    var plus = !!opts.plus;
+    var polZ = data.polZ;
+    var hasZ = plus && polZ != null && Number.isFinite(Number(polZ));
+    var profile = { polX: data.polX, polY: data.polY, polZ: hasZ ? polZ : undefined };
+    var m = collectMatches(profile, hasZ, 3, 8);
+    var simpleFigs = matchCardsHtml(m.figuresSimple, 'simple', 'figure');
+    var simpleCtry = matchCardsHtml(m.countriesSimple, 'simple', 'country');
+    var complexFigs = matchCardsHtml(m.figuresComplex, 'complex', 'figure');
+    var complexCtry = matchCardsHtml(m.countriesComplex, 'complex', 'country');
+
+    function polList(arr) {
+      if (!Array.isArray(arr) || !arr.length) return '';
+      return '<ul class="animus-axis-list">' + arr.map(function (item) {
+        return '<li>' + esc(item) + '</li>';
+      }).join('') + '</ul>';
+    }
+
+    return (
+      '<div class="animus-depth-bar" role="group" aria-label="Reading depth">' +
+      '<button type="button" class="animus-seg-btn is-on" data-depth="simple">Simple</button>' +
+      '<button type="button" class="animus-seg-btn" data-depth="complex">Complex</button>' +
+      '</div>' +
+      compassBlockHtml(data.polX, data.polY, polZ, hasZ) +
+      '<section class="animus-pol-simple" data-depth-pane="simple">' +
+      '<p class="panel-sub">Plain-language map of where your answers sit. Matches are coordinate rhymes, not endorsements.</p>' +
+      '<div class="section-label">People you sit near</div>' + (simpleFigs || '<p class="animus-muted">No close figure matches on this map.</p>') +
+      '<div class="section-label">Countries you sit near</div>' + (simpleCtry || '<p class="animus-muted">No close country matches on this map.</p>') +
+      '</section>' +
+      '<section class="animus-pol-complex is-hidden" data-depth-pane="complex">' +
+      '<p class="panel-sub">Same simple cards, then the full stack: distances, more names, parties, and Plus interpretation.</p>' +
+      '<div class="animus-card"><div class="animus-card-kicker">Still the simple read</div><p>Premium does not hide the free cards. Scroll for depth.</p></div>' +
+      '<div class="section-label">People you sit near</div>' + (simpleFigs || '') +
+      '<div class="section-label">Expanded figures</div>' + (complexFigs || '') +
+      '<div class="section-label">Countries you sit near</div>' + (simpleCtry || '') +
+      '<div class="section-label">Expanded countries</div>' + (complexCtry || '') +
+      (ai.politicalThinkers && ai.politicalThinkers.length ? card({ kicker: 'Thinkers', title: 'Intellectual neighborhood', body: polList(ai.politicalThinkers) }) : '') +
+      (ai.similarParties && ai.similarParties.length ? card({ kicker: 'Parties', title: 'Platform rhymes', body: polList(ai.similarParties) }) : '') +
+      (ai.similarPoliticians && ai.similarPoliticians.length ? card({ kicker: 'Named politicians (AI)', title: 'Additional names', body: polList(ai.similarPoliticians) }) : '') +
+      (ai.similarCountries && ai.similarCountries.length ? card({ kicker: 'Named countries (AI)', title: 'Additional countries', body: polList(ai.similarCountries) }) : '') +
+      '<div id="culturalModule"></div>' +
+      '<div id="deeperInsightMount"></div>' +
+      '</section>'
+    );
+  }
+
+  function bindCompassAndDepth(root) {
+    if (!root) return;
+    root.querySelectorAll('[data-depth]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var depth = btn.getAttribute('data-depth');
+        root.querySelectorAll('[data-depth]').forEach(function (b) { b.classList.toggle('is-on', b === btn); });
+        root.querySelectorAll('[data-depth-pane]').forEach(function (pane) {
+          pane.classList.toggle('is-hidden', pane.getAttribute('data-depth-pane') !== depth);
+        });
+      });
+    });
+    var block = root.querySelector('[data-compass-block]');
+    if (block) {
+      block.querySelectorAll('[data-compass-view]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var view = btn.getAttribute('data-compass-view');
+          block.querySelectorAll('[data-compass-view]').forEach(function (b) { b.classList.toggle('is-on', b === btn); });
+          block.querySelectorAll('[data-pane]').forEach(function (pane) {
+            pane.classList.toggle('is-hidden', pane.getAttribute('data-pane') !== view);
+          });
+        });
+      });
+      var scene = block.querySelector('.c3d-scene');
+      var yaw = -28;
+      block.querySelectorAll('[data-rot]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          yaw += Number(btn.getAttribute('data-rot')) || 0;
+          if (scene) scene.style.setProperty('--c3d-yaw', yaw + 'deg');
+        });
+      });
+    }
   }
 
   g.AnimusResultsUI = {
@@ -192,6 +368,12 @@
     groupDynamicCard: groupDynamicCard,
     legacyNote: legacyNote,
     compassSvg: compassSvg,
-    culturalSlider: culturalSlider
+    compassBlockHtml: compassBlockHtml,
+    culturalSlider: culturalSlider,
+    matchCardsHtml: matchCardsHtml,
+    collectMatches: collectMatches,
+    simpleMatchMeaning: simpleMatchMeaning,
+    politicalPanelHtml: politicalPanelHtml,
+    bindCompassAndDepth: bindCompassAndDepth
   };
 })(typeof window !== 'undefined' ? window : globalThis);

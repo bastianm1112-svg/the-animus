@@ -2458,6 +2458,35 @@ function insertDetailedTestUpsell() {
   }
 }
 
+function hydratePlusPolitical(data, ai) {
+  var root = document.getElementById('politicalDynamicRoot');
+  var user = typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser;
+  function finish(plus, polZ) {
+    if (plus && polZ != null) data.polZ = polZ;
+    if (root && typeof AnimusResultsUI !== 'undefined' && AnimusResultsUI.politicalPanelHtml) {
+      root.innerHTML = AnimusResultsUI.politicalPanelHtml({ data: data, ai: ai, plus: !!plus });
+      AnimusResultsUI.bindCompassAndDepth(root);
+    }
+    bindDeeperInsight(data);
+    if (typeof AnimusCulturalUI !== 'undefined' && AnimusCulturalUI.mount) AnimusCulturalUI.mount();
+  }
+  if (!user || typeof AnimusEntitlements === 'undefined') {
+    finish(false, null);
+    return;
+  }
+  firebase.firestore().collection('users').doc(user.uid).get().then(function (doc) {
+    var ud = doc.exists ? doc.data() : {};
+    var plus = AnimusEntitlements.hasAnimusPlus(ud);
+    if (!plus || typeof AnimusShared === 'undefined' || !AnimusShared.fetchApiGet) {
+      finish(plus, null);
+      return;
+    }
+    AnimusShared.fetchApiGet('/api/cultural').then(function (r) { return r.json(); }).then(function (cult) {
+      finish(true, cult && cult.polZ != null ? cult.polZ : null);
+    }).catch(function () { finish(true, null); });
+  }).catch(function () { finish(false, null); });
+}
+
 function bindDeeperInsight(data) {
   var mount = document.getElementById('deeperInsightMount');
   if (!mount || typeof AnimusResultsUI === 'undefined') return;
@@ -2559,7 +2588,14 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'<div class="animus-results-scan">'
     +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.scoreCard('Type', mbti, enn.type + 'w' + enn.wing + ' · ' + fnsSorted[0]) : '')
     +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.scoreCard('Compass', (data.polX > 0 ? '+' : '') + data.polX + ' / ' + (data.polY > 0 ? '+' : '') + data.polY, 'Actual coordinates — not just a quadrant') : '')
-    +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.compassSvg(data.polX, data.polY) : '')
+    +(typeof AnimusResultsUI !== 'undefined' && AnimusResultsUI.compassBlockHtml ? AnimusResultsUI.compassBlockHtml(data.polX, data.polY, data.polZ, data.polZ != null) : '')
+    +(typeof AnimusResultsUI !== 'undefined' && AnimusResultsUI.collectMatches ? (function () {
+      var pack = AnimusResultsUI.collectMatches({ polX: data.polX, polY: data.polY, polZ: data.polZ }, data.polZ != null, 3, 3);
+      return '<div class="section-label">In simple terms — nearby figures</div>' +
+        AnimusResultsUI.matchCardsHtml(pack.figuresSimple, 'simple', 'figure') +
+        '<div class="section-label">In simple terms — nearby countries</div>' +
+        AnimusResultsUI.matchCardsHtml(pack.countriesSimple, 'simple', 'country');
+    })() : '')
     +'</div>'
 
     +'<div class="stat-grid">'
@@ -2730,70 +2766,21 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'</div>';
 
   // ── POLITICAL PANEL ──
-  // polX: positive=right(economic freedom), negative=left
-  // polY: positive=authoritarian(up on SVG = low dotY), negative=libertarian(down = high dotY)
   var px=data.polX, py=data.polY;
-  var dotX = Math.round(100 + (px / 100) * 44);
-  var dotY = Math.round(100 - (py / 100) * 44);
-  dotX = Math.max(8, Math.min(192, dotX));
-  dotY = Math.max(8, Math.min(192, dotY));
-
   var econLabel  = px >  5 ? 'Economic Freedom' : (px < -5 ? 'State Economy' : 'Mixed Economy');
   var socialLabel= py >  5 ? 'Authoritarian'    : (py < -5 ? 'Libertarian'   : 'Moderate');
 
-  // Helper to build list items from AI array fields
-  function polList(arr, labelColor){
-    if(!Array.isArray(arr)||!arr.length) return '<p style="font-size:11px;color:var(--muted)">—</p>';
-    return arr.map(function(item){
-      var parts = item.split(':');
-      var label = parts[0].trim();
-      var desc  = parts.slice(1).join(':').trim();
-      return '<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">'
-        +'<div style="min-width:6px;margin-top:6px"><div style="width:4px;height:4px;background:'+(labelColor||'var(--accent)')+'"></div></div>'
-        +'<div><div style="font-size:12px;color:var(--text);font-weight:500;margin-bottom:1px">'+escapeHTML(label)+'</div>'
-        +(desc?'<div style="font-size:11px;color:var(--muted2);line-height:1.7">'+escapeHTML(desc)+'</div>':'')
-        +'</div></div>';
-    }).join('');
-  }
-
   panels+='<div class="panel" id="panel-political">'
     +'<div class="panel-title">Political spectrum</div>'
-    +'<p class="panel-sub">Position uses exact coordinates. Nearby figures are ranked by distance, then popularity — not by sharing a quadrant.</p>'
-
-    // Compass + axis cards
-    +'<div class="grid2" style="align-items:start;margin-bottom:16px">'
-    +'<div class="compass-wrap">'
-    +'<svg class="compass-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">'
-    +'<rect width="200" height="200" fill="#0d0d0d"/>'
-    +'<rect x="0"   y="0"   width="100" height="100" fill="rgba(120,30,30,0.18)"/>'
-    +'<rect x="100" y="0"   width="100" height="100" fill="rgba(100,75,20,0.18)"/>'
-    +'<rect x="0"   y="100" width="100" height="100" fill="rgba(26,58,92,0.18)"/>'
-    +'<rect x="100" y="100" width="100" height="100" fill="rgba(26,74,42,0.18)"/>'
-    +'<line x1="100" y1="2"   x2="100" y2="198" stroke="#252525" stroke-width="1"/>'
-    +'<line x1="2"   y1="100" x2="198" y2="100" stroke="#252525" stroke-width="1"/>'
-    +'<text x="100" y="10"  text-anchor="middle" fill="#555" font-size="6.5" font-family="IBM Plex Mono" letter-spacing="1">AUTHORITARIAN</text>'
-    +'<text x="100" y="197" text-anchor="middle" fill="#555" font-size="6.5" font-family="IBM Plex Mono" letter-spacing="1">LIBERTARIAN</text>'
-    +'<text x="4"   y="103" fill="#555" font-size="6.5" font-family="IBM Plex Mono" letter-spacing="0.5">STATE</text>'
-    +'<text x="148" y="103" fill="#555" font-size="6.5" font-family="IBM Plex Mono" letter-spacing="0.5">FREEDOM</text>'
-    +'<text x="4"   y="20" fill="#3a2a2a" font-size="5.5" font-family="IBM Plex Mono">AUTH-LEFT</text>'
-    +'<text x="118" y="20" fill="#3a3020" font-size="5.5" font-family="IBM Plex Mono">AUTH-RIGHT</text>'
-    +'<text x="4"   y="194" fill="#1a2a3a" font-size="5.5" font-family="IBM Plex Mono">LIB-LEFT</text>'
-    +'<text x="118" y="194" fill="#1a2a1a" font-size="5.5" font-family="IBM Plex Mono">LIB-RIGHT</text>'
-    +'<circle cx="'+dotX+'" cy="'+dotY+'" r="16" fill="none" stroke="var(--accent)" stroke-width="0.4" opacity="0.25"/>'
-    +'<circle class="compass-dot" cx="100" cy="100" r="0" fill="var(--accent)" data-cx="'+dotX+'" data-cy="'+dotY+'"/>'
-    +'</svg>'
-    +'</div>'
-    +'<div>'
-    +'<div class="card2" style="margin-bottom:8px"><div class="card-title">Economic Axis</div>'
+    +'<p class="panel-sub">Simple cards stay visible even with Plus. Complex adds distances, more names, Cultural Z, and Deeper Insight.</p>'
+    +'<div class="grid2" style="margin-bottom:12px">'
+    +'<div class="card2"><div class="card-title">Economic Axis</div>'
     +'<p style="font-size:22px;font-family:\'Cormorant Garamond\',serif;color:var(--text);">'+econLabel+'</p>'
     +'<p style="font-size:10px;color:var(--muted);margin-top:4px">Score: '+(px>0?'+':'')+px+'</p></div>'
     +'<div class="card2"><div class="card-title">Social Axis</div>'
     +'<p style="font-size:22px;font-family:\'Cormorant Garamond\',serif;color:var(--text);">'+socialLabel+'</p>'
     +'<p style="font-size:10px;color:var(--muted);margin-top:4px">Score: '+(py>0?'+':'')+py+'</p></div>'
     +'</div>'
-    +'</div>'
-
-    // Ideology label — big prominent display
     +(sanitizeText(ai.politicalIdeology,2000) ? (
       '<div class="card" style="margin-bottom:16px">'
       +'<div class="card-title">Your Ideology</div>'
@@ -2801,77 +2788,22 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
       +(sanitizeText(ai.politicalIdeologyDesc,2000) ? '<p style="font-size:12px;color:var(--muted2);line-height:1.8">'+sanitizeText(ai.politicalIdeologyDesc,2000)+'</p>' : '')
       +'</div>'
     ) : '')
-
-    +(function () {
-      if (typeof AnimusPoliticalFigures === 'undefined' || typeof AnimusResultsUI === 'undefined') return '';
-      var ranked = AnimusPoliticalFigures.rankClosest({ polX: data.polX, polY: data.polY }, { limit: 5 });
-      if (!ranked.length) return '';
-      return '<div class="section-label">Closest political figures (estimated placements)</div>' +
-        ranked.map(function (f) {
-          return AnimusResultsUI.figureCard({
-            name: f.name,
-            dataStatus: f.dataStatus,
-            note: f.label + ' · similarity ' + f.similarity,
-            sourceNote: f.sourceNote
-          });
-        }).join('');
-    })()
-    +'<div id="deeperInsightMount"></div>'
-    +'<p class="animus-fine">Cultural axis (Plus) is scored separately and is not stored on public profiles.</p>'
-
-    // AI narrative
+    +(typeof AnimusResultsUI !== 'undefined' && AnimusResultsUI.politicalPanelHtml
+      ? '<div id="politicalDynamicRoot">' + AnimusResultsUI.politicalPanelHtml({ data: data, ai: ai, plus: false }) + '</div>'
+      : '<div id="politicalDynamicRoot"></div>')
     +(sanitizeText(ai.politicalNarrative,2000)
       ? sanitizeText(ai.politicalNarrative,2000).split('\n\n').map(function(para,i){
           var titles=['Your Position','Psychological Roots','Tensions & Contradictions'];
-          return '<div class="narrative-block"><div class="narrative-title">'+(titles[i]||'Analysis')+'</div>'
+          return '<div class="narrative-block animus-pol-narrative"><div class="narrative-title">'+(titles[i]||'Analysis')+'</div>'
             +'<div class="narrative-text">'+para+'</div></div>';
         }).join('')
       : '')
-
-    // Strengths & weaknesses
     +(sanitizeText(ai.politicalStrengths,2000)||sanitizeText(ai.politicalWeaknesses,2000) ? (
       '<div class="grid2" style="margin-top:4px">'
       +(sanitizeText(ai.politicalStrengths,2000) ? '<div class="card2"><div class="card-title" style="color:#4a7a5a">What This Position Gets Right</div><p style="font-size:12px;color:var(--muted2);line-height:1.8">'+sanitizeText(ai.politicalStrengths,2000)+'</p></div>' : '')
       +(sanitizeText(ai.politicalWeaknesses,2000) ? '<div class="card2"><div class="card-title" style="color:#7a4a4a">Blind Spots & Failures</div><p style="font-size:12px;color:var(--muted2);line-height:1.8">'+sanitizeText(ai.politicalWeaknesses,2000)+'</p></div>' : '')
       +'</div>'
     ) : '')
-
-    // Intellectual influences
-    +(Array.isArray(ai.politicalThinkers)&&ai.politicalThinkers.length ? (
-      '<div class="card" style="margin-top:12px">'
-      +'<div class="card-title">Intellectual Influences</div>'
-      +'<p style="font-size:11px;color:var(--muted);margin-bottom:10px">Thinkers and theorists whose work most resonates with your political orientation.</p>'
-      +polList(ai.politicalThinkers,'var(--accent)')
-      +'</div>'
-    ) : '')
-
-    // Similar politicians
-    +(Array.isArray(ai.similarPoliticians)&&ai.similarPoliticians.length ? (
-      '<div class="card" style="margin-top:12px">'
-      +'<div class="card-title">Politicians With Similar Views</div>'
-      +'<p style="font-size:11px;color:var(--muted);margin-bottom:10px">Historical and contemporary political figures whose positions most closely align with yours.</p>'
-      +polList(ai.similarPoliticians,'var(--accent)')
-      +'</div>'
-    ) : '')
-
-    // Similar parties
-    +(Array.isArray(ai.similarParties)&&ai.similarParties.length ? (
-      '<div class="card" style="margin-top:12px">'
-      +'<div class="card-title">Political Parties That Represent You</div>'
-      +'<p style="font-size:11px;color:var(--muted);margin-bottom:10px">Parties from around the world whose platforms best match your position.</p>'
-      +polList(ai.similarParties,'var(--accent2)')
-      +'</div>'
-    ) : '')
-
-    // Similar countries
-    +(Array.isArray(ai.similarCountries)&&ai.similarCountries.length ? (
-      '<div class="card" style="margin-top:12px">'
-      +'<div class="card-title">Countries With Similar Political Culture</div>'
-      +'<p style="font-size:11px;color:var(--muted);margin-bottom:10px">Nations whose dominant political values and institutions most closely reflect your orientation.</p>'
-      +polList(ai.similarCountries,'var(--accent2)')
-      +'</div>'
-    ) : '')
-
     +'</div>';
 
   // ── SOCIAL PANEL ──
@@ -2954,7 +2886,11 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
     +'</div>';
 
   document.getElementById('tabPanels').innerHTML=panels;
-  bindDeeperInsight(data);
+  if (typeof AnimusResultsUI !== 'undefined' && AnimusResultsUI.bindCompassAndDepth) {
+    AnimusResultsUI.bindCompassAndDepth(document.getElementById('panel-overview'));
+    AnimusResultsUI.bindCompassAndDepth(document.getElementById('panel-political'));
+  }
+  hydratePlusPolitical(data, ai);
 
   // Tab switching
   document.getElementById('tabsBar').querySelectorAll('.tab').forEach(function(tab){

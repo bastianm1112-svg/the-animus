@@ -18,14 +18,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/psyche-cross.js"></script>
-<script src="/js/animus-entitlements.js"></script>
+<script src="/js/animus-entitlements.js?v=20260816"></script>
 <script src="/js/animus-scoring-core.js"></script>
 <script src="/js/figures-library.js"></script>
 <script src="/js/profile-narrative-depth.js"></script>
 <script src="/js/profile-narratives.js"></script>
 <script src="/js/compare-normalize.js"></script>
 <script src="/js/animus-username-policy.js"></script>
-<script src="/js/animus-shared.js?v=20260619"></script>
+<script src="/js/animus-shared.js?v=20260816"></script>
 <script>
 AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 var auth = firebase.auth();
@@ -77,6 +77,7 @@ var db = firebase.firestore();
         <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadAccount()">Load account</button>
         <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadProfile()">Load + profile editor</button>
         <button type="button" class="admin-btn-secondary" onclick="AnimusAdmin.loadMyProfile()">My profile</button>
+        <button type="button" class="admin-btn-primary" onclick="AnimusAdmin.refreshPanel()">Refresh panel</button>
       </div>
       <div class="admin-status" id="adminStatus"></div>
     </div>
@@ -141,11 +142,11 @@ var db = firebase.firestore();
       <details class="admin-advanced" open>
         <summary>Entitlements · Shop access</summary>
         <div class="admin-card admin-card-nested">
-          <p class="admin-hint">Grant paid features on this account for free.</p>
+          <p class="admin-hint">Grant paid features on this account. Animus Plus includes the Cultural axis, Deeper Insight, and the 3D compass — simple cards stay visible too.</p>
           <div class="admin-ent-grid">
             <label class="admin-ent-check"><input type="checkbox" id="adminEntDetailed" /> Detailed Test ($10)</label>
             <label class="admin-ent-check"><input type="checkbox" id="adminEntEstimator" /> Test Estimator ($10)</label>
-            <label class="admin-ent-check"><input type="checkbox" id="adminEntPlus" /> Animus Plus ($5/mo)</label>
+            <label class="admin-ent-check"><input type="checkbox" id="adminEntPlus" /> Animus Plus ($5/mo) — Cultural axis + Deeper Insight</label>
           </div>
           <div class="admin-actions" style="margin-top:12px">
             <button type="button" class="admin-btn-primary" onclick="AnimusAdmin.saveEntitlements()">Save entitlements</button>
@@ -179,7 +180,7 @@ var db = firebase.firestore();
 
 <script src="/js/animus-social.js"></script>
 <script src="/js/animus-nav.js"></script>
-<script src="/js/animus-admin.js"></script>
+<script src="/js/animus-admin.js?v=20260816"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   AnimusNav.mountTop('appNavMount', '');
