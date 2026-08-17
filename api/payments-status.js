@@ -30,7 +30,8 @@ module.exports = async function handler(req, res) {
       provider: null,
       placements: {
         'results.belowSummary': true,
-        'home.footer': true
+        'home.footer': true,
+        'profile.footer': true
       }
     }
   });

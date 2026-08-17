@@ -154,7 +154,10 @@
     }).join('');
     return (
       '<svg class="animus-compass" viewBox="0 0 200 200" role="img" aria-label="Two-axis map: money left to right, rules up and down">' +
-      '<rect x="1" y="1" width="198" height="198" class="animus-compass-bg"/>' +
+      '<rect x="1" y="1" width="99" height="99" class="animus-compass-q animus-compass-q-ul"/>' +
+      '<rect x="100" y="1" width="99" height="99" class="animus-compass-q animus-compass-q-ur"/>' +
+      '<rect x="1" y="100" width="99" height="99" class="animus-compass-q animus-compass-q-ll"/>' +
+      '<rect x="100" y="100" width="99" height="99" class="animus-compass-q animus-compass-q-lr"/>' +
       '<line x1="100" y1="8" x2="100" y2="192" class="animus-compass-axis"/>' +
       '<line x1="8" y1="100" x2="192" y2="100" class="animus-compass-axis"/>' +
       '<text x="100" y="16" text-anchor="middle" class="animus-compass-label">More rules</text>' +

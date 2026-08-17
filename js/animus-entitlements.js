@@ -20,7 +20,8 @@
     '1.25× XP on all activities',
     '20% off assessment packs in the Shop',
     'AI Career & Lifestyle Guide PDF (3 per month)',
-    'Plus badge on your profile'
+    'Plus badge on your profile',
+    'Ad-free — no banners, even later when ads exist for free accounts'
   ];
 
   var PRODUCTS = {
@@ -56,7 +57,7 @@
       interval: 'month',
       badge: 'Membership',
       description:
-        'Unlimited compares, group compare, Cultural axis (Plus), Deeper Insight, 2D/3D compass, 1.25× XP, 20% Shop discount, Plus badge, and 3 AI Career & Lifestyle PDFs per month.'
+        'Unlimited compares, group compare, Cultural axis (Plus), Deeper Insight, 2D/3D compass, ad-free, 1.25× XP, 20% Shop discount, Plus badge, and 3 AI Career & Lifestyle PDFs per month.'
     }
   };
 
@@ -157,6 +158,10 @@
     var until = parsePlusUntil(e.animusPlusUntil);
     if (until) return until.getTime() > Date.now();
     return e.animusPlus === true;
+  }
+
+  function shouldShowAds(userData) {
+    return !hasAnimusPlus(userData);
   }
 
   function hasEntitlement(userData, key) {
@@ -304,6 +309,7 @@
     hasDetailedTest: hasDetailedTest,
     hasTestEstimator: hasTestEstimator,
     hasAnimusPlus: hasAnimusPlus,
+    shouldShowAds: shouldShowAds,
     getCompareUsage: getCompareUsage,
     getCompareRemaining: getCompareRemaining,
     canCompare: canCompare,

@@ -1905,7 +1905,7 @@ function finishQuiz(){
   clearTimeout(_serverDraftSaveTimer);
   clearTestProgress();
   setTestPhase('loading');
-  document.getElementById('loadStatus').textContent='Scoring your responses...';
+  document.getElementById('loadStatus').textContent='Scoring your answers…';
 
   var data = score();
   var mbti = data.mbti;
@@ -1915,7 +1915,7 @@ function finishQuiz(){
   var instStack = data.instStack;
   var fnsSorted = Object.keys(data.cog).sort(function(a,b){return data.cog[b]-data.cog[a];});
 
-  document.getElementById('loadStatus').textContent='Generating your profile...';
+  document.getElementById('loadStatus').textContent='Writing your snapshot…';
   var prompt = buildPrompt(data);
 
   callAIWithRetry(prompt, 3, function(aiRes){
@@ -2547,20 +2547,15 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   var polLabel=(data.polX>5?(es?'Libertad económica':'Econ Freedom'):(data.polX<-5?(es?'Economía estatal':'State Economy'):(es?'Mixto':'Mixed')))+'/'+(data.polY>5?(es?'Autoritario':'Authoritarian'):(data.polY<-5?(es?'Libertario':'Libertarian'):(es?'Moderado':'Moderate')));
 
   document.getElementById('resHero').innerHTML=badge
-    +'<div class="res-eyebrow">'+(es?'Tu perfil completo':'Your Complete Profile')+'</div>'
+    +'<div class="res-eyebrow">'+(es?'Listo':'You\'re mapped')+'</div>'
     +'<div class="res-type">'+mbti+'</div>'
     +'<div class="res-archetype">'+(sanitizeText(ai.mbtiName,2000)||'')+'</div>'
-    +'<p class="res-tagline">'+(sanitizeText(ai.tagline,2000)||'')+'</p>'
+    +'<p class="res-tagline">'+(sanitizeText(ai.tagline,2000)||(es?'Esto es el recorte. Abre las pestañas cuando quieras más.':'This is the snapshot. Open a tab when you want more.'))+'</p>'
     +'<div class="res-chips">'
     +'<div class="chip"><strong>Type</strong>'+mbti+'</div>'
-    +'<div class="chip"><strong>Enn</strong>'+enn.type+'w'+enn.wing+'</div>'
-    +'<div class="chip"><strong>Tritype</strong>'+enn.tritype+'</div>'
+    +'<div class="chip"><strong>Enneagram</strong>'+enn.type+'w'+enn.wing+'</div>'
     +'<div class="chip"><strong>Attachment</strong>'+attNames[att]+'</div>'
     +'<div class="chip"><strong>Philosophy</strong>'+(phiNames[phi]||phi)+'</div>'
-    +'<div class="chip"><strong>Political</strong>'+(sanitizeText(ai.politicalIdeology,2000)||polLabel)+'</div>'
-    +'<div class="chip"><strong>Instinct</strong>'+instStack+'</div>'
-    +'<div class="chip"><strong>Socionics</strong>'+(sanitizeText(ai.socionics,2000)||'')+'</div>'
-    +'<div class="chip"><strong>Temperament</strong>'+(sanitizeText(ai.keirsey,2000)||'')+'</div>'
     +'</div>';
 
   insertDetailedTestUpsell();
@@ -2581,39 +2576,26 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
 
   // ── OVERVIEW PANEL ──
   panels+='<div class="panel active" id="panel-overview">'
-    +'<div class="panel-title">Your Profile at a Glance</div>'
-    +'<p class="panel-sub">Scan the cards, then open any tab for more. Full read: about 10 minutes.</p>'
+    +'<div class="panel-title">'+(es?'Tu recorte':'Here you are')+'</div>'
+    +'<p class="panel-sub">'+(es?'Cuatro datos. El mapa. Luego las pestañas si quieres profundizar.':'Four facts. Your map. Tabs below if you want to go deeper.')+'</p>'
     +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.legacyNote({ bankVersion: data.bankVersion, scoringVersion: data.scoringVersion }) : '')
     +(typeof AnimusAds !== 'undefined' ? AnimusAds.slot('results.belowSummary', _introUserData) : '')
     +'<div class="animus-results-scan">'
-    +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.scoreCard('Type', mbti, enn.type + 'w' + enn.wing + ' · ' + fnsSorted[0]) : '')
-    +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.scoreCard('Compass', (data.polX > 0 ? '+' : '') + data.polX + ' / ' + (data.polY > 0 ? '+' : '') + data.polY, 'Actual coordinates — not just a quadrant') : '')
+    +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.scoreCard('Type', mbti, enn.type + 'w' + enn.wing) : '')
+    +(typeof AnimusResultsUI !== 'undefined' ? AnimusResultsUI.scoreCard('How you attach', attNames[att]||att, '') : '')
     +(typeof AnimusResultsUI !== 'undefined' && AnimusResultsUI.compassBlockHtml ? AnimusResultsUI.compassBlockHtml(data.polX, data.polY, data.polZ, data.polZ != null) : '')
     +(typeof AnimusResultsUI !== 'undefined' && AnimusResultsUI.collectMatches ? (function () {
       var pack = AnimusResultsUI.collectMatches({ polX: data.polX, polY: data.polY, polZ: data.polZ }, data.polZ != null, 3, 3);
-      return '<div class="section-label">In simple terms — nearby figures</div>' +
+      return '<div class="section-label">People this map sits near</div>' +
         AnimusResultsUI.matchCardsHtml(pack.figuresSimple, 'simple', 'figure') +
-        '<div class="section-label">In simple terms — nearby countries</div>' +
+        '<div class="section-label">Places this map sits near</div>' +
         AnimusResultsUI.matchCardsHtml(pack.countriesSimple, 'simple', 'country');
     })() : '')
     +'</div>'
 
-    +'<div class="stat-grid">'
-    +'<div class="stat-cell"><span class="stat-big">'+mbti+'</span><span class="stat-lbl">Cognitive type</span></div>'
-    +'<div class="stat-cell"><span class="stat-big">'+enn.type+'w'+enn.wing+'</span><span class="stat-lbl">Enneagram</span></div>'
-    +'<div class="stat-cell"><span class="stat-big">'+fnsSorted[0]+'</span><span class="stat-lbl">Dominant Fn</span></div>'
-    +'</div>'
-
     +'<div class="grid2">'
-    +'<div class="card2"><div class="card-title">Alone — Inner World</div><p style="font-size:11px;color:var(--muted2);line-height:1.9;">'+(sanitizeText(ai.aloneDesc,2000)||'')+'</p></div>'
-    +'<div class="card2"><div class="card-title">With Others — Social Presence</div><p style="font-size:11px;color:var(--muted2);line-height:1.9;">'+(sanitizeText(ai.socialDesc,2000)||'')+'</p></div>'
-    +'</div>'
-
-    +'<div class="card"><div class="card-title">Shadow & Blind Spots</div><p style="font-size:11px;color:var(--muted2);line-height:1.9;">'+(sanitizeText(ai.shadowDesc,2000)||'')+'</p></div>'
-
-    +'<div class="section-label">Core Values</div>'
-    +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px;">'
-    +(Array.isArray(ai.values)?ai.values.map(function(v){return '<div class="value-tag"><div class="value-dot"></div>'+escapeHTML(v)+'</div>';}).join(''):'')
+    +'<div class="card2"><div class="card-title">When you\'re alone</div><p style="font-size:13px;color:var(--muted2);line-height:1.75;">'+(sanitizeText(ai.aloneDesc,2000)||'')+'</p></div>'
+    +'<div class="card2"><div class="card-title">With other people</div><p style="font-size:13px;color:var(--muted2);line-height:1.75;">'+(sanitizeText(ai.socialDesc,2000)||'')+'</p></div>'
     +'</div>'
     +'</div>';
 
@@ -2622,8 +2604,8 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   var stackPos=['Dominant','Auxiliary','Tertiary','Inferior'];
 
   panels+='<div class="panel" id="panel-cognitive">'
-    +'<div class="panel-title">Cognitive Architecture</div>'
-    +'<p class="panel-sub">Your function stack — the 8 Jungian cognitive functions scored and ranked. The top 4 form your type\'s characteristic way of processing reality.</p>'
+    +'<div class="panel-title">How you think</div>'
+    +'<p class="panel-sub">Eight mental tools, ranked. The top two are the ones you reach for first.</p>'
     +(sanitizeText(ai.cogNarrative,2000)?'<div class="narrative-block"><div class="narrative-title">Analysis</div><div class="narrative-text">'+sanitizeText(ai.cogNarrative,2000).split('\n\n').join('</div><div class="narrative-text" style="margin-top:12px">')+'</div></div>':'')
     +'<div class="card"><div class="card-title">All 8 Functions</div>'
     +fnsSorted.map(function(fn,i){
@@ -2661,8 +2643,8 @@ function showResults(data,mbti,enn,att,phi,instStack,fnsSorted,ai,isFallback){
   var sortedIV=Object.keys(data.iv).sort(function(a,b){return data.iv[b]-data.iv[a];});
 
   panels+='<div class="panel" id="panel-personality">'
-    +'<div class="panel-title">Personality Systems</div>'
-    +'<p class="panel-sub">Enneagram, attachment style, temperament, instinctual variants, and four temperaments.</p>'
+    +'<div class="panel-title">Personality</div>'
+    +'<p class="panel-sub">Enneagram, attachment, temperament — how you tend to move through a day.</p>'
 
     +'<div class="section-label">Enneagram</div>'
     +(sanitizeText(ai.ennNarrative,2000)?'<div class="narrative-block"><div class="narrative-title">Type '+enn.type+'w'+enn.wing+' &mdash; '+ennNames[parseInt(enn.type)]+'</div><div class="narrative-text">'+sanitizeText(ai.ennNarrative,2000).split('\n\n').join('</div><div class="narrative-text" style="margin-top:12px">')+'</div></div>':'')

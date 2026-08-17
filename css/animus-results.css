@@ -101,14 +101,28 @@
   height: auto;
   display: block;
   margin: 12px auto;
+  border: 1px solid var(--border2);
+  background: var(--surface);
 }
 .animus-compass-bg { fill: var(--surface2); stroke: var(--border2); }
-.animus-compass-axis { stroke: var(--border2); }
-.animus-compass-label { fill: var(--muted2); font-size: 9px; font-family: 'DM Sans', sans-serif; }
+.animus-compass-q-ul { fill: rgba(168, 52, 52, 0.38); }
+.animus-compass-q-ur { fill: rgba(196, 158, 72, 0.36); }
+.animus-compass-q-ll { fill: rgba(46, 90, 148, 0.36); }
+.animus-compass-q-lr { fill: rgba(46, 122, 82, 0.34); }
+body.light-mode .animus-compass-q-ul { fill: rgba(196, 72, 72, 0.28); }
+body.light-mode .animus-compass-q-ur { fill: rgba(210, 168, 64, 0.28); }
+body.light-mode .animus-compass-q-ll { fill: rgba(56, 102, 176, 0.24); }
+body.light-mode .animus-compass-q-lr { fill: rgba(46, 140, 88, 0.24); }
+.animus-compass-axis { stroke: rgba(240, 236, 228, 0.35); }
+body.light-mode .animus-compass-axis { stroke: rgba(26, 23, 20, 0.28); }
+.animus-compass-label { fill: var(--text); font-size: 8px; font-family: 'DM Sans', sans-serif; }
 .animus-compass-dot {
   fill: var(--gold);
+  stroke: #080808;
+  stroke-width: 1.5;
   transition: cx 0.8s ease, cy 0.8s ease;
 }
+body.light-mode .animus-compass-dot { stroke: #fff; }
 .animus-compass-other { fill: var(--muted2); opacity: 0.7; }
 
 .animus-cultural-track {
@@ -144,13 +158,23 @@
   display: grid;
   gap: 12px;
 }
+.animus-results-scan .animus-compass-block {
+  grid-column: 1 / -1;
+}
 @media (min-width: 720px) {
   .animus-results-scan { grid-template-columns: 1fr 1fr; }
 }
 
+.animus-ad-host:empty,
+.animus-ad-host[hidden] {
+  display: none;
+}
 .animus-ad-slot {
+  max-width: 336px;
+  margin: 20px auto;
+  padding: 0;
   min-height: 0;
-  margin: 16px 0;
+  text-align: center;
 }
 
 .animus-link { color: var(--gold); }

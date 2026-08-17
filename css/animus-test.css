@@ -475,6 +475,9 @@ body.page-test.phase-results .test-action-bar.is-visible {
 
 .test-action-bar .btn-action-profile {
   text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 
 #results .tabs-wrap {
