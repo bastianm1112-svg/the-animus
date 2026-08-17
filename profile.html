@@ -210,12 +210,12 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 <script src="/js/animus-political.js"></script>
 <script src="/js/political-figures.js?v=20260818c"></script>
 <script src="/js/political-countries.js?v=20260818c"></script>
-<script src="/js/animus-results-ui.js?v=20260818e"></script>
+<script src="/js/animus-results-ui.js?v=20260818f"></script>
 <script src="/js/animus-ads.js?v=20260818e"></script>
 <script src="/js/figures-library.js"></script>
 <script src="/js/profile-narrative-depth.js?v=20260609"></script>
 <script src="/js/profile-narratives.js?v=20260609"></script>
-<script src="/js/animus-i18n.js"></script>
+<script src="/js/animus-i18n.js?v=20260818f"></script>
 <script src="/js/compare-normalize.js?v=20260817"></script>
 <script src="/js/animus-entitlements.js"></script>
 <script src="/js/animus-shared.js?v=20260619"></script>
@@ -224,9 +224,9 @@ AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 var auth=firebase.auth(); var db=firebase.firestore();
 </script>
 <script src="/js/profile-voice.js"></script>
-<script src="/js/profile-sections.js?v=20260818c"></script>
+<script src="/js/profile-sections.js?v=20260818f"></script>
 <script src="/js/profile-panels-visual.js"></script>
-<script src="/js/profile-visuals.js?v=20260818d"></script>
+<script src="/js/profile-visuals.js?v=20260818f"></script>
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/css/animus-release.css">
 <link rel="stylesheet" href="/css/animus-plus.css">
@@ -257,7 +257,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
         <div class="profile-meta">
           <div class="profile-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="joinedDate">Joined recently</span></div>
           <div class="profile-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><strong id="friendCount">0</strong>&nbsp;friends</div>
-          <div class="profile-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><strong id="assessCount">0</strong>&nbsp;<span id="assessMetaText">assessments taken</span></div>
+          <div class="profile-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><strong id="assessCount">0</strong>&nbsp;<span id="assessMetaText">tests taken</span></div>
         </div>
       </div>
       <div class="hero-actions">
@@ -267,15 +267,15 @@ var auth=firebase.auth(); var db=firebase.firestore();
       </div>
     </div>
     <div id="profileViewBanner" style="display:none;margin:12px 0 0;padding:10px 14px;background:rgba(200,169,110,0.08);border:1px solid var(--border2);font-size:12px;color:var(--muted2);line-height:1.5"></div>
-    <div class="type-strip" id="typeStrip"><div class="type-badge" style="color:var(--muted)" id="typeStripPlaceholder" data-voice-you="Take the assessment to see your types" data-voice-they="%name% has not completed the assessment yet">Take the assessment to see your types</div></div>
+    <div class="type-strip" id="typeStrip"><div class="type-badge" style="color:var(--muted)" id="typeStripPlaceholder" data-voice-you="Take the test to see your types" data-voice-they="%name% has not taken the test yet">Take the test to see your types</div></div>
     <div class="profile-tabs" id="profileTabs">
       <button class="profile-tab active" data-panel="overview" data-en="Overview" data-es="Resumen">Overview</button>
-      <button class="profile-tab" data-panel="cognition" data-en="Cognition" data-es="Cognición">Cognition</button>
+      <button class="profile-tab" data-panel="cognition" data-en="Thinking" data-es="Pensar">Thinking</button>
       <button class="profile-tab" data-panel="personality" data-en="Personality" data-es="Personalidad">Personality</button>
       <button class="profile-tab" data-panel="philosophy" data-en="Philosophy" data-es="Filosofía">Philosophy</button>
       <button class="profile-tab" data-panel="political" data-en="Political" data-es="Política">Political</button>
       <button class="profile-tab" data-panel="social" data-en="Social" data-es="Social">Social</button>
-      <button class="profile-tab" data-panel="figures" data-en="Figures" data-es="Figuras">Figures</button>
+      <button class="profile-tab" data-panel="figures" data-en="People" data-es="Personas">People</button>
     </div>
   </div>
 </div>
@@ -284,7 +284,7 @@ var auth=firebase.auth(); var db=firebase.firestore();
 
   <div class="panel active" id="panel-overview">
     <div class="panel-main" id="overviewPanelRoot">
-      <div class="viz-empty"><div class="viz-empty-title">Overview</div><p data-voice-you="Complete the assessment to unlock your full profile." data-voice-they="%name% has not shared assessment results yet.">Complete the assessment to unlock your full profile.</p></div>
+      <div class="viz-empty"><div class="viz-empty-title">Overview</div><p data-voice-you="Take the test to unlock your full profile." data-voice-they="%name% has not shared results yet.">Take the test to unlock your full profile.</p></div>
     </div>
     <div class="panel-side">
       <div class="profile-actions-card">
@@ -293,31 +293,31 @@ var auth=firebase.auth(); var db=firebase.firestore();
         <button class="btn-full btn-full-outline" onclick="downloadPDF()">&#9113; Download PDF</button>
       </div>
       <div id="careerGuideMount" class="owner-only"></div>
-      <div class="side-card owner-only"><div class="side-card-title">Retake History</div><div id="historyList"><div style="color:var(--muted);font-size:12px;padding:8px 0">No assessments yet</div></div><div id="historyChartWrap" class="history-chart" style="margin-top:12px"></div></div>
+      <div class="side-card owner-only"><div class="side-card-title">Past tests</div><div id="historyList"><div style="color:var(--muted);font-size:12px;padding:8px 0">No tests yet</div></div><div id="historyChartWrap" class="history-chart" style="margin-top:12px"></div></div>
       <div class="side-card"><div class="side-card-title">Quick Stats</div><div style="display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted2)">Political</span><span id="statPolitical" style="color:var(--text)">&#8212;</span></div>
         <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted2)">Ethics</span><span id="statEthics" style="color:var(--text)">&#8212;</span></div>
         <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted2)">Temperament</span><span id="statTemp" style="color:var(--text)">&#8212;</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0"><span style="color:var(--muted2)">Keirsey</span><span id="statKeirsey" style="color:var(--text)">&#8212;</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0"><span style="color:var(--muted2)">Temperament</span><span id="statKeirsey" style="color:var(--text)">&#8212;</span></div>
       </div></div>
     </div>
   </div>
 
   <div class="panel" id="panel-cognition">
     <div class="panel-main" id="cognitionPanelRoot">
-      <div class="viz-empty"><div class="viz-empty-title">Cognition</div><p data-voice-you="Complete the assessment to see your cognitive profile." data-voice-they="This section will appear after they complete the assessment.">Complete the assessment to see your cognitive profile.</p></div>
+      <div class="viz-empty"><div class="viz-empty-title">Thinking</div><p data-voice-you="Take the test to see how you think." data-voice-they="This section shows up after they take the test.">Take the test to see how you think.</p></div>
     </div>
   </div>
 
   <div class="panel" id="panel-personality">
     <div class="panel-main" id="personalityPanelRoot">
-      <div class="viz-empty"><div class="viz-empty-title">Personality</div><p data-voice-you="Complete the assessment to see your enneagram and temperament profile." data-voice-they="This section will appear after they complete the assessment.">Complete the assessment to see your enneagram and temperament profile.</p></div>
+      <div class="viz-empty"><div class="viz-empty-title">Personality</div><p data-voice-you="Take the test to see your personality pattern." data-voice-they="This section shows up after they take the test.">Take the test to see your personality pattern.</p></div>
     </div>
   </div>
 
   <div class="panel" id="panel-philosophy">
     <div class="panel-main" id="philosophyPanelRoot">
-      <div class="viz-empty"><div class="viz-empty-title">Philosophy</div><p data-voice-you="Complete the assessment to see your philosophical orientation." data-voice-they="This section will appear after they complete the assessment.">Complete the assessment to see your philosophical orientation.</p></div>
+      <div class="viz-empty"><div class="viz-empty-title">Philosophy</div><p data-voice-you="Take the test to see what you tend to believe." data-voice-they="This section shows up after they take the test.">Take the test to see what you tend to believe.</p></div>
     </div>
   </div>
 
@@ -577,7 +577,7 @@ function showProfileNoResults(handle) {
     heading: name,
     handle: handle || '',
     cardTitle: 'Nothing shared yet',
-    cardBody: escapeHTML(name) + ' has an ANIMUS account but has not completed the assessment yet. Check back later — or map your own mind first.'
+    cardBody: escapeHTML(name) + ' has an ANIMUS account but has not taken the test yet. Check back later — or take yours first.'
   });
 }
 
@@ -896,7 +896,7 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
 <script src="/js/animus-career-guide.js"></script>
 <script src="/js/animus-cultural-ui.js"></script>
 <script src="/js/animus-social.js"></script>
-<script src="/js/animus-nav.js"></script>
+<script src="/js/animus-nav.js?v=20260818f"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   if (typeof AnimusI18n !== 'undefined' && typeof AnimusShared !== 'undefined') {

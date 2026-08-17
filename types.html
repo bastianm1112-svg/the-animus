@@ -450,7 +450,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <!-- POLITICS -->
   <div class="type-panel" id="panel-politics">
     <div class="sec-label">The Two Axes</div>
-    <p style="color:var(--muted2);font-size:13px;line-height:1.9;max-width:700px;margin-bottom:32px">ANIMUS uses a two-axis political spectrum matrix (not affiliated with any third-party “political compass” brand). It measures two independent dimensions. <strong style="color:var(--text)">Economic axis</strong> (left—right): how much should the state control economic life? <strong style="color:var(--text)">Social axis</strong> (authoritarian—libertarian): how much should the state control personal life? These axes are genuinely independent — you can be economically left and socially libertarian, or economically right and socially authoritarian.</p>
+    <p style="color:var(--muted2);font-size:13px;line-height:1.9;max-width:700px;margin-bottom:32px">Two independent sliders — not a party quiz, and not affiliated with any branded “political compass.” <strong style="color:var(--text)">Money</strong>: more state vs more markets. <strong style="color:var(--text)">Rules</strong>: more control vs more personal freedom. You can be left on money and high on freedom, or the reverse.</p>
     <div class="compass-diagram">
       <div class="compass-q ul"><strong>AUTH-LEFT</strong><span style="color:var(--muted);font-size:10px">State economy<br>Social control</span></div>
       <div class="compass-q ur"><strong>AUTH-RIGHT</strong><span style="color:var(--muted);font-size:10px">Free market<br>Social order</span></div>
@@ -532,7 +532,7 @@ AnimusShared.initFirebaseApp(AnimusShared.FIREBASE_CONFIG);
 <div id="appBottomMount"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="/js/animus-social.js"></script>
-<script src="/js/animus-nav.js"></script>
+<script src="/js/animus-nav.js?v=20260818f"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   AnimusNav.mountTop('appNavMount', 'types');

@@ -50,10 +50,10 @@ var db = firebase.firestore();
 
 <main class="member-home friends-page app-page" id="main-content">
   <header class="home-header app-page-head animus-reveal">
-    <p class="animus-page-eyebrow">Observer mode</p>
-    <h1 class="app-page-title friends-page-title">Estimations</h1>
-    <p class="app-page-sub friends-page-sub">Guess someone&apos;s profile from what you&apos;ve actually seen them do — not private thoughts you can&apos;t know.</p>
-    <p class="estimations-note"><a href="/activity">← Activity</a> · Saved separately from friends</p>
+    <p class="animus-page-eyebrow">Guess</p>
+    <h1 class="app-page-title friends-page-title">Guess someone</h1>
+    <p class="app-page-sub friends-page-sub">Estimate a person from what you&apos;ve actually seen them do — not thoughts you can&apos;t know.</p>
+    <p class="estimations-note"><a href="/activity">← Friends</a> · Saved separately from friends</p>
   </header>
 
   <div id="estimationsMount" class="app-section-mount"></div>
@@ -64,7 +64,7 @@ var db = firebase.firestore();
 <div id="appBottomMount"></div>
 <script src="/js/animus-estimator.js"></script>
 <script src="/js/animus-type-ui.js"></script>
-<script src="/js/animus-nav.js"></script>
+<script src="/js/animus-nav.js?v=20260818f"></script>
 <script src="/js/animus-estimations-page.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {

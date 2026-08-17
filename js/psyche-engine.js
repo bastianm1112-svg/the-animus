@@ -682,7 +682,7 @@ function refreshOtherModeResumeLink() {
   var es = lang === 'es';
   var label = other === 'full'
     ? (es ? 'También podés continuar el Test Detallado →' : 'You may also continue the Detailed Test →')
-    : (es ? 'También podés continuar el Test Principal →' : 'You may also continue the Main Test →');
+    : (es ? 'También podés continuar el test →' : 'You may also continue the test →');
   btn.textContent = label;
   wrap.style.display = 'block';
 }
@@ -941,7 +941,7 @@ function applyQuizHeaderForMode() {
     if (qSection) qSection.textContent = lang === 'es' ? 'Test rápido' : 'Quick Test';
     document.body.classList.remove('test-quiz-detailed');
   } else {
-    if (qSection) qSection.textContent = lang === 'es' ? 'Test Principal' : 'Main Test';
+    if (qSection) qSection.textContent = lang === 'es' ? 'Test' : 'Test';
     document.body.classList.remove('test-quiz-detailed');
     var qhdrMain = document.querySelector('.qhdr');
     if (qhdrMain) qhdrMain.classList.remove('qhdr--detailed');
@@ -2417,12 +2417,12 @@ function buildFallbackNarrative(mbti, enn, att, phi, data) {
 // ── RENDER RESULTS ──// ── RENDER RESULTS ──
 var TABS=[
   {id:'overview',label:'Overview'},
-  {id:'cognitive',label:'Cognition'},
+  {id:'cognitive',label:'Thinking'},
   {id:'personality',label:'Personality'},
   {id:'philosophy',label:'Philosophy'},
   {id:'political',label:'Political'},
   {id:'social',label:'Social'},
-  {id:'figures',label:'Figures'}
+  {id:'figures',label:'People'}
 ];
 
 function insertDetailedTestUpsell() {
@@ -3612,7 +3612,7 @@ function showComparison(you, them){
       notice.innerHTML='<div style="font-size:9px;letter-spacing:0.4em;color:var(--accent2);text-transform:uppercase;margin-bottom:20px">Shared Profile Loaded</div>'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:72px;font-weight:300;color:var(--text);line-height:1;margin-bottom:8px">'+shared.mbti+'</div>'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--accent);font-style:italic;margin-bottom:32px">'+(shared.mbtiName||'')+'</div>'
-        +'<p style="max-width:480px;color:var(--muted2);font-size:12px;line-height:1.9;margin-bottom:40px">Someone shared their ANIMUS profile with you. Complete the assessment yourself and their results will be waiting for comparison at the end.</p>'
+        +'<p style="max-width:480px;color:var(--muted2);font-size:14px;line-height:1.7;margin-bottom:40px">A friend shared their ANIMUS map. Take the test (about 15–25 minutes) and you can compare with them when you finish.</p>'
         +'<button class="btn-primary" id="takeTestForCompare">TAKE THE TEST →</button>';
       document.body.insertBefore(notice, document.getElementById('quiz'));
 

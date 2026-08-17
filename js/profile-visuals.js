@@ -340,8 +340,8 @@
 
     if (!snap || !snap.mbti) {
       var socEmpty = isOwner
-        ? 'Complete the assessment to see how you show up alone vs with others.'
-        : 'Social profile data will appear after they complete the assessment.';
+        ? 'Complete the test to see how you show up alone vs with others.'
+        : 'This shows up after they take the test.';
       root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Social profile</div>'
         + '<p>' + socEmpty + '</p></div>';
       return;
@@ -412,8 +412,8 @@
         + '<div class="figures-empty-orbit" aria-hidden="true"></div>'
         + '<div class="viz-empty-title">Similar figures</div>'
         + '<p>' + (isOwner
-          ? 'Complete the assessment to see historical, cultural, and fictional mirrors of your profile.'
-          : 'Figures will appear here after ' + escapeHTML(name) + ' completes the assessment.') + '</p></div>';
+          ? 'Take the test to see people and characters who rhyme with your map.'
+          : 'People show up here after ' + escapeHTML(name) + ' takes the test.') + '</p></div>';
       return;
     }
 

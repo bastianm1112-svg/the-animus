@@ -204,7 +204,7 @@
       (bits ? bits + '. ' : '') +
       'Ranked by distance on the axes we actually measured' +
       (item.axes && item.axes.length > 2 ? ', including cultural Z' : '') +
-      '. Estimated placement, not a psychometric score for that person or country.';
+      '. Estimated placement — not a test they took.';
   }
 
   function matchCardsHtml(list, mode, kind) {

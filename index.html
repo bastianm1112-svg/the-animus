@@ -5,9 +5,9 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <title>ANIMUS — Know Yourself Completely</title>
-<meta name="description" content="The most comprehensive personality assessment available — 14 dimensions across cognitive type, Enneagram, philosophy, political spectrum, attachment style, and more. AI narrative, compare, and shareable profiles.">
+<meta name="description" content="A personality map you can use with friends — take the test, read your snapshot, compare.">
 <meta property="og:title" content="ANIMUS — Know Yourself Completely">
-<meta property="og:description" content="14 dimensions. AI-generated narrative. Compare with friends. The most rigorous personality instrument available.">
+<meta property="og:description" content="Take the test. Get a readable map. Compare with friends.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://animustest.com/og-image.svg">
 <meta property="og:image:alt" content="ANIMUS — Know Yourself Completely">
@@ -798,8 +798,8 @@ var db = firebase.firestore();
     </a>
     <a href="/estimations" class="home-action-card animus-pressable">
       <span class="home-action-copy">
-        <span class="home-action-title">Estimations</span>
-        <span class="home-action-desc">Observe &amp; guess</span>
+        <span class="home-action-title">Guess someone</span>
+        <span class="home-action-desc">Estimate a person from how they act</span>
       </span>
     </a>
     </div>
@@ -902,31 +902,28 @@ var db = firebase.firestore();
       <div class="section-label">What is ANIMUS</div>
       <h2 class="about-title">Not a quiz.<br><em>A mirror.</em></h2>
       <p class="about-body">
-        Most personality tests tell you what you already know. ANIMUS goes deeper — mapping the <strong>architecture of how you actually think</strong>, what you value at the deepest level, how you attach to others, and where you stand philosophically and politically.
+        Most quizzes hand you a label. ANIMUS maps how you think, what you value, how you get close to people, and where you sit politically — then writes it in plain language.
       </p>
       <p class="about-body">
-        Fourteen dimensions and AI-generated narrative analysis. Your profile isn't a label — it's a complete picture of who you are, how you operate, and why you do what you do.
-      </p>
-      <p class="about-body">
-        Built for people who take self-knowledge seriously.
+        Take the test, save a profile, share a link, compare with friends. That’s the whole product.
       </p>
     </div>
     <div class="about-right">
       <div class="dim-card reveal reveal-delay-1">
         <div class="dim-icon">Ni</div>
-        <div class="dim-info"><strong>Cognitive Functions</strong><span>All 8 Jungian functions scored and stacked</span></div>
+        <div class="dim-info"><strong>How you think</strong><span>Your go-to mental tools, ranked</span></div>
       </div>
       <div class="dim-card reveal reveal-delay-2">
         <div class="dim-icon">E5</div>
-        <div class="dim-info"><strong>Enneagram</strong><span>Type, wing, tritype, and instinctual variants</span></div>
+        <div class="dim-info"><strong>Personality</strong><span>What drives you when things get hard</span></div>
       </div>
       <div class="dim-card reveal reveal-delay-3">
         <div class="dim-icon">f</div>
-        <div class="dim-info"><strong>Philosophy</strong><span>Stoic, Nietzschean, Kantian, Existentialist and more</span></div>
+        <div class="dim-info"><strong>Values</strong><span>What you treat as a good life</span></div>
       </div>
       <div class="dim-card reveal reveal-delay-4">
         <div class="dim-icon">±</div>
-        <div class="dim-info"><strong>Political spectrum</strong><span>Two-axis map with psychological roots</span></div>
+        <div class="dim-info"><strong>Politics</strong><span>Money vs the state, rules vs freedom</span></div>
       </div>
     </div>
   </div>
@@ -936,27 +933,27 @@ var db = firebase.firestore();
 <section class="how" id="how">
   <div class="how-inner">
     <div class="section-label reveal">How it works</div>
-    <h2 class="how-title reveal">Four steps to a complete profile</h2>
+    <h2 class="how-title reveal">Four steps</h2>
     <div class="steps">
       <div class="step reveal">
         <div class="step-num">01</div>
-        <div class="step-title">Take the Assessment</div>
-        <div class="step-body">A rigorous instrument across every dimension. Questions are randomized and unlabeled, with plain-English simplifications when you need them.</div>
+        <div class="step-title">Take the test</div>
+        <div class="step-body">About 15–25 minutes. Honest answers, no trick labels on the questions.</div>
       </div>
       <div class="step reveal reveal-delay-1">
         <div class="step-num">02</div>
-        <div class="step-title">AI Generates Your Narrative</div>
-        <div class="step-body">Your scores are sent to an AI that writes a personalized analysis of your cognitive style, Enneagram, attachment pattern, philosophy, and political position.</div>
+        <div class="step-title">Read your snapshot</div>
+        <div class="step-body">You get a type, a personality pattern, and a political map — plus a short write-up in everyday words.</div>
       </div>
       <div class="step reveal reveal-delay-2">
         <div class="step-num">03</div>
-        <div class="step-title">Save Your Profile</div>
-        <div class="step-body">Create an account and your profile lives at animustest.com/you. Share the link with anyone. Download a PDF. Retake to track how you change.</div>
+        <div class="step-title">Save your profile</div>
+        <div class="step-body">Sign in so it lives at your link. Share it. Compare later. Retake if you want a new snapshot.</div>
       </div>
       <div class="step reveal reveal-delay-3">
         <div class="step-num">04</div>
-        <div class="step-title">Compare with Friends</div>
-        <div class="step-body">See a compatibility score, full side-by-side comparison, and AI analysis of how two specific profiles interact — where you align, where you clash.</div>
+        <div class="step-title">Compare with friends</div>
+        <div class="step-body">Where you click, where you clash, and a short brief on how you’d actually get along.</div>
       </div>
     </div>
   </div>
@@ -966,33 +963,33 @@ var db = firebase.firestore();
 <section id="dimensions">
   <div class="dims-section">
     <div class="section-label reveal">What gets measured</div>
-    <h2 class="dims-title reveal">14 dimensions.<br>Nothing left out.</h2>
-    <p class="dims-sub reveal">Every aspect of personality, cognition, values, and orientation — measured rigorously and explained clearly.</p>
+    <h2 class="dims-title reveal">What the test looks at</h2>
+    <p class="dims-sub reveal">Thinking, personality, values, closeness, and politics — scored, then explained.</p>
     <div class="dims-grid">
       <div class="dim-full-card reveal">
-        <div class="dim-full-label">Cognition</div>
-        <div class="dim-full-name">Cognitive Functions</div>
-        <div class="dim-full-desc">All 8 Jungian cognitive functions scored 0–100. Dominant, auxiliary, tertiary, inferior — your full stack revealed.</div>
+        <div class="dim-full-label">Thinking</div>
+        <div class="dim-full-name">How you think</div>
+        <div class="dim-full-desc">Eight mental tools, ranked. The top two are the ones you reach for first.</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-1">
         <div class="dim-full-label">Personality</div>
-        <div class="dim-full-name">Enneagram</div>
-        <div class="dim-full-desc">Type, wing, tritype across all three centers (gut/heart/head), and instinctual variant stack (SP/SOC/SX).</div>
+        <div class="dim-full-name">Personality pattern</div>
+        <div class="dim-full-desc">What you want when life gets hard, and the habits you use to feel okay again.</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-2">
         <div class="dim-full-label">Relationships</div>
-        <div class="dim-full-name">Attachment Style</div>
+        <div class="dim-full-name">How you get close</div>
         <div class="dim-full-desc">Secure, anxious, avoidant, or disorganized — how you seek connection and respond to intimacy.</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-3">
         <div class="dim-full-label">Worldview</div>
-        <div class="dim-full-name">Philosophical School</div>
-        <div class="dim-full-desc">Stoic, Epicurean, Kantian, Aristotelian, Nietzschean, Existentialist, Pragmatist, or Skeptic — your conceptual home.</div>
+        <div class="dim-full-name">What you believe</div>
+        <div class="dim-full-desc">Stoic, Kantian, Nietzschean, and more — a home base for what a good life looks like.</div>
       </div>
       <div class="dim-full-card reveal">
         <div class="dim-full-label">Knowledge</div>
-        <div class="dim-full-name">Epistemology</div>
-        <div class="dim-full-desc">Rationalist, empiricist, intuitionist, or skeptic — how you believe you know what you know.</div>
+        <div class="dim-full-name">How you decide what’s true</div>
+        <div class="dim-full-desc">Reason, evidence, gut, or doubt — how you trust a claim.</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-1">
         <div class="dim-full-label">Morality</div>
@@ -1006,28 +1003,28 @@ var db = firebase.firestore();
       </div>
       <div class="dim-full-card reveal reveal-delay-3">
         <div class="dim-full-label">Character</div>
-        <div class="dim-full-name">Four Temperaments</div>
-        <div class="dim-full-desc">The ancient precursor to all typology — Choleric, Melancholic, Sanguine, Phlegmatic — scored and explained.</div>
+        <div class="dim-full-name">Energy style</div>
+        <div class="dim-full-desc">Pushy, careful, sunny, or steady — an old four-way read of how you move through a day.</div>
       </div>
       <div class="dim-full-card reveal">
         <div class="dim-full-label">Drive</div>
-        <div class="dim-full-name">Instinctual Variants</div>
-        <div class="dim-full-desc">Self-preservation, social, and sexual/intimate instincts — the motivational layer beneath your Enneagram type.</div>
+        <div class="dim-full-name">What you protect first</div>
+        <div class="dim-full-desc">Yourself, the group, or one intense bond — the layer under your personality type.</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-1">
         <div class="dim-full-label">Social</div>
-        <div class="dim-full-name">Interpersonal Style</div>
-        <div class="dim-full-desc">How you present to others — dominance, warmth, directness, introversion — and how you actually are when nobody's watching.</div>
+        <div class="dim-full-name">How you show up</div>
+        <div class="dim-full-desc">Warm or cool, direct or quiet — and how that changes when nobody’s watching.</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-2">
         <div class="dim-full-label">Values</div>
-        <div class="dim-full-name">Moral Foundations</div>
-        <div class="dim-full-desc">Haidt's six moral foundations scored — Care, Fairness, Loyalty, Authority, Sanctity, Liberty — revealing what you treat as sacred.</div>
+        <div class="dim-full-name">What feels morally important</div>
+        <div class="dim-full-desc">Care, fairness, loyalty, rules, purity, liberty — which ones actually pull you.</div>
       </div>
       <div class="dim-full-card reveal reveal-delay-3">
         <div class="dim-full-label">Traits</div>
         <div class="dim-full-name">Big Five</div>
-        <div class="dim-full-desc">Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism — derived from your cognitive and personality scores.</div>
+        <div class="dim-full-desc">Open, organized, outgoing, agreeable, easily stressed — a simple five-trait snapshot.</div>
       </div>
     </div>
   </div>
@@ -1101,9 +1098,9 @@ var db = firebase.firestore();
 <!-- TESTS -->
 <section id="tests">
   <div class="tests-section">
-    <div class="section-label reveal">The assessment</div>
+    <div class="section-label reveal">The test</div>
     <h2 class="tests-title reveal">Fourteen dimensions.<br>One complete profile.</h2>
-    <p class="tests-sub reveal">One assessment maps cognition, personality, values, and worldview — then turns your results into something you can read, share, and compare.</p>
+    <p class="tests-sub reveal">One sitting. A readable map. Then share it or compare with a friend.</p>
     <div class="tests-single reveal">
       <div class="test-card featured">
         <div class="test-name">The ANIMUS Assessment</div>
@@ -1145,7 +1142,7 @@ var db = firebase.firestore();
 <script src="/js/animus-daily.js"></script>
 <script src="/js/animus-type-ui.js"></script>
 <script src="/js/animus-social.js"></script>
-<script src="/js/animus-nav.js"></script>
+<script src="/js/animus-nav.js?v=20260818f"></script>
 <script src="/js/animus-legal.js"></script>
 <script src="/js/animus-home.js"></script>
 <script>

@@ -28,27 +28,34 @@
     'Take Test': 'Hacer test',
     Compare: 'Comparar',
     Types: 'Tipos',
+    People: 'Personas',
+    Activity: 'Amigos',
+    Figures: 'Personas',
     Profile: 'Perfil'
   };
 
   var RESULT_TABS_ES = {
     Overview: 'Resumen',
-    Cognition: 'Cognición',
+    Thinking: 'Pensar',
+    Cognition: 'Pensar',
     Personality: 'Personalidad',
     Philosophy: 'Filosofía',
     Political: 'Política',
     Social: 'Social',
-    Figures: 'Figuras'
+    People: 'Personas',
+    Figures: 'Personas'
   };
 
   var PROFILE_TABS_ES = {
     Overview: 'Resumen',
-    Cognition: 'Cognición',
+    Thinking: 'Pensar',
+    Cognition: 'Pensar',
     Personality: 'Personalidad',
     Philosophy: 'Filosofía',
     Political: 'Política',
     Social: 'Social',
-    Figures: 'Figuras'
+    People: 'Personas',
+    Figures: 'Personas'
   };
 
   var Q_ES = [];

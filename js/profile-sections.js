@@ -111,8 +111,8 @@
 
     var blocks = [
       {
-        kicker: 'Cognition',
-        title: p.poss + ' mental architecture',
+        kicker: 'Thinking',
+        title: p.poss + ' way of thinking',
         body: narr(
           p.subj + ' ' + p.be + ' wired around <strong>' + domFn + '</strong>' +
           (auxFn ? ' with <strong>' + auxFn + '</strong> as a supporting lens' : '') +
@@ -120,9 +120,9 @@
           ', which shapes how ' + p.subjL + ' frame problems, learn, and make decisions under pressure.'
         ),
         metrics: [
-          ['Cognitive type', snap.mbti],
-          ['Dom', domFn],
-          ['Socionics', snap.socionics || '—']
+          ['Type', snap.mbti],
+          ['Lead tool', domFn],
+          ['Temperament', snap.keirsey || '—']
         ],
         simple: 'In simple terms: ' + p.subjL + ' usually solve problems with ' + (FN_DESC[domFn] || 'a favorite thinking style') + '. That is a habit, not a cage.'
       },
@@ -138,8 +138,8 @@
           'this combination explains motivation loops, stress behavior, and what ' + p.subjL + ' reach for when challenged.'
         ),
         metrics: [
-          ['Ennea', snap.ennType ? (snap.ennType + (snap.ennWing ? 'w' + snap.ennWing : '')) : '—'],
-          ['Tritype', snap.ennTritype || '—'],
+          ['Type', snap.ennType ? (snap.ennType + (snap.ennWing ? 'w' + snap.ennWing : '')) : '—'],
+          ['Blend', snap.ennTritype || '—'],
           ['Instinct', snap.instStack || '—']
         ],
         simple: 'In simple terms: this is the emotional engine — what ' + p.subjL + ' want when things get hard, and how ' + p.subjL + ' try to feel okay again.'

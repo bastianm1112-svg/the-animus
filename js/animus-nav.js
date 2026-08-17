@@ -49,7 +49,7 @@
       ac(active, 'activity') +
       '" id="navNotifBtn">' +
       SVG_ACTIVITY +
-      ' <span data-en="Activity" data-es="Actividad">Activity</span><div class="notif-badge" id="notifBadge"></div></a>' +
+      ' <span data-en="Friends" data-es="Amigos">Friends</span><div class="notif-badge" id="notifBadge"></div></a>' +
       '<a href="/test" class="nav-item' +
       ac(active, 'test') +
       '">' +
@@ -72,7 +72,7 @@
       ' <span data-en="Types" data-es="Tipos">Types</span></a>' +
       '<a href="/figures" class="nav-item' +
       ac(active, 'figures') +
-      '"><span data-en="Figures" data-es="Figuras">Figures</span></a>' +
+      '"><span data-en="People" data-es="Personas">People</span></a>' +
       '</div>' +
       '<div class="nav-right">' +
       '<button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleThemeGlobal()" title="Toggle theme">' +
@@ -92,7 +92,7 @@
       '">Settings</a>' +
       '<a href="/activity" class="nav-mobile-item' +
       ac(active, 'activity') +
-      '">Activity</a>' +
+      '">Friends</a>' +
       '<a href="/test" class="nav-mobile-item' +
       ac(active, 'test') +
       '">Take Test</a>' +
@@ -107,7 +107,7 @@
       '">Types</a>' +
       '<a href="/figures" class="nav-mobile-item' +
       ac(active, 'figures') +
-      '">Figures</a>' +
+      '">People</a>' +
       '</div>'
     );
   }
@@ -136,7 +136,7 @@
       ac(active, 'activity') +
       '">' +
       svgActivity +
-      '<span data-en="Activity" data-es="Actividad">Activity</span><div class="mbn-badge" id="mbnNotifBadge"></div></a>' +
+      '<span data-en="Friends" data-es="Amigos">Friends</span><div class="mbn-badge" id="mbnNotifBadge"></div></a>' +
       '<a href="/compare" class="mbn-item' +
       ac(active, 'compare') +
       '">' +
