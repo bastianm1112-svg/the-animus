@@ -153,16 +153,16 @@
       return '<circle class="animus-compass-other" cx="' + ex + '" cy="' + ey + '" r="3" data-i="' + i + '"><title>' + esc(e.name || '') + '</title></circle>';
     }).join('');
     return (
-      '<svg class="animus-compass" viewBox="0 0 200 200" role="img" aria-label="Political compass">' +
+      '<svg class="animus-compass" viewBox="0 0 200 200" role="img" aria-label="Two-axis map: money left to right, rules up and down">' +
       '<rect x="1" y="1" width="198" height="198" class="animus-compass-bg"/>' +
       '<line x1="100" y1="8" x2="100" y2="192" class="animus-compass-axis"/>' +
       '<line x1="8" y1="100" x2="192" y2="100" class="animus-compass-axis"/>' +
-      '<text x="100" y="14" text-anchor="middle" class="animus-compass-label">Auth</text>' +
-      '<text x="100" y="196" text-anchor="middle" class="animus-compass-label">Lib</text>' +
-      '<text x="8" y="96" class="animus-compass-label">Left</text>' +
-      '<text x="168" y="96" class="animus-compass-label">Right</text>' +
+      '<text x="100" y="16" text-anchor="middle" class="animus-compass-label">More rules</text>' +
+      '<text x="100" y="194" text-anchor="middle" class="animus-compass-label">More freedom</text>' +
+      '<text x="8" y="96" class="animus-compass-label">State</text>' +
+      '<text x="154" y="96" class="animus-compass-label">Markets</text>' +
       dots +
-      '<circle class="animus-compass-dot" cx="' + x + '" cy="' + y + '" r="5" data-cx="' + x + '" data-cy="' + y + '"/>' +
+      '<circle class="animus-compass-dot" cx="' + x + '" cy="' + y + '" r="6" data-cx="' + x + '" data-cy="' + y + '"/>' +
       '</svg>'
     );
   }
@@ -233,17 +233,27 @@
     var tz = (z / 100) * 62;
     return (
       '<div class="animus-compass-block" data-compass-block>' +
-      '<p class="cube-lead">Scroll to walk around the cube. The gold sphere is you. Left–right is money, up–down is rules vs freedom, front–back is culture' +
-      (hasZ ? '.' : ' (Plus).') + '</p>' +
-      '<div class="cube-scroll" data-cube-scroll>' +
-      '<div class="cube-sticky">' +
+      '<p class="cube-lead" data-compass-lead>The gold mark is you. Money runs left–right. Rules vs freedom runs up–down.</p>' +
+      '<div class="animus-depth-bar animus-view-toggle" role="group" aria-label="Map view">' +
+      '<button type="button" class="animus-seg-btn is-on" data-compass-view="2d">2D map</button>' +
+      '<button type="button" class="animus-seg-btn" data-compass-view="3d">3D cube</button>' +
+      '</div>' +
+      '<div class="compass-pane" data-compass-pane="2d">' +
+      compassSvg(polX, polY) +
       '<div class="cube-legend" aria-hidden="true">' +
       '<span><i class="cube-key cube-key-x"></i> Money</span>' +
       '<span><i class="cube-key cube-key-y"></i> Rules / freedom</span>' +
-      '<span><i class="cube-key cube-key-z"></i> Culture</span>' +
       '</div>' +
-      '<div class="cube-stage">' +
-      '<div class="cube-scene" data-cube-scene style="--cube-yaw:0deg;--cube-pitch:-6deg">' +
+      '</div>' +
+      '<div class="compass-pane is-hidden" data-compass-pane="3d">' +
+      '<div class="cube-legend" aria-hidden="true">' +
+      '<span><i class="cube-key cube-key-x"></i> Money</span>' +
+      '<span><i class="cube-key cube-key-y"></i> Rules / freedom</span>' +
+      '<span><i class="cube-key cube-key-z"></i> Culture' + (hasZ ? '' : ' (Plus)') + '</span>' +
+      '</div>' +
+      '<div class="cube-stage" data-cube-stage tabindex="0" role="application" aria-label="3D cube. Drag or use arrow keys to rotate.">' +
+      '<div class="cube-scale">' +
+      '<div class="cube-scene" data-cube-scene style="--cube-yaw:32deg;--cube-pitch:-18deg">' +
       '<div class="cube" aria-hidden="true">' +
       cubeFace('cube-front') + cubeFace('cube-back') + cubeFace('cube-right') +
       cubeFace('cube-left') + cubeFace('cube-top') + cubeFace('cube-bottom') +
@@ -262,16 +272,8 @@
       '<span class="cube-sphere-ring" style="transform:rotateX(60deg)"></span>' +
       '<span class="cube-sphere-ring" style="transform:rotateX(120deg)"></span>' +
       '<span class="cube-sphere-ring" style="transform:rotateY(90deg)"></span>' +
-      '</div></div></div></div>' +
-      '<div class="cube-path" role="list">' +
-      '<span data-cube-tick="0">Money</span>' +
-      '<span data-cube-tick="1">Rules</span>' +
-      '<span data-cube-tick="2">Culture</span>' +
-      '<span data-cube-tick="3">All three</span>' +
-      '</div>' +
-      '<p class="cube-caption" data-cube-caption>Front face — money left to right, rules up and down.</p>' +
-      '</div>' +
-      '<div class="cube-rail" aria-hidden="true"></div>' +
+      '</div></div></div></div></div>' +
+      '<p class="cube-caption">Drag with your thumb (or mouse) to turn the cube. Gold sphere is you.</p>' +
       '</div>' +
       (hasZ ? culturalSlider(polZ) : '') +
       '</div>'
@@ -325,7 +327,7 @@
       '</div>' +
       compassBlockHtml(data.polX, data.polY, polZ, hasZ) +
       '<section class="animus-pol-simple" data-depth-pane="simple">' +
-      '<p class="panel-sub">Plain-language map of where your answers sit. Nearby names are estimated coordinate rhymes from a mixed global set — not endorsements, and not “you are this person.”</p>' +
+      '<p class="panel-sub">Nearby names are map rhymes from a mixed global set — not endorsements, and not “you are this person.”</p>' +
       '<div class="section-label">People you sit near</div>' + (simpleFigs || '<p class="animus-muted">No close figure matches on this map.</p>') +
       '<div class="section-label">Countries you sit near</div>' + (simpleCtry || '<p class="animus-muted">No close country matches on this map.</p>') +
       '</section>' +
@@ -346,6 +348,56 @@
     );
   }
 
+  function bindCubeDrag(stage, scene) {
+    if (!stage || !scene || stage._cubeBound) return;
+    stage._cubeBound = true;
+    var yaw = 32;
+    var pitch = -18;
+    var dragging = false;
+    var lastX = 0;
+    var lastY = 0;
+    function apply() {
+      scene.style.setProperty('--cube-yaw', yaw + 'deg');
+      scene.style.setProperty('--cube-pitch', pitch + 'deg');
+    }
+    function clampPitch(p) {
+      return Math.max(-78, Math.min(78, p));
+    }
+    stage.addEventListener('pointerdown', function (e) {
+      if (e.button != null && e.button !== 0) return;
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      stage.classList.add('is-dragging');
+      try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      yaw += (e.clientX - lastX) * 0.45;
+      pitch = clampPitch(pitch - (e.clientY - lastY) * 0.35);
+      lastX = e.clientX;
+      lastY = e.clientY;
+      apply();
+    });
+    function endDrag() {
+      dragging = false;
+      stage.classList.remove('is-dragging');
+    }
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+    stage.addEventListener('lostpointercapture', endDrag);
+    stage.addEventListener('keydown', function (e) {
+      var step = e.shiftKey ? 12 : 6;
+      if (e.key === 'ArrowLeft') { yaw -= step; e.preventDefault(); }
+      else if (e.key === 'ArrowRight') { yaw += step; e.preventDefault(); }
+      else if (e.key === 'ArrowUp') { pitch = clampPitch(pitch + step); e.preventDefault(); }
+      else if (e.key === 'ArrowDown') { pitch = clampPitch(pitch - step); e.preventDefault(); }
+      else return;
+      apply();
+    });
+    apply();
+  }
+
   function bindCompassAndDepth(root) {
     if (!root) return;
     root.querySelectorAll('[data-depth]').forEach(function (btn) {
@@ -357,53 +409,29 @@
         });
       });
     });
-    var block = root.querySelector('[data-compass-block]');
-    if (block) {
-      var scene = block.querySelector('[data-cube-scene]');
-      var scroller = block.querySelector('[data-cube-scroll]');
-      var caption = block.querySelector('[data-cube-caption]');
-      var ticks = block.querySelectorAll('[data-cube-tick]');
-      var lines = [
-        'Front face — money left to right, rules up and down.',
-        'Tilt — see how high or low you sit on rules vs freedom.',
-        'Turn — culture is the front-to-back depth of the cube.',
-        'Full view — all three axes at once. Gold sphere is you.'
-      ];
-      function applyFromScroll() {
-        if (!scene || !scroller) return;
-        if (!block.isConnected) {
-          if (block._onCubeScroll) {
-            window.removeEventListener('scroll', block._onCubeScroll);
-            window.removeEventListener('resize', block._onCubeScroll);
-          }
-          return;
-        }
-        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          scene.style.setProperty('--cube-yaw', '38deg');
-          scene.style.setProperty('--cube-pitch', '-18deg');
-          return;
-        }
-        var rect = scroller.getBoundingClientRect();
-        var sticky = 300;
-        var range = Math.max(1, scroller.offsetHeight - sticky);
-        var t = Math.max(0, Math.min(1, (80 - rect.top) / range));
-        var yaw = t * 215;
-        var pitch = -6 + Math.sin(t * Math.PI) * -26;
-        scene.style.setProperty('--cube-yaw', yaw + 'deg');
-        scene.style.setProperty('--cube-pitch', pitch + 'deg');
-        var step = t < 0.22 ? 0 : t < 0.48 ? 1 : t < 0.74 ? 2 : 3;
-        if (caption) caption.textContent = lines[step];
-        ticks.forEach(function (el, i) {
-          el.classList.toggle('is-on', i === step);
+    root.querySelectorAll('[data-compass-block]').forEach(function (block) {
+      if (block._viewBound) return;
+      block._viewBound = true;
+      var lead = block.querySelector('[data-compass-lead]');
+      var lead2 = 'The gold mark is you. Money runs left–right. Rules vs freedom runs up–down.';
+      var lead3 = 'Drag the cube to turn it. Front-to-back is culture (Plus). Gold sphere is you.';
+      function setView(view) {
+        block.querySelectorAll('[data-compass-view]').forEach(function (b) {
+          b.classList.toggle('is-on', b.getAttribute('data-compass-view') === view);
         });
+        block.querySelectorAll('[data-compass-pane]').forEach(function (pane) {
+          pane.classList.toggle('is-hidden', pane.getAttribute('data-compass-pane') !== view);
+        });
+        if (lead) lead.textContent = view === '3d' ? lead3 : lead2;
       }
-      if (!block._onCubeScroll) {
-        block._onCubeScroll = applyFromScroll;
-        window.addEventListener('scroll', applyFromScroll, { passive: true });
-        window.addEventListener('resize', applyFromScroll);
-      }
-      applyFromScroll();
-    }
+      block.querySelectorAll('[data-compass-view]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          setView(btn.getAttribute('data-compass-view'));
+        });
+      });
+      bindCubeDrag(block.querySelector('[data-cube-stage]'), block.querySelector('[data-cube-scene]'));
+      setView('2d');
+    });
   }
 
   g.AnimusResultsUI = {

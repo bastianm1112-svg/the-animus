@@ -245,7 +245,7 @@
       var polEmpty = isOwner
         ? 'Take the test to see where you sit on money, rules, and (with Plus) culture.'
         : 'Their political map shows up after they finish the test.';
-      root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Political cube</div>'
+      root.innerHTML = '<div class="viz-empty"><div class="viz-empty-title">Political map</div>'
         + '<p>' + polEmpty + '</p></div>';
       return;
     }
@@ -257,8 +257,9 @@
         + 'more ' + (q.auth === 'Authoritarian' ? 'rules' : q.auth === 'Libertarian' ? 'personal freedom' : 'middle-ground rules')
         + ' and ' + (q.econ === 'Right' ? 'markets' : q.econ === 'Left' ? 'state' : 'a mixed economy') + '.', isOwner);
 
-    var simple = p.subj + ' sit in a see-through cube: left–right is money, up–down is rules vs freedom'
-      + (plus ? ', and front–back is culture.' : '. Culture (front–back) is a Plus layer.');
+    var simple = plus
+      ? 'A flat map of money and rules. Open 3D to add culture as depth.'
+      : 'A flat map of money and rules. 3D adds a culture axis with Plus.';
     var panel = g.AnimusResultsUI && g.AnimusResultsUI.politicalPanelHtml
       ? g.AnimusResultsUI.politicalPanelHtml({ data: snap, ai: snap, plus: !!plus })
       : '';
@@ -273,10 +274,6 @@
       + '<p class="insight-simple">' + escapeHTML(simple) + '</p>'
       + (polText ? '<div class="narrative pol-narrative"><div class="narrative-title">In everyday words</div><div class="narrative-text">' + polText + '</div></div>' : '')
       + '<div id="politicalDynamicRoot">' + panel + '</div>'
-      + '<div class="card pol-axes-card" style="margin-top:16px"><div class="card-title">The two everyday sliders</div>'
-      + axisTrack('Money', snap.polX, 'More state', 'More markets')
-      + axisTrack('Rules', snap.polY, 'More freedom', 'More rules')
-      + '</div>'
       + (snap.mf ? '<div class="card pol-mf-card"><div class="card-title">What feels morally important</div>'
         + '<p class="pol-align-sub">Not a party. Six gut-level cares, scored from your answers.</p>'
         + '<div class="pol-mf-layout"><div class="mf-radar-wrap">' + buildMfRadar(snap.mf) + '</div>'
