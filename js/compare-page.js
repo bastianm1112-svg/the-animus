@@ -32,13 +32,13 @@
   }
 
   function switchTab(panelId) {
-    var tabs = document.querySelectorAll('.compare-tab');
+    var tabs = document.querySelectorAll('#compareTabs .compare-tab');
     tabs.forEach(function (t) {
       var on = t.getAttribute('data-panel') === panelId;
       t.classList.toggle('active', on);
       t.setAttribute('aria-selected', on ? 'true' : 'false');
     });
-    document.querySelectorAll('.c-panel').forEach(function (p) {
+    document.querySelectorAll('#comparePanels .c-panel').forEach(function (p) {
       p.classList.remove('active');
     });
     var panel = document.getElementById('c-panel-' + panelId);

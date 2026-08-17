@@ -29,12 +29,14 @@
       mbtiName: snap.mbtiName || '',
       ennType: snap.ennType || '',
       ennWing: snap.ennWing || '',
+      ennTritype: snap.ennTritype || '',
       instStack: snap.instStack || '',
       phi: snap.phi || '',
       att: snap.att || '',
       cog: snap.cog || {},
       polX: snap.polX || 0,
       polY: snap.polY || 0,
+      tagline: snap.tagline || '',
       isYou: isYou
     };
   }
@@ -240,23 +242,27 @@
 
     content.innerHTML =
       '<div class="compare-hero group-hero">' + strip + scoreHtml + glance + '</div>' +
+      '<div class="compare-panel-card group-ai-card" id="groupAiPanel">' +
+      '<div class="compare-panel-head">' +
+      '<h2 class="compare-panel-title">AI Analysis</h2>' +
+      '<p class="compare-panel-sub">How these types interact in the room — same live brief as 1-on-1.</p>' +
+      '</div>' +
+      '<div id="groupAiContent"><div class="compare-ai-loading" role="status">Writing the group analysis…</div></div>' +
+      '</div>' +
       '<div class="compare-tabs-wrap"><div class="compare-tabs" role="tablist">' +
-      '<button type="button" class="compare-tab active" data-group-panel="ai"><span class="compare-tab-text"><span class="compare-tab-label">AI</span><span class="compare-tab-desc">Insight</span></span></button>' +
-      '<button type="button" class="compare-tab" data-group-panel="room"><span class="compare-tab-text"><span class="compare-tab-label">Room</span><span class="compare-tab-desc">Dynamics</span></span></button>' +
+      '<button type="button" class="compare-tab active" data-group-panel="room"><span class="compare-tab-text"><span class="compare-tab-label">Room</span><span class="compare-tab-desc">Dynamics</span></span></button>' +
       '<button type="button" class="compare-tab" data-group-panel="grid"><span class="compare-tab-text"><span class="compare-tab-label">Pairs</span><span class="compare-tab-desc">Matrix</span></span></button>' +
       '</div></div>' +
-      '<div class="c-panel compare-panel-card active" data-group-pane="ai">' +
-      '<div class="compare-panel-head"><h2 class="compare-panel-title">AI Analysis</h2>' +
-      '<p class="compare-panel-sub">How this mix actually runs — same beats as 1-on-1.</p></div>' +
-      '<div id="groupAiContent"><div class="compare-ai-loading" role="status">Writing the group brief…</div></div></div>' +
-      '<div class="c-panel compare-panel-card" data-group-pane="room">' +
+      '<div class="group-pane active" data-group-pane="room">' +
+      '<div class="compare-panel-card">' +
       '<div class="compare-panel-head"><h2 class="compare-panel-title">The room</h2>' +
       '<p class="compare-panel-sub">Who sits near whom, and who is the weather system.</p></div>' +
-      (roomHtml || '<p class="compare-panel-empty">Need two completed profiles.</p>') + '</div>' +
-      '<div class="c-panel compare-panel-card" data-group-pane="grid">' +
+      (roomHtml || '<p class="compare-panel-empty">Need two completed profiles.</p>') + '</div></div>' +
+      '<div class="group-pane" data-group-pane="grid">' +
+      '<div class="compare-panel-card">' +
       '<div class="compare-panel-head"><h2 class="compare-panel-title">Every pair</h2>' +
       '<p class="compare-panel-sub">Same scoring as 1-on-1, for each pairing in the room.</p></div>' +
-      (matrixHtml || '<p class="compare-panel-empty">Need two completed tests.</p>') + '</div>';
+      (matrixHtml || '<p class="compare-panel-empty">Need two completed tests.</p>') + '</div></div>';
 
     content.querySelectorAll('[data-group-panel]').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -280,39 +286,85 @@
   }
 
   function renderGroupAnalysisHtml(ai, note) {
-    var html = '';
-    if (ai.simpleTake) {
-      html += '<p class="insight-simple">' + escapeHTML(ai.simpleTake) + '</p>';
+    var html =
+      '<div class="ai-section"><div class="ai-section-title">Where You Align</div><div class="ai-block"><div class="ai-block-text">' +
+      formatAiParagraphs(ai.whereAlign) +
+      '</div></div></div>' +
+      '<div class="ai-section"><div class="ai-section-title">Where You\'ll Clash</div><div class="ai-block"><div class="ai-block-text">' +
+      formatAiParagraphs(ai.whereClash) +
+      '</div></div></div>' +
+      '<div class="ai-section"><div class="ai-section-title">How You\'d Interact</div><div class="ai-block"><div class="ai-block-text">' +
+      formatAiParagraphs(ai.dynamic) +
+      '</div></div></div>' +
+      '<div class="ai-section"><div class="ai-section-title">What Each Brings Out</div><div class="ai-block"><div class="ai-block-text">' +
+      formatAiParagraphs(ai.mutualEffect) +
+      '</div></div></div>';
+    if (note) {
+      html = '<p class="compare-ai-note">' + escapeHTML(note) + '</p>' + html;
     }
-    html +=
-      '<div class="ai-section"><div class="ai-section-title">Where You Align</div><div class="ai-block"><div class="ai-block-text">' + formatAiParagraphs(ai.whereAlign) + '</div></div></div>' +
-      '<div class="ai-section"><div class="ai-section-title">Where You\'ll Clash</div><div class="ai-block"><div class="ai-block-text">' + formatAiParagraphs(ai.whereClash) + '</div></div></div>' +
-      '<div class="ai-section"><div class="ai-section-title">How You\'d Interact</div><div class="ai-block"><div class="ai-block-text">' + formatAiParagraphs(ai.dynamic) + '</div></div></div>' +
-      '<div class="ai-section"><div class="ai-section-title">What Each Brings Out</div><div class="ai-block"><div class="ai-block-text">' + formatAiParagraphs(ai.mutualEffect) + '</div></div></div>';
-    if (note) html = '<p class="compare-ai-note">' + escapeHTML(note) + '</p>' + html;
     return html;
+  }
+
+  function parseAnalysisPayload(text) {
+    if (!text) return null;
+    var cleaned = text.replace(/```json|```/g, '').trim();
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {
+      var match = cleaned.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          return JSON.parse(match[0]);
+        } catch (e2) {
+          return null;
+        }
+      }
+    }
+    return null;
   }
 
   function runGroupAnalysis(people, dyn, avgCompat) {
     var el = document.getElementById('groupAiContent');
     if (!el) return;
     var Normalize = g.AnimusCompareNormalize;
+    var names = people.map(function (p) { return p.displayName || 'Someone'; });
+    var pairLines = [];
+    for (var i = 0; i < people.length; i++) {
+      for (var j = i + 1; j < people.length; j++) {
+        var sc = calcCompat(people[i], people[j]);
+        if (sc != null) {
+          pairLines.push(
+            (people[i].displayName || 'A') + ' × ' + (people[j].displayName || 'B') + ' ~' + sc + '%'
+          );
+        }
+      }
+    }
     var meta = {
       avgCompat: avgCompat,
+      pairLines: pairLines.join('\n'),
       closest: dyn && dyn.closestPair && (dyn.closestPair.names || []).join(' & '),
       contrast: dyn && dyn.contrastingPair && (dyn.contrastingPair.names || []).join(' & ')
     };
     function showOffline(note) {
       var ai = Normalize && Normalize.buildOfflineGroupAnalysis
         ? Normalize.buildOfflineGroupAnalysis(people, meta)
-        : { whereAlign: 'This group shares overlapping types.', whereClash: 'Friction follows the widest matrix gaps.', dynamic: 'Roles will sort themselves under stress.', mutualEffect: 'Name functions instead of character.', simpleTake: 'In plain words: overlap is the glue; the matrix shows the weather.' };
+        : {
+            whereAlign: 'Your types suggest overlapping values with distinct blind spots.',
+            whereClash: 'Stress may highlight different priorities in planning vs. emotional tone.',
+            dynamic: 'Clear roles after hard talks keep the room constructive.',
+            mutualEffect: 'Each person can stretch the others outside their default comfort zone.'
+          };
       el.innerHTML = renderGroupAnalysisHtml(ai, note);
     }
+    el.innerHTML =
+      '<div class="compare-ai-loading" role="status">Analyzing <strong>' +
+      escapeHTML(names.join(', ')) +
+      '</strong>…</div>';
     var prompt = Normalize && Normalize.buildGroupPrompt
       ? Normalize.buildGroupPrompt(people, meta)
-      : 'Analyze this group. JSON keys whereAlign, whereClash, dynamic, mutualEffect.';
+      : 'Analyze this group. Return JSON with keys whereAlign, whereClash, dynamic, mutualEffect.';
     if (!g.AnimusShared || !g.AnimusShared.fetchApiPost) {
-      showOffline('Local brief — sign in for the live group analysis.');
+      showOffline('Sign in to refresh live AI — showing profile-based analysis.');
       return;
     }
     g.AnimusShared.fetchApiPost('/api/compare', { prompt: prompt, mode: 'group' })
@@ -324,23 +376,21 @@
         var text = (d.content || []).map(function (b) {
           return b.type === 'text' ? b.text : '';
         }).join('').trim();
-        if (!text && d.whereAlign) {
-          el.innerHTML = renderGroupAnalysisHtml(d);
+        var ai = parseAnalysisPayload(text);
+        if (ai && ai.whereAlign) {
+          el.innerHTML = renderGroupAnalysisHtml(ai, null);
           return;
         }
-        var ai = null;
-        try { ai = JSON.parse(text.replace(/```json|```/g, '').trim()); } catch (e) {
-          var m = text.match(/\{[\s\S]*\}/);
-          if (m) { try { ai = JSON.parse(m[0]); } catch (e2) { ai = null; } }
-        }
-        if (!ai || !ai.whereAlign) {
-          showOffline('Live response was incomplete — showing the local group brief.');
-          return;
-        }
-        el.innerHTML = renderGroupAnalysisHtml(ai);
+        showOffline('AI response was incomplete — showing profile-based analysis from your scores.');
       })
-      .catch(function () {
-        showOffline('Live analysis unavailable right now. This is the local group brief.');
+      .catch(function (err) {
+        var note = 'Live AI unavailable — showing profile-based analysis from your scores.';
+        if (err && err.message === '401') note = 'Sign in to refresh live AI — showing profile-based analysis.';
+        if (err && err.message === '403') note = 'Group analysis needs Animus Plus — showing profile-based analysis.';
+        if (err && err.message === '429') {
+          note = 'Too many AI requests right now — showing profile-based analysis from your scores.';
+        }
+        showOffline(note);
       });
   }
 

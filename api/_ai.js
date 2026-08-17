@@ -14,7 +14,7 @@ const TOKEN_BUDGET = {
   compare: 2800,
   simplify: 150,
   career: 1800,
-  group: 2200
+  group: 2800
 };
 
 const inFlight = new Map();

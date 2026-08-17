@@ -473,30 +473,37 @@
     p = p || {};
     return (
       (p.displayName || p.name || 'Someone') +
+      (p.isYou ? ' (You)' : '') +
       ': MBTI ' + (p.mbti || '?') +
+      (p.mbtiName ? ' (' + p.mbtiName + ')' : '') +
       ', Enneagram ' + (p.ennType || '?') + 'w' + (p.ennWing || '?') +
+      (p.ennTritype ? ', tritype ' + p.ennTritype : '') +
       ', attachment ' + labelAtt(p.att) +
       ', philosophy ' + labelPhi(p.phi) +
-      ', political X=' + (p.polX || 0) + ' Y=' + (p.polY || 0) +
+      ', political ' + polSummary(p) +
+      ' (X=' + (p.polX || 0) + ' Y=' + (p.polY || 0) + ')' +
       (p.instStack ? ', instincts ' + p.instStack : '') +
-      (p.cog ? ', stack ' + topFnList(p.cog, 4).join('>') : '')
+      (p.cog ? ', stack ' + topFnList(p.cog, 4).join('>') : '') +
+      (p.tagline ? ', tagline "' + p.tagline + '"' : '')
     );
   }
 
   function buildGroupPrompt(people, meta) {
     meta = meta || {};
     var list = (people || []).map(personLine).join('\n');
+    var pairs = meta.pairLines ? '\nPair scores:\n' + meta.pairLines + '\n' : '';
     return (
       'You are an expert group-dynamics analyst using MBTI functions, Enneagram, attachment, and political temperament. ' +
-      'Write a specific brief for this real group. Rules:\n' +
-      '- Name people. Cite types and scores. No horoscope fluff.\n' +
+      'Write the SAME depth of analysis as a 1-on-1 ANIMUS compare, but for this whole group. Rules:\n' +
+      '- Name every person. Cite types, functions, Enneagram, attachment, and scores. No horoscope fluff.\n' +
       '- Ban vague lines like "great team chemistry" unless tied to a measured trait.\n' +
       '- Conflict is predictable triggers, not moral failure.\n\n' +
       'Group (' + (people || []).length + ' people):\n' + list + '\n' +
+      pairs +
       (meta.avgCompat != null ? 'Average pair compatibility ~' + meta.avgCompat + '%.\n' : '') +
       (meta.closest ? 'Closest pair: ' + meta.closest + '.\n' : '') +
       (meta.contrast ? 'Most contrasting pair: ' + meta.contrast + '.\n' : '') +
-      'Return ONLY valid JSON: {"simpleTake":"3-5 everyday sentences a non-expert can read first","whereAlign":"2 short paragraphs on what holds the group together","whereClash":"2 short paragraphs on likely friction and who it lands on","dynamic":"1-2 paragraphs on how the group actually runs meetings, jokes, and stress","mutualEffect":"1-2 paragraphs on what each role pulls from the others, naming people"}.'
+      'Return ONLY valid JSON with string values (no markdown): {"whereAlign":"2 paragraphs (~120 words each) on what holds the group together, naming people and types","whereClash":"2 paragraphs on friction, who it lands on, and attachment/philosophy/political gaps","dynamic":"1-2 paragraphs on day-to-day interaction in calm talk, conflict, and groups","mutualEffect":"1-2 paragraphs on what each person pulls out of the others, naming functions/traits"}.'
     );
   }
 
@@ -505,7 +512,7 @@
     var names = (people || []).map(function (p) { return p.displayName || p.mbti || 'Someone'; });
     var joined = names.join(', ');
     return {
-      simpleTake: 'In plain words: this room shares a language more than a random crowd would. Use the matrix for who clicks, and the brief below for who will clash when plans, closeness, or control get real.',
+      simpleTake: '',
       whereAlign: joined + ' share overlapping maps on type and values more than a random room would. The glue is usually the most common function stack and whoever sits nearest the group average on politics and attachment.\n\nTreat that overlap as a shared language, not proof everyone wants the same outcome.',
       whereClash: 'Friction shows up where Enneagram motives and attachment styles disagree about speed, closeness, and who is allowed to decide. The most contrasting pair in the matrix is the weather system everyone else has to walk through.\n\nName the trigger (planning vs feeling, control vs space) instead of calling someone difficult.',
       dynamic: 'In calm talk, the group likely follows whoever has the strongest Te/Fe read of the room. Under stress, inferior functions and protest behaviors get louder. Average pair score ~' + (meta.avgCompat != null ? meta.avgCompat : '—') + '%.',

@@ -1525,9 +1525,11 @@ body.page-compare .friends-picker-bar {
   font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 14px;
 }
-.compare-mode-group .compare-tabs-wrap {
+.group-ai-card {
   margin-top: 18px;
 }
+.group-pane { display: none; }
+.group-pane.active { display: block; }
 @media (max-width: 640px) {
   .group-glance { grid-template-columns: 1fr; }
 }
