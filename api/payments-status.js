@@ -19,6 +19,19 @@ module.exports = async function handler(req, res) {
     livePayments: stripeMode === 'live',
     productionSite: isProductionSite(),
     warning: livePaymentsBlock || null,
-    missing: missing
+    missing: missing,
+    gaMeasurementId: /^G-[A-Z0-9]+$/i.test(
+      (process.env.ANIMUS_GA_MEASUREMENT_ID || process.env.GA_MEASUREMENT_ID || '').trim()
+    )
+      ? (process.env.ANIMUS_GA_MEASUREMENT_ID || process.env.GA_MEASUREMENT_ID || '').trim()
+      : null,
+    ads: {
+      enabled: false,
+      provider: null,
+      placements: {
+        'results.belowSummary': true,
+        'home.footer': true
+      }
+    }
   });
 };

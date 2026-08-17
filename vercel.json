@@ -100,6 +100,8 @@
     {"source": "/types", "destination": "/types.html"},
     {"source": "/figures", "destination": "/figures.html"},
     {"source": "/api/admin/me", "destination": "/api/admin"},
+    {"source": "/api/cultural-score", "destination": "/api/cultural"},
+    {"source": "/api/site-config", "destination": "/api/payments-status"},
     {"source": "/profile", "destination": "/profile.html"},
     {"source": "/404", "destination": "/404.html"},
     {"source": "/:username([^/.]+)", "destination": "/profile.html?u=:username"}
