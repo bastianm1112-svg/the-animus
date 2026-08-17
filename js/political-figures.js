@@ -40,7 +40,19 @@
     { name: 'Jacinda Ardern', popularity: 4, polX: -30, polY: 0, polZ: 60, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' },
     { name: 'Viktor Orbán', popularity: 4, polX: 20, polY: 55, polZ: -75, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' },
     { name: 'Pope Francis', popularity: 5, polX: -35, polY: 20, polZ: -30, dataStatus: 'estimated', sourceNote: 'Public teaching; estimated — not a party politician.' },
-    { name: 'Thomas Sowell', popularity: 3, polX: 60, polY: -15, polZ: -25, dataStatus: 'estimated', sourceNote: 'Published commentary; estimated.' }
+    { name: 'Thomas Sowell', popularity: 3, polX: 60, polY: -15, polZ: -25, dataStatus: 'estimated', sourceNote: 'Published commentary; estimated.' },
+    { name: 'Nelson Mandela', popularity: 5, polX: -35, polY: -10, polZ: 25, dataStatus: 'estimated', sourceNote: 'Historical public record; estimated. Not a living politician.' },
+    { name: 'Lee Kuan Yew', popularity: 4, polX: 25, polY: 50, polZ: -25, dataStatus: 'estimated', sourceNote: 'Historical public record of state-building; estimated.' },
+    { name: 'Luiz Inácio Lula da Silva', popularity: 5, polX: -40, polY: 8, polZ: 20, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' },
+    { name: 'Andrés Manuel López Obrador', popularity: 4, polX: -30, polY: 20, polZ: -5, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' },
+    { name: 'Narendra Modi', popularity: 5, polX: 18, polY: 38, polZ: -45, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' },
+    { name: 'Tsai Ing-wen', popularity: 4, polX: 5, polY: -5, polZ: 40, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' },
+    { name: 'Ellen Johnson Sirleaf', popularity: 3, polX: -10, polY: 5, polZ: 15, dataStatus: 'estimated', sourceNote: 'Historical public record; estimated.' },
+    { name: 'Giorgia Meloni', popularity: 4, polX: 22, polY: 28, polZ: -55, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' },
+    { name: 'Sanna Marin', popularity: 3, polX: -28, polY: -5, polZ: 55, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' },
+    { name: 'Claudia Sheinbaum', popularity: 4, polX: -32, polY: 12, polZ: 10, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' },
+    { name: 'Cyril Ramaphosa', popularity: 3, polX: -18, polY: 10, polZ: 5, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' },
+    { name: 'Joko Widodo', popularity: 4, polX: -5, polY: 15, polZ: -10, dataStatus: 'estimated', sourceNote: 'Public record; estimated.' }
   ];
 
   var MISMATCH_FLOOR = 0.85;

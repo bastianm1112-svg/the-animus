@@ -43,6 +43,10 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 2px;
 }
 
 .site-legal-footer .footer-links a:hover {

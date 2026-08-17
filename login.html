@@ -27,7 +27,15 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(e){ con
 body.light-mode{--bg:#f4f1ec;--surface:#fff;--surface2:#f8f5f0;--border:#e0dbd4;--border2:#cdc7bf;--text:#1a1714;--muted:#9a9189;--muted2:#6b6259;--white:#1a1714;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
-@media(max-width:768px){body{grid-template-columns:1fr;}.left-panel{display:none;}}
+@media(max-width:768px){
+  body{grid-template-columns:1fr;}
+  .left-panel{display:none;}
+  .mobile-logo{display:block;}
+  .right-panel{padding:28px 20px calc(24px + env(safe-area-inset-bottom,0px));}
+  .form-input{font-size:16px;min-height:44px;}
+  .toggle-btn{min-height:44px;}
+  .btn-google,.btn-submit{min-height:48px;}
+}
 .left-panel{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:space-between;padding:48px;position:relative;overflow:hidden;}
 .left-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(200,169,110,0.05) 0%,transparent 70%);pointer-events:none;}
 .panel-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.12em;color:var(--white);text-decoration:none;}
@@ -40,6 +48,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .panel-dim::before{content:'';width:24px;height:1px;background:var(--gold2);flex-shrink:0;}
 .panel-dim strong{color:var(--muted2);font-weight:400;}
 .right-panel{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:48px 40px;min-height:100vh;}
+.skip-link{position:absolute;left:-999px;top:8px;background:var(--gold);color:#000;padding:8px 12px;z-index:999;font-size:13px;}
+.skip-link:focus{left:8px;}
 .auth-box{width:100%;max-width:400px;}
 .mobile-logo{display:none;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.12em;color:var(--white);text-decoration:none;margin-bottom:40px;text-align:center;}
 .mobile-logo span{color:var(--gold);}
@@ -52,6 +62,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .toggle-btn.active{background:var(--surface2);color:var(--text);border-bottom:2px solid var(--gold);}
 .btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-bottom:20px;}
 .btn-google:hover{border-color:var(--gold2);background:var(--surface2);}
+.btn-google:focus-visible,.btn-submit:focus-visible,.toggle-btn:focus-visible,.form-input:focus-visible{
+  outline:2px solid var(--gold);outline-offset:2px;
+}
 .btn-google:disabled{opacity:0.5;cursor:not-allowed;}
 .auth-divider{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
@@ -109,6 +122,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <script src="/js/animus-app.js" defer></script>
 </head>
 <body>
+<a href="#auth-box" class="skip-link">Skip to sign in</a>
 <script>(function(){if(localStorage.getItem('animus_theme')==='light')document.body.classList.add('light-mode');})();</script>
 
 <div class="left-panel">
@@ -128,7 +142,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 </div>
 
 <div class="right-panel">
-<div class="auth-box">
+<div class="auth-box" id="auth-box">
   <a href="/" class="mobile-logo">ANI<span>MUS</span></a>
 
   <div id="screenMain" class="screen show">

@@ -448,7 +448,7 @@ body.page-compare .compat-pct {
 }
 
 .compare-tab-desc {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
@@ -1415,9 +1415,9 @@ body.page-compare .friends-picker-bar {
   min-height: 44px;
 }
 
-.person-chip:hover {
-  border-color: var(--gold2);
-  transform: translateY(-1px);
+.person-chip:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .person-chip.selected {

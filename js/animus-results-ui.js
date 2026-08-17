@@ -325,7 +325,7 @@
       '</div>' +
       compassBlockHtml(data.polX, data.polY, polZ, hasZ) +
       '<section class="animus-pol-simple" data-depth-pane="simple">' +
-      '<p class="panel-sub">Plain-language map of where your answers sit. Matches are coordinate rhymes, not endorsements.</p>' +
+      '<p class="panel-sub">Plain-language map of where your answers sit. Nearby names are estimated coordinate rhymes from a mixed global set — not endorsements, and not “you are this person.”</p>' +
       '<div class="section-label">People you sit near</div>' + (simpleFigs || '<p class="animus-muted">No close figure matches on this map.</p>') +
       '<div class="section-label">Countries you sit near</div>' + (simpleCtry || '<p class="animus-muted">No close country matches on this map.</p>') +
       '</section>' +

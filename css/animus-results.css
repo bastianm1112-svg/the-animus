@@ -238,6 +238,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
 }
 .cube-scene {
   width: 156px;
@@ -360,15 +361,26 @@
 .sc-card .cube-stage { height: 168px; }
 .sc-card .cube-lead, .sc-card .cube-legend, .sc-card .cube-path, .sc-card .cube-caption { display: none; }
 
+body.light-mode .cube-face {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(138, 111, 62, 0.45);
+}
+body.light-mode .cube-cap { color: rgba(26, 23, 20, 0.7); }
+body.light-mode .cube-sphere-core {
+  box-shadow: inset -3px -4px 7px rgba(40, 24, 8, 0.25), 0 0 14px rgba(200, 169, 110, 0.45);
+}
+
+@media (max-width: 640px) {
+  .cube-stage { height: 200px; }
+  .cube-scene { transform: scale(0.82) rotateX(var(--cube-pitch, -6deg)) rotateY(var(--cube-yaw, 0deg)); }
+  .cube-rail { height: min(48vh, 360px); }
+  .cube-sticky { top: calc(var(--nav-h, 56px) + env(safe-area-inset-top, 0px)); }
+  .cube-cap { font-size: 8px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cube-rail { height: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cube-scene { animation: none; }
-}
-
-@media (prefers-reduced-motion: reduce) {
+  .cube-scene { animation: none; transform: rotateX(-18deg) rotateY(-28deg); }
   .animus-meter > span, .animus-compass-dot, .c3d-scene { transition: none; }
   html { scroll-behavior: auto; }
 }

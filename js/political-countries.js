@@ -29,7 +29,17 @@
     { name: 'Poland', popularity: 3, polX: 10, polY: 22, polZ: -35, dataStatus: 'estimated', sourceNote: 'Estimated conservative-institutional lean in recent decades.' },
     { name: 'Hungary', popularity: 3, polX: 8, polY: 40, polZ: -50, dataStatus: 'estimated', sourceNote: 'Estimated from publicly discussed illiberal-democratic turn.' },
     { name: 'Cuba', popularity: 3, polX: -70, polY: 70, polZ: 20, dataStatus: 'estimated', sourceNote: 'Estimated one-party socialist state placement.' },
-    { name: 'China', popularity: 5, polX: -30, polY: 80, polZ: -40, dataStatus: 'estimated', sourceNote: 'Estimated party-state political economy — not a personal endorsement.' }
+    { name: 'China', popularity: 5, polX: -30, polY: 80, polZ: -40, dataStatus: 'estimated', sourceNote: 'Estimated party-state political economy — not a personal endorsement.' },
+    { name: 'South Africa', popularity: 4, polX: -12, polY: 8, polZ: 10, dataStatus: 'estimated', sourceNote: 'Estimated mixed-economy democracy; national average, not every party.' },
+    { name: 'Nigeria', popularity: 4, polX: 8, polY: 18, polZ: -15, dataStatus: 'estimated', sourceNote: 'Estimated large federal democracy — not every region or party.' },
+    { name: 'Kenya', popularity: 3, polX: 5, polY: 12, polZ: -10, dataStatus: 'estimated', sourceNote: 'Estimated mixed-market East African democracy.' },
+    { name: 'Ghana', popularity: 3, polX: 0, polY: 5, polZ: 5, dataStatus: 'estimated', sourceNote: 'Estimated stable West African democratic placement.' },
+    { name: 'Egypt', popularity: 4, polX: 10, polY: 55, polZ: -40, dataStatus: 'estimated', sourceNote: 'Estimated high-capacity state placement — not a personal endorsement.' },
+    { name: 'Turkey', popularity: 4, polX: 12, polY: 40, polZ: -35, dataStatus: 'estimated', sourceNote: 'Estimated from publicly discussed executive-power and cultural mix.' },
+    { name: 'Indonesia', popularity: 5, polX: 5, polY: 20, polZ: -20, dataStatus: 'estimated', sourceNote: 'Estimated large-democracy average — not every party or island.' },
+    { name: 'Chile', popularity: 3, polX: 8, polY: 0, polZ: 15, dataStatus: 'estimated', sourceNote: 'Estimated market-leaning South American democracy.' },
+    { name: 'Argentina', popularity: 4, polX: -8, polY: 10, polZ: 5, dataStatus: 'estimated', sourceNote: 'Estimated mixed presidential-system placement — not every administration.' },
+    { name: 'United Arab Emirates', popularity: 4, polX: 40, polY: 50, polZ: -45, dataStatus: 'estimated', sourceNote: 'Estimated high-capacity Gulf state + market economy; not a personal endorsement.' }
   ];
 
   function rankClosest(profile, opts) {

@@ -138,7 +138,7 @@
           'this combination explains motivation loops, stress behavior, and what ' + p.subjL + ' reach for when challenged.'
         ),
         metrics: [
-          ['Ennea', (snap.ennType || '—') + 'w' + (snap.ennWing || '')],
+          ['Ennea', snap.ennType ? (snap.ennType + (snap.ennWing ? 'w' + snap.ennWing : '')) : '—'],
           ['Tritype', snap.ennTritype || '—'],
           ['Instinct', snap.instStack || '—']
         ],

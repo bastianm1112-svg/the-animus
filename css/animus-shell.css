@@ -679,6 +679,15 @@ p, .shop-sub, .friends-page-sub {
   transform: scale(0.98);
 }
 
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px;
+  }
+  .nav-item {
+    min-height: 44px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

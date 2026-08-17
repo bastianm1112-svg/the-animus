@@ -193,7 +193,7 @@
     {mbti:"ENFP",name:"Pippi Longstocking",cat:"Pop Culture",e:8,w:NaN,note:"Archetypal parallel."},
     {mbti:"ENFP",name:"Carl Rogers",cat:"Historical",e:1,w:NaN,note:"Archetypal parallel."},
     {mbti:"ENFP",name:"Ellen DeGeneres",cat:"Celebrity",e:6,w:NaN,note:"Archetypal parallel."},
-    {mbti:"ENFP",name:"Elizabeth Bennet",cat:"Pop Culture",e:4,w:NaN,note:"Archetypal parallel."}
+    {mbti:"ENFP",name:"Elizabeth Bennet",cat:"Pop Culture",e:4,w:NaN,note:"Archetypal parallel."},
     {mbti:"ESTP",name:"Serena Williams",cat:"Sports",e:8,w:7,note:"Competitive presence under elite pressure.",popularity:5,dataStatus:"estimated"},
     {mbti:"ESFP",name:"Lionel Messi",cat:"Sports",e:9,w:1,note:"Quiet craft expressed through play.",popularity:5,dataStatus:"estimated"},
     {mbti:"ESTP",name:"Cristiano Ronaldo",cat:"Sports",e:3,w:8,note:"Relentless self-demand and showmanship.",popularity:5,dataStatus:"estimated"},
@@ -222,7 +222,9 @@
     return {
       name: fig.name,
       cat: fig.cat,
-      type: fig.mbti + ' ' + fig.e + 'w' + fig.w,
+      type: fig.mbti + (Number.isFinite(Number(fig.e))
+        ? (' ' + fig.e + (Number.isFinite(Number(fig.w)) ? 'w' + fig.w : ''))
+        : ''),
       initials: initials(fig.name),
       note: fig.note,
       popularity: fig.popularity || 3,
@@ -236,8 +238,10 @@
     s += 40;
     if (String(fig.e) === String(ennType)) s += 35;
     else if (Math.abs(parseInt(fig.e, 10) - parseInt(ennType, 10)) === 1) s += 12;
-    if (String(fig.w) === String(ennWing)) s += 18;
-    else if (Math.abs(parseInt(fig.w, 10) - parseInt(ennWing, 10)) === 1) s += 6;
+    if (Number.isFinite(Number(fig.w))) {
+      if (String(fig.w) === String(ennWing)) s += 18;
+      else if (Math.abs(parseInt(fig.w, 10) - parseInt(ennWing, 10)) === 1) s += 6;
+    }
     s += (fig.popularity || 3) * 2;
     return s;
   }

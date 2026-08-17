@@ -101,7 +101,7 @@
       var init = (p.displayName || '?').charAt(0).toUpperCase();
       var isSel = _selected.indexOf(p.uid) > -1;
       var cls = 'person-chip' + (p.isYou ? ' you' : '') + (isSel ? ' selected' : '');
-      return '<div class="' + cls + '" data-uid="' + escapeHTML(p.uid) + '">'
+      return '<div class="' + cls + '" role="button" tabindex="0" aria-pressed="' + (isSel ? 'true' : 'false') + '" data-uid="' + escapeHTML(p.uid) + '">'
         + '<div class="chip-avatar">' + init + '</div>'
         + '<div class="chip-info">'
         + '<div class="chip-name">' + escapeHTML(p.isYou ? 'You (' + p.displayName + ')' : p.displayName) + '</div>'
@@ -401,6 +401,14 @@
     grid.addEventListener('click', function (e) {
       var chip = e.target.closest('.person-chip');
       if (!chip) return;
+      var uid = chip.getAttribute('data-uid');
+      if (uid) togglePerson(uid);
+    });
+    grid.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var chip = e.target.closest('.person-chip');
+      if (!chip || !grid.contains(chip)) return;
+      e.preventDefault();
       var uid = chip.getAttribute('data-uid');
       if (uid) togglePerson(uid);
     });
