@@ -34,10 +34,10 @@
 </script>
 <link rel="stylesheet" href="/css/animus-shell.css?v=20260817">
 <link rel="stylesheet" href="/style.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-unified.css?v=20260603">
+<link rel="stylesheet" href="/css/animus-unified.css?v=20260818">
 <link rel="stylesheet" href="/css/animus-release.css?v=20260603">
-<link rel="stylesheet" href="/css/animus-compare.css?v=20260817">
-<link rel="stylesheet" href="/css/animus-results.css">
+<link rel="stylesheet" href="/css/animus-compare.css?v=20260818">
+<link rel="stylesheet" href="/css/animus-results.css?v=20260818">
 <link rel="stylesheet" href="/css/animus-plus.css?v=20260603">
 <link rel="stylesheet" href="/css/animus-premium.css?v=20260608">
 <link rel="stylesheet" href="/css/animus-app-shell.css?v=20260608">
@@ -135,7 +135,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Playfair Display" font-size="12">—</text>
         </svg>
         <div class="ring-label">Cognitive</div>
       </div>
@@ -145,7 +145,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Playfair Display" font-size="12">—</text>
         </svg>
         <div class="ring-label">Values</div>
       </div>
@@ -155,7 +155,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Playfair Display" font-size="12">—</text>
         </svg>
         <div class="ring-label">Philosophy</div>
       </div>
@@ -165,7 +165,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Playfair Display" font-size="12">—</text>
         </svg>
         <div class="ring-label">Political</div>
       </div>
@@ -175,7 +175,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Playfair Display" font-size="12">—</text>
         </svg>
         <div class="ring-label">Attachment</div>
       </div>
@@ -185,7 +185,7 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
           <circle cx="28" cy="28" r="22" fill="none" stroke="#c8a96e" stroke-width="4"
             stroke-dasharray="138.16" stroke-dashoffset="138.16" stroke-linecap="round"
             transform="rotate(-90 28 28)"/>
-          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Bebas Neue" font-size="12">—</text>
+          <text x="28" y="32" text-anchor="middle" fill="#e2e2e2" font-family="Playfair Display" font-size="12">—</text>
         </svg>
         <div class="ring-label">Social</div>
       </div>
@@ -370,11 +370,11 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
 
 <div id="compareModeGroup" class="compare-mode-group">
   <div class="group-page-header">
-    <h2 class="group-page-title">Group compare</h2>
-    <div class="group-page-sub">Pick 2–6 people. You get a live analysis like 1-on-1: a simple take, then where you align, where you clash, and how the room actually runs.</div>
+    <h2 class="group-page-title">The room</h2>
+    <div class="group-page-sub">Same layout as 1-on-1: a score, then AI, then the details. Pick 2–6 people.</div>
   </div>
   <div class="selector-section">
-    <div class="selector-label">Select People to Compare</div>
+    <div class="selector-label">Who is in the room</div>
     <div class="selector-grid" id="selectorGrid">
       <div style="color:var(--muted);font-size:12px">Loading friends...</div>
     </div>
@@ -393,11 +393,11 @@ function escapeHTML(s){ return AnimusShared.escapeHTML(s); }
 
 <script src="/js/animus-political.js"></script>
 <script src="/js/animus-group-dynamics.js"></script>
-<script src="/js/animus-results-ui.js?v=20260817"></script>
+<script src="/js/animus-results-ui.js?v=20260818"></script>
 <script src="/js/compare-compat.js"></script>
 <script src="/js/compare-normalize.js?v=20260817"></script>
 <script src="/js/compare-friends.js"></script>
-<script src="/js/compare-group.js?v=20260817"></script>
+<script src="/js/compare-group.js?v=20260818"></script>
 <script src="/js/compare-pair.js?v=20260608"></script>
 <script src="/js/compare-page.js?v=20260608"></script>
 <script>

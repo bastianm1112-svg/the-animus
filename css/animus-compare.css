@@ -134,7 +134,7 @@ body.page-compare .compat-pct {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 16px;
   color: var(--gold);
   flex-shrink: 0;
@@ -440,7 +440,7 @@ body.page-compare .compat-pct {
 }
 
 .compare-tab-label {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 15px;
   letter-spacing: 0.08em;
   line-height: 1;
@@ -509,7 +509,7 @@ body.page-compare .compat-pct {
 }
 
 .compare-panel-title {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 28px;
   letter-spacing: 0.06em;
   color: var(--white);
@@ -672,13 +672,13 @@ body.page-compare .compat-pct {
 }
 
 .compare-panel-card .dual-num {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 13px;
   letter-spacing: 0.04em;
 }
 
 .compare-panel-card .dual-label strong {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 14px;
   letter-spacing: 0.04em;
 }
@@ -890,7 +890,7 @@ body.page-compare .compat-pct {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 24px;
   color: var(--gold);
   flex-shrink: 0;
@@ -916,7 +916,7 @@ body.page-compare .compat-pct {
 }
 
 .ph-type {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 28px;
   color: var(--gold);
   letter-spacing: 0.06em;
@@ -940,7 +940,7 @@ body.page-compare .compat-pct {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 14px;
   letter-spacing: 0.14em;
   border-color: var(--gold2);
@@ -974,7 +974,7 @@ body.page-compare .compat-pct {
 }
 
 .compat-pct {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 48px;
   color: var(--white);
   letter-spacing: 0.04em;
@@ -1481,14 +1481,55 @@ body.page-compare .friends-picker-bar {
   text-transform: none;
 }
 
-.group-content .section-title {
+.group-hero {
+  margin-bottom: 0;
+}
+.group-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 8px;
+  justify-content: flex-start;
+}
+.group-strip .profile-half {
+  flex: 1 1 140px;
+  max-width: 200px;
+}
+.group-glance {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+.group-glance-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+}
+.group-glance-item span {
+  display: block;
   font-size: 10px;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--gold2);
-  margin: 24px 0 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+.group-glance-item strong {
+  font-family: var(--font-display, 'Playfair Display', serif);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1.3;
+}
+.matrix-type {
+  color: var(--gold);
+  font-family: var(--font-display, 'Playfair Display', serif);
+  font-size: 14px;
+}
+.compare-mode-group .compare-tabs-wrap {
+  margin-top: 18px;
+}
+@media (max-width: 640px) {
+  .group-glance { grid-template-columns: 1fr; }
 }
 
 .profiles-grid {
@@ -1532,7 +1573,7 @@ body.page-compare .friends-picker-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 20px;
   color: var(--gold);
   margin: 0 auto 10px;
@@ -1552,7 +1593,7 @@ body.page-compare .friends-picker-bar {
 }
 
 .pc-mbti {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 28px;
   letter-spacing: 0.06em;
   color: var(--gold);
@@ -1619,7 +1660,7 @@ body.page-compare .friends-picker-bar {
 }
 
 .matrix-pct {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 22px;
   letter-spacing: 0.04em;
 }
@@ -1651,7 +1692,7 @@ body.page-compare .friends-picker-bar {
 }
 
 .insight-value {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 32px;
   letter-spacing: 0.04em;
   color: var(--white);

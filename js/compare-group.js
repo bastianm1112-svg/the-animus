@@ -155,56 +155,22 @@
       PH_NIE: 'Nietzschean', PH_EXI: 'Existentialist', PH_PRA: 'Pragmatist', PH_SKE: 'Skeptic'
     };
 
-    var cardsHtml = '<div class="section-title">Profiles</div><div class="profiles-grid">'
-      + people.map(function (p) {
-        var init = (p.displayName || '?').charAt(0).toUpperCase();
-        var ennStr = p.ennType && p.ennWing ? p.ennType + 'w' + p.ennWing : '';
-        var phi = p.phi ? phiNames[p.phi] || p.phi : '';
-        var detail = [ennStr, p.instStack, phi].filter(Boolean).join(' · ');
-        return '<div class="profile-card' + (p.isYou ? ' is-you' : '') + '">'
-          + (p.isYou ? '<div class="pc-you-badge">You</div>' : '')
-          + '<div class="pc-avatar">' + init + '</div>'
-          + '<div class="pc-name">' + escapeHTML(p.displayName) + '</div>'
-          + '<div class="pc-username">' + (p.username ? '@' + escapeHTML(p.username) : '') + '</div>'
-          + (p.mbti
-            ? '<div class="pc-mbti">' + escapeHTML(p.mbti) + '</div><div class="pc-enn">' + escapeHTML(detail) + '</div>'
-            : '<div class="pc-no-data">No profile yet</div>')
-          + '</div>';
-      }).join('')
-      + '</div>';
-
-    var matrixHtml = '';
-    if (people.filter(function (p) { return p.mbti; }).length >= 2) {
-      matrixHtml = '<div class="matrix-section"><div class="section-title">Compatibility Matrix</div>'
-        + '<div class="matrix-wrap"><table class="matrix-table"><thead><tr><th></th>'
-        + people.map(function (p) {
-          return '<th>' + (p.isYou ? 'You' : escapeHTML(p.displayName.split(' ')[0]))
-            + '<br><span style="color:var(--gold);font-family:var(--font-display),serif;font-size:14px">' + escapeHTML(p.mbti || '—') + '</span></th>';
-        }).join('')
-        + '</tr></thead><tbody>'
-        + people.map(function (a) {
-          return '<tr><td class="matrix-name">'
-            + (a.isYou ? '<span style="color:var(--green)">You</span>' : escapeHTML(a.displayName.split(' ')[0]))
-            + ' <span style="font-size:10px;color:var(--gold)">' + escapeHTML(a.mbti || '') + '</span></td>'
-            + people.map(function (b) {
-              if (a.uid === b.uid) return '<td class="self">—</td>';
-              var score = calcCompat(a, b);
-              if (score === null) return '<td style="color:var(--muted);font-size:11px">—</td>';
-              return '<td><span class="matrix-pct ' + compatClass(score) + '">' + score + '</span><span style="font-size:10px;color:var(--muted)">%</span></td>';
-            }).join('')
-            + '</tr>';
-        }).join('')
-        + '</tbody></table></div></div>';
-    }
+    var strip = '<div class="profiles-strip group-strip">' + people.map(function (p) {
+      var init = (p.displayName || '?').charAt(0).toUpperCase();
+      var ennStr = p.ennType && p.ennWing ? p.ennType + 'w' + p.ennWing : '';
+      return '<div class="profile-half">'
+        + '<div class="ph-avatar">' + init + '</div>'
+        + '<div class="ph-info">'
+        + '<div class="ph-name">' + escapeHTML(p.isYou ? 'You' : p.displayName) + '</div>'
+        + '<div class="ph-type">' + escapeHTML(p.mbti || '—') + '</div>'
+        + '<div class="ph-enn">' + escapeHTML(ennStr || (p.username ? '@' + p.username : '')) + '</div>'
+        + '</div></div>';
+    }).join('') + '</div>';
 
     var mbtiCounts = {};
     var totalCompat = 0, compatPairs = 0;
-    var avgPolX = 0, avgPolY = 0, polCount = 0;
     people.forEach(function (p) {
       if (p.mbti) mbtiCounts[p.mbti] = (mbtiCounts[p.mbti] || 0) + 1;
-      avgPolX += p.polX;
-      avgPolY += p.polY;
-      polCount++;
     });
     for (var i = 0; i < people.length; i++) {
       for (var j = i + 1; j < people.length; j++) {
@@ -213,40 +179,97 @@
       }
     }
     var avgCompat = compatPairs ? Math.round(totalCompat / compatPairs) : null;
-    avgPolX = polCount ? Math.round(avgPolX / polCount) : 0;
-    avgPolY = polCount ? Math.round(avgPolY / polCount) : 0;
     var mostCommon = Object.keys(mbtiCounts).sort(function (a, b) {
       return mbtiCounts[b] - mbtiCounts[a];
     })[0] || '—';
-    var eTypes = people.map(function (p) { return p.ennType; }).filter(Boolean);
-    var mostEnn = eTypes.length ? eTypes.sort(function (a, b) {
-      return eTypes.filter(function (x) { return x === b; }).length
-        - eTypes.filter(function (x) { return x === a; }).length;
-    })[0] : '—';
-    var polLabel = avgPolX > 10 ? 'Right' : avgPolX < -10 ? 'Left' : 'Center';
-    var authLabel = avgPolY > 10 ? 'Auth' : avgPolY < -10 ? 'Lib' : 'Moderate';
 
     var dyn = (g.AnimusGroupDynamics && g.AnimusGroupDynamics.analyze)
-      ? g.AnimusGroupDynamics.analyze(people, {
-          includeCultural: !!_hasPlus
-        })
+      ? g.AnimusGroupDynamics.analyze(people, { includeCultural: !!_hasPlus })
       : null;
-    var insightsHtml = '<div class="c-panel compare-panel-card" id="groupAiPanel" style="margin-top:8px">' +
-      '<div class="ai-section-title">Group analysis</div>' +
-      '<p class="compare-ai-note">Live brief for this mix — same four beats as 1-on-1, plus a plain-language opener.</p>' +
-      '<div id="groupAiContent"><div class="compare-ai-loading" role="status">Writing the group brief…</div></div>' +
-      '</div>';
-    if (dyn && g.AnimusResultsUI) {
-      insightsHtml += g.AnimusResultsUI.groupDynamicCard(dyn);
-    }
-    if (dyn && dyn.clusters && dyn.clusters.length) {
-      insightsHtml += '<div class="animus-card"><div class="animus-card-kicker">Subgroups</div><ul>' +
-        dyn.clusters.map(function (c) {
-          return '<li>' + escapeHTML(c.label) + ': ' + escapeHTML((c.members || []).join(', ')) + '</li>';
-        }).join('') + '</ul><p class="animus-fine">' + escapeHTML(dyn.qualified) + '</p></div>';
+
+    var verdict = avgCompat == null
+      ? 'Need completed tests on both sides of each pair.'
+      : avgCompat >= 70 ? 'This room overlaps a lot — friction will still show up in the brief.'
+        : avgCompat >= 50 ? 'Enough overlap to work; the brief names where it will snag.'
+          : 'This is a contrast room — useful if roles stay explicit.';
+
+    var scoreHtml = '<div class="compat-bar-wrap">'
+      + '<div class="compat-label">Room compatibility</div>'
+      + '<div class="compat-score-row">'
+      + '<div class="compat-pct">' + (avgCompat != null ? avgCompat : '—') + '<span>%</span></div>'
+      + '<div class="compat-track"><div class="compat-fill" style="width:' + (avgCompat || 0) + '%"></div></div>'
+      + '<div class="compat-verdict">' + escapeHTML(verdict) + '</div>'
+      + '</div></div>';
+
+    var glance = '<div class="group-glance">'
+      + '<div class="group-glance-item"><span>Common type</span><strong>' + escapeHTML(mostCommon) + '</strong></div>'
+      + '<div class="group-glance-item"><span>Closest</span><strong>' + escapeHTML(dyn && dyn.closestPair ? (dyn.closestPair.names || []).join(' & ') : '—') + '</strong></div>'
+      + '<div class="group-glance-item"><span>Most contrast</span><strong>' + escapeHTML(dyn && dyn.contrastingPair ? (dyn.contrastingPair.names || []).join(' & ') : '—') + '</strong></div>'
+      + '</div>';
+
+    var matrixHtml = '';
+    if (people.filter(function (p) { return p.mbti; }).length >= 2) {
+      matrixHtml = '<div class="matrix-wrap"><table class="matrix-table"><thead><tr><th></th>'
+        + people.map(function (p) {
+          return '<th>' + (p.isYou ? 'You' : escapeHTML(p.displayName.split(' ')[0]))
+            + '<br><span class="matrix-type">' + escapeHTML(p.mbti || '—') + '</span></th>';
+        }).join('')
+        + '</tr></thead><tbody>'
+        + people.map(function (a) {
+          return '<tr><td class="matrix-name">'
+            + (a.isYou ? 'You' : escapeHTML(a.displayName.split(' ')[0]))
+            + '</td>'
+            + people.map(function (b) {
+              if (a.uid === b.uid) return '<td class="self">—</td>';
+              var score = calcCompat(a, b);
+              if (score === null) return '<td>—</td>';
+              return '<td><span class="matrix-pct ' + compatClass(score) + '">' + score + '</span>%</td>';
+            }).join('')
+            + '</tr>';
+        }).join('')
+        + '</tbody></table></div>';
     }
 
-    content.innerHTML = cardsHtml + insightsHtml + matrixHtml;
+    var roomHtml = (dyn && g.AnimusResultsUI ? g.AnimusResultsUI.groupDynamicCard(dyn) : '')
+      + (dyn && dyn.clusters && dyn.clusters.length
+        ? '<div class="animus-card" style="margin-top:12px"><div class="animus-card-kicker">Subgroups</div><ul>' +
+          dyn.clusters.map(function (c) {
+            return '<li>' + escapeHTML(c.label) + ': ' + escapeHTML((c.members || []).join(', ')) + '</li>';
+          }).join('') + '</ul></div>'
+        : '');
+
+    content.innerHTML =
+      '<div class="compare-hero group-hero">' + strip + scoreHtml + glance + '</div>' +
+      '<div class="compare-tabs-wrap"><div class="compare-tabs" role="tablist">' +
+      '<button type="button" class="compare-tab active" data-group-panel="ai"><span class="compare-tab-text"><span class="compare-tab-label">AI</span><span class="compare-tab-desc">Insight</span></span></button>' +
+      '<button type="button" class="compare-tab" data-group-panel="room"><span class="compare-tab-text"><span class="compare-tab-label">Room</span><span class="compare-tab-desc">Dynamics</span></span></button>' +
+      '<button type="button" class="compare-tab" data-group-panel="grid"><span class="compare-tab-text"><span class="compare-tab-label">Pairs</span><span class="compare-tab-desc">Matrix</span></span></button>' +
+      '</div></div>' +
+      '<div class="c-panel compare-panel-card active" data-group-pane="ai">' +
+      '<div class="compare-panel-head"><h2 class="compare-panel-title">AI Analysis</h2>' +
+      '<p class="compare-panel-sub">How this mix actually runs — same beats as 1-on-1.</p></div>' +
+      '<div id="groupAiContent"><div class="compare-ai-loading" role="status">Writing the group brief…</div></div></div>' +
+      '<div class="c-panel compare-panel-card" data-group-pane="room">' +
+      '<div class="compare-panel-head"><h2 class="compare-panel-title">The room</h2>' +
+      '<p class="compare-panel-sub">Who sits near whom, and who is the weather system.</p></div>' +
+      (roomHtml || '<p class="compare-panel-empty">Need two completed profiles.</p>') + '</div>' +
+      '<div class="c-panel compare-panel-card" data-group-pane="grid">' +
+      '<div class="compare-panel-head"><h2 class="compare-panel-title">Every pair</h2>' +
+      '<p class="compare-panel-sub">Same scoring as 1-on-1, for each pairing in the room.</p></div>' +
+      (matrixHtml || '<p class="compare-panel-empty">Need two completed tests.</p>') + '</div>';
+
+    content.querySelectorAll('[data-group-panel]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-group-panel');
+        content.querySelectorAll('[data-group-panel]').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
+        content.querySelectorAll('[data-group-pane]').forEach(function (pane) {
+          pane.classList.toggle('active', pane.getAttribute('data-group-pane') === id);
+        });
+      });
+    });
+
     runGroupAnalysis(people, dyn, avgCompat);
   }
 

@@ -123,8 +123,8 @@
     }
     return card({
       kind: 'group',
-      kicker: 'Group profile',
-      title: 'Cohesion ' + (dyn.cohesion || '—') + ' · Diversity ' + (dyn.diversity || '—'),
+      kicker: 'How tight is this room',
+      title: 'Glue ' + (dyn.cohesion || '—') + ' · Spread ' + (dyn.diversity || '—'),
       body:
         '<ul>' +
         '<li>Closest pair: ' + esc((dyn.closestPair && dyn.closestPair.names || []).join(' & ')) + '</li>' +
@@ -233,33 +233,45 @@
     var tz = (z / 100) * 62;
     return (
       '<div class="animus-compass-block" data-compass-block>' +
-      '<p class="cube-lead">This cube <em>is</em> the compass. Gold dot = you. Left–right = money. Up–down = rules vs freedom. Front–back = culture' +
+      '<p class="cube-lead">Scroll to walk around the cube. The gold sphere is you. Left–right is money, up–down is rules vs freedom, front–back is culture' +
       (hasZ ? '.' : ' (Plus).') + '</p>' +
+      '<div class="cube-scroll" data-cube-scroll>' +
+      '<div class="cube-sticky">' +
       '<div class="cube-legend" aria-hidden="true">' +
       '<span><i class="cube-key cube-key-x"></i> Money</span>' +
       '<span><i class="cube-key cube-key-y"></i> Rules / freedom</span>' +
       '<span><i class="cube-key cube-key-z"></i> Culture</span>' +
       '</div>' +
       '<div class="cube-stage">' +
-      '<div class="cube-scene" data-cube-scene style="--cube-yaw:-38deg;--cube-pitch:-22deg">' +
+      '<div class="cube-scene" data-cube-scene style="--cube-yaw:0deg;--cube-pitch:-6deg">' +
       '<div class="cube" aria-hidden="true">' +
       cubeFace('cube-front') + cubeFace('cube-back') + cubeFace('cube-right') +
       cubeFace('cube-left') + cubeFace('cube-top') + cubeFace('cube-bottom') +
       '<div class="cube-axis cube-axis-x"></div>' +
       '<div class="cube-axis cube-axis-y"></div>' +
       '<div class="cube-axis cube-axis-z"></div>' +
-      '<span class="cube-cap cube-cap-r">Right</span>' +
-      '<span class="cube-cap cube-cap-l">Left</span>' +
+      '<span class="cube-cap cube-cap-r">Markets</span>' +
+      '<span class="cube-cap cube-cap-l">State</span>' +
       '<span class="cube-cap cube-cap-u">Rules</span>' +
       '<span class="cube-cap cube-cap-d">Freedom</span>' +
       '<span class="cube-cap cube-cap-f">Culture+</span>' +
       '<span class="cube-cap cube-cap-b">Culture−</span>' +
-      '<div class="cube-dot" style="transform:translate3d(' + tx + 'px,' + ty + 'px,' + tz + 'px)"></div>' +
-      '</div></div></div>' +
-      '<div class="cube-controls">' +
-      '<button type="button" class="c3d-rot" data-rot="-22">Turn</button>' +
-      '<button type="button" class="c3d-flat" data-flat>Look straight on</button>' +
-      '<button type="button" class="c3d-rot" data-rot="22">Turn</button>' +
+      '<div class="cube-sphere" style="--sx:' + tx + 'px;--sy:' + ty + 'px;--sz:' + tz + 'px">' +
+      '<span class="cube-sphere-core"></span>' +
+      '<span class="cube-sphere-ring" style="transform:rotateX(0deg)"></span>' +
+      '<span class="cube-sphere-ring" style="transform:rotateX(60deg)"></span>' +
+      '<span class="cube-sphere-ring" style="transform:rotateX(120deg)"></span>' +
+      '<span class="cube-sphere-ring" style="transform:rotateY(90deg)"></span>' +
+      '</div></div></div></div>' +
+      '<div class="cube-path" role="list">' +
+      '<span data-cube-tick="0">Money</span>' +
+      '<span data-cube-tick="1">Rules</span>' +
+      '<span data-cube-tick="2">Culture</span>' +
+      '<span data-cube-tick="3">All three</span>' +
+      '</div>' +
+      '<p class="cube-caption" data-cube-caption>Front face — money left to right, rules up and down.</p>' +
+      '</div>' +
+      '<div class="cube-rail" aria-hidden="true"></div>' +
       '</div>' +
       (hasZ ? culturalSlider(polZ) : '') +
       '</div>'
@@ -348,28 +360,49 @@
     var block = root.querySelector('[data-compass-block]');
     if (block) {
       var scene = block.querySelector('[data-cube-scene]');
-      var yaw = -38;
-      var pitch = -22;
-      function applyCube() {
-        if (!scene) return;
-        scene.classList.add('is-paused');
+      var scroller = block.querySelector('[data-cube-scroll]');
+      var caption = block.querySelector('[data-cube-caption]');
+      var ticks = block.querySelectorAll('[data-cube-tick]');
+      var lines = [
+        'Front face — money left to right, rules up and down.',
+        'Tilt — see how high or low you sit on rules vs freedom.',
+        'Turn — culture is the front-to-back depth of the cube.',
+        'Full view — all three axes at once. Gold sphere is you.'
+      ];
+      function applyFromScroll() {
+        if (!scene || !scroller) return;
+        if (!block.isConnected) {
+          if (block._onCubeScroll) {
+            window.removeEventListener('scroll', block._onCubeScroll);
+            window.removeEventListener('resize', block._onCubeScroll);
+          }
+          return;
+        }
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          scene.style.setProperty('--cube-yaw', '38deg');
+          scene.style.setProperty('--cube-pitch', '-18deg');
+          return;
+        }
+        var rect = scroller.getBoundingClientRect();
+        var sticky = 300;
+        var range = Math.max(1, scroller.offsetHeight - sticky);
+        var t = Math.max(0, Math.min(1, (80 - rect.top) / range));
+        var yaw = t * 215;
+        var pitch = -6 + Math.sin(t * Math.PI) * -26;
         scene.style.setProperty('--cube-yaw', yaw + 'deg');
         scene.style.setProperty('--cube-pitch', pitch + 'deg');
-      }
-      block.querySelectorAll('[data-rot]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          yaw += Number(btn.getAttribute('data-rot')) || 0;
-          applyCube();
-        });
-      });
-      var flat = block.querySelector('[data-flat]');
-      if (flat) {
-        flat.addEventListener('click', function () {
-          yaw = 0;
-          pitch = 0;
-          applyCube();
+        var step = t < 0.22 ? 0 : t < 0.48 ? 1 : t < 0.74 ? 2 : 3;
+        if (caption) caption.textContent = lines[step];
+        ticks.forEach(function (el, i) {
+          el.classList.toggle('is-on', i === step);
         });
       }
+      if (!block._onCubeScroll) {
+        block._onCubeScroll = applyFromScroll;
+        window.addEventListener('scroll', applyFromScroll, { passive: true });
+        window.addEventListener('resize', applyFromScroll);
+      }
+      applyFromScroll();
     }
   }
 

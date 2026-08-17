@@ -16,7 +16,7 @@
 
 .oh-big {
   display: block;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 36px;
   color: var(--white);
   letter-spacing: 0.06em;
@@ -149,7 +149,7 @@
 }
 
 .fn-wheel-dom {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 22px;
   color: var(--gold);
   line-height: 1;
@@ -186,7 +186,7 @@
 }
 
 .stack-fn {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 24px;
   letter-spacing: 0.05em;
 }
@@ -210,7 +210,7 @@
 }
 
 .b5-letter {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 28px;
   color: var(--gold);
 }
@@ -263,7 +263,7 @@
 }
 
 .type-badge-lg strong {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 32px;
   letter-spacing: 0.05em;
 }
@@ -320,14 +320,14 @@
 }
 
 .enn-hero-big {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 72px;
   color: var(--gold);
   line-height: 1;
 }
 
 .enn-hero-wing {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 32px;
   color: var(--muted2);
   margin-left: 4px;
@@ -378,7 +378,7 @@
 }
 
 .enn-ring-num {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 22px;
   color: var(--text);
 }
@@ -543,7 +543,7 @@
 }
 
 .pol-align-icon-party {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-display, 'Playfair Display', serif);
   font-style: normal;
   font-size: 20px;
 }
